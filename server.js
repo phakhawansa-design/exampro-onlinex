@@ -729,7 +729,7 @@ app.post('/api/report-cheat', (req, res) => {
     const { roomId, studentId, name, class: studentClass, action } = req.body;
     if (!roomId || !studentId || !name) return res.status(400).json({ message: "ข้อมูลไม่ครบถ้วน" });
 
-    const time = new Date().toLocaleTimeString('th-TH');
+    const time = new Date().toLocaleTimeString('th-TH', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit', second: '2-digit' });
     db.run('INSERT INTO cheat_logs (roomId, studentId, name, class, action, time) VALUES (?, ?, ?, ?, ?, ?)', 
         [roomId, studentId, name, studentClass || '', action || "🚨 ตรวจพบการสลับหน้าจอ", time], (err) => {
             if (err) return res.status(500).json({ message: err.message });
@@ -799,10 +799,10 @@ app.post('/api/submit-exam', (req, res) => {
             if (studentAns === correctAns && correctAns !== "") score++;
         });
 
-        // เก็บบันทึกข้อมูลวันที่แบบเต็มรูปแบบภาษาไทย (วัน วันที่ เดือน พ.ศ.)
-        const thaiDateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        // เก็บบันทึกข้อมูลวันที่แบบเต็มรูปแบบภาษาไทย (วัน วันที่ เดือน พ.ศ.) เวลาประเทศไทย (GMT+7)
+        const thaiDateOptions = { timeZone: 'Asia/Bangkok', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         const date = new Date().toLocaleDateString('th-TH', thaiDateOptions);
-        const time = new Date().toLocaleTimeString('th-TH');
+        const time = new Date().toLocaleTimeString('th-TH', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
         const answersJson = JSON.stringify(answers);
 
@@ -1244,8 +1244,8 @@ app.post('/api/log-student-login', (req, res) => {
     const { studentId, name, class: studentClass, roomId } = req.body;
     if (!studentId || !name || !roomId) return res.status(400).json({ message: "ข้อมูลไม่ครบถ้วน" });
 
-    const loginTime = new Date().toLocaleTimeString('th-TH');
-    const loginDate = new Date().toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const loginTime = new Date().toLocaleTimeString('th-TH', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const loginDate = new Date().toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
     db.run('INSERT INTO student_logins (studentId, name, class, roomId, loginTime, loginDate) VALUES (?, ?, ?, ?, ?, ?)',
         [studentId, name, studentClass || '', roomId, loginTime, loginDate], (err) => {
@@ -1284,7 +1284,7 @@ app.get('/api/teacher/active-students-list', (req, res) => {
 
 // 👨‍🎓 API สำหรับดึงจำนวนนักศึกษาที่กำลังเข้าสอบแบบเรียลไทม์ (Active Students)
 app.get('/api/teacher/active-students', (req, res) => {
-    const { username, roomId } = req.query;
+    const { username } = req.query;
     if (!username || username === 'undefined') return res.status(400).json({ message: "กรุณาระบุ username" });
 
     // ดึงห้องทั้งหมดของอาจารย์ท่านนี้
@@ -1296,50 +1296,58 @@ app.get('/api/teacher/active-students', (req, res) => {
         }
 
         const placeholders = roomIds.map(() => '?').join(',');
-        const sql = `
-            SELECT sl.roomId, sl.studentId,
-            (SELECT COUNT(*) FROM exam_results er WHERE er.roomId = sl.roomId AND er.studentId = sl.studentId) as isSubmitted
-            FROM student_logins sl
-            WHERE sl.roomId IN (${placeholders})
-        `;
 
-        db.all(sql, roomIds, (err2, rows) => {
+        // 1. ดึงผู้เข้าทำข้อสอบจาก student_logins
+        db.all(`SELECT roomId, studentId FROM student_logins WHERE roomId IN (${placeholders})`, roomIds, (err2, loginRows) => {
             if (err2) return res.status(500).json({ message: err2.message });
 
-            const roomMap = {};
-            const roomSubmittedSet = {};
-            const roomLoggedInSet = {};
+            // 2. ดึงผู้ส่งข้อสอบเรียบร้อยแล้วจาก exam_results
+            db.all(`SELECT roomId, studentId FROM exam_results WHERE roomId IN (${placeholders})`, roomIds, (err3, resultRows) => {
+                if (err3) return res.status(500).json({ message: err3.message });
 
-            (rows || []).forEach(row => {
-                if (!roomLoggedInSet[row.roomId]) roomLoggedInSet[row.roomId] = new Set();
-                if (!roomSubmittedSet[row.roomId]) roomSubmittedSet[row.roomId] = new Set();
+                const roomLoggedInSet = {};
+                const roomSubmittedSet = {};
 
-                roomLoggedInSet[row.roomId].add(row.studentId);
-                if (row.isSubmitted > 0) {
-                    roomSubmittedSet[row.roomId].add(row.studentId);
-                }
-            });
+                (loginRows || []).forEach(row => {
+                    const rId = (row.roomId || '').trim();
+                    const sId = (row.studentId || '').trim();
+                    if (rId && sId) {
+                        if (!roomLoggedInSet[rId]) roomLoggedInSet[rId] = new Set();
+                        roomLoggedInSet[rId].add(sId);
+                    }
+                });
 
-            let grandTotalActive = 0;
-            let grandTotalLoggedIn = 0;
-            let grandTotalSubmitted = 0;
+                (resultRows || []).forEach(row => {
+                    const rId = (row.roomId || '').trim();
+                    const sId = (row.studentId || '').trim();
+                    if (rId && sId) {
+                        if (!roomSubmittedSet[rId]) roomSubmittedSet[rId] = new Set();
+                        roomSubmittedSet[rId].add(sId);
+                    }
+                });
 
-            roomIds.forEach(rId => {
-                const loggedIn = roomLoggedInSet[rId] ? roomLoggedInSet[rId].size : 0;
-                const submitted = roomSubmittedSet[rId] ? roomSubmittedSet[rId].size : 0;
-                const active = Math.max(0, loggedIn - submitted);
+                const roomMap = {};
+                let grandTotalActive = 0;
+                let grandTotalLoggedIn = 0;
+                let grandTotalSubmitted = 0;
 
-                roomMap[rId] = { loggedIn, submitted, active };
-                grandTotalActive += active;
-                grandTotalLoggedIn += loggedIn;
-                grandTotalSubmitted += submitted;
-            });
+                roomIds.forEach(rId => {
+                    const loggedIn = roomLoggedInSet[rId] ? roomLoggedInSet[rId].size : 0;
+                    const submitted = roomSubmittedSet[rId] ? roomSubmittedSet[rId].size : 0;
+                    const active = Math.max(0, loggedIn - submitted);
 
-            res.json({
-                grandTotalActive,
-                grandTotalLoggedIn,
-                grandTotalSubmitted,
-                rooms: roomMap
+                    roomMap[rId] = { loggedIn, submitted, active };
+                    grandTotalActive += active;
+                    grandTotalLoggedIn += loggedIn;
+                    grandTotalSubmitted += submitted;
+                });
+
+                res.json({
+                    grandTotalActive,
+                    grandTotalLoggedIn,
+                    grandTotalSubmitted,
+                    rooms: roomMap
+                });
             });
         });
     });
@@ -1499,7 +1507,7 @@ app.post('/api/send-warning', (req, res) => {
     const { roomId, studentId, message } = req.body;
     if (!roomId || !studentId || !message) return res.status(400).json({ message: "ข้อมูลไม่ครบถ้วน" });
     
-    const time = new Date().toLocaleTimeString('th-TH');
+    const time = new Date().toLocaleTimeString('th-TH', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit', second: '2-digit' });
     
     db.run('INSERT INTO student_warnings (roomId, studentId, message, status, time) VALUES (?, ?, ?, ?, ?)',
         [roomId, studentId, message, 'unread', time], function(err) {
@@ -1585,6 +1593,7 @@ function syncRoomToLibrary(roomId) {
         db.get('SELECT id FROM exam_templates WHERE teacherUsername = ? AND templateName = ?', [teacherUsername, templateName], (err, tpl) => {
             if (err) return;
             const nowStr = new Date().toLocaleDateString('th-TH', { 
+                timeZone: 'Asia/Bangkok',
                 weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
                 hour: '2-digit', minute: '2-digit'
             });
@@ -1678,6 +1687,7 @@ app.post('/api/library/update-template-questions', (req, res) => {
 
     db.serialize(() => {
         const nowStr = new Date().toLocaleDateString('th-TH', { 
+            timeZone: 'Asia/Bangkok',
             weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
             hour: '2-digit', minute: '2-digit'
         });

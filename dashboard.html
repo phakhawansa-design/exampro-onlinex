@@ -392,32 +392,7 @@
             </div>
         </div>
 
-        <!-- ===== MY STORAGE WIDGET ===== -->
-        <div class="glass-card p-6 space-y-4" id="my-storage-widget">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-violet-500 flex items-center justify-center text-base">🗄️</div>
-                    <div>
-                        <div class="text-sm md:text-base font-extrabold text-slate-800">พื้นที่จัดเก็บข้อมูลของฉัน</div>
-                        <div class="text-xs text-slate-500 font-medium">ข้อมูลการใช้งานในระบบของคุณ</div>
-                    </div>
-                </div>
-                <div class="text-right" id="my-storage-total">
-                    <div class="text-xl font-black text-cyan-600" id="my-storage-size">—</div>
-                    <div class="text-xs text-slate-500 font-bold">ทั้งหมด</div>
-                </div>
-            </div>
-
-            <!-- Chips -->
-            <div class="flex flex-wrap gap-2" id="my-storage-chips">
-                <span class="my-stat-chip">⏳ กำลังโหลด...</span>
-            </div>
-
-            <!-- Storage bars -->
-            <div class="space-y-2.5" id="my-storage-bars">
-                <!-- rendered by JS -->
-            </div>
-        </div>
+        <!-- ===== MY STORAGE WIDGET REMOVED ===== -->
 
     </main>
 
@@ -489,53 +464,7 @@
     document.getElementById('welcome-text').textContent = `ยินดีต้อนรับกลับมา, อาจารย์ ${teacherName} 👋`;
     document.getElementById('sidebar-teacher-name').textContent = `อาจารย์: ${teacherName}`;
 
-    // Load my storage
-    function fmtBytes(b) {
-        if (!b || b === 0) return '0 B';
-        if (b < 1024) return b + ' B';
-        if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
-        return (b / 1048576).toFixed(2) + ' MB';
-    }
-    async function loadMyStorage() {
-        if (!teacherUsername) return;
-        try {
-            const res = await fetch('/api/teacher/my-storage?username=' + encodeURIComponent(teacherUsername));
-            const d = await res.json();
-            document.getElementById('my-storage-size').textContent = fmtBytes(d.totalBytes || 0);
-            document.getElementById('my-storage-chips').innerHTML = [
-                { icon: '🏫', label: (d.roomCount || 0) + ' ห้องสอบ' },
-                { icon: '📝', label: (d.questionCount || 0).toLocaleString() + ' ข้อสอบ' },
-                { icon: '📊', label: (d.resultCount || 0).toLocaleString() + ' ผลสอบ' },
-                { icon: '📚', label: (d.templateCount || 0) + ' เทมเพลต' },
-            ].map(c => `<span class="my-stat-chip">${c.icon} ${c.label}</span>`).join('');
 
-            const bars = [
-                { label: 'ข้อสอบในห้องสอบ', bytes: d.questionBytes || 0, color: 'from-cyan-400 to-cyan-500' },
-                { label: 'ผลการสอบ', bytes: d.resultBytes || 0, color: 'from-violet-400 to-violet-500' },
-                { label: 'คลังเทมเพลต', bytes: d.templateBytes || 0, color: 'from-pink-400 to-rose-400' },
-            ];
-            const maxB = Math.max(...bars.map(b => b.bytes), 1);
-            document.getElementById('my-storage-bars').innerHTML = bars.map(b => {
-                const pct = Math.max(2, Math.round((b.bytes / maxB) * 100));
-                return `
-                    <div>
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-                            <span style="font-size:11px;color:#64748b;font-weight:600">${b.label}</span>
-                            <span style="font-size:11px;font-weight:700;color:#334155">${fmtBytes(b.bytes)}</span>
-                        </div>
-                        <div class="my-storage-bar-bg">
-                            <div class="my-storage-bar-fill bg-gradient-to-r ${b.color}" style="width:0%" data-w="${pct}%"></div>
-                        </div>
-                    </div>`;
-            }).join('');
-            setTimeout(() => {
-                document.querySelectorAll('.my-storage-bar-fill').forEach(el => { el.style.width = el.dataset.w; });
-            }, 80);
-        } catch(e) {
-            document.getElementById('my-storage-chips').innerHTML = '<span class="my-stat-chip">⚠️ โหลดไม่ได้</span>';
-        }
-    }
-    document.addEventListener('DOMContentLoaded', loadMyStorage);
 
     // Date display
     const now = new Date();

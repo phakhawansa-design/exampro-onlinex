@@ -430,10 +430,10 @@
                     });
                 } catch(err) { console.error(err); }
 
+                // บันทึกพฤติกรรมสลับหน้าจอลงระบบแบบเงียบๆ โดยไม่แสดงป้ายเตือนให้นักเรียนเห็น
                 const badge = document.getElementById('switch-warning-badge');
                 if (badge) {
-                    badge.classList.remove('hidden');
-                    badge.innerHTML = `⚠️ สลับหน้าจอแล้ว ${tabSwitchCount} ครั้ง (บันทึกเข้าระบบแล้ว)`;
+                    badge.classList.add('hidden');
                 }
             };
 

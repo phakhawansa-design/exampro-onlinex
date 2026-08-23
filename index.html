@@ -336,21 +336,21 @@
 
     // --- SECTION 2: MARQUEE SECTION ---
     const row1Images = [
-      '/images/student_exam_ui.jpg',
-      '/images/student_studying.jpg',
-      '/images/student_cartoon.jpg',
-      '/images/teacher_cartoon.jpg',
-      '/images/teacher_class.jpg',
-      '/images/teacher_analytics.jpg',
+      './images/student_exam_ui.jpg',
+      './images/student_studying.jpg',
+      './images/student_cartoon.jpg',
+      './images/teacher_cartoon.jpg',
+      './images/teacher_class.jpg',
+      './images/teacher_analytics.jpg',
     ];
 
     const row2Images = [
-      '/images/admin_cartoon.jpg',
-      '/images/admin_security.jpg',
-      '/images/admin_database.jpg',
-      '/images/exam_security_ui.jpg',
-      '/images/classroom_stats_ui.jpg',
-      '/images/ai_question_generation_ui.jpg',
+      './images/admin_cartoon.jpg',
+      './images/admin_security.jpg',
+      './images/admin_database.jpg',
+      './images/exam_security_ui.jpg',
+      './images/classroom_stats_ui.jpg',
+      './images/ai_question_generation_ui.jpg',
     ];
 
     const MarqueeSection = () => {
@@ -397,6 +397,7 @@
                   src={url}
                   alt={`Marquee item ${idx}`}
                   loading="lazy"
+                  onError={(e) => { e.target.onerror = null; e.target.src = 'logo.png'; }}
                   className="w-[300px] h-[190px] sm:w-[360px] sm:h-[230px] md:w-[420px] md:h-[270px] rounded-2xl object-cover"
                 />
               ))}
@@ -418,6 +419,7 @@
                   src={url}
                   alt={`Marquee item ${idx}`}
                   loading="lazy"
+                  onError={(e) => { e.target.onerror = null; e.target.src = 'logo.png'; }}
                   className="w-[300px] h-[190px] sm:w-[360px] sm:h-[230px] md:w-[420px] md:h-[270px] rounded-2xl object-cover"
                 />
               ))}
@@ -610,27 +612,27 @@
         category: 'Exam Environment',
         name: 'Student Exam Portal',
         link: 'Student-login.html',
-        col1Img1: '/images/student_exam_ui.jpg',
-        col1Img2: '/images/student_studying.jpg',
-        col2Img: '/images/student_cartoon.jpg',
+        col1Img1: './images/student_exam_ui.jpg',
+        col1Img2: './images/student_studying.jpg',
+        col2Img: './images/student_cartoon.jpg',
       },
       {
         num: '02',
         category: 'Management & Monitoring',
         name: 'Teacher Dashboard',
         link: 'teacher-login.html',
-        col1Img1: '/images/teacher_analytics.jpg',
-        col1Img2: '/images/teacher_class.jpg',
-        col2Img: '/images/teacher_cartoon.jpg',
+        col1Img1: './images/teacher_analytics.jpg',
+        col1Img2: './images/teacher_class.jpg',
+        col2Img: './images/teacher_cartoon.jpg',
       },
       {
         num: '03',
         category: 'Global System Controls',
         name: 'Super Admin Panel',
         link: 'admin-login.html',
-        col1Img1: '/images/admin_database.jpg',
-        col1Img2: '/images/admin_security.jpg',
-        col2Img: '/images/admin_cartoon.jpg',
+        col1Img1: './images/admin_database.jpg',
+        col1Img2: './images/admin_security.jpg',
+        col2Img: './images/admin_cartoon.jpg',
       },
     ];
 
@@ -690,12 +692,14 @@
                 <img
                   src={project.col1Img1}
                   alt={`${project.name} image 1`}
+                  onError={(e) => { e.target.onerror = null; e.target.src = 'logo.png'; }}
                   className="w-full object-cover rounded-[20px] sm:rounded-[35px] md:rounded-[45px] lg:rounded-[60px] select-none pointer-events-none flex-1 min-h-0"
                   style={{ height: 'clamp(130px, 16vw, 230px)' }}
                 />
                 <img
                   src={project.col1Img2}
                   alt={`${project.name} image 2`}
+                  onError={(e) => { e.target.onerror = null; e.target.src = 'logo.png'; }}
                   className="w-full object-cover rounded-[20px] sm:rounded-[35px] md:rounded-[45px] lg:rounded-[60px] select-none pointer-events-none flex-1 min-h-0"
                   style={{ height: 'clamp(160px, 22vw, 340px)' }}
                 />
@@ -705,6 +709,7 @@
                 <img
                   src={project.col2Img}
                   alt={`${project.name} image 3`}
+                  onError={(e) => { e.target.onerror = null; e.target.src = 'logo.png'; }}
                   className="w-full h-full object-cover rounded-[20px] sm:rounded-[35px] md:rounded-[45px] lg:rounded-[60px] select-none pointer-events-none"
                 />
               </div>

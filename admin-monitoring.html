@@ -255,13 +255,16 @@
             const tabsEl = document.getElementById('room-tabs');
             tabsEl.innerHTML = '<div class="text-xs text-slate-400 py-2 px-3 animate-pulse">กำลังตรวจสอบห้องสอบ...</div>';
 
-            // ดึง cheat log ทุกห้องพร้อมกันเพื่อแสดงจำนวนตัวเลขการแจ้งเตือน
+            // ดึง cheat log ทุกห้องพร้อมกันเพื่อแสดงจำนวนตัวเลขการแจ้งเตือน (นับจำนวนนักศึกษาที่ไม่ซ้ำกัน)
             const roomCounts = {};
             await Promise.all(rooms.map(async r => {
                 try {
                     const res = await fetch(`/api/cheat-logs?roomId=${r.roomId}&username=${username}`);
                     const data = await res.json();
-                    if (data.length > 0) roomCounts[r.roomId] = data.length;
+                    if (data.length > 0) {
+                        const uniqueStudents = new Set(data.map(log => log.studentId || log.name));
+                        roomCounts[r.roomId] = uniqueStudents.size;
+                    }
                 } catch(e) {}
             }));
 
@@ -289,7 +292,7 @@
                     ${r.roomId !== 'ALL' ? '🏫' : ''} ${escapeHtml(displayName)}
                     ${isLive ? '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="กำลังเปิดสอบ (LIVE)"></span>' : ''}
                     <span id="active-student-badge-${r.roomId}" class="hidden bg-emerald-100 border border-emerald-300 text-emerald-900 text-[10px] font-black px-2 py-0.5 rounded-lg shadow-2xs">👨‍🎓 0 คน</span>
-                    ${count > 0 ? `<span class="min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[10px] font-black flex items-center justify-center px-1.5 shadow-sm" title="พบพฤติกรรมน่าสงสัย ${count} ครั้ง">${count}</span>` : ''}
+                    ${count > 0 ? `<span class="min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[10px] font-black flex items-center justify-center px-1.5 shadow-sm" title="พบพฤติกรรมน่าสงสัย ${count} คน">${count}</span>` : ''}
                 </button>`;
             }).join('');
 
@@ -384,8 +387,9 @@
                     const data = await res.json();
                     const badge = document.getElementById(`badge-${r.roomId}`);
                     if (badge) {
-                        if (data.length > 0) {
-                            badge.textContent = data.length;
+                        const uniqueStudents = new Set(data.map(log => log.studentId || log.name)).size;
+                        if (uniqueStudents > 0) {
+                            badge.textContent = uniqueStudents;
                             badge.classList.remove('hidden');
                             badge.classList.add('flex');
                         } else {
@@ -559,7 +563,11 @@
                     method: 'DELETE', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ roomId: currentRoomId })
                 });
-                if (res.ok) { alert('🧹 ล้างบันทึกเรียบร้อยแล้ว'); loadCheatLogs(); }
+                if (res.ok) { 
+                    alert('🧹 ล้างบันทึกเรียบร้อยแล้ว'); 
+                    await renderRoomTabsWithFilter();
+                    loadCheatLogs(); 
+                }
             } catch(err) { alert('เกิดข้อผิดพลาด'); }
         }
 
