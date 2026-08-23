@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แผงควบคุมหลัก - Tab-Lock Online Proctoring System</title>
+    <meta name="description" content="แผงควบคุมหลักระบบสอบออนไลน์ Tab-Lock สำหรับอาจารย์ผู้ดูแลห้องสอบ">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Kanit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        html { font-size: 100%; }
+        @media (min-width: 640px) { html { font-size: 110%; } }
+        @media (min-width: 1024px) { html { font-size: 120%; } }
+
+        @media (max-width: 768px) {
+            #sidebar {
+                position: fixed;
+                top: 0; bottom: 0; left: -280px;
+                z-index: 9999;
+                width: 260px !important;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+                transition: left 0.3s ease-in-out;
+            }
+            #sidebar.mobile-open { left: 0 !important; }
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Kanit', 'Inter', sans-serif;
+            background: #f8fafc;
+            color: #334155;
+        }
+
+        /* ===== SIDEBAR ===== */
+        #sidebar {
+            background: #ffffff;
+            width: 256px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            border-right: 1px solid rgba(226,232,240,0.8);
+            flex-shrink: 0;
+            transition: width 0.2s ease-in-out;
+        }
+        #sidebar::before {
+            content: '';
+            position: absolute;
+            top: -60px; left: -60px;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(99,102,241,0.04) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: blobPulse 6s ease-in-out infinite;
+            pointer-events: none; z-index: 0;
+        }
+        @keyframes blobPulse {
+            0%, 100% { transform: scale(1) translate(0, 0); opacity: 0.6; }
+            33% { transform: scale(1.15) translate(10px, -10px); opacity: 1; }
+            66% { transform: scale(0.9) translate(-5px, 8px); opacity: 0.7; }
+        }
+        .sidebar-inner { position: relative; z-index: 1; }
+        .logo-gradient {
+            background: linear-gradient(135deg, #0891b2, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .logo-shield {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .nav-link {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px; border-radius: 12px;
+            font-size: 13px; font-weight: 700;
+            color: #64748b; text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover { color: #1e293b; background: rgba(15,23,42,0.04); }
+        .nav-link.active {
+            background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+            color: #ffffff; font-weight: 700;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2);
+        }
+        .nav-link svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+        /* Collapsible Sidebar */
+        #sidebar.collapsed { width: 72px !important; }
+        #sidebar.collapsed .logo-text,
+        #sidebar.collapsed nav a span,
+        #sidebar.collapsed .flex-1.min-w-0 { display: none !important; }
+        #sidebar.collapsed .nav-link { justify-content: center; padding: 10px; }
+        #sidebar.collapsed .logo-shield { margin: 0 auto; }
+        #sidebar-toggle {
+            position: absolute;
+            right: 12px; top: 24px;
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            z-index: 100;
+        }
+        #sidebar-toggle:hover { color: #1e293b; background: #f8fafc; }
+        #sidebar.collapsed #sidebar-toggle {
+            right: 0; left: 0; margin: 0 auto; top: 60px;
+        }
+
+        /* ===== MAIN ===== */
+        #main-area {
+            flex: 1; background: #f8fafc;
+            background-image:
+                linear-gradient(to right, rgba(99,102,241,0.01) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(99,102,241,0.01) 1px, transparent 1px);
+            background-size: 32px 32px;
+            display: flex; flex-direction: column; overflow-x: hidden;
+        }
+        #top-header {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(226,232,240,0.8);
+            padding: 16px 28px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .glass-card {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(226,232,240,0.8);
+            border-radius: 20px;
+        }
+        .hero-banner {
+            background: linear-gradient(135deg, #e0f2fe 0%, #f5f3ff 50%, #eff6ff 100%);
+            border: 1px solid rgba(226,232,240,0.8);
+        }
+        .orb {
+            position: absolute; border-radius: 50%;
+            filter: blur(40px); opacity: 0.35;
+            animation: orbFloat 6s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes orbFloat {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-15px) scale(1.05); }
+        }
+        .action-card { transition: all 0.3s ease; cursor: pointer; text-decoration: none; }
+        .action-card:hover { transform: translateY(-4px); border-color: rgba(6, 182, 212, 0.25) !important; }
+        .stat-tile { transition: all 0.2s ease; }
+        .stat-tile:hover { transform: translateY(-2px); }
+        @keyframes onlinePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+        }
+        .online-dot { animation: onlinePulse 2s ease-in-out infinite; }
+        @keyframes sidebarDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .sidebar-online-dot { animation: sidebarDot 2s ease-in-out infinite; }
+
+        /* Modal */
+        #gemini-modal {
+            display: none;
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(15,23,42,0.5);
+            backdrop-filter: blur(8px);
+            align-items: center; justify-content: center;
+        }
+        #gemini-modal.open { display: flex; }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(6,182,212,0.25); border-radius: 4px; }
+
+        /* Storage widget */
+        .my-storage-bar-bg { height: 8px; border-radius: 9999px; background: #e2e8f0; overflow: hidden; }
+        .my-storage-bar-fill { height: 100%; border-radius: 9999px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+        .my-stat-chip { display:inline-flex; align-items:center; gap:4px; background:rgba(15,23,42,0.04); border:1px solid rgba(226,232,240,0.8); border-radius:20px; padding:3px 10px; font-size:11px; font-weight:600; color:#475569; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+<!-- ===== SIDEBAR ===== -->
+<aside id="sidebar">
+    <button id="sidebar-toggle" title="ย่อ/ขยายเมนู">◀</button>
+
+    <div class="sidebar-inner p-5 space-y-6 flex-1">
+        <!-- Logo -->
+        <div class="flex items-center gap-3 pb-2">
+            <div class="logo-shield bg-white p-1 border border-slate-100">
+                <img src="logo.png" alt="Tab-Lock Logo" class="w-full h-full object-cover rounded-lg" />
+            </div>
+            <div class="logo-text leading-tight">
+                <div class="font-extrabold text-base tracking-tight text-slate-800">Tab-<span class="logo-gradient">Lock</span></div>
+                <div class="text-[8px] sm:text-[9px] text-slate-500 uppercase tracking-widest font-bold">Online Proctoring System</div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="space-y-1">
+            <a href="dashboard.html" class="nav-link active">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+                <span>แดชบอร์ดหลัก</span>
+            </a>
+            <a href="admin-active-exams.html" class="nav-link">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" /></svg>
+                <span>กำลังดำเนินการสอบ</span>
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-auto"></span>
+            </a>
+            <a href="admin-portal.html" class="nav-link">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+                <span>จัดการข้อสอบ</span>
+            </a>
+            <a href="admin-library.html" class="nav-link">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+                <span>คลังข้อสอบสะสม</span>
+            </a>
+            <a href="admin-results.html" class="nav-link">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /></svg>
+                <span>ตรวจสอบผลการสอบ</span>
+            </a>
+            <a href="admin-monitoring.html" class="nav-link">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" /></svg>
+                <span>ตรวจสอบพฤติกรรมน่าสงสัย</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Bottom profile -->
+    <div class="sidebar-inner p-5 border-t border-slate-100 space-y-3">
+        <div class="flex items-center gap-2.5">
+            <div class="relative">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-xs font-bold text-white">อ</div>
+                <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white sidebar-online-dot online-dot"></span>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="text-xs font-semibold text-slate-800 truncate" id="sidebar-teacher-name">อาจารย์ผู้ดูแล</div>
+                <div class="text-[10px] text-slate-500 font-medium">ออนไลน์ • ผู้ดูแลระบบ</div>
+            </div>
+        </div>
+        <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();"
+           class="flex items-center justify-center gap-2 w-full py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition-all duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
+            ออกจากระบบ
+        </a>
+    </div>
+</aside>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div id="main-area">
+    <!-- Header -->
+    <header id="top-header">
+        <div class="flex items-center gap-3">
+            <button id="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')" class="md:hidden p-2 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <div>
+                <h1 class="text-xl md:text-2xl font-black text-slate-800" id="welcome-text">ยินดีต้อนรับกลับมา 👋</h1>
+                <p class="text-sm font-medium text-slate-500 mt-1">Tab-Lock Online Proctoring System &middot; Teacher Dashboard</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3.5 py-2 rounded-full">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 online-dot"></span>
+                <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">System Online</span>
+            </div>
+            <div class="hidden sm:flex items-center gap-2 bg-slate-100 border border-slate-200 px-3.5 py-2 rounded-full">
+                <span class="text-xs text-slate-600 font-medium" id="date-display"></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main workspace -->
+    <main class="flex-1 p-6 md:p-8 space-y-8 overflow-y-auto max-w-[1400px] w-full mx-auto">
+
+        <!-- ===== HERO BANNER ===== -->
+        <div class="hero-banner rounded-2xl p-8 relative overflow-hidden">
+            <div class="orb w-64 h-64 bg-indigo-600/30" style="top:-50px;right:-30px;animation-delay:0s;"></div>
+            <div class="orb w-40 h-40 bg-violet-600/20" style="bottom:-20px;left:100px;animation-delay:3s;"></div>
+            <div class="orb w-24 h-24 bg-purple-400/20" style="top:20px;left:40%;animation-delay:1.5s;"></div>
+            <div class="relative z-10">
+                <div class="flex flex-wrap items-start gap-4">
+                    <div class="flex-1 min-w-0 space-y-3">
+                        <div class="inline-flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-full">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                            <span class="text-xs font-extrabold text-amber-700 uppercase tracking-wider">Enterprise AI Platform</span>
+                        </div>
+                        <h1 class="text-2xl md:text-3xl font-black text-slate-800 leading-tight">
+                            ระบบประมวลผลสอบอัจฉริยะยุคใหม่<br>
+                            <span class="text-indigo-600">และวิเคราะห์ผลลัพธ์ห้องเรียน</span>
+                        </h1>
+                        <p class="text-slate-600 text-sm md:text-base max-w-lg font-medium">ศูนย์รวมข้อสอบออนไลน์ ตรวจจับพฤติกรรมทุจริต วิเคราะห์คุณภาพข้อสอบ และสรุปผลการเรียนรู้แบบอัตโนมัติ</p>
+                    </div>
+                    <div class="shrink-0 self-end">
+                        <a href="admin-portal.html" class="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-black px-8 py-3.5 rounded-2xl text-sm transition-all duration-200 shadow-lg shadow-pink-500/25 active:scale-[0.98]">
+                            ➕ สร้างและจัดการข้อสอบใหม่
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== QUICK STATS ===== -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <!-- Gemini AI Card -->
+            <div onclick="openGeminiModal()" class="glass-card p-5 flex items-center gap-4 cursor-pointer border border-slate-200/80 bg-white/90 hover:bg-white hover:border-purple-300 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 rounded-2xl group active:scale-[0.99]">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-xl shrink-0 shadow-md shadow-purple-500/20 group-hover:scale-110 transition-transform duration-300">✨</div>
+                <div class="min-w-0">
+                    <div class="text-base md:text-lg font-extrabold text-slate-800 leading-snug group-hover:text-purple-700 transition-colors">Gemini AI Generator</div>
+                    <div class="text-xs md:text-sm text-slate-500 font-medium mt-0.5 truncate">สร้างและแปลงข้อสอบด้วย AI Gem 🚀</div>
+                </div>
+            </div>
+
+            <!-- Real-time Card -->
+            <a href="admin-results.html" class="glass-card p-5 flex items-center gap-4 cursor-pointer border border-slate-200/80 bg-white/90 hover:bg-white hover:border-emerald-300 hover:shadow-lg hover:shadow-emerald-500/10 transition-all duration-300 rounded-2xl group active:scale-[0.99]">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-xl shrink-0 shadow-md shadow-emerald-500/20 group-hover:scale-110 transition-transform duration-300">📊</div>
+                <div class="min-w-0">
+                    <div class="text-base md:text-lg font-extrabold text-slate-800 leading-snug group-hover:text-teal-700 transition-colors">Real-Time Data</div>
+                    <div class="text-xs md:text-sm text-slate-500 font-medium mt-0.5 truncate">ประมวลผลและดึงข้อมูลสดทันที</div>
+                </div>
+            </a>
+
+            <!-- AI Guard Card -->
+            <a href="admin-monitoring.html" class="glass-card p-5 flex items-center gap-4 cursor-pointer border border-slate-200/80 bg-white/90 hover:bg-white hover:border-rose-300 hover:shadow-lg hover:shadow-rose-500/10 transition-all duration-300 rounded-2xl group active:scale-[0.99]">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-red-600 flex items-center justify-center text-xl shrink-0 shadow-md shadow-rose-500/20 group-hover:scale-110 transition-transform duration-300">🛡️</div>
+                <div class="min-w-0">
+                    <div class="text-base md:text-lg font-extrabold text-slate-800 leading-snug group-hover:text-rose-700 transition-colors">AI Anti-Cheat Guard</div>
+                    <div class="text-xs md:text-sm text-slate-500 font-medium mt-0.5 truncate">ตรวจจับสลับหน้าจออัตโนมัติ</div>
+                </div>
+            </a>
+        </div>
+
+        <!-- ===== 4 ACTION CARDS ===== -->
+        <div>
+            <h2 class="text-sm md:text-base font-extrabold text-slate-700 uppercase tracking-wider mb-5 flex items-center gap-2">
+                <span class="w-4 h-px bg-indigo-400/50 rounded inline-block"></span>
+                เมนูหลัก
+                <span class="w-4 h-px bg-indigo-400/50 rounded inline-block"></span>
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <!-- Questions -->
+                <a href="admin-questions.html" class="action-card glass-card p-6 space-y-4 block hover:shadow-lg hover:shadow-indigo-500/10">
+                    <div class="flex items-center justify-between">
+                        <div class="w-12 h-12 rounded-2xl bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center text-2xl">📚</div>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-slate-400"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base md:text-lg font-black text-slate-800">ระบบจัดการคลังข้อสอบ</h3>
+                        <p class="text-sm text-slate-600 mt-1.5 leading-relaxed font-medium">เพิ่ม แก้ไข ลบ และเผยแพร่ข้อสอบ รองรับ Excel, AI Generator และรูปภาพ</p>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <div class="h-2 flex-1 bg-indigo-500/30 rounded-full overflow-hidden"><div class="h-full bg-indigo-500 rounded-full" style="width:65%"></div></div>
+                        <span class="text-xs text-indigo-600 font-extrabold">จัดการข้อสอบ</span>
+                    </div>
+                </a>
+                <!-- Results -->
+                <a href="admin-results.html" class="action-card glass-card p-6 space-y-4 block hover:shadow-lg hover:shadow-emerald-500/10">
+                    <div class="flex items-center justify-between">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-2xl">📈</div>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-slate-400"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base md:text-lg font-black text-slate-800">ตรวจสอบคะแนนสอบ</h3>
+                        <p class="text-sm text-slate-600 mt-1.5 leading-relaxed font-medium">ดูผลการสอบ Z-Score, T-Score, Item Analysis และส่งออกรายงาน Excel</p>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <div class="h-2 flex-1 bg-emerald-100 rounded-full overflow-hidden"><div class="h-full bg-emerald-500 rounded-full" style="width:82%"></div></div>
+                        <span class="text-xs text-emerald-600 font-extrabold">วิเคราะห์ผล</span>
+                    </div>
+                </a>
+                <!-- Monitoring -->
+                <a href="admin-monitoring.html" class="action-card glass-card p-6 space-y-4 block hover:shadow-lg hover:shadow-rose-500/10">
+                    <div class="flex items-center justify-between">
+                        <div class="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-2xl">🚨</div>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-slate-400"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base md:text-lg font-black text-slate-800">ตรวจสอบพฤติกรรมน่าสงสัย</h3>
+                        <p class="text-sm text-slate-600 mt-1.5 leading-relaxed font-medium">ติดตามการสลับหน้าจอ ตรวจจับกลุ่มเสี่ยงสูง และส่งสัญญาณเตือนแบบเรียลไทม์</p>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <div class="h-2 flex-1 bg-rose-100 rounded-full overflow-hidden"><div class="h-full bg-rose-500 rounded-full animate-pulse" style="width:100%"></div></div>
+                        <span class="text-xs text-rose-600 font-extrabold">Live Monitor</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- ===== MY STORAGE WIDGET ===== -->
+        <div class="glass-card p-6 space-y-4" id="my-storage-widget">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-violet-500 flex items-center justify-center text-base">🗄️</div>
+                    <div>
+                        <div class="text-sm md:text-base font-extrabold text-slate-800">พื้นที่จัดเก็บข้อมูลของฉัน</div>
+                        <div class="text-xs text-slate-500 font-medium">ข้อมูลการใช้งานในระบบของคุณ</div>
+                    </div>
+                </div>
+                <div class="text-right" id="my-storage-total">
+                    <div class="text-xl font-black text-cyan-600" id="my-storage-size">—</div>
+                    <div class="text-xs text-slate-500 font-bold">ทั้งหมด</div>
+                </div>
+            </div>
+
+            <!-- Chips -->
+            <div class="flex flex-wrap gap-2" id="my-storage-chips">
+                <span class="my-stat-chip">⏳ กำลังโหลด...</span>
+            </div>
+
+            <!-- Storage bars -->
+            <div class="space-y-2.5" id="my-storage-bars">
+                <!-- rendered by JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-100 py-4 px-8 text-center">
+        <p class="text-[10px] text-slate-500">&copy; 2026 Tab-Lock Online Proctoring System &middot; Enterprise Edition &middot; สงวนลิขสิทธิ์</p>
+    </footer>
+</div>
+
+<!-- ===== GEMINI AI MODAL ===== -->
+<div id="gemini-modal">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+        <!-- Modal Header -->
+        <div class="bg-gradient-to-r from-cyan-500 via-violet-500 to-indigo-600 p-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center text-2xl">✨</div>
+                    <div>
+                        <h2 class="text-white font-black text-base">สร้างข้อสอบด้วย Gemini AI</h2>
+                        <p class="text-white/70 text-xs mt-0.5">ระบบช่วยสร้างข้อสอบโดย AI อัจฉริยะ</p>
+                    </div>
+                </div>
+                <button onclick="closeGeminiModal()" class="text-white/70 hover:text-white transition text-xl font-bold leading-none">✕</button>
+            </div>
+        </div>
+        <!-- Modal Body -->
+        <div class="p-6 space-y-4">
+            <p class="text-slate-600 text-sm leading-relaxed">
+                Tab-Lock รองรับการสร้างข้อสอบด้วย AI Gemini ผ่าน 2 วิธี:
+            </p>
+            <div class="space-y-3">
+                <!-- Option 1 -->
+                <a href="admin-portal.html" onclick="closeGeminiModal()" class="flex items-start gap-4 p-4 rounded-2xl border border-violet-100 bg-violet-50 hover:bg-violet-100 transition cursor-pointer group block">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-lg flex-shrink-0 shadow-sm">🤖</div>
+                    <div>
+                        <div class="text-sm font-extrabold text-slate-800">AI Generator ในระบบ</div>
+                        <div class="text-xs text-slate-500 mt-0.5 leading-relaxed">ไปที่ "จัดการข้อสอบ" แล้วกดปุ่ม <strong>AI Generator</strong> เพื่อให้ระบบสร้างข้อสอบตามหัวข้อที่กำหนดได้เลย</div>
+                    </div>
+                </a>
+                <!-- Option 2 -->
+                <a href="https://gemini.google.com" target="_blank" rel="noopener" class="flex items-start gap-4 p-4 rounded-2xl border border-cyan-100 bg-cyan-50 hover:bg-cyan-100 transition cursor-pointer group block">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-lg flex-shrink-0 shadow-sm">🌐</div>
+                    <div>
+                        <div class="text-sm font-extrabold text-slate-800">Gemini.google.com (Gem)</div>
+                        <div class="text-xs text-slate-500 mt-0.5 leading-relaxed">ใช้ Gemini Gem โดยตรง แล้วนำข้อสอบที่ได้มาวางผ่านระบบ Excel Import ของ Tab-Lock</div>
+                        <div class="text-[10px] text-cyan-600 font-bold mt-1">↗ เปิดในแท็บใหม่</div>
+                    </div>
+                </a>
+            </div>
+            <div class="bg-amber-50 border border-amber-100 rounded-xl p-3">
+                <p class="text-xs text-amber-700 font-medium">
+                    💡 <strong>เคล็ดลับ:</strong> แนะนำให้ใช้ AI Generator ในระบบ เพราะรองรับรูปแบบข้อสอบและการเผยแพร่ได้ทันที
+                </p>
+            </div>
+        </div>
+        <!-- Modal Footer -->
+        <div class="px-6 pb-6">
+            <button onclick="closeGeminiModal()" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-sm font-bold transition">
+                ปิด
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Teacher info
+    const teacherName = localStorage.getItem('teacher_name') || 'ไม่ระบุชื่ออาจารย์';
+    const teacherUsername = localStorage.getItem('teacher_username') || '';
+    document.getElementById('welcome-text').textContent = `ยินดีต้อนรับกลับมา, อาจารย์ ${teacherName} 👋`;
+    document.getElementById('sidebar-teacher-name').textContent = `อาจารย์: ${teacherName}`;
+
+    // Load my storage
+    function fmtBytes(b) {
+        if (!b || b === 0) return '0 B';
+        if (b < 1024) return b + ' B';
+        if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+        return (b / 1048576).toFixed(2) + ' MB';
+    }
+    async function loadMyStorage() {
+        if (!teacherUsername) return;
+        try {
+            const res = await fetch('/api/teacher/my-storage?username=' + encodeURIComponent(teacherUsername));
+            const d = await res.json();
+            document.getElementById('my-storage-size').textContent = fmtBytes(d.totalBytes || 0);
+            document.getElementById('my-storage-chips').innerHTML = [
+                { icon: '🏫', label: (d.roomCount || 0) + ' ห้องสอบ' },
+                { icon: '📝', label: (d.questionCount || 0).toLocaleString() + ' ข้อสอบ' },
+                { icon: '📊', label: (d.resultCount || 0).toLocaleString() + ' ผลสอบ' },
+                { icon: '📚', label: (d.templateCount || 0) + ' เทมเพลต' },
+            ].map(c => `<span class="my-stat-chip">${c.icon} ${c.label}</span>`).join('');
+
+            const bars = [
+                { label: 'ข้อสอบในห้องสอบ', bytes: d.questionBytes || 0, color: 'from-cyan-400 to-cyan-500' },
+                { label: 'ผลการสอบ', bytes: d.resultBytes || 0, color: 'from-violet-400 to-violet-500' },
+                { label: 'คลังเทมเพลต', bytes: d.templateBytes || 0, color: 'from-pink-400 to-rose-400' },
+            ];
+            const maxB = Math.max(...bars.map(b => b.bytes), 1);
+            document.getElementById('my-storage-bars').innerHTML = bars.map(b => {
+                const pct = Math.max(2, Math.round((b.bytes / maxB) * 100));
+                return `
+                    <div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                            <span style="font-size:11px;color:#64748b;font-weight:600">${b.label}</span>
+                            <span style="font-size:11px;font-weight:700;color:#334155">${fmtBytes(b.bytes)}</span>
+                        </div>
+                        <div class="my-storage-bar-bg">
+                            <div class="my-storage-bar-fill bg-gradient-to-r ${b.color}" style="width:0%" data-w="${pct}%"></div>
+                        </div>
+                    </div>`;
+            }).join('');
+            setTimeout(() => {
+                document.querySelectorAll('.my-storage-bar-fill').forEach(el => { el.style.width = el.dataset.w; });
+            }, 80);
+        } catch(e) {
+            document.getElementById('my-storage-chips').innerHTML = '<span class="my-stat-chip">⚠️ โหลดไม่ได้</span>';
+        }
+    }
+    document.addEventListener('DOMContentLoaded', loadMyStorage);
+
+    // Date display
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('th-TH', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+    document.getElementById('date-display').textContent = dateStr;
+
+    // Gemini Modal
+    function openGeminiModal() {
+        document.getElementById('gemini-modal').classList.add('open');
+    }
+    function closeGeminiModal() {
+        document.getElementById('gemini-modal').classList.remove('open');
+    }
+    document.getElementById('gemini-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeGeminiModal();
+    });
+
+    // Collapsible Sidebar
+    function initSidebarCollapse() {
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        if (!sidebar || !toggleBtn) return;
+
+        // Auto highlight active menu link
+        let activePage = window.location.pathname.split('/').pop() || 'dashboard.html';
+        if (activePage === 'admin-questions.html' || activePage === 'admin-excel.html') {
+            activePage = 'admin-portal.html';
+        }
+        document.querySelectorAll('nav a').forEach(a => {
+            a.className = a.getAttribute('href') === activePage ? 'nav-link active' : 'nav-link';
+        });
+
+        // Load saved collapsed state
+        const isCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
+        sidebar.classList.toggle('collapsed', isCollapsed);
+        toggleBtn.textContent = isCollapsed ? '▶' : '◀';
+
+        toggleBtn.addEventListener('click', () => {
+            const collapsed = sidebar.classList.toggle('collapsed');
+            toggleBtn.textContent = collapsed ? '▶' : '◀';
+            localStorage.setItem('sidebar_collapsed', collapsed.toString());
+        });
+    }
+    document.addEventListener('DOMContentLoaded', initSidebarCollapse);
+</script>
+</body>
+</html>

@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คลังข้อสอบสะสม - Tab-Lock Online Proctoring System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Kanit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        html { font-size: 100%; }
+        @media (min-width: 640px) { html { font-size: 110%; } }
+        @media (min-width: 1024px) { html { font-size: 120%; } }
+
+        @media (max-width: 768px) {
+            #sidebar {
+                position: fixed;
+                top: 0; bottom: 0; left: -280px;
+                z-index: 9999;
+                width: 260px !important;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+                transition: left 0.3s ease-in-out;
+            }
+            #sidebar.mobile-open { left: 0 !important; }
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Kanit', 'Inter', sans-serif;
+            background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #faf5ff 100%);
+            background-attachment: fixed;
+            color: #334155;
+        }
+        #sidebar {
+            background: #ffffff;
+            width: 256px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            border-right: 1px solid rgba(226,232,240,0.8);
+            flex-shrink: 0;
+         transition: width 0.2s ease-in-out; }
+        #sidebar::before {
+            content: '';
+            position: absolute;
+            top: -60px; left: -60px;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.04) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: blobPulse 6s ease-in-out infinite;
+            pointer-events: none; z-index: 0;
+        }
+        #sidebar::after {
+            content: '';
+            position: absolute;
+            bottom: -60px; right: -40px;
+            width: 180px; height: 180px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: blobPulse 8s ease-in-out infinite reverse;
+            pointer-events: none; z-index: 0;
+        }
+        @keyframes blobPulse {
+            0%, 100% { transform: scale(1) translate(0, 0); opacity: 0.6; }
+            33% { transform: scale(1.15) translate(10px, -10px); opacity: 1; }
+            66% { transform: scale(0.9) translate(-5px, 8px); opacity: 0.7; }
+        }
+        .sidebar-inner { position: relative; z-index: 1; }
+        .logo-gradient {
+            background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .logo-shield {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .nav-link {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px; border-radius: 12px;
+            font-size: 13px; font-weight: 700;
+            color: #64748b; text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover { color: #1e293b; background: rgba(15,23,42,0.04); }
+        .nav-link.active {
+            background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+            color: #ffffff; font-weight: 700;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2);
+        }
+        .nav-link svg { width: 18px; height: 18px; flex-shrink: 0; }
+        #main-area {
+            flex: 1; background: #f8fafc;
+            background-image:
+                linear-gradient(to right, rgba(99,102,241,0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(99,102,241,0.03) 1px, transparent 1px);
+            background-size: 32px 32px;
+            display: flex; flex-direction: column; overflow-x: hidden;
+        }
+        #top-header {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(226,232,240,0.8);
+            padding: 16px 28px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);
+        }
+        @keyframes sidebarDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .sidebar-online-dot { animation: sidebarDot 2s ease-in-out infinite; }
+        select.dark-select, input.dark-input {
+            background: #ffffff;
+            border: 1px solid rgba(226, 232, 240, 1);
+            color: #1e293b; border-radius: 10px;
+            padding: 10px 14px; font-size: 13px;
+            font-family: 'Kanit', sans-serif;
+            outline: none; width: 100%; transition: border-color 0.2s;
+        }
+        select.dark-select:focus, input.dark-input:focus { border-color: rgba(6,182,212,0.5); }
+        select.dark-select option { background: #ffffff; color: #1e293b; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.3); border-radius: 4px; }
+    
+        /* Collapsible Sidebar */
+        #sidebar.collapsed { width: 72px !important; }
+        #sidebar.collapsed .logo-text,
+        #sidebar.collapsed nav a span,
+        #sidebar.collapsed .flex-1.min-w-0 { display: none !important; }
+        #sidebar.collapsed .nav-link { justify-content: center; padding: 10px; }
+        #sidebar.collapsed .logo-shield { margin: 0 auto; }
+        #sidebar-toggle {
+            position: absolute;
+            right: 12px; top: 24px;
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            z-index: 100;
+        }
+        #sidebar-toggle:hover { color: #1e293b; background: #f8fafc; }
+        #sidebar.collapsed #sidebar-toggle {
+            right: 0; left: 0; margin: 0 auto; top: 60px;
+        }
+
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Animated Background Blobs -->
+    <div class="fixed w-[500px] h-[500px] bg-cyan-500/5 blur-[120px] rounded-full -top-20 -left-20 pointer-events-none"></div>
+    <div class="fixed w-[550px] h-[550px] bg-pink-500/4 blur-[130px] rounded-full -bottom-20 -right-20 pointer-events-none"></div>
+
+    <!-- Sidebar Menu -->
+    <aside id="sidebar">
+    <button id="sidebar-toggle" title="ย่อ/ขยายเมนู">◀</button>
+        <div class="sidebar-inner p-5 space-y-6 flex-1">
+            <div class="flex items-center gap-3">
+                <div class="logo-shield overflow-hidden bg-white p-1 border border-slate-100">
+                    <img src="logo.png" alt="Tab-Lock Logo" class="w-full h-full object-cover rounded-lg" />
+                </div>
+                <div class="leading-tight">
+                    <div class="font-extrabold text-base tracking-tight text-slate-800">Tab-<span class="logo-gradient">Lock</span></div>
+                    <div class="text-[8px] sm:text-[9px] text-slate-500 uppercase tracking-widest font-bold">Online Proctoring System</div>
+                </div>
+            </div>
+            <nav class="space-y-1">
+                <a href="dashboard.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+                    <span>แดชบอร์ดหลัก</span>
+                </a>
+                <a href="admin-active-exams.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" /></svg>
+                    <span>กำลังดำเนินการสอบ</span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-auto"></span>
+                </a>
+                <a href="admin-portal.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+                    <span>จัดการข้อสอบ</span>
+                </a>
+                <a href="admin-library.html" class="nav-link active">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+                    <span>คลังข้อสอบสะสม</span>
+                </a>
+                <a href="admin-results.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /></svg>
+                    <span>ตรวจสอบผลการสอบ</span>
+                </a>
+                <a href="admin-monitoring.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" /></svg>
+                    <span>ตรวจสอบพฤติกรรมน่าสงสัย</span>
+                </a>
+            </nav>
+        </div>
+
+        <div class="sidebar-inner p-5 border-t border-slate-100 space-y-3">
+            <div class="flex items-center gap-2.5">
+                <div class="relative">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white">อ</div>
+                    <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white sidebar-online-dot"></span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-xs font-semibold text-slate-800 truncate" id="sidebar-teacher-name">อาจารย์ผู้ดูแล</div>
+                    <div class="text-[10px] text-slate-500 font-medium">ออนไลน์ • ผู้ดูแลระบบ</div>
+                </div>
+            </div>
+            <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();"
+               class="flex items-center justify-center gap-2 w-full py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition-all duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
+                ออกจากระบบ
+            </a>
+        </div>
+    </aside>
+
+    <!-- 💻 Main Display Area -->
+    <div id="main-area">
+        
+        <!-- Header -->
+        <header id="top-header">
+            <div class="flex justify-between items-center w-full">
+                <h1 class="text-xl md:text-2xl font-black text-slate-900">📚 คลังข้อสอบสะสม (My Exam Library)</h1>
+                <a href="dashboard.html" class="text-xs md:text-sm text-slate-500 hover:text-slate-800 font-bold">&larr; กลับแดชบอร์ด</a>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="p-6 md:p-8 flex-grow max-w-[1400px] w-full mx-auto space-y-6 overflow-y-auto">
+            
+            <!-- Library Header Control panel -->
+            <div class="glass-card p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/90">
+                <div class="space-y-1">
+                    <h2 class="text-lg md:text-xl font-black text-slate-800">📚 คลังระบบสะสมข้อสอบอัตโนมัติ (My Exam Library)</h2>
+                    <p class="text-xs md:text-sm text-slate-600 font-medium leading-relaxed">ข้อสอบทุกชุดที่คุณนำเข้าผ่าน Excel หรือสร้างเองสดๆ ในระบบจะบันทึกซิงค์ลงในคลังสะสมนี้โดยอัตโนมัติ เพื่อดึงกลับมาใช้ใหม่หรือแก้ไขได้ตามชอบ</p>
+                </div>
+            </div>
+
+            <!-- Templates Grid Container -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="library-templates-list">
+                <!-- ข้อมูลคลังข้อสอบสะสมจะโหลดมาแสดงตรงนี้ -->
+            </div>
+        </main>
+    </div>
+
+    <!-- ✏️ Modal แก้ไขข้อสอบในคลังสะสม -->
+    <div id="edit-template-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 select-none">
+        <div class="w-full max-w-4xl bg-white border border-slate-200 p-8 rounded-3xl shadow-2xl space-y-6 text-slate-800 flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">✏️</span>
+                    <div>
+                        <h3 class="text-base font-extrabold text-slate-850">แก้ไขชุดข้อสอบในคลังสะสม</h3>
+                        <p class="text-[10px] text-slate-500 font-semibold mt-0.5">คุณกำลังทำการแก้ไขรายละเอียดโจทย์ ตัวเลือก และเฉลยภายในคลังสะสมโดยตรง</p>
+                    </div>
+                </div>
+                <button onclick="closeEditTemplateModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold p-1">&times;</button>
+            </div>
+            
+            <!-- ชื่อเทมเพลต -->
+            <div class="space-y-1.5 text-left">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">ชื่อชุดข้อสอบในคลัง</label>
+                <input type="text" id="edit-modal-template-name" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-cyan-500 transition font-bold" />
+            </div>
+
+            <!-- รายการข้อสอบย่อย -->
+            <div id="edit-modal-questions-list" class="flex-grow overflow-y-auto space-y-6 pr-2 min-h-[300px]">
+                <!-- โหลดรายการข้อสอบแก้ไขตรงนี้ -->
+            </div>
+            
+            <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button onclick="closeEditTemplateModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition duration-200">
+                    ยกเลิก
+                </button>
+                <button onclick="saveTemplateEdits()" class="px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white text-xs font-bold rounded-xl transition duration-200 shadow-md">
+                    💾 บันทึกการเปลี่ยนแปลงในคลัง
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // โหลดข้อมูลยืนยันตัวตน
+        const username = localStorage.getItem('teacher_username');
+        if (!username) {
+            alert("กรุณาเข้าสู่ระบบก่อนการใช้งานหน้าจัดการคลังข้อสอบสะสม");
+            window.location.href = 'teacher-login.html';
+        } else {
+            const teacherName = localStorage.getItem('teacher_name') || username;
+            document.getElementById('sidebar-teacher-name').textContent = `อาจารย์: ${teacherName}`;
+        }
+
+        let rooms = [];
+
+        // รันครั้งแรก
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadLibraryTemplates();
+        });
+
+        // ดึงรายการชุดข้อสอบสะสมในคลังทั้งหมดมาแสดง
+        async function loadLibraryTemplates() {
+            const listContainer = document.getElementById('library-templates-list');
+            listContainer.innerHTML = '<div class="col-span-full text-center py-8 text-slate-400 font-semibold">กำลังโหลดคลังข้อสอบสะสม...</div>';
+
+            try {
+                const res = await fetch(`/api/library/get-templates?username=${username}`);
+                const templates = await res.json();
+
+                if (templates.length === 0) {
+                    listContainer.innerHTML = `
+                        <div class="col-span-full text-center py-12 text-slate-400 border-2 border-dashed border-slate-200 rounded-3xl bg-slate-50/50 shadow-inner">
+                            📭 ยังไม่มีข้อสอบบันทึกอยู่ในคลังสะสมของคุณ<br>
+                            <span class="text-[10px] text-slate-500 font-medium mt-1.5 block">เมื่อคุณสร้างหรือนำเข้าข้อสอบในวิชาใดก็ตาม ระบบจะจัดเก็บข้อมูลลงคลังนี้ให้โดยอัตโนมัติ</span>
+                        </div>`;
+                    return;
+                }
+
+                listContainer.innerHTML = templates.map(t => {
+                    const ownerBadge = (username === 'admin' && t.teacherUsername)
+                        ? `<span class="bg-violet-50 border border-violet-100 text-violet-600 font-black text-[9px] px-2 py-0.5 rounded-lg">👤 ${t.teacherUsername}</span>`
+                        : '';
+                    return `
+                        <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4 hover:shadow-md transition duration-300 flex flex-col justify-between" id="tpl-card-${t.id}">
+                            <div class="space-y-2">
+                                <div class="flex items-start justify-between gap-3">
+                                    <h3 class="font-extrabold text-slate-800 text-sm leading-snug">${escapeHtml(t.templateName)}</h3>
+                                    <div class="flex flex-col items-end gap-1 shrink-0">
+                                        <span class="bg-cyan-50 border border-cyan-100 text-cyan-600 font-black text-[10px] px-2.5 py-1 rounded-xl">
+                                            ${t.questionCount} ข้อ
+                                        </span>
+                                        ${ownerBadge}
+                                    </div>
+                                </div>
+                                <p class="text-[10px] text-slate-500 font-bold">📅 อัปเดตล่าสุด: ${t.created_at}</p>
+                            </div>
+
+                            <!-- ปุ่มสั่งการ -->
+                            <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
+                                <button onclick="openEditTemplateModal(${t.id}, '${escapeHtml(t.templateName)}')"
+                                    class="flex-1 min-w-[120px] bg-gradient-to-r from-cyan-500 to-indigo-500 hover:from-cyan-600 hover:to-indigo-600 text-white font-bold py-2 rounded-xl text-[10px] transition duration-200 active:scale-95 shadow-sm">
+                                    ✏️ แก้ไขข้อสอบในคลัง
+                                </button>
+                                <button onclick="togglePreviewTemplate(${t.id}, this)"
+                                    class="bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 font-bold px-3 py-2 rounded-xl text-[10px] transition duration-200 active:scale-95">
+                                    👁️ ดูข้อสอบ
+                                </button>
+                                <button onclick="deleteLibraryTemplate(${t.id})"
+                                    class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-100 font-bold px-3 py-2 rounded-xl text-[10px] transition duration-200 active:scale-95">
+                                    🗑️ ลบ
+                                </button>
+                            </div>
+
+                            <!-- กล่องพรีวิวคำถามย่อย (ซ่อนอยู่เริ่มต้น) -->
+                            <div id="tpl-preview-box-${t.id}" class="hidden mt-4 pt-4 border-t border-slate-100 space-y-3 max-h-[300px] overflow-y-auto pr-1">
+                                <div class="text-[10px] text-slate-400 font-bold">กำลังโหลดตัวอย่างข้อสอบ...</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error(err);
+                listContainer.innerHTML = '<div class="col-span-full text-center py-8 text-rose-600 font-semibold">เกิดข้อผิดพลาดในการโหลดคลังข้อสอบ</div>';
+            }
+        }
+
+        // เปิด/ปิด พรีวิวดูคำถามภายในชุดข้อสอบสะสม
+        async function togglePreviewTemplate(templateId, btn) {
+            const previewBox = document.getElementById(`tpl-preview-box-${templateId}`);
+            if (!previewBox) return;
+
+            if (!previewBox.classList.contains('hidden')) {
+                previewBox.classList.add('hidden');
+                btn.textContent = '👁️ ดูข้อสอบ';
+                return;
+            }
+
+            previewBox.classList.remove('hidden');
+            btn.textContent = '🙈 ซ่อนข้อสอบ';
+            previewBox.innerHTML = '<div class="text-[10px] text-slate-400 font-bold animate-pulse">กำลังโหลดตัวอย่างข้อสอบ...</div>';
+
+            try {
+                const res = await fetch(`/api/library/get-template-questions?templateId=${templateId}`);
+                const questions = await res.json();
+
+                if (questions.length === 0) {
+                    previewBox.innerHTML = '<div class="text-[10px] text-slate-400 font-bold">ไม่มีข้อสอบอยู่ในชุดนี้</div>';
+                    return;
+                }
+
+                previewBox.innerHTML = questions.map((q, idx) => {
+                    const choices = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
+                    const validChoicesHtml = choices
+                        .filter(key => q[key])
+                        .map(key => {
+                            const isCorrect = q.answer && String(q.answer).trim().toLowerCase() === key;
+                            return `
+                                <div class="text-[10px] flex items-start gap-1.5 ${isCorrect ? 'text-emerald-600 font-bold' : 'text-slate-500'}">
+                                    <span class="uppercase font-mono">${key}:</span>
+                                    <span>${escapeHtml(q[key])}</span>
+                                    ${isCorrect ? ' <span class="text-[8px] bg-emerald-50 text-emerald-600 px-1 rounded font-bold">เฉลย</span>' : ''}
+                                </div>
+                            `;
+                        }).join('');
+
+                    return `
+                        <div class="p-3 bg-slate-50 border border-slate-100 rounded-2xl space-y-2 text-left">
+                            <div class="text-[11px] font-bold text-slate-800 leading-normal">
+                                ข้อที่ ${idx + 1}. ${escapeHtml(q.question)}
+                            </div>
+                            ${q.question_img ? `
+                                <img src="${q.question_img}" class="max-h-20 rounded border border-slate-200 object-contain shadow-sm">
+                            ` : ''}
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 mt-1 border-t border-slate-100/50 pt-1.5">
+                                ${validChoicesHtml}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error(err);
+                previewBox.innerHTML = '<div class="text-[10px] text-rose-500 font-bold">เกิดข้อผิดพลาดในการโหลดตัวอย่างข้อสอบ</div>';
+            }
+        }
+
+        // ==========================================
+        // ✏️ ระบบแก้ไขข้อสอบในคลังสะสม
+        // ==========================================
+        let currentEditTemplateId = null;
+        let loadedQuestionsCount = 0;
+
+        async function openEditTemplateModal(templateId, templateName) {
+            currentEditTemplateId = templateId;
+            document.getElementById('edit-modal-template-name').value = templateName;
+            document.getElementById('edit-template-modal').classList.remove('hidden');
+
+            const listContainer = document.getElementById('edit-modal-questions-list');
+            listContainer.innerHTML = '<div class="text-center py-12 text-slate-500 font-semibold animate-pulse">กำลังโหลดรายละเอียดข้อสอบ...</div>';
+
+            try {
+                const res = await fetch(`/api/library/get-template-questions?templateId=${templateId}`);
+                const questions = await res.json();
+                loadedQuestionsCount = questions.length;
+
+                if (questions.length === 0) {
+                    listContainer.innerHTML = '<div class="text-center py-8 text-slate-400 font-semibold">ไม่มีข้อสอบในชุดนี้ครับ</div>';
+                    return;
+                }
+
+                listContainer.innerHTML = questions.map((q, idx) => {
+                    const choices = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
+                    let choicesHtml = '';
+                    let answerOptions = '';
+
+                    choices.forEach(key => {
+                        const hasVal = q[key] && String(q[key]).trim() !== '';
+                        const showChoice = hasVal || ['a', 'b', 'c', 'd'].includes(key);
+                        if (showChoice) {
+                            choicesHtml += `
+                                <div class="flex items-center gap-2" data-choice-key="${key}">
+                                    <span class="text-xs font-bold text-slate-400 uppercase w-4 shrink-0">${key}:</span>
+                                    <input type="text" id="edit-q-${idx}-choice-${key}" value="${escapeHtml(q[key])}" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs" />
+                                </div>
+                            `;
+                            answerOptions += `<option value="${key}" ${q.answer === key ? 'selected' : ''}>เฉลยตัวเลือก ${key.toUpperCase()}</option>`;
+                        }
+                    });
+
+                    return `
+                        <div class="p-6 bg-slate-50/50 border border-slate-200 rounded-2xl space-y-4 text-left question-edit-card" data-q-img="${q.question_img || ''}">
+                            <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                                <span class="text-xs font-extrabold text-cyan-600">ข้อที่ ${idx + 1}</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] font-bold text-slate-400">เฉลย:</span>
+                                    <select id="edit-q-${idx}-answer" class="dark-select text-[10px] py-1 px-2.5 bg-white border border-slate-200 rounded-lg">
+                                        ${answerOptions}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <!-- โจทย์ -->
+                                <div class="space-y-1">
+                                    <label class="block text-[10px] font-bold text-slate-400 uppercase">โจทย์คำถาม</label>
+                                    <textarea id="edit-q-${idx}-text" rows="2" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-cyan-500 transition">${escapeHtml(q.question)}</textarea>
+                                </div>
+                                ${q.question_img ? `
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[9px] text-slate-450 font-bold">🖼️ ภาพโจทย์:</span>
+                                        <img src="${q.question_img}" class="h-10 rounded border border-slate-200 object-contain">
+                                    </div>
+                                ` : ''}
+                                <!-- ตัวเลือก -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                                    ${choicesHtml}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error(err);
+                listContainer.innerHTML = '<div class="text-center py-8 text-rose-500 font-bold">เกิดข้อผิดพลาดในการโหลดข้อสอบ</div>';
+            }
+        }
+
+        function closeEditTemplateModal() {
+            document.getElementById('edit-template-modal').classList.add('hidden');
+            currentEditTemplateId = null;
+        }
+
+        async function saveTemplateEdits() {
+            if (!currentEditTemplateId) return;
+
+            const templateName = document.getElementById('edit-modal-template-name').value.trim();
+            if (!templateName) {
+                alert("⚠️ กรุณากรอกชื่อชุดข้อสอบด้วยครับ");
+                return;
+            }
+
+            const questions = [];
+            for (let idx = 0; idx < loadedQuestionsCount; idx++) {
+                const questionText = document.getElementById(`edit-q-${idx}-text`).value.trim();
+                const answer = document.getElementById(`edit-q-${idx}-answer`).value;
+                const question_img = document.querySelector(`#edit-modal-questions-list > div:nth-child(${idx + 1})`).getAttribute('data-q-img') || '';
+
+                const q = { question: questionText, question_img, answer };
+                const choices = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
+                choices.forEach(key => {
+                    const inputEl = document.getElementById(`edit-q-${idx}-choice-${key}`);
+                    if (inputEl) {
+                        q[key] = inputEl.value.trim();
+                    } else {
+                        q[key] = '';
+                    }
+                });
+
+                if (!questionText) {
+                    alert(`⚠️ กรุณากรอกโจทย์คำถามในข้อที่ ${idx + 1}`);
+                    return;
+                }
+                questions.push(q);
+            }
+
+            try {
+                const res = await fetch('/api/library/update-template-questions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        templateId: currentEditTemplateId,
+                        templateName,
+                        questions
+                    })
+                });
+
+                if (res.ok) {
+                    alert("💾 บันทึกการแก้ไขข้อสอบในคลังสะสมเรียบร้อยแล้ว!");
+                    closeEditTemplateModal();
+                    loadLibraryTemplates();
+                } else {
+                    const errData = await res.json();
+                    alert("❌ บันทึกไม่สำเร็จ: " + errData.message);
+                }
+            } catch (err) {
+                console.error(err);
+                alert("❌ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
+            }
+        }
+
+        // ลบเทมเพลตออกจากคลังสะสม
+        async function deleteLibraryTemplate(templateId) {
+            const confirmDel = confirm("⚠️ คุณยืนยันที่จะลบชุดข้อสอบนี้ออกจากคลังสะสมส่วนตัวของคุณอย่างถาวรใช่หรือไม่?");
+            if (!confirmDel) return;
+
+            try {
+                const res = await fetch('/api/library/delete-template', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ templateId })
+                });
+                if (res.ok) {
+                    alert("🗑️ ลบชุดข้อสอบออกจากคลังสำเร็จแล้ว");
+                    loadLibraryTemplates();
+                } else {
+                    const errData = await res.json();
+                    alert("❌ ไม่สามารถลบได้: " + errData.message);
+                }
+            } catch(err) {
+                console.error(err);
+            }
+        }
+
+        function escapeHtml(text) {
+            if (text === null || text === undefined || text === '') return '';
+            return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    
+    // Collapsible Sidebar
+    function initSidebarCollapse() {
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        if (!sidebar || !toggleBtn) return;
+        let activePage = window.location.pathname.split('/').pop() || 'dashboard.html';
+        if (activePage === 'admin-questions.html' || activePage === 'admin-excel.html') {
+            activePage = 'admin-portal.html';
+        }
+        document.querySelectorAll('nav a').forEach(a => {
+            a.className = a.getAttribute('href') === activePage ? 'nav-link active' : 'nav-link';
+        });
+        const isCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
+        sidebar.classList.toggle('collapsed', isCollapsed);
+        toggleBtn.textContent = isCollapsed ? '▶' : '◀';
+        toggleBtn.addEventListener('click', () => {
+            const collapsed = sidebar.classList.toggle('collapsed');
+            toggleBtn.textContent = collapsed ? '▶' : '◀';
+            localStorage.setItem('sidebar_collapsed', collapsed.toString());
+        });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSidebarCollapse);
+    } else {
+        initSidebarCollapse();
+    }
+
+</script>
+</body>
+</html>

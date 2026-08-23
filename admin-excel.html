@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>นำเข้าข้อสอบ Excel - Tab-Lock Online Proctoring System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Kanit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        html { font-size: 100%; }
+        @media (min-width: 640px) { html { font-size: 110%; } }
+        @media (min-width: 1024px) { html { font-size: 120%; } }
+
+        @media (max-width: 768px) {
+            #sidebar {
+                position: fixed;
+                top: 0; bottom: 0; left: -280px;
+                z-index: 9999;
+                width: 260px !important;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+                transition: left 0.3s ease-in-out;
+            }
+            #sidebar.mobile-open { left: 0 !important; }
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Kanit', 'Inter', sans-serif;
+            background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #faf5ff 100%);
+            background-attachment: fixed;
+            color: #334155;
+        }
+        #sidebar {
+            background: #ffffff;
+            width: 256px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            border-right: 1px solid rgba(226,232,240,0.8);
+            flex-shrink: 0;
+         transition: width 0.2s ease-in-out; }
+        #sidebar::before {
+            content: '';
+            position: absolute;
+            top: -60px; left: -60px;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.04) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: blobPulse 6s ease-in-out infinite;
+            pointer-events: none; z-index: 0;
+        }
+        #sidebar::after {
+            content: '';
+            position: absolute;
+            bottom: -60px; right: -40px;
+            width: 180px; height: 180px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: blobPulse 8s ease-in-out infinite reverse;
+            pointer-events: none; z-index: 0;
+        }
+        @keyframes blobPulse {
+            0%, 100% { transform: scale(1) translate(0, 0); opacity: 0.6; }
+            33% { transform: scale(1.15) translate(10px, -10px); opacity: 1; }
+            66% { transform: scale(0.9) translate(-5px, 8px); opacity: 0.7; }
+        }
+        .sidebar-inner { position: relative; z-index: 1; }
+        .logo-gradient {
+            background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .logo-shield {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .nav-link {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px; border-radius: 12px;
+            font-size: 13px; font-weight: 700;
+            color: #64748b; text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover { color: #1e293b; background: rgba(15,23,42,0.04); }
+        .nav-link.active {
+            background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+            color: #ffffff; font-weight: 700;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2);
+        }
+        .nav-link svg { width: 18px; height: 18px; flex-shrink: 0; }
+        #main-area {
+            flex: 1; background: #f8fafc;
+            background-image:
+                linear-gradient(to right, rgba(99,102,241,0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(99,102,241,0.03) 1px, transparent 1px);
+            background-size: 32px 32px;
+            display: flex; flex-direction: column; overflow-x: hidden;
+        }
+        #top-header {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(226,232,240,0.8);
+            padding: 16px 28px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);
+        }
+        @keyframes onlinePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+        }
+        .online-dot { animation: onlinePulse 2s ease-in-out infinite; }
+        @keyframes sidebarDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .sidebar-online-dot { animation: sidebarDot 2s ease-in-out infinite; }
+        select.dark-select, input.dark-input {
+            background: #ffffff;
+            border: 1px solid rgba(226, 232, 240, 1);
+            color: #1e293b; border-radius: 10px;
+            padding: 10px 14px; font-size: 13px;
+            font-family: 'Kanit', sans-serif;
+            outline: none; width: 100%; transition: border-color 0.2s;
+        }
+        select.dark-select:focus, input.dark-input:focus { border-color: rgba(6,182,212,0.5); }
+        select.dark-select option { background: #ffffff; color: #1e293b; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.3); border-radius: 4px; }
+    
+        /* Collapsible Sidebar */
+        #sidebar.collapsed { width: 72px !important; }
+        #sidebar.collapsed .logo-text,
+        #sidebar.collapsed nav a span,
+        #sidebar.collapsed .flex-1.min-w-0 { display: none !important; }
+        #sidebar.collapsed .nav-link { justify-content: center; padding: 10px; }
+        #sidebar.collapsed .logo-shield { margin: 0 auto; }
+        #sidebar-toggle {
+            position: absolute;
+            right: 12px; top: 24px;
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            z-index: 100;
+        }
+        #sidebar-toggle:hover { color: #1e293b; background: #f8fafc; }
+        #sidebar.collapsed #sidebar-toggle {
+            right: 0; left: 0; margin: 0 auto; top: 60px;
+        }
+
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Animated Background Blobs -->
+    <div class="fixed w-[500px] h-[500px] bg-cyan-500/5 blur-[120px] rounded-full -top-20 -left-20 pointer-events-none"></div>
+    <div class="fixed w-[550px] h-[550px] bg-pink-500/4 blur-[130px] rounded-full -bottom-20 -right-20 pointer-events-none"></div>
+
+    <!-- 📊 Left Sidebar Navigation (SaaS Style) -->
+    <aside id="sidebar">
+    <button id="sidebar-toggle" title="ย่อ/ขยายเมนู">◀</button>
+        <div class="sidebar-inner p-5 space-y-6 flex-1">
+            <div class="flex items-center gap-3 pb-2">
+                <div class="logo-shield overflow-hidden bg-white p-1 border border-slate-100">
+                    <img src="logo.png" alt="Tab-Lock Logo" class="w-full h-full object-cover rounded-lg" />
+                </div>
+                <div class="leading-tight">
+                    <div class="font-extrabold text-base tracking-tight text-slate-800">Tab-<span class="logo-gradient">Lock</span></div>
+                    <div class="text-[8px] sm:text-[9px] text-slate-500 uppercase tracking-widest font-bold">Online Proctoring System</div>
+                </div>
+            </div>
+            <nav class="space-y-1">
+                <a href="dashboard.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+                    <span>แดชบอร์ดหลัก</span>
+                </a>
+                <a href="admin-active-exams.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" /></svg>
+                    <span>กำลังดำเนินการสอบ</span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-auto"></span>
+                </a>
+                <a href="admin-portal.html" class="nav-link active">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+                    <span>จัดการข้อสอบ</span>
+                </a>
+                <a href="admin-library.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+                    <span>คลังข้อสอบสะสม</span>
+                </a>
+                <a href="admin-results.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /></svg>
+                    <span>ตรวจสอบผลการสอบ</span>
+                </a>
+                <a href="admin-monitoring.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" /></svg>
+                    <span>ตรวจสอบพฤติกรรมน่าสงสัย</span>
+                </a>
+            </nav>
+        </div>
+        <div class="sidebar-inner p-5 border-t border-white/5 space-y-3">
+            <div class="flex items-center gap-2.5">
+                <div class="relative">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white">อ</div>
+                    <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white sidebar-online-dot"></span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-xs font-semibold text-slate-800 truncate" id="sidebar-teacher-name">อาจารย์ผู้ดูแล</div>
+                    <div class="text-[10px] text-slate-500 font-medium">ออนไลน์ • ผู้ดูแลระบบ</div>
+                </div>
+            </div>
+            <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();"
+               class="flex items-center justify-center gap-2 w-full py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition-all duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
+                ออกจากระบบ
+            </a>
+        </div>
+    </aside>
+
+    <!-- 💻 Main Display Area -->
+    <div id="main-area">
+        
+        <!-- Header -->
+        <header id="top-header">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
+                <div class="flex items-center gap-3">
+                    <a href="dashboard.html" class="md:hidden text-xs text-slate-500 hover:text-slate-800 font-bold">&larr; กลับ</a>
+                    <h1 class="text-xl md:text-2xl font-black text-slate-900">📂 นำเข้าข้อสอบจาก Excel</h1>
+                </div>
+
+                <!-- 🏠 Room Selector -->
+                <div class="flex items-center gap-3 w-full sm:w-auto shrink-0 justify-end">
+                    <span class="text-sm font-bold text-slate-700">ห้องสอบที่ต้องการบันทึก:</span>
+                    <select id="room-selector" onchange="onRoomChange()" class="dark-select max-w-[200px] text-sm">
+                        <!-- รายการห้องจะโหลดมาตรงนี้ -->
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="p-6 md:p-8 flex-grow max-w-[1400px] w-full mx-auto space-y-6 overflow-y-auto">
+            
+            <div class="glass-card p-8 space-y-6 shadow-2xl">
+                <div class="space-y-1">
+                    <h2 class="text-xl md:text-2xl font-black bg-gradient-to-r from-cyan-600 to-indigo-600 bg-clip-text text-transparent flex items-center gap-2">
+                        📂 นำเข้าข้อสอบผ่านไฟล์ Microsoft Excel (.xlsx)
+                    </h2>
+                    <p class="text-sm text-slate-600 font-medium">กรุณาจัดโครงสร้างตารางข้อมูลข้อสอบให้ตรงตามคู่มือตารางด้านล่าง เพื่อความแม่นยำในการนำเข้าคำถาม</p>
+                </div>
+                
+                <!-- Guidelines Table -->
+                <div class="space-y-3">
+                    <p class="text-xs text-slate-650 font-bold flex items-center gap-1">
+                        💡 ข้อกำหนดโครงสร้างข้อมูลตาราง (เริ่มบรรทัดที่ 1 ของตาราง Excel):
+                    </p>
+                    <div class="overflow-x-auto border border-slate-200 rounded-2xl">
+                        <table class="w-full text-left text-xs font-mono">
+                            <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase">
+                                <tr>
+                                    <th class="p-3">question</th>
+                                    <th class="p-3">a</th>
+                                    <th class="p-3">b</th>
+                                    <th class="p-3">c</th>
+                                    <th class="p-3">d</th>
+                                    <th class="p-3 text-slate-400">e ... j (ตัวเลือกเสริม)</th>
+                                    <th class="p-3 text-rose-600">answer</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 bg-white text-slate-700">
+                                <tr>
+                                    <td class="p-3">พิมพ์คำถามตรงนี้...</td>
+                                    <td class="p-3">ช้อยส์ ข้อ ก</td>
+                                    <td class="p-3">ช้อยส์ ข้อ ข</td>
+                                    <td class="p-3">ช้อยส์ ข้อ ค</td>
+                                    <td class="p-3">ช้อยส์ ข้อ ง</td>
+                                    <td class="p-3 text-slate-400">ใส่ตัวเลือกเพิ่ม (กว้างสุด j)</td>
+                                    <td class="p-3 text-rose-600 font-bold">a, b, c หรือ d ... j</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Drag & Drop Zone -->
+                <div id="drop-zone" class="border-2 border-dashed border-slate-300 hover:border-cyan-500 bg-slate-50/50 hover:bg-cyan-50/30 p-16 rounded-2xl transition duration-300 text-center cursor-pointer group shadow-sm">
+                    <input type="file" id="file-input" accept=".xlsx, .xls" class="hidden">
+                    <div class="space-y-3">
+                        <span class="text-5xl block group-hover:scale-110 transition duration-300">📊</span>
+                        <p class="text-slate-700 font-semibold text-sm">ลากไฟล์ Excel (.xlsx) มาวางตรงนี้ หรือคลิกเพื่อเลือกไฟล์</p>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest">รองรับช้อยส์สูงสุด 10 ช้อยส์ (a-j)</p>
+                        <p class="text-[11px] text-amber-600 font-medium mt-1">⚠️ แนะนำการอัพโหลดไฟล์ Excel ขนาดไม่เกิน 50MB ต่อการอัพโหลด 1 ครั้ง</p>
+                        <div class="pt-2">
+                            <button type="button" onclick="event.stopPropagation(); downloadExcelTemplate();" 
+                                class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 rounded-xl text-[10px] font-bold text-cyan-600 transition">
+                                📄 ดาวน์โหลดไฟล์ Excel ตัวอย่างสำหรับกรอกข้อสอบ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview File Info -->
+                <div id="preview-area" class="hidden space-y-4 pt-2">
+                    <div class="flex justify-between items-center bg-cyan-50/70 border border-cyan-200 p-5 rounded-2xl text-xs">
+                        <span class="text-cyan-700 font-semibold flex items-center gap-1.5">📄 แฟ้มข้อมูล: <strong id="file-name" class="text-slate-800 font-bold"></strong></span>
+                        <span class="bg-cyan-600 text-white font-extrabold px-3 py-1 rounded-full text-[10px]" id="row-count">0 ข้อ</span>
+                    </div>
+                    <button id="upload-btn" class="w-full bg-gradient-to-r from-cyan-500 to-indigo-500 hover:from-cyan-600 hover:to-indigo-600 text-white font-extrabold text-sm py-4 px-4 rounded-2xl transition shadow-lg shadow-cyan-500/20 active:scale-[0.99]">
+                        🚀 นำข้อสอบเข้าสู่ระบบ
+                    </button>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="border-t border-slate-100 py-4 px-8 text-center text-slate-500 text-[10px]">
+            <p>&copy; 2026 ระบบการจัดการคลังข้อสอบ Tab-Lock Online Proctoring System. สงวนลิขสิทธิ์ทั้งหมด.</p>
+        </footer>
+    </div>
+
+    <script>
+        const username = localStorage.getItem('teacher_username') || 'admin';
+        const teacherName = localStorage.getItem('teacher_name') || 'ไม่ระบุชื่ออาจารย์';
+
+        document.getElementById('sidebar-teacher-name').textContent = `อาจารย์: ${teacherName}`;
+
+        let currentRoomId = "";
+        let rooms = [];
+        let excelData = null;
+
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const previewArea = document.getElementById('preview-area');
+        const fileNameSpan = document.getElementById('file-name');
+        const rowCountSpan = document.getElementById('row-count');
+        const uploadBtn = document.getElementById('upload-btn');
+
+        // โหลดห้องสอบอาจารย์
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadTeacherRooms();
+        });
+
+        async function loadTeacherRooms() {
+            try {
+                const res = await fetch(`/api/teacher/rooms?username=${username}`);
+                rooms = await res.json();
+                const select = document.getElementById('room-selector');
+                if (rooms.length === 0) {
+                    select.innerHTML = '<option value="">ไม่มีห้องสอบ</option>';
+                    return;
+                }
+                select.innerHTML = rooms.map(r => `<option value="${r.roomId}">${r.roomName}</option>`).join('');
+                
+                // ใช้ห้องเดิมที่เลือกใน localStorage หากมีอยู่
+                const savedRoom = localStorage.getItem('active_room_id');
+                if (savedRoom && rooms.some(r => r.roomId === savedRoom)) {
+                    select.value = savedRoom;
+                }
+                currentRoomId = select.value;
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        function onRoomChange() {
+            currentRoomId = document.getElementById('room-selector').value;
+            localStorage.setItem('active_room_id', currentRoomId);
+            previewArea.classList.add('hidden');
+            excelData = null;
+        }
+
+        // Drag & Drop
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+        
+        dropZone.addEventListener('dragover', (e) => { 
+            e.preventDefault(); 
+            dropZone.classList.add('border-cyan-500','bg-cyan-500/10'); 
+        });
+        dropZone.addEventListener('dragleave', () => { 
+            dropZone.classList.remove('border-cyan-500','bg-cyan-500/10'); 
+        });
+        dropZone.addEventListener('drop', (e) => { 
+            e.preventDefault(); 
+            handleFile(e.dataTransfer.files[0]); 
+        });
+
+        function handleFile(file) {
+            if (!file || (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls'))) {
+                alert('❌ ใช้ไฟล์ Excel (.xlsx) เท่านั้นครับ'); 
+                return;
+            }
+            fileNameSpan.textContent = file.name;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+                    const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                    if (json.length === 0) { 
+                        alert('❌ ไม่พบข้อมูลข้อสอบภายในไฟล์ Excel'); 
+                        return; 
+                    }
+                    excelData = json.map(row => {
+                        const newRow = {};
+                        for (let key in row) {
+                            if (row.hasOwnProperty(key)) {
+                                const cleanKey = key.trim().toLowerCase();
+                                const val = row[key];
+                                newRow[cleanKey] = (val !== null && val !== undefined) ? String(val).trim() : '';
+                            }
+                        }
+                        return newRow;
+                    });
+                    rowCountSpan.textContent = `${json.length} ข้อ`;
+                    previewArea.classList.remove('hidden');
+                } catch (err) {
+                    alert("ไม่สามารถอ่านข้อมูลในไฟล์ได้ กรุณาตรวจสอบหัวตาราง");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        uploadBtn.addEventListener('click', async () => {
+            if (!excelData || !currentRoomId) return;
+
+            uploadBtn.disabled = true;
+            uploadBtn.textContent = '⏳ กำลังนำข้อสอบเข้าสู่ระบบ...';
+
+            try {
+                const res = await fetch('/api/upload-questions-excel', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomId: currentRoomId, questions: excelData })
+                });
+                
+                let data;
+                try {
+                    data = await res.json();
+                } catch(jsonErr) {
+                    data = { message: `ตอบกลับจากเซิร์ฟเวอร์ไม่ถูกต้อง (HTTP ${res.status})` };
+                }
+
+                if (res.ok && data.success) {
+                    alert(`✅ นำเข้าข้อสอบเข้าห้อง ${currentRoomId} สำเร็จจำนวน ${excelData.length} ข้อเรียบร้อยแล้ว!\nระบบจะพาท่านไปยังหน้าจัดการข้อสอบหลักเพื่อตรวจสอบครับ`);
+                    previewArea.classList.add('hidden');
+                    excelData = null;
+                    window.location.href = 'admin-questions.html?tab=preview';
+                } else {
+                    alert(`❌ ล้มเหลว: ${data.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล'}`);
+                }
+            } catch (err) { 
+                console.error(err);
+                alert(`❌ เกิดข้อผิดพลาดในการเชื่อมต่อ: ${err.message}`); 
+            } finally {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = '🚀 นำข้อสอบเข้าสู่ระบบ';
+            }
+        });
+
+        // ดาวน์โหลดแม่แบบ Excel
+        function downloadExcelTemplate() {
+            try {
+                const headers = [
+                    ["Question", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "Answer", "Question_img", "A_img", "B_img", "C_img", "D_img", "E_img", "F_img", "G_img", "H_img", "I_img", "J_img"]
+                ];
+                headers.push([
+                    "1 + 1 มีค่าเท่ากับเท่าใด?", "2", "3", "4", "5", "", "", "", "", "", "", "a", "", "", "", "", "", "", "", "", "", "", ""
+                ]);
+                headers.push([
+                    "โปรแกรมเบราว์เซอร์ข้อใดได้รับความนิยมสูงสุดในปัจจุบัน?", "Google Chrome", "Safari", "Firefox", "Internet Explorer", "", "", "", "", "", "", "a", "", "", "", "", "", "", "", "", "", "", ""
+                ]);
+
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(headers);
+                XLSX.utils.book_append_sheet(wb, ws, "แบบฟอร์มคลังข้อสอบ");
+                XLSX.writeFile(wb, `exam_template_${currentRoomId || 'general'}.xlsx`);
+            } catch (err) {
+                console.error(err);
+                alert("ไม่สามารถดาวน์โหลดไฟล์ตัวอย่างได้");
+            }
+        }
+    
+    // Collapsible Sidebar
+    function initSidebarCollapse() {
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        if (!sidebar || !toggleBtn) return;
+        let activePage = window.location.pathname.split('/').pop() || 'dashboard.html';
+        if (activePage === 'admin-questions.html' || activePage === 'admin-excel.html') {
+            activePage = 'admin-portal.html';
+        }
+        document.querySelectorAll('nav a').forEach(a => {
+            a.className = a.getAttribute('href') === activePage ? 'nav-link active' : 'nav-link';
+        });
+        const isCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
+        sidebar.classList.toggle('collapsed', isCollapsed);
+        toggleBtn.textContent = isCollapsed ? '▶' : '◀';
+        toggleBtn.addEventListener('click', () => {
+            const collapsed = sidebar.classList.toggle('collapsed');
+            toggleBtn.textContent = collapsed ? '▶' : '◀';
+            localStorage.setItem('sidebar_collapsed', collapsed.toString());
+        });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSidebarCollapse);
+    } else {
+        initSidebarCollapse();
+    }
+
+</script>
+</body>
+</html>

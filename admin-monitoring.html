@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตรวจสอบพฤติกรรมน่าสงสัย - Tab-Lock Online Proctoring System</title>
+    <meta name="description" content="ศูนย์ตรวจสอบพฤติกรรมน่าสงสัยแบบเรียลไทม์ Tab-Lock">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Kanit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        html { font-size: 100%; }
+        @media (min-width: 640px) { html { font-size: 110%; } }
+        @media (min-width: 1024px) { html { font-size: 120%; } }
+
+        @media (max-width: 768px) {
+            #sidebar {
+                position: fixed;
+                top: 0; bottom: 0; left: -280px;
+                z-index: 9999;
+                width: 260px !important;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+                transition: left 0.3s ease-in-out;
+            }
+            #sidebar.mobile-open { left: 0 !important; }
+        }
+
+        * { box-sizing: border-box; }
+        body { font-family: 'Kanit', 'Inter', sans-serif; background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #faf5ff 100%); background-attachment: fixed; color: #334155; }
+        #sidebar { background: #ffffff; width: 256px; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; border-right: 1px solid rgba(226,232,240,0.8); flex-shrink: 0;  transition: width 0.2s ease-in-out; }
+        #sidebar::before { content: ''; position: absolute; top: -60px; left: -60px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(6, 182, 212, 0.04) 0%, transparent 70%); border-radius: 50%; animation: blobPulse 6s ease-in-out infinite; pointer-events: none; z-index: 0; }
+        #sidebar::after { content: ''; position: absolute; bottom: -60px; right: -40px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, transparent 70%); border-radius: 50%; animation: blobPulse 8s ease-in-out infinite reverse; pointer-events: none; z-index: 0; }
+        @keyframes blobPulse { 0%, 100% { transform: scale(1) translate(0,0); opacity: 0.6; } 33% { transform: scale(1.15) translate(10px,-10px); opacity: 1; } 66% { transform: scale(0.9) translate(-5px,8px); opacity: 0.7; } }
+        .sidebar-inner { position: relative; z-index: 1; }
+        .logo-gradient { background: linear-gradient(135deg, #06b6d4, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .logo-shield {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .nav-link { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; font-size: 13px; font-weight: 700; color: #64748b; text-decoration: none; transition: all 0.2s ease; }
+        .nav-link:hover { color: #1e293b; background: rgba(15,23,42,0.04); }
+        .nav-link.active { background: linear-gradient(135deg, #06b6d4, #8b5cf6); color: #ffffff; font-weight: 700; box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2); }
+        .nav-link svg { width: 18px; height: 18px; flex-shrink: 0; }
+        #main-area { flex: 1; background: #f8fafc; background-image: linear-gradient(to right, rgba(99,102,241,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.03) 1px, transparent 1px); background-size: 32px 32px; display: flex; flex-direction: column; overflow-x: hidden; }
+        #top-header { background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(226,232,240,0.8); padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; }
+        @keyframes onlinePulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); } 50% { box-shadow: 0 0 0 6px rgba(16,185,129,0); } }
+        .online-dot { animation: onlinePulse 2s ease-in-out infinite; }
+        @keyframes sidebarDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .sidebar-online-dot { animation: sidebarDot 2s ease-in-out infinite; }
+        @keyframes pulse-ring { 0% { transform: scale(0.95); opacity: 0.5; } 50% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(0.95); opacity: 0.5; } }
+        .pulse-active { animation: pulse-ring 2s infinite; }
+        select { background: #ffffff !important; color: #1e293b !important; border-color: rgba(226,232,240,1) !important; border-radius: 10px; padding: 8px 12px; font-family: 'Kanit', sans-serif; outline: none; transition: border-color 0.2s; }
+        select:focus { border-color: rgba(6,182,212,0.5) !important; }
+        select option { background: #ffffff; color: #1e293b; }
+        @media (max-width: 768px) { #sidebar { display: none; } }
+        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.2); border-radius: 4px; }
+    
+        /* Collapsible Sidebar */
+        #sidebar.collapsed { width: 72px !important; }
+        #sidebar.collapsed .logo-text,
+        #sidebar.collapsed nav a span,
+        #sidebar.collapsed .flex-1.min-w-0 { display: none !important; }
+        #sidebar.collapsed .nav-link { justify-content: center; padding: 10px; }
+        #sidebar.collapsed .logo-shield { margin: 0 auto; }
+        #sidebar-toggle {
+            position: absolute;
+            right: 12px; top: 24px;
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            z-index: 100;
+        }
+        #sidebar-toggle:hover { color: #1e293b; background: #f8fafc; }
+        #sidebar.collapsed #sidebar-toggle {
+            right: 0; left: 0; margin: 0 auto; top: 60px;
+        }
+
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- ===== TAB-LOCK SIDEBAR ===== -->
+    <aside id="sidebar">
+    <button id="sidebar-toggle" title="ย่อ/ขยายเมนู">◀</button>
+        <div class="sidebar-inner p-5 space-y-6 flex-1">
+            <div class="flex items-center gap-3 pb-2">
+                <div class="logo-shield overflow-hidden bg-white p-1 border border-slate-100">
+                    <img src="logo.png" alt="Tab-Lock Logo" class="w-full h-full object-cover rounded-lg" />
+                </div>
+                <div class="leading-tight">
+                    <div class="font-extrabold text-base tracking-tight text-slate-800">Tab-<span class="logo-gradient">Lock</span></div>
+                    <div class="text-[8px] sm:text-[9px] text-slate-500 uppercase tracking-widest font-bold">Online Proctoring System</div>
+                </div>
+            </div>
+            <nav class="space-y-1">
+                <a href="dashboard.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+                    <span>แดชบอร์ดหลัก</span>
+                </a>
+                <a href="admin-active-exams.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" /></svg>
+                    <span>กำลังดำเนินการสอบ</span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-auto"></span>
+                </a>
+                <a href="admin-portal.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+                    <span>จัดการข้อสอบ</span>
+                </a>
+                <a href="admin-library.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+                    <span>คลังข้อสอบสะสม</span>
+                </a>
+                <a href="admin-results.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /></svg>
+                    <span>ตรวจสอบผลการสอบ</span>
+                </a>
+                <a href="admin-monitoring.html" class="nav-link active">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" /></svg>
+                    <span>ตรวจสอบพฤติกรรมน่าสงสัย</span>
+                </a>
+            </nav>
+        </div>
+        <div class="sidebar-inner p-5 border-t border-slate-200 space-y-3">
+            <div class="flex items-center gap-2.5">
+                <div class="relative">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-slate-800">อ</div>
+                    <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white sidebar-online-dot"></span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-xs font-semibold text-slate-800 truncate" id="sidebar-teacher-name">อาจารย์ผู้ดูแล</div>
+                    <div class="text-[10px] text-slate-500 font-medium">ออนไลน์ • ผู้ดูแลระบบ</div>
+                </div>
+            </div>
+            <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();"
+               class="flex items-center justify-center gap-2 w-full py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition-all duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
+                ออกจากระบบ
+            </a>
+        </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div id="main-area">
+        <!-- Header -->
+        <header id="top-header">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
+                <div class="flex items-center gap-3">
+                    <span class="inline-block w-3 h-3 rounded-full bg-rose-500 pulse-active shadow-md"></span>
+                    <h1 class="text-xl md:text-2xl font-black text-slate-900">ศูนย์ตรวจสอบพฤติกรรมน่าสงสัย (Real-Time)</h1>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="openActiveStudentsModalFromMonitoring()" class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500/20 px-4 py-2 rounded-2xl text-emerald-700 font-black text-sm animate-pulse transition cursor-pointer">
+                        <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                        <span id="active-students-badge">👨‍🎓 กำลังทำข้อสอบ: 0 คน</span>
+                        <span class="text-xs text-emerald-800 underline ml-1 font-bold">👁️ ดูรายชื่อ</span>
+                    </button>
+                    <span class="text-xs md:text-sm font-bold text-slate-400" id="global-log-count">รวม 0 รายการ</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="p-6 md:p-8 flex-grow w-full mx-auto space-y-5 overflow-y-auto">
+
+            <!-- Room Tabs Navigation -->
+            <div class="glass-card p-2 shadow-sm" id="room-tabs-bar">
+                <div class="flex gap-2 overflow-x-auto flex-wrap" id="room-tabs">
+                    <!-- tabs injected here -->
+                    <div class="text-xs text-slate-400 py-2 px-3">กำลังโหลดห้องสอบ...</div>
+                </div>
+            </div>
+
+            <!-- All-room summary row -->
+            <div id="room-summary-row" class="grid grid-cols-2 sm:grid-cols-4 gap-3 hidden">
+                <!-- cards injected here -->
+            </div>
+
+            <!-- High Risk Panel -->
+            <div id="high-risk-panel" class="bg-rose-900/10 border border-rose-200 rounded-3xl p-5 shadow-sm text-slate-800 space-y-4 hidden">
+                <div class="flex justify-between items-center border-b border-rose-200 pb-3">
+                    <span class="text-xs font-bold text-rose-700 flex items-center gap-2">
+                        🚨 นักศึกษากลุ่มความเสี่ยงสูง (สลับหน้าจอ ≥ 3 ครั้ง)
+                    </span>
+                    <span class="bg-rose-500/10 border border-rose-500/20 text-rose-600 text-[10px] font-extrabold px-2.5 py-1 rounded-lg animate-pulse" id="high-risk-count">0 คน</span>
+                </div>
+                <div id="high-risk-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+            </div>
+
+            <!-- Streaming Logs -->
+            <div class="glass-card p-6 shadow-sm space-y-4">
+                <div class="flex flex-wrap justify-between items-center border-b border-slate-200 pb-3 gap-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">📋 บันทึกพฤติกรรมสด</span>
+                        <span class="bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 text-[10px] font-bold px-2 py-0.5 rounded-full" id="log-count-badge">0 รายการ</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="downloadExcel()" class="flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-3.5 py-1.5 rounded-xl font-bold text-xs transition">
+                            📥 ดาวน์โหลด Excel
+                        </button>
+                        <button onclick="clearCheatLogs()" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/20 px-3.5 py-1.5 rounded-xl font-bold text-xs transition">
+                            🧹 ล้างบันทึกห้องนี้
+                        </button>
+                    </div>
+                </div>
+                <div id="live-logs-container" class="space-y-3 max-h-[500px] overflow-y-auto pr-2 divide-y divide-slate-100">
+                    <div class="text-center py-16 text-slate-400 font-semibold">
+                        📭 ยังไม่มีข้อมูล
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <footer class="border-t border-slate-200 py-4 px-8 text-center">
+            <p class="text-[10px] text-slate-500">&copy; 2026 Tab-Lock Online Proctoring System · ตรวจสอบพฤติกรรมน่าสงสัย</p>
+        </footer>
+    </div>
+
+    <script>
+        const username = localStorage.getItem('teacher_username') || 'admin';
+        const teacherName = localStorage.getItem('teacher_name') || 'ไม่ระบุชื่ออาจารย์';
+        document.getElementById('sidebar-teacher-name').textContent = `อาจารย์: ${teacherName}`;
+
+        let rooms = [];
+        let currentRoomId = 'ALL';
+        let lastLogsLength = 0;
+        let roomLogCounts = {}; // { roomId: count }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadTeacherRooms();
+            await loadCheatLogs();
+            setInterval(loadCheatLogs, 3000);
+        });
+
+        async function loadTeacherRooms() {
+            try {
+                const res = await fetch(`/api/teacher/rooms?username=${username}`);
+                rooms = await res.json();
+                // โหลด cheat log ก่อนเพื่อกรองห้องที่มีข้อมูล
+                await renderRoomTabsWithFilter();
+            } catch(e) { console.error(e); }
+        }
+
+        // ดึงห้องที่กำลังเปิดสอบ (is_published) หรือมีข้อมูลข้อสอบ / พฤติกรรมทุจริต
+        async function renderRoomTabsWithFilter() {
+            const tabsEl = document.getElementById('room-tabs');
+            tabsEl.innerHTML = '<div class="text-xs text-slate-400 py-2 px-3 animate-pulse">กำลังตรวจสอบห้องสอบ...</div>';
+
+            // ดึง cheat log ทุกห้องพร้อมกันเพื่อแสดงจำนวนตัวเลขการแจ้งเตือน
+            const roomCounts = {};
+            await Promise.all(rooms.map(async r => {
+                try {
+                    const res = await fetch(`/api/cheat-logs?roomId=${r.roomId}&username=${username}`);
+                    const data = await res.json();
+                    if (data.length > 0) roomCounts[r.roomId] = data.length;
+                } catch(e) {}
+            }));
+
+            // กรองห้องที่มีการเผยแพร่ข้อสอบ (is_published === 1) หรือห้องที่มีข้อสอบ หรือห้องที่มีประวัติทุจริต
+            const activeRooms = rooms.filter(r => r.is_published === 1 || r.questionCount > 0 || (roomCounts[r.roomId] && roomCounts[r.roomId] > 0));
+
+            if (activeRooms.length === 0) {
+                tabsEl.innerHTML = '<div class="text-xs text-slate-400 py-2 px-3">📭 ไม่มีห้องสอบที่กำลังเปิดสอบอยู่ขณะนี้</div>';
+                document.getElementById('global-log-count').textContent = 'รวม 0 รายการ';
+                return;
+            }
+
+            if (!currentRoomId || (currentRoomId !== 'ALL' && !activeRooms.some(r => r.roomId === currentRoomId))) {
+                currentRoomId = 'ALL';
+            }
+
+            const all = [{ roomId: 'ALL', roomName: '📝 ทุกห้องรวม' }, ...activeRooms];
+            tabsEl.innerHTML = all.map(r => {
+                const displayName = r.roomId === 'ALL' ? r.roomName : (r.roomName || r.exam_title || r.roomId);
+                const count = roomCounts[r.roomId] || 0;
+                const isLive = r.is_published === 1;
+                return `
+                <button onclick="selectRoom('${r.roomId}')" id="tab-${r.roomId}"
+                    class="room-tab flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition ${r.roomId === currentRoomId ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-md shadow-rose-500/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}">
+                    ${r.roomId !== 'ALL' ? '🏫' : ''} ${escapeHtml(displayName)}
+                    ${isLive ? '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="กำลังเปิดสอบ (LIVE)"></span>' : ''}
+                    <span id="active-student-badge-${r.roomId}" class="hidden bg-emerald-100 border border-emerald-300 text-emerald-900 text-[10px] font-black px-2 py-0.5 rounded-lg shadow-2xs">👨‍🎓 0 คน</span>
+                    ${count > 0 ? `<span class="min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[10px] font-black flex items-center justify-center px-1.5 shadow-sm" title="พบพฤติกรรมน่าสงสัย ${count} ครั้ง">${count}</span>` : ''}
+                </button>`;
+            }).join('');
+
+            await loadActiveStudentStats();
+        }
+
+        async function loadActiveStudentStats() {
+            try {
+                const res = await fetch(`/api/teacher/active-students?username=${username}`);
+                const data = await res.json();
+
+                const totalActiveAcrossAll = data.grandTotalActive || 0;
+
+                // Update badge for ALL rooms tab
+                const allBadge = document.getElementById('active-student-badge-ALL');
+                if (allBadge) {
+                    allBadge.textContent = `👨‍🎓 รวม ${totalActiveAcrossAll} คน`;
+                    allBadge.classList.toggle('hidden', totalActiveAcrossAll === 0);
+                }
+
+                // Update badge at top header
+                let activeCount = 0;
+                if (currentRoomId === 'ALL') {
+                    activeCount = totalActiveAcrossAll;
+                } else {
+                    activeCount = data.rooms && data.rooms[currentRoomId] ? data.rooms[currentRoomId].active : 0;
+                }
+
+                const badgeEl = document.getElementById('active-students-badge');
+                if (badgeEl) {
+                    badgeEl.textContent = `👨‍🎓 กำลังทำข้อสอบ: ${activeCount} คน`;
+                }
+
+                // Update tab badges for active student counts per room
+                rooms.forEach(r => {
+                    const roomInfo = data.rooms ? data.rooms[r.roomId] : null;
+                    const activeInRoom = roomInfo ? roomInfo.active : 0;
+                    const badge = document.getElementById(`active-student-badge-${r.roomId}`);
+                    if (badge) {
+                        badge.textContent = `👨‍🎓 ${activeInRoom} คน`;
+                        badge.classList.toggle('hidden', activeInRoom === 0);
+                    }
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        function renderRoomTabs() { /* legacy: ใช้ renderRoomTabsWithFilter แทน */ }
+
+        function selectRoom(roomId) {
+            currentRoomId = roomId;
+            localStorage.setItem('active_room_id', roomId);
+            // update tab UI
+            document.querySelectorAll('.room-tab').forEach(btn => {
+                btn.className = btn.className.replace('bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-md shadow-rose-500/20', 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50');
+            });
+            const active = document.getElementById(`tab-${roomId}`);
+            if (active) {
+                active.className = active.className.replace('bg-white border border-slate-200 text-slate-600 hover:bg-slate-50', 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-md shadow-rose-500/20');
+            }
+            loadCheatLogs();
+        }
+
+        async function loadCheatLogs() {
+            if (!currentRoomId) return;
+            try {
+                loadActiveStudentStats();
+                const response = await fetch(`/api/cheat-logs?roomId=${currentRoomId}&username=${username}`);
+                const logs = await response.json();
+
+                document.getElementById('log-count-badge').textContent = `${logs.length} รายการ`;
+
+                // Summarize per room if ALL
+                if (currentRoomId === 'ALL') {
+                    updateAllRoomSummary(logs);
+                } else {
+                    document.getElementById('room-summary-row').classList.add('hidden');
+                }
+
+                // Update badge counts per room
+                await updateRoomBadges();
+
+                renderHighRisk(logs);
+                renderTimeline(logs);
+            } catch(err) { console.error(err); }
+        }
+
+        async function updateRoomBadges() {
+            // Fetch per-room counts (only for specific rooms in sidebar)
+            for (const r of rooms) {
+                try {
+                    const res = await fetch(`/api/cheat-logs?roomId=${r.roomId}&username=${username}`);
+                    const data = await res.json();
+                    const badge = document.getElementById(`badge-${r.roomId}`);
+                    if (badge) {
+                        if (data.length > 0) {
+                            badge.textContent = data.length;
+                            badge.classList.remove('hidden');
+                            badge.classList.add('flex');
+                        } else {
+                            badge.classList.add('hidden');
+                        }
+                    }
+                } catch(e) {}
+            }
+        }
+
+        function updateAllRoomSummary(logs) {
+            const perRoom = {};
+            logs.forEach(log => {
+                if (!perRoom[log.roomId]) perRoom[log.roomId] = { count: 0, room: log.roomId, highRisk: 0, students: {} };
+                perRoom[log.roomId].count++;
+                if (!perRoom[log.roomId].students[log.studentId]) perRoom[log.roomId].students[log.studentId] = 0;
+                perRoom[log.roomId].students[log.studentId]++;
+            });
+            Object.values(perRoom).forEach(r => {
+                r.highRisk = Object.values(r.students).filter(c => c >= 3).length;
+            });
+
+            const summaryEl = document.getElementById('room-summary-row');
+            const roomList = Object.values(perRoom);
+            if (roomList.length === 0) { summaryEl.classList.add('hidden'); return; }
+
+            summaryEl.classList.remove('hidden');
+            const gridClass = roomList.length <= 2 ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-4';
+            summaryEl.className = `grid ${gridClass} gap-3`;
+
+            summaryEl.innerHTML = roomList.map(r => {
+                const roomName = rooms.find(rm => rm.roomId === r.room)?.roomName || r.room;
+                return `<div class="glass-card p-4 cursor-pointer hover:border-rose-200 transition" onclick="selectRoom('${r.room}')">
+                    <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1 truncate">🏫 ${escapeHtml(roomName)}</div>
+                    <div class="flex items-end justify-between">
+                        <div>
+                            <div class="text-2xl font-extrabold text-slate-800">${r.count}</div>
+                            <div class="text-[9px] text-slate-400">พฤติกรรมรวม</div>
+                        </div>
+                        ${r.highRisk > 0
+                            ? `<div class="bg-rose-100 text-rose-600 text-[10px] font-black px-2 py-1 rounded-lg animate-pulse">⚠️ ${r.highRisk} คนเสี่ยง</div>`
+                            : `<div class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2 py-1 rounded-lg">✅ ปกติ</div>`}
+                    </div>
+                </div>`;
+            }).join('');
+
+            const total = roomList.reduce((s, r) => s + r.count, 0);
+            document.getElementById('global-log-count').textContent = `รวม ${total} รายการ`;
+        }
+
+        function renderHighRisk(logs) {
+            const studentStats = {};
+            logs.forEach(log => {
+                if (!log.studentId) return;
+                if (!studentStats[log.studentId]) studentStats[log.studentId] = { studentId: log.studentId, name: log.name, class: log.class, roomId: log.roomId, count: 0 };
+                studentStats[log.studentId].count++;
+            });
+            const highRisk = Object.values(studentStats).filter(s => s.count >= 3);
+            const hrPanel = document.getElementById('high-risk-panel');
+            const hrList = document.getElementById('high-risk-list');
+            const hrCount = document.getElementById('high-risk-count');
+
+            if (highRisk.length > 0) {
+                hrCount.textContent = `${highRisk.length} คน`;
+                hrList.innerHTML = highRisk.map(s => `
+                    <div class="bg-rose-50 border border-rose-200 p-4 rounded-2xl flex items-center justify-between gap-3 animate-pulse">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <strong class="text-rose-800 text-xs">${escapeHtml(s.name)}</strong>
+                                <span class="text-[9px] text-rose-700 font-mono bg-rose-100 px-2 py-0.5 rounded-full">${escapeHtml(s.studentId)}</span>
+                                ${currentRoomId === 'ALL' ? `<span class="text-[9px] text-rose-600 font-bold bg-rose-100 px-2 py-0.5 rounded-full">🏫 ${escapeHtml(s.roomId)}</span>` : ''}
+                            </div>
+                            <div class="text-[10px] text-rose-600 font-bold">⚠️ สลับหน้าจอสะสม ${s.count} ครั้ง</div>
+                        </div>
+                        <button onclick="sendDirectWarning('${s.studentId}', '${escapeHtml(s.name)}')"
+                            class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-[9px] font-bold tracking-wider transition active:scale-95 shadow-sm flex-shrink-0">
+                            💬 ส่งเตือน
+                        </button>
+                    </div>`).join('');
+                hrPanel.classList.remove('hidden');
+            } else {
+                hrPanel.classList.add('hidden');
+            }
+            return studentStats;
+        }
+
+        function renderTimeline(logs) {
+            const container = document.getElementById('live-logs-container');
+            if (logs.length === 0) {
+                container.innerHTML = `<div class="text-center py-16 text-slate-400 font-semibold bg-white rounded-2xl border border-slate-200 shadow-sm">📭 ไม่พบพฤติกรรมน่าสงสัยในห้องนี้</div>`;
+                return;
+            }
+
+            const studentStats = {};
+            logs.forEach(log => {
+                if (!studentStats[log.studentId]) studentStats[log.studentId] = { count: 0 };
+                studentStats[log.studentId].count++;
+            });
+
+            container.innerHTML = logs.map(log => {
+                const cleanDate = log.date ? log.date.replace('วัน', '') : '—';
+                const isHigh = studentStats[log.studentId] && studentStats[log.studentId].count >= 3;
+                const cardClass = isHigh
+                    ? 'flex flex-col sm:flex-row items-start sm:items-center justify-between p-4.5 rounded-2xl bg-rose-50/90 border-2 border-rose-300 shadow-md gap-4 transition hover:shadow-lg'
+                    : 'flex flex-col sm:flex-row items-start sm:items-center justify-between p-4.5 rounded-2xl bg-white border border-slate-200/90 shadow-sm gap-4 transition hover:border-slate-300 hover:shadow-md';
+                
+                // คำนวณสีของจุดสถานะตามพฤติกรรม
+                let dotColorClass = 'bg-rose-500 animate-pulse';
+                if (log.action.includes('กลับเข้า') || log.action.includes('กลับมา')) {
+                    dotColorClass = 'bg-amber-500';
+                } else if (log.action.includes('ปกติ') || log.action.includes('ราบรื่น')) {
+                    dotColorClass = 'bg-emerald-500';
+                }
+
+                return `<div class="${cardClass}">
+                    <div class="flex items-start gap-3.5">
+                        <div class="relative shrink-0 w-11 h-11 rounded-full ${isHigh ? 'bg-rose-100 text-rose-700 border-2 border-rose-300' : 'bg-slate-100 text-slate-700 border border-slate-300'} flex items-center justify-center shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                            </svg>
+                            <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${dotColorClass}"></span>
+                        </div>
+                        <div class="space-y-1.5">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <strong class="text-slate-900 font-black text-base tracking-tight">${escapeHtml(log.name)}</strong>
+                                <span class="text-xs font-bold text-slate-800 font-mono bg-slate-100 border border-slate-300 px-2.5 py-0.5 rounded-lg shadow-2xs">${escapeHtml(log.studentId)}</span>
+                                <span class="text-xs font-extrabold text-cyan-900 bg-cyan-100/90 border border-cyan-300 px-2.5 py-0.5 rounded-lg shadow-2xs">${escapeHtml(log.class || '—')}</span>
+                                ${currentRoomId === 'ALL' ? `<span class="text-xs font-extrabold text-violet-900 bg-violet-100/90 border border-violet-300 px-2.5 py-0.5 rounded-lg">🏫 ${escapeHtml(log.roomId)}</span>` : ''}
+                                ${isHigh ? '<span class="text-xs font-black bg-rose-600 text-white px-2.5 py-0.5 rounded-lg uppercase tracking-wider animate-pulse shadow-sm">⚠️ ความเสี่ยงสูง</span>' : ''}
+                            </div>
+                            <p class="text-rose-700 text-sm font-extrabold flex items-center gap-1">${escapeHtml(log.action)}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 self-end sm:self-center shrink-0">
+                        <div class="text-right font-mono">
+                            <div class="text-slate-900 text-sm font-black">${log.time}</div>
+                            <div class="text-slate-500 text-xs font-bold mt-0.5">${cleanDate}</div>
+                        </div>
+                        <button onclick="sendDirectWarning('${log.studentId}', '${escapeHtml(log.name)}')"
+                            class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white rounded-xl text-xs font-black transition shadow-md flex items-center gap-1">
+                            💬 ส่งเตือน
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function sendDirectWarning(studentId, name) {
+            const warningMsg = prompt(`💬 ส่งข้อความแจ้งเตือนไปยัง [${name}]:`, 'กรุณาอย่าสลับหน้าจอเด็ดขาด ระบบกำลังบันทึกพฤติกรรม');
+            if (warningMsg === null) return;
+            const trimmed = warningMsg.trim();
+            if (!trimmed) { alert('กรุณากรอกข้อความก่อน'); return; }
+
+            const targetRoom = currentRoomId === 'ALL' ? rooms[0]?.roomId : currentRoomId;
+            if (!targetRoom) { alert('ไม่พบห้องสอบ'); return; }
+
+            try {
+                const res = await fetch('/api/send-warning', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomId: targetRoom, studentId, message: trimmed })
+                });
+                alert(res.ok ? '✅ ส่งข้อความแจ้งเตือนสำเร็จ!' : '❌ ล้มเหลวในการส่งข้อความ');
+            } catch(err) { alert('เกิดข้อผิดพลาดในการเชื่อมต่อ'); }
+        }
+
+        async function clearCheatLogs() {
+            if (currentRoomId === 'ALL') { alert('กรุณาเลือกห้องสอบก่อนล้างบันทึกครับ'); return; }
+            if (!confirm(`⚠️ ยืนยันการล้างบันทึกทุจริตทั้งหมดของห้อง ${currentRoomId}?`)) return;
+            try {
+                const res = await fetch('/api/clear-cheat-logs', {
+                    method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomId: currentRoomId })
+                });
+                if (res.ok) { alert('🧹 ล้างบันทึกเรียบร้อยแล้ว'); loadCheatLogs(); }
+            } catch(err) { alert('เกิดข้อผิดพลาด'); }
+        }
+
+        // ดาวน์โหลดประวัติการสลับหน้าจอเป็น Excel (CSV)
+        async function downloadExcel() {
+            try {
+                const roomIdParam = currentRoomId === 'ALL' ? '' : currentRoomId;
+                // ดึงข้อมูลทั้งหมดของห้องที่เลือก
+                const allLogs = [];
+                if (currentRoomId === 'ALL') {
+                    // ดึงจากทุกห้อง
+                    const activeRooms = rooms.filter(r => {
+                        const badge = document.getElementById(`tab-${r.roomId}`);
+                        return badge !== null;
+                    });
+                    // ดึง ALL logs
+                    const res = await fetch(`/api/cheat-logs?roomId=ALL&username=${username}`);
+                    const data = await res.json();
+                    allLogs.push(...data);
+                } else {
+                    const res = await fetch(`/api/cheat-logs?roomId=${currentRoomId}&username=${username}`);
+                    const data = await res.json();
+                    allLogs.push(...data);
+                }
+
+                if (allLogs.length === 0) {
+                    alert('ไม่มีข้อมูลให้ดาวน์โหลด');
+                    return;
+                }
+
+                // นับจำนวนครั้งสลับหน้าจอต่อนักศึกษา
+                const studentSummary = {};
+                allLogs.forEach(log => {
+                    const key = log.studentId;
+                    if (!studentSummary[key]) {
+                        studentSummary[key] = {
+                            ชื่อ: log.name || '',
+                            รหัสนักศึกษา: log.studentId || '',
+                            ชั้นเรียน: log.class || '',
+                            ห้องสอบ: log.roomId || '',
+                            จำนวนครั้งสลับหน้าจอ: 0,
+                            ล่าสุด: ''
+                        };
+                    }
+                    studentSummary[key].จำนวนครั้งสลับหน้าจอ++;
+                    studentSummary[key].ล่าสุด = `${log.date || ''} ${log.time || ''}`;
+                });
+
+                // สร้าง CSV
+                const headers = ['ชื่อ', 'รหัสนักศึกษา', 'ชั้นเรียน', 'ห้องสอบ', 'จำนวนครั้งสลับหน้าจอ', 'ล่าสุด'];
+                const rows = Object.values(studentSummary).sort((a, b) => b.จำนวนครั้งสลับหน้าจอ - a.จำนวนครั้งสลับหน้าจอ);
+
+                // Detail sheet - log ทุกรายการ
+                const detailHeaders = ['ลำดับ', 'ชื่อ', 'รหัสนักศึกษา', 'ชั้นเรียน', 'ห้องสอบ', 'พฤติกรรม', 'เวลา', 'วันที่'];
+                const detailRows = allLogs.map((log, i) => [
+                    i + 1,
+                    log.name || '',
+                    log.studentId || '',
+                    log.class || '',
+                    log.roomId || '',
+                    log.action || '',
+                    log.time || '',
+                    log.date || ''
+                ]);
+
+                // รวมทั้ง 2 ส่วน: สรุปและรายละเอียด
+                const BOM = '\uFEFF';
+                let csv = BOM;
+                csv += '=== สรุปจำนวนครั้งสลับหน้าจอต่อนักศึกษา ===\n';
+                csv += headers.join(',') + '\n';
+                rows.forEach(r => {
+                    csv += headers.map(h => `"${String(r[h] || '').replace(/"/g, '""')}"`).join(',') + '\n';
+                });
+                csv += '\n=== รายละเอียดทุกรายการ ===\n';
+                csv += detailHeaders.join(',') + '\n';
+                detailRows.forEach(r => {
+                    csv += r.map(v => `"${String(v || '').replace(/"/g, '""')}"`).join(',') + '\n';
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                const roomLabel = currentRoomId === 'ALL' ? 'ทุกห้อง' : currentRoomId;
+                a.href = url;
+                a.download = `ประวัติสลับหน้าจอ_${roomLabel}_${new Date().toLocaleDateString('th-TH').replace(/\//g,'-')}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch(err) {
+                console.error(err);
+                alert('เกิดข้อผิดพลาดในการสร้างไฟล์');
+            }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+        }
+    
+        async function openActiveStudentsModalFromMonitoring() {
+            const targetRoomId = currentRoomId;
+            const modal = document.getElementById('active-students-modal');
+            const titleEl = document.getElementById('active-modal-room-title');
+            const tbody = document.getElementById('active-students-list-body');
+            const totalEl = document.getElementById('active-modal-total-count');
+
+            if (targetRoomId === 'ALL') {
+                titleEl.textContent = `ข้อสอบทุกห้องเรียน ( grand total )`;
+                tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400 font-bold animate-pulse">⏳ กำลังรวมรายชื่อนักศึกษาจากทุกห้องสอบ...</td></tr>';
+                modal.classList.remove('hidden');
+
+                try {
+                    // Fetch live active list for all rooms
+                    let allStudents = [];
+                    for (const r of rooms) {
+                        const res = await fetch(`/api/teacher/active-students-list?roomId=${encodeURIComponent(r.roomId)}`);
+                        const list = await res.json();
+                        if (Array.isArray(list)) {
+                            allStudents = allStudents.concat(list.map(item => ({ ...item, roomName: r.roomName || r.roomId })));
+                        }
+                    }
+
+                    totalEl.textContent = `รวม ${allStudents.length} คน`;
+
+                    if (allStudents.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="5" class="p-10 text-center text-slate-400 space-y-2">
+                                    <div class="text-3xl">📭</div>
+                                    <div class="font-bold text-xs">ขณะนี้ไม่มีนักศึกษากำลังทำข้อสอบในทุกห้อง</div>
+                                </td>
+                            </tr>
+                        `;
+                        return;
+                    }
+
+                    tbody.innerHTML = allStudents.map((s, idx) => `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-3 text-center font-bold text-slate-400">${idx + 1}</td>
+                            <td class="p-3 font-mono font-black text-blue-600">${escapeHtml(s.studentId)}</td>
+                            <td class="p-3 font-extrabold text-slate-800">${escapeHtml(s.name)}</td>
+                            <td class="p-3 text-center">
+                                <span class="bg-cyan-50 border border-cyan-200 text-cyan-700 font-bold px-2 py-0.5 rounded-md text-[11px]">${escapeHtml(s.class || s.roomName || 'ไม่ระบุ')}</span>
+                            </td>
+                            <td class="p-3 text-center font-mono text-emerald-600 font-bold">${escapeHtml(s.loginTime || '-')}</td>
+                        </tr>
+                    `).join('');
+                } catch(e) {
+                    console.error(e);
+                    tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-rose-500 font-bold">❌ ไม่สามารถดึงรายชื่อนักศึกษาได้</td></tr>';
+                }
+            } else {
+                const targetRoom = rooms.find(r => r.roomId === targetRoomId);
+                const roomTitle = targetRoom ? (targetRoom.exam_title || targetRoom.roomName || targetRoomId) : targetRoomId;
+                titleEl.textContent = `ห้องสอบ: ${roomTitle} (${targetRoomId})`;
+                tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400 font-bold animate-pulse">⏳ กำลังดึงรายชื่อนักศึกษา...</td></tr>';
+                totalEl.textContent = 'รวม 0 คน';
+                modal.classList.remove('hidden');
+
+                try {
+                    const res = await fetch(`/api/teacher/active-students-list?roomId=${encodeURIComponent(targetRoomId)}`);
+                    const students = await res.json();
+
+                    totalEl.textContent = `รวม ${students.length} คน`;
+
+                    if (!Array.isArray(students) || students.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="5" class="p-10 text-center text-slate-400 space-y-2">
+                                    <div class="text-3xl">📭</div>
+                                    <div class="font-bold text-xs">ขณะนี้ไม่มีนักศึกษากำลังทำข้อสอบในห้องนี้</div>
+                                </td>
+                            </tr>
+                        `;
+                        return;
+                    }
+
+                    tbody.innerHTML = students.map((s, idx) => `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-3 text-center font-bold text-slate-400">${idx + 1}</td>
+                            <td class="p-3 font-mono font-black text-blue-600">${escapeHtml(s.studentId)}</td>
+                            <td class="p-3 font-extrabold text-slate-800">${escapeHtml(s.name)}</td>
+                            <td class="p-3 text-center">
+                                <span class="bg-cyan-50 border border-cyan-200 text-cyan-700 font-bold px-2 py-0.5 rounded-md text-[11px]">${escapeHtml(s.class || 'ไม่ระบุ')}</span>
+                            </td>
+                            <td class="p-3 text-center font-mono text-emerald-600 font-bold">${escapeHtml(s.loginTime || '-')}</td>
+                        </tr>
+                    `).join('');
+                } catch (err) {
+                    console.error(err);
+                    tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-rose-500 font-bold">❌ ไม่สามารถโหลดข้อมูลรายชื่อได้</td></tr>';
+                }
+            }
+        }
+
+        function closeActiveStudentsModal() {
+            document.getElementById('active-students-modal').classList.add('hidden');
+        }
+
+    // Collapsible Sidebar
+    function initSidebarCollapse() {
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        if (!sidebar || !toggleBtn) return;
+        let activePage = window.location.pathname.split('/').pop() || 'dashboard.html';
+        if (activePage === 'admin-questions.html' || activePage === 'admin-excel.html') {
+            activePage = 'admin-portal.html';
+        }
+        document.querySelectorAll('nav a').forEach(a => {
+            a.className = a.getAttribute('href') === activePage ? 'nav-link active' : 'nav-link';
+        });
+        const isCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
+        sidebar.classList.toggle('collapsed', isCollapsed);
+        toggleBtn.textContent = isCollapsed ? '▶' : '◀';
+        toggleBtn.addEventListener('click', () => {
+            const collapsed = sidebar.classList.toggle('collapsed');
+            toggleBtn.textContent = collapsed ? '▶' : '◀';
+            localStorage.setItem('sidebar_collapsed', collapsed.toString());
+        });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSidebarCollapse);
+    } else {
+        initSidebarCollapse();
+    }
+
+</script>
+
+    <!-- Modal: รายชื่อนักศึกษาที่กำลังเข้าทำข้อสอบ -->
+    <div id="active-students-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 select-none">
+        <div class="w-full max-w-2xl bg-white border border-slate-200 p-7 rounded-3xl shadow-2xl space-y-5 text-slate-800 flex flex-col max-h-[85vh]">
+            <div class="flex justify-between items-start border-b border-slate-100 pb-3">
+                <div>
+                    <h3 class="text-base font-black text-slate-800 flex items-center gap-2">
+                        <span>👨‍🎓</span> รายชื่อนักศึกษาที่กำลังทำข้อสอบอยู่
+                    </h3>
+                    <p class="text-xs text-slate-500 font-semibold mt-0.5" id="active-modal-room-title">ห้องสอบ: ...</p>
+                </div>
+                <button onclick="closeActiveStudentsModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold p-1 leading-none">&times;</button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto pr-1">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wider">
+                            <th class="p-3 w-12 text-center">#</th>
+                            <th class="p-3">รหัสนักศึกษา</th>
+                            <th class="p-3">ชื่อ - นามสกุล</th>
+                            <th class="p-3 text-center">ชั้นเรียน / ห้อง</th>
+                            <th class="p-3 text-center">เวลาเข้าสอบ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="active-students-list-body" class="divide-y divide-slate-100 font-medium">
+                        <tr><td colspan="5" class="p-8 text-center text-slate-400 font-bold">กำลังดึงข้อมูล...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex justify-between items-center">
+                <span class="text-xs font-bold text-slate-400" id="active-modal-total-count">รวม 0 คน</span>
+                <button onclick="closeActiveStudentsModal()" class="px-5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs rounded-xl transition">
+                    ปิดหน้าต่าง
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

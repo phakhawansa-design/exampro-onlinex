@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>การใช้พื้นที่จัดเก็บข้อมูล - Tab-Lock Online Proctoring System</title>
+    <meta name="description" content="ภาพรวมการใช้พื้นที่จัดเก็บข้อมูลของอาจารย์แต่ละท่านในระบบ Tab-Lock">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Kanit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        html { font-size: 100%; }
+        @media (min-width: 640px) { html { font-size: 110%; } }
+        @media (min-width: 1024px) { html { font-size: 120%; } }
+
+        @media (max-width: 768px) {
+            #sidebar {
+                position: fixed;
+                top: 0; bottom: 0; left: -280px;
+                z-index: 9999;
+                width: 260px !important;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+                transition: left 0.3s ease-in-out;
+            }
+            #sidebar.mobile-open { left: 0 !important; }
+        }
+
+        * { box-sizing: border-box; }
+        body { font-family: 'Kanit', 'Inter', sans-serif; background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #faf5ff 100%); background-attachment: fixed; color: #334155; }
+        #sidebar { background: #ffffff; width: 256px; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; border-right: 1px solid rgba(226,232,240,0.8); flex-shrink: 0; transition: width 0.2s ease-in-out; }
+        #sidebar::before { content: ''; position: absolute; top: -60px; left: -60px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(6, 182, 212, 0.04) 0%, transparent 70%); border-radius: 50%; animation: blobPulse 6s ease-in-out infinite; pointer-events: none; z-index: 0; }
+        #sidebar::after { content: ''; position: absolute; bottom: -60px; right: -40px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, transparent 70%); border-radius: 50%; animation: blobPulse 8s ease-in-out infinite reverse; pointer-events: none; z-index: 0; }
+        @keyframes blobPulse { 0%, 100% { transform: scale(1) translate(0,0); opacity: 0.6; } 33% { transform: scale(1.15) translate(10px,-10px); opacity: 1; } 66% { transform: scale(0.9) translate(-5px,8px); opacity: 0.7; } }
+        .sidebar-inner { position: relative; z-index: 1; }
+        .logo-gradient { background: linear-gradient(135deg, #06b6d4, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .logo-shield { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
+        .nav-link { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; font-size: 13px; font-weight: 700; color: #64748b; text-decoration: none; transition: all 0.2s ease; }
+        .nav-link:hover { color: #1e293b; background: rgba(15,23,42,0.04); }
+        .nav-link.active { background: linear-gradient(135deg, #06b6d4, #8b5cf6); color: #ffffff; font-weight: 700; box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2); }
+        .nav-link svg { width: 18px; height: 18px; flex-shrink: 0; }
+        #main-area { flex: 1; background: #f8fafc; background-image: linear-gradient(to right, rgba(99,102,241,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.03) 1px, transparent 1px); background-size: 32px 32px; display: flex; flex-direction: column; overflow-x: hidden; }
+        #top-header { background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(226,232,240,0.8); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+        .glass-card { background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); border: 1px solid rgba(226,232,240,0.8); border-radius: 20px; box-shadow: 0 4px 20px rgba(15,23,42,0.04); }
+        @keyframes sidebarDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .sidebar-online-dot { animation: sidebarDot 2s ease-in-out infinite; }
+        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(6,182,212,0.3); border-radius: 4px; }
+        /* Collapsible Sidebar */
+        #sidebar.collapsed { width: 72px !important; }
+        #sidebar.collapsed .logo-text, #sidebar.collapsed nav a span, #sidebar.collapsed .flex-1.min-w-0 { display: none !important; }
+        #sidebar.collapsed .nav-link { justify-content: center; padding: 10px; }
+        #sidebar.collapsed .logo-shield { margin: 0 auto; }
+        #sidebar-toggle { position: absolute; right: 12px; top: 24px; width: 24px; height: 24px; border-radius: 50%; background: #ffffff; border: 1px solid #e2e8f0; color: #64748b; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: all 0.2s; z-index: 100; }
+        #sidebar-toggle:hover { color: #1e293b; background: #f8fafc; }
+        #sidebar.collapsed #sidebar-toggle { right: 0; left: 0; margin: 0 auto; top: 60px; }
+
+        /* Storage bar */
+        .storage-bar-bg { height: 8px; border-radius: 9999px; background: #e2e8f0; overflow: hidden; }
+        .storage-bar-fill { height: 100%; border-radius: 9999px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+
+        /* Rank badge */
+        .rank-badge { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0; }
+
+        /* Stat chip */
+        .stat-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(15,23,42,0.04); border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 600; color: #475569; }
+
+        /* Summary card */
+        .summary-card { border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 6px; }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeInUp 0.3s ease forwards; }
+
+        /* Detail row */
+        .detail-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(226,232,240,0.6); }
+        .detail-row:last-child { border-bottom: none; }
+
+        /* Modal */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.7); backdrop-filter: blur(8px); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+<div class="fixed w-96 h-96 bg-cyan-500/5 blur-[100px] rounded-full -top-16 -left-16 pointer-events-none"></div>
+<div class="fixed w-96 h-96 bg-violet-500/5 blur-[100px] rounded-full -bottom-16 -right-16 pointer-events-none"></div>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+    <button id="sidebar-toggle" title="ย่อ/ขยายเมนู">◀</button>
+    <div class="sidebar-inner p-5 space-y-6 flex-1">
+        <div class="flex items-center gap-3">
+            <div class="logo-shield overflow-hidden bg-white p-1 border border-slate-100">
+                <img src="logo.png" alt="Tab-Lock Logo" class="w-full h-full object-cover rounded-lg" />
+            </div>
+            <div class="leading-tight logo-text">
+                <div class="font-extrabold text-base tracking-tight text-slate-800">Tab-<span class="logo-gradient">Lock</span></div>
+                <div class="text-[8px] sm:text-[9px] text-slate-500 uppercase tracking-widest font-bold">Online Proctoring System</div>
+            </div>
+        </div>
+        <nav class="space-y-1">
+            <a href="dashboard.html" class="nav-link">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+                <span>แดชบอร์ดหลัก</span>
+            </a>
+            <a href="admin-active-exams.html" class="nav-link">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" /></svg>
+                <span>กำลังดำเนินการสอบ</span>
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-auto"></span>
+            </a>
+            <a href="admin-portal.html" class="nav-link">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+                <span>จัดการข้อสอบ</span>
+            </a>
+            <a href="admin-library.html" class="nav-link">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+                <span>คลังข้อสอบสะสม</span>
+            </a>
+            <a href="admin-results.html" class="nav-link">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /></svg>
+                <span>ตรวจสอบผลการสอบ</span>
+            </a>
+            <a href="admin-monitoring.html" class="nav-link">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" /></svg>
+                <span>ตรวจสอบพฤติกรรมน่าสงสัย</span>
+            </a>
+        </nav>
+    </div>
+    <div class="sidebar-inner p-5 border-t border-slate-100 space-y-3">
+        <div class="flex items-center gap-2.5">
+            <div class="relative">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white">อ</div>
+                <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white sidebar-online-dot"></span>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="text-xs font-semibold text-slate-800 truncate" id="sidebar-teacher-name">อาจารย์ผู้ดูแล</div>
+                <div class="text-[10px] text-slate-500 font-medium">ออนไลน์ • ผู้ดูแลระบบ</div>
+            </div>
+        </div>
+        <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();"
+           class="flex items-center justify-center gap-2 w-full py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition-all duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
+            ออกจากระบบ
+        </a>
+    </div>
+</aside>
+
+<!-- Main Content -->
+<div id="main-area">
+    <header id="top-header">
+        <div class="flex justify-between items-center w-full">
+            <h1 class="text-xl md:text-2xl font-black text-slate-900">🗄️ การใช้พื้นที่จัดเก็บข้อมูล (Storage Overview)</h1>
+            <div class="flex items-center gap-3">
+                <button id="refresh-btn" onclick="loadStorageStats()"
+                    class="flex items-center gap-1.5 text-xs md:text-sm font-extrabold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 hover:border-slate-300 px-3.5 py-2 rounded-xl transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+                    รีเฟรช
+                </button>
+                <a href="dashboard.html" class="text-xs md:text-sm text-slate-500 hover:text-slate-800 font-bold">&larr; กลับแดชบอร์ด</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="p-6 flex-grow overflow-y-auto">
+        <!-- Summary Cards Row -->
+        <div id="summary-row" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="glass-card p-5 flex flex-col gap-1">
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">อาจารย์ทั้งหมด</div>
+                <div class="text-3xl font-black text-slate-800" id="total-teachers">—</div>
+                <div class="text-[10px] text-slate-500">บัญชีที่ลงทะเบียน</div>
+            </div>
+            <div class="glass-card p-5 flex flex-col gap-1">
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">ข้อสอบในระบบ</div>
+                <div class="text-3xl font-black text-cyan-600" id="total-questions">—</div>
+                <div class="text-[10px] text-slate-500">ข้อทั้งหมด</div>
+            </div>
+            <div class="glass-card p-5 flex flex-col gap-1">
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">ผลการสอบ</div>
+                <div class="text-3xl font-black text-violet-600" id="total-results">—</div>
+                <div class="text-[10px] text-slate-500">รายการผลสอบ</div>
+            </div>
+            <div class="glass-card p-5 flex flex-col gap-1">
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">พื้นที่ใช้ไป</div>
+                <div class="text-3xl font-black text-emerald-600" id="total-storage">—</div>
+                <div class="text-[10px] text-slate-500" id="total-storage-sub">ข้อมูลรวม</div>
+            </div>
+        </div>
+
+        <!-- Loading Skeleton -->
+        <div id="loading-state" class="glass-card p-10 flex flex-col items-center justify-center gap-4">
+            <div class="w-10 h-10 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin"></div>
+            <p class="text-sm font-semibold text-slate-500">กำลังโหลดข้อมูล...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="glass-card p-10 flex-col items-center justify-center gap-4 hidden">
+            <div class="text-5xl">🗄️</div>
+            <p class="text-sm font-semibold text-slate-500">ยังไม่มีข้อมูลอาจารย์ในระบบ</p>
+        </div>
+
+        <!-- Teacher Storage List -->
+        <div id="storage-list" class="space-y-4 hidden"></div>
+    </main>
+</div>
+
+<!-- Detail Modal -->
+<div id="detail-modal" class="modal-overlay hidden">
+    <div class="w-full max-w-lg bg-white rounded-3xl shadow-2xl p-6 space-y-5 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-start">
+            <div class="space-y-1">
+                <div class="text-base font-extrabold text-slate-800" id="modal-teacher-name">อาจารย์</div>
+                <div class="text-[11px] text-slate-400 font-medium" id="modal-teacher-username">username</div>
+            </div>
+            <button onclick="closeModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold p-1 hover:bg-slate-100 rounded-lg transition">&times;</button>
+        </div>
+        <div id="modal-content" class="space-y-4"></div>
+    </div>
+</div>
+
+<script>
+    // Auth
+    const username = localStorage.getItem('teacher_username') || 'admin';
+    const teacherName = localStorage.getItem('teacher_name') || username;
+    document.getElementById('sidebar-teacher-name').textContent = `อาจารย์: ${teacherName}`;
+
+    let allStats = [];
+
+    function formatBytes(bytes) {
+        if (bytes === 0) return '0 B';
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    function getStorageColor(bytes, maxBytes) {
+        const pct = maxBytes > 0 ? bytes / maxBytes : 0;
+        if (pct >= 0.75) return { bar: 'from-rose-500 to-red-500', text: 'text-rose-600', bg: 'bg-rose-50 border-rose-100' };
+        if (pct >= 0.4) return { bar: 'from-amber-400 to-orange-400', text: 'text-amber-600', bg: 'bg-amber-50 border-amber-100' };
+        return { bar: 'from-cyan-400 to-violet-500', text: 'text-cyan-600', bg: 'bg-emerald-50 border-emerald-100' };
+    }
+
+    function getRankBadge(rank) {
+        if (rank === 1) return { bg: 'bg-yellow-100', text: 'text-yellow-700', icon: '🥇' };
+        if (rank === 2) return { bg: 'bg-slate-100', text: 'text-slate-600', icon: '🥈' };
+        if (rank === 3) return { bg: 'bg-orange-100', text: 'text-orange-600', icon: '🥉' };
+        return { bg: 'bg-slate-50', text: 'text-slate-500', icon: rank };
+    }
+
+    async function loadStorageStats() {
+        document.getElementById('loading-state').classList.remove('hidden');
+        document.getElementById('storage-list').classList.add('hidden');
+        document.getElementById('empty-state').classList.add('hidden');
+
+        try {
+            const res = await fetch('/api/admin/storage-stats');
+            allStats = await res.json();
+
+            if (!Array.isArray(allStats) || allStats.length === 0) {
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('empty-state').classList.remove('hidden');
+                document.getElementById('empty-state').style.display = 'flex';
+                return;
+            }
+
+            // Sort by totalBytes descending
+            allStats.sort((a, b) => b.totalBytes - a.totalBytes);
+
+            // Summary totals
+            const totalTeachers = allStats.length;
+            const totalQuestions = allStats.reduce((s, t) => s + (t.questionCount || 0), 0);
+            const totalResults = allStats.reduce((s, t) => s + (t.resultCount || 0), 0);
+            const totalBytes = allStats.reduce((s, t) => s + (t.totalBytes || 0), 0);
+            const maxBytes = allStats[0]?.totalBytes || 1;
+
+            document.getElementById('total-teachers').textContent = totalTeachers;
+            document.getElementById('total-questions').textContent = totalQuestions.toLocaleString();
+            document.getElementById('total-results').textContent = totalResults.toLocaleString();
+            document.getElementById('total-storage').textContent = formatBytes(totalBytes);
+
+            // Render list
+            const listEl = document.getElementById('storage-list');
+            listEl.innerHTML = '';
+
+            allStats.forEach((t, i) => {
+                const rank = i + 1;
+                const badge = getRankBadge(rank);
+                const pct = maxBytes > 0 ? Math.max(2, Math.round((t.totalBytes / maxBytes) * 100)) : 2;
+                const color = getStorageColor(t.totalBytes, maxBytes);
+                const createdDate = t.created_at ? new Date(t.created_at).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
+                const statusBadge = t.status === 'approved'
+                    ? '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">✓ อนุมัติแล้ว</span>'
+                    : '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full">⏳ รอการอนุมัติ</span>';
+
+                const card = document.createElement('div');
+                card.className = 'glass-card p-5 fade-in cursor-pointer hover:shadow-lg transition-all duration-300';
+                card.style.animationDelay = `${i * 0.06}s`;
+                card.style.opacity = '0';
+                card.onclick = () => openModal(t);
+                card.innerHTML = `
+                    <div class="flex items-start gap-4">
+                        <!-- Rank -->
+                        <div class="rank-badge ${badge.bg} ${badge.text} flex-shrink-0 text-lg mt-0.5">
+                            ${typeof badge.icon === 'number' ? '<span class="text-[11px]">' + badge.icon + '</span>' : badge.icon}
+                        </div>
+
+                        <!-- Info -->
+                        <div class="flex-1 min-w-0 space-y-3">
+                            <div class="flex items-center flex-wrap gap-2">
+                                <span class="font-extrabold text-slate-800 text-sm truncate">${t.name || t.username}</span>
+                                <span class="text-[10px] text-slate-400 font-medium">@${t.username}</span>
+                                ${statusBadge}
+                            </div>
+
+                            <!-- Stats chips row -->
+                            <div class="flex flex-wrap gap-2">
+                                <span class="stat-chip">🏫 ${t.roomCount || 0} ห้องสอบ</span>
+                                <span class="stat-chip">📝 ${(t.questionCount || 0).toLocaleString()} ข้อสอบ</span>
+                                <span class="stat-chip">📊 ${(t.resultCount || 0).toLocaleString()} ผลสอบ</span>
+                                <span class="stat-chip">📚 ${t.templateCount || 0} เทมเพลต</span>
+                            </div>
+
+                            <!-- Storage bar -->
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[11px] font-semibold text-slate-500">พื้นที่ใช้ไป</span>
+                                    <span class="text-[12px] font-black ${color.text}">${formatBytes(t.totalBytes)}</span>
+                                </div>
+                                <div class="storage-bar-bg">
+                                    <div class="storage-bar-fill bg-gradient-to-r ${color.bar}" style="width: 0%" data-width="${pct}%"></div>
+                                </div>
+                                <div class="text-[10px] text-slate-400">${pct}% เทียบกับอาจารย์ที่ใช้มากที่สุด</div>
+                            </div>
+                        </div>
+
+                        <!-- Arrow icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-slate-300 flex-shrink-0 mt-1">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                        </svg>
+                    </div>
+                `;
+                listEl.appendChild(card);
+            });
+
+            document.getElementById('loading-state').classList.add('hidden');
+            listEl.classList.remove('hidden');
+
+            // Animate bars after render
+            setTimeout(() => {
+                document.querySelectorAll('.storage-bar-fill').forEach(el => {
+                    el.style.width = el.dataset.width;
+                });
+            }, 100);
+
+        } catch (e) {
+            document.getElementById('loading-state').innerHTML = `
+                <div class="text-rose-500 text-2xl">⚠️</div>
+                <p class="text-sm font-semibold text-rose-500">ไม่สามารถโหลดข้อมูลได้: ${e.message}</p>
+                <button onclick="loadStorageStats()" class="text-xs bg-rose-50 text-rose-600 px-4 py-2 rounded-xl font-bold">ลองใหม่</button>
+            `;
+        }
+    }
+
+    function openModal(t) {
+        document.getElementById('modal-teacher-name').textContent = t.name || t.username;
+        document.getElementById('modal-teacher-username').textContent = `@${t.username}`;
+
+        const createdDate = t.created_at ? new Date(t.created_at).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' }) : '—';
+
+        const sections = [
+            {
+                title: '📦 ข้อมูลการใช้พื้นที่',
+                rows: [
+                    { label: 'ข้อสอบในห้องสอบ', value: formatBytes(t.questionBytes || 0), sub: `${(t.questionCount || 0).toLocaleString()} ข้อ` },
+                    { label: 'ผลการสอบ', value: formatBytes(t.resultBytes || 0), sub: `${(t.resultCount || 0).toLocaleString()} รายการ` },
+                    { label: 'เทมเพลตคลังข้อสอบ', value: formatBytes(t.templateBytes || 0), sub: `${t.templateCount || 0} เทมเพลต / ${(t.templateQuestionCount || 0).toLocaleString()} ข้อ` },
+                    { label: '🔢 รวมทั้งหมด', value: `<span class="font-black text-base text-violet-600">${formatBytes(t.totalBytes || 0)}</span>`, sub: '' },
+                ]
+            },
+            {
+                title: '📋 สถิติข้อมูล',
+                rows: [
+                    { label: 'จำนวนห้องสอบ', value: `${t.roomCount || 0} ห้อง`, sub: '' },
+                    { label: 'ข้อสอบในระบบ', value: `${(t.questionCount || 0).toLocaleString()} ข้อ`, sub: '' },
+                    { label: 'ผลการสอบทั้งหมด', value: `${(t.resultCount || 0).toLocaleString()} รายการ`, sub: '' },
+                    { label: 'เทมเพลตสะสม', value: `${t.templateCount || 0} ชุด`, sub: `${(t.templateQuestionCount || 0).toLocaleString()} ข้อ` },
+                    { label: 'ประวัติทุจริต', value: `${(t.cheatLogCount || 0).toLocaleString()} รายการ`, sub: '' },
+                    { label: 'สร้างบัญชีเมื่อ', value: createdDate, sub: '' },
+                ]
+            }
+        ];
+
+        const content = document.getElementById('modal-content');
+        content.innerHTML = sections.map(sec => `
+            <div class="space-y-1">
+                <div class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">${sec.title}</div>
+                <div class="bg-slate-50 rounded-2xl px-4 py-2">
+                    ${sec.rows.map(r => `
+                        <div class="detail-row">
+                            <span class="text-[12px] text-slate-500 font-medium">${r.label}</span>
+                            <div class="text-right">
+                                <div class="text-[12px] font-bold text-slate-800">${r.value}</div>
+                                ${r.sub ? `<div class="text-[10px] text-slate-400">${r.sub}</div>` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('');
+
+        document.getElementById('detail-modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('detail-modal').classList.add('hidden');
+    }
+
+    // Close modal on backdrop click
+    document.getElementById('detail-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    // Sidebar collapse
+    function initSidebarCollapse() {
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        if (!sidebar || !toggleBtn) return;
+        const isCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
+        sidebar.classList.toggle('collapsed', isCollapsed);
+        toggleBtn.textContent = isCollapsed ? '▶' : '◀';
+        toggleBtn.addEventListener('click', () => {
+            const collapsed = sidebar.classList.toggle('collapsed');
+            toggleBtn.textContent = collapsed ? '▶' : '◀';
+            localStorage.setItem('sidebar_collapsed', collapsed.toString());
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => { initSidebarCollapse(); loadStorageStats(); });
+    } else {
+        initSidebarCollapse();
+        loadStorageStats();
+    }
+</script>
+</body>
+</html>

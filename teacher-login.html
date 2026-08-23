@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <script>
+    if (window.location.protocol === 'file:') {
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <script>
+    if (window.location.protocol === 'file:') {
+      const fileName = window.location.pathname.split('/').pop() || 'index.html';
+      window.location.href = 'http://localhost:5000/' + fileName;
+    }
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>เข้าสู่ระบบอาจารย์ - Tab-Lock Online Proctoring System</title>
+  <meta name="description" content="ระบบเข้าสู่ระบบสำหรับอาจารย์ผู้สอน Tab-Lock Online Proctoring System" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+        html { font-size: 100%; }
+        @media (min-width: 640px) { html { font-size: 110%; } }
+        @media (min-width: 1024px) { html { font-size: 120%; } }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Kanit', 'Inter', sans-serif;
+      background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #faf5ff 100%);
+      color: #334155;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; }
+
+    .grid-overlay {
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(99,102,241,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99,102,241,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none; z-index: 0;
+    }
+    .blob {
+      position: fixed; border-radius: 50%;
+      filter: blur(100px); pointer-events: none; z-index: 0;
+    }
+    .blob-1 {
+      width: 550px; height: 550px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
+      top: -180px; left: -180px;
+      animation: radial-pulse 8s ease-in-out infinite;
+    }
+    .blob-2 {
+      width: 450px; height: 450px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.04) 0%, transparent 70%);
+      bottom: -130px; right: -130px;
+      animation: radial-pulse 10s ease-in-out infinite reverse;
+    }
+    @keyframes radial-pulse {
+      0%, 100% { transform: scale(1); opacity: 0.7; }
+      50% { transform: scale(1.2); opacity: 1; }
+    }
+
+    .content-layer { position: relative; z-index: 10; }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      border-top: 1px solid rgba(6, 182, 212, 0.25);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+      border-radius: 28px;
+    }
+
+    /* Glass inputs */
+    .glass-input {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(226, 232, 240, 1);
+      color: #1e293b;
+      border-radius: 12px;
+      padding: 13px 14px 13px 44px;
+      width: 100%;
+      font-family: 'Kanit', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+    }
+    .glass-input::placeholder { color: #94a3b8; }
+    .glass-input:focus {
+      border-color: #06b6d4;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+    }
+
+    /* Submit button */
+    .btn-submit {
+      background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+      box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2);
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-submit:hover:not(:disabled) {
+      box-shadow: 0 4px 20px rgba(6, 182, 212, 0.35);
+      transform: translateY(-2px);
+    }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* Show password toggle */
+    .toggle-pass {
+      background: none; border: none; cursor: pointer;
+      color: #64748b; padding: 0;
+      transition: color 0.2s;
+    }
+    .toggle-pass:hover { color: #06b6d4; }
+
+    /* Links */
+    .link-primary { color: #06b6d4; transition: color 0.2s; }
+    .link-primary:hover { color: #22d3ee; }
+    .link-secondary { color: #64748b; transition: color 0.2s; font-size: 0.8rem; }
+    .link-secondary:hover { color: #cbd5e1; }
+
+    /* Back link */
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: #64748b; font-size: 0.8rem; transition: color 0.2s;
+    }
+    .back-link:hover { color: #cbd5e1; }
+
+    /* Divider line */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(226, 232, 240, 0.8), transparent);
+    }
+
+    /* Shield badge */
+    .shield-badge {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(139, 92, 246, 0.1));
+      border: 1px solid rgba(6, 182, 212, 0.2);
+      border-radius: 16px;
+      padding: 12px;
+      display: inline-flex;
+      font-size: 1.8rem;
+      animation: shield-glow 3s ease-in-out infinite;
+    }
+    @keyframes shield-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(99,102,241,0.4); }
+      50% { box-shadow: 0 0 40px rgba(99,102,241,0.75); }
+    }
+
+    /* Input wrapper */
+    .input-wrapper { position: relative; }
+    .input-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: #475569; pointer-events: none;
+    }
+    .input-action {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    }
+  </style>
+</head>
+<body>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="grid-overlay"></div>
+
+  <div class="content-layer min-h-screen flex flex-col items-center justify-center px-4 py-10">
+    <div class="w-full max-w-md mx-auto">
+
+      <!-- Card -->
+      <div class="glass-card p-8 md:p-10">
+
+        <!-- Header -->
+        <div class="flex flex-col items-center text-center mb-8">
+          <div class="shield-badge mb-4 overflow-hidden bg-white p-2 flex items-center justify-center w-16 h-16 rounded-2xl">
+            <img src="logo.png" alt="Tab-Lock Logo" class="w-full h-full object-cover rounded-xl" />
+          </div>
+          <div class="text-xs font-bold tracking-[0.3em] text-cyan-600 uppercase mb-1">TAB-LOCK</div>
+          <h1 class="text-2xl font-bold text-slate-800 mb-1">เข้าสู่ระบบอาจารย์ผู้สอน</h1>
+          <p class="text-slate-500 text-sm">กรุณาใส่ข้อมูลเพื่อเข้าสู่ระบบ</p>
+        </div>
+
+        <!-- Error msg -->
+        <div id="error-msg" class="hidden mb-5 p-3.5 rounded-xl text-sm font-medium text-rose-600 flex items-center gap-2"
+             style="background:rgba(244,63,94,0.05);border:1px solid rgba(244,63,94,0.2);">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span></span>
+        </div>
+
+        <!-- Form -->
+        <div class="space-y-4 mb-6">
+          <!-- Username -->
+          <div>
+            <label class="block text-sm font-medium text-slate-550 mb-1.5">ชื่อผู้ใช้ (Username)</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+              </span>
+              <input id="username" type="text" class="glass-input" placeholder="กรอก username ของคุณ" autocomplete="username" />
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label class="block text-sm font-medium text-slate-550 mb-1.5">รหัสผ่าน (Password)</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+              </span>
+              <input id="password" type="password" class="glass-input" placeholder="กรอกรหัสผ่านของคุณ" autocomplete="current-password" />
+              <span class="input-action">
+                <button class="toggle-pass" onclick="togglePassword()" type="button" id="toggle-pass-btn" aria-label="แสดง/ซ่อนรหัสผ่าน">
+                  <svg id="eye-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                  </svg>
+                </button>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit button -->
+        <button id="login-btn" onclick="login()" class="btn-submit w-full py-3.5 rounded-xl text-white font-bold text-sm flex items-center justify-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3h7a3 3 0 013 3v1"/>
+          </svg>
+          เข้าสู่ระบบอาจารย์ผู้สอน
+        </button>
+
+        <!-- Divider -->
+        <div class="divider my-6"></div>
+
+        <!-- Register link -->
+        <div class="text-center mb-3">
+          <span class="text-slate-500 text-sm">ยังไม่มีบัญชี? </span>
+          <a href="register-teacher.html" class="link-primary text-sm font-semibold">สมัครสมาชิกใหม่</a>
+        </div>
+
+        <!-- Back link -->
+        <div class="text-center">
+          <a href="index.html" class="back-link justify-center">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            ย้อนกลับหน้าหลัก
+          </a>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <p class="text-center text-slate-450 text-xs mt-6 tracking-wider">Tab-Lock Online Proctoring System</p>
+    </div>
+  </div>
+
+  <script>
+    function togglePassword() {
+      const input = document.getElementById('password');
+      const eyeIcon = document.getElementById('eye-icon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        eyeIcon.innerHTML = `
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+        `;
+      } else {
+        input.type = 'password';
+        eyeIcon.innerHTML = `
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+        `;
+      }
+    }
+
+    async function login() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      if (!username || !password) { showError('กรุณากรอก Username และ Password'); return; }
+      const btn = document.getElementById('login-btn');
+      btn.disabled = true;
+      btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> กำลังตรวจสอบ...`;
+      try {
+        const res = await fetch('/api/teacher/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+          localStorage.setItem('teacher_username', data.teacher.username);
+          localStorage.setItem('teacher_name', data.teacher.name);
+          localStorage.setItem('teacher_role', data.teacher.role);
+          if (data.teacher.role === 'admin') {
+            window.location.href = 'super-admin.html';
+          } else {
+            window.location.href = 'dashboard.html';
+          }
+        } else {
+          showError(data.message || 'เข้าสู่ระบบล้มเหลว');
+          btn.disabled = false;
+          btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3h7a3 3 0 013 3v1"/></svg> เข้าสู่ระบบอาจารย์ผู้สอน`;
+        }
+      } catch(e) {
+        showError('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้');
+        btn.disabled = false;
+        btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3h7a3 3 0 013 3v1"/></svg> เข้าสู่ระบบอาจารย์ผู้สอน`;
+      }
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('error-msg');
+      el.querySelector('span').textContent = msg;
+      el.classList.remove('hidden');
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+  </script>
+</body>
+</html>

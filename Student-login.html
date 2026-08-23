@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <script>
+        if (window.location.protocol === 'file:') {
+            const fileName = window.location.pathname.split('/').pop() || 'index.html';
+            window.location.href = 'http://localhost:5000/' + fileName;
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tab-Lock — Online Proctoring System (นักศึกษา)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Kanit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        html { font-size: 100%; }
+        @media (min-width: 640px) { html { font-size: 110%; } }
+        @media (min-width: 1024px) { html { font-size: 120%; } }
+
+        body { font-family: 'Kanit', 'Inter', sans-serif; background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #faf5ff 100%); background-attachment: fixed; color: #334155; -webkit-user-select:none; user-select:none; }
+        .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(226, 232, 240, 0.8); box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04); }
+        .glass-light { background: rgba(255, 255, 255, 0.5); border: 1px solid rgba(226, 232, 240, 0.5); }
+        .input-dark { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(226, 232, 240, 1); color: #1e293b; }
+        .input-dark:focus { outline: none; border-color: #06b6d4; background: #ffffff; box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15); }
+        .input-dark::placeholder { color: #94a3b8; }
+        .btn-primary { background: linear-gradient(135deg, #06b6d4, #8b5cf6); box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2); transition: all 0.3s; }
+        .btn-primary:hover { box-shadow: 0 4px 20px rgba(6, 182, 212, 0.35); transform: translateY(-1px); }
+        .btn-green { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2); }
+        .btn-green:hover { box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35); transform: translateY(-1px); }
+        .tab-active { background: linear-gradient(135deg, #06b6d4, #8b5cf6); color: white; box-shadow: 0 4px 15px rgba(6, 182, 212, 0.25); }
+        @keyframes blob { 0%{transform:translate(0,0) scale(1)} 50%{transform:translate(30px,-40px) scale(1.1)} 100%{transform:translate(-20px,20px) scale(0.9)} }
+        .animate-blob { animation: blob 12s infinite alternate ease-in-out; }
+        .animate-blob-delay { animation: blob 15s infinite alternate-reverse ease-in-out; animation-delay: 3s; }
+        .progress-bar { background: linear-gradient(90deg, #06b6d4, #8b5cf6); transition: width 0.4s ease; }
+        select.input-dark option { background: #ffffff; color: #1e293b; }
+        .exam-title-badge { background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(139, 92, 246, 0.1)); border: 1px solid rgba(6, 182, 212, 0.2); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative overflow-x-hidden">
+
+    <!-- Animated Background Blobs -->
+    <div class="fixed w-[500px] h-[500px] bg-cyan-500/5 blur-[120px] rounded-full -top-20 -left-20 pointer-events-none animate-blob"></div>
+    <div class="fixed w-[550px] h-[550px] bg-violet-500/5 blur-[130px] rounded-full -bottom-20 -right-20 pointer-events-none animate-blob-delay"></div>
+    <div class="fixed inset-0 bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.02)_0%,transparent_70%)] pointer-events-none"></div>
+
+    <!-- Main center wrapper -->
+    <div class="w-full flex-grow flex items-center justify-center py-10 px-4 relative z-10">
+
+        <!-- ===== LOGIN SCREEN ===== -->
+        <div id="login-screen" class="w-full max-w-lg glass p-8 md:p-10 rounded-3xl space-y-7 shadow-2xl">
+
+            <!-- Logo Header -->
+            <div class="text-center space-y-3">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl select-none relative group cursor-default shadow-lg border border-slate-100/60 overflow-hidden bg-white">
+                    <img src="logo.png" alt="Tab-Lock Logo" class="w-full h-full object-cover rounded-2xl" />
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black text-slate-800 tracking-tight">Tab-<span style="background: linear-gradient(to right,#06b6d4,#6366f1,#8b5cf6); -webkit-background-clip:text; background-clip:text; color:transparent;">Lock</span></h1>
+                    <h2 class="text-xl font-bold text-slate-800 mt-2">เข้าสู่ระบบนักศึกษา</h2>
+                    <p class="text-xs text-slate-400 font-medium mt-1">กรุณากรอกข้อมูลส่วนตัวและรหัสเพื่อทำข้อสอบ</p>
+                </div>
+            </div>
+
+
+
+            <!-- Exam Tab Content -->
+            <div id="exam-tab-content" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="space-y-1.5">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">ชื่อจริง</label>
+                        <input type="text" id="student-firstname" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm placeholder-slate-400 focus:ring-0 transition-all" placeholder="ชื่อจริง">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">นามสกุล</label>
+                        <input type="text" id="student-lastname" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm placeholder-slate-400 transition-all" placeholder="นามสกุล">
+                    </div>
+                </div>
+                <div class="space-y-1.5">
+                    <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">รหัสนักศึกษา</label>
+                    <input type="text" id="student-id" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm font-mono transition-all" placeholder="กรอกรหัสประจำตัวนักศึกษา">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">ชั้นเรียน / กลุ่มเรียน</label>
+                    <input type="text" id="student-class" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm transition-all" placeholder="เช่น TEC3N">
+                </div>
+                <!-- Teacher & Room Selector -->
+                <div class="space-y-1.5">
+                    <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">เลือกอาจารย์ผู้สอน</label>
+                    <div class="relative">
+                        <select id="teacher-selector" onchange="onTeacherChange()" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm appearance-none cursor-pointer">
+                            <option value="">กำลังโหลดรายชื่ออาจารย์...</option>
+                        </select>
+                        <span class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-500 text-xs">▼</span>
+                    </div>
+                </div>
+                <div class="space-y-1.5">
+                    <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">กรอกรหัสข้อสอบ (Exam Code)</label>
+                    <input type="text" id="exam-code-input" class="input-dark w-full px-3 py-2.5 rounded-xl text-sm transition-all" placeholder="รหัสข้อสอบ เช่น MATH101">
+                </div>
+                <button onclick="startExam()" class="btn-primary w-full text-white py-3.5 rounded-2xl font-black text-sm flex items-center justify-center gap-2 mt-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    เริ่มทำข้อสอบ
+                </button>
+            </div>
+
+
+        </div>
+
+        <!-- ===== EXAM SCREEN ===== -->
+        <div id="exam-screen" class="hidden w-full max-w-3xl space-y-6">
+
+            <!-- Exam header card -->
+            <div class="glass p-6 rounded-3xl shadow-2xl space-y-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,#06b6d4,#8b5cf6);">
+                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                </div>
+                                <h2 class="text-lg font-black text-slate-800">สมุดข้อสอบออนไลน์</h2>
+                            </div>
+                            <span id="exam-title-display" class="hidden exam-title-badge px-3 py-1 rounded-xl text-xs font-bold text-cyan-600 animate-pulse"></span>
+                            <span class="px-2.5 py-1 rounded-xl text-[9px] font-bold text-rose-600 border border-rose-500/20 bg-rose-500/5 uppercase tracking-wider animate-pulse flex items-center gap-1">
+                                <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+                                ระบบความปลอดภัยกำลังทำงาน
+                            </span>
+                        </div>
+                        <p id="student-identity-display" class="text-slate-500 text-xs font-medium">ผู้เข้าสอบ: ...</p>
+                    </div>
+                    <!-- Progress -->
+                    <div class="w-full md:w-48 space-y-1.5">
+                        <div class="flex justify-between text-[9px] font-bold text-slate-500 uppercase tracking-wider">
+                            <span>ความคืบหน้า</span>
+                            <span id="progress-percentage-label">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-100 border border-slate-205 h-2 rounded-full overflow-hidden">
+                            <div id="progress-bar-fill" class="progress-bar h-full rounded-full" style="width:0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Anti-Cheat Switch Warning Badge -->
+                <div id="switch-warning-badge" class="hidden flex items-center gap-3 p-3.5 bg-amber-50 border border-amber-300 rounded-2xl text-xs font-extrabold text-amber-800 shadow-sm">
+                </div>
+
+                <!-- Announcement Banner -->
+                <div id="announcement-banner" class="hidden flex items-start gap-3 p-4 bg-rose-50 border border-rose-200 rounded-2xl">
+                    <span class="text-xl shrink-0 animate-bounce">📢</span>
+                    <div>
+                        <div class="text-[10px] font-bold text-rose-600 uppercase tracking-widest">ประกาศจากผู้คุมสอบ</div>
+                        <p id="announcement-text" class="text-xs text-rose-700 font-semibold mt-0.5 leading-relaxed"></p>
+                    </div>
+                </div>
+
+                <!-- Timer Banner -->
+                <div id="timer-banner" class="hidden flex items-center justify-between p-4 bg-indigo-50 border border-indigo-200 rounded-2xl">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-indigo-100/50 flex items-center justify-center">
+                            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-bold text-indigo-650 uppercase tracking-widest">เวลาที่เหลืออยู่</div>
+                            <div class="text-[9px] text-slate-500 font-medium mt-0.5">ส่งคำตอบก่อนระบบล็อกกระดาษ</div>
+                        </div>
+                    </div>
+                    <div id="countdown-clock" class="text-xl font-mono font-black text-indigo-700 bg-indigo-100 border border-indigo-200 px-4 py-2 rounded-xl">00:00:00</div>
+                </div>
+            </div>
+
+            <!-- Questions Card -->
+            <div class="glass p-8 rounded-3xl shadow-2xl">
+                <div id="questions-container" class="space-y-8 divide-y divide-slate-200"></div>
+            </div>
+
+            <!-- Submit Button -->
+            <button onclick="submitExam()" class="btn-green w-full text-white py-4 rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-xl">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                ส่งกระดาษคำตอบเข้าระบบ
+            </button>
+        </div>
+    </div>
+
+    <!-- ⏱️ Modal แจ้งเตือนหมดเวลาทำข้อสอบ / ปิดการสอบ -->
+    <div id="times-up-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center space-y-5 shadow-2xl border border-slate-100 transform transition-all scale-100">
+            <div class="w-20 h-20 bg-rose-100 border border-rose-200 rounded-full flex items-center justify-center mx-auto text-4xl shadow-inner animate-bounce">
+                ⏱️
+            </div>
+            <div>
+                <h3 id="times-up-title" class="text-2xl font-black text-slate-800">หมดเวลาทำข้อสอบ!</h3>
+                <p id="times-up-desc" class="text-xs text-slate-500 font-semibold mt-2 leading-relaxed">
+                    ระบบได้ทำการบันทึกและส่งคำตอบของคุณเข้าระบบเรียบร้อยแล้ว
+                </p>
+            </div>
+            <div class="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl text-[11px] font-bold text-slate-600">
+                ✅ บันทึกคำตอบสำเร็จแล้ว สามารถออกจากหน้านี้ได้
+            </div>
+            <button onclick="window.location.href='Student-login.html'" class="w-full bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-extrabold text-xs py-3.5 rounded-2xl shadow-lg transition">
+                กลับสู่หน้าหลัก
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center py-5 text-[10px] text-slate-500 font-bold uppercase tracking-widest z-10 relative">
+        Tab-Lock Online Proctoring System &bull; &copy; 2026 สงวนลิขสิทธิ์ทั้งหมด
+    </footer>
+
+    <!-- Warning Modal -->
+    <div id="warning-modal" class="fixed inset-0 z-[100] flex items-center justify-center hidden p-4" style="background:rgba(15,23,42,0.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);">
+        <div class="w-full max-w-md glass p-8 rounded-3xl text-center space-y-6 shadow-2xl border-t-4 border-rose-500">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-rose-50 border border-rose-200 text-rose-500 text-3xl animate-pulse">⚠️</div>
+            <div class="space-y-2">
+                <h2 class="text-lg font-black text-slate-800 uppercase tracking-wide">สัญญาณคำเตือนจากผู้คุมสอบ</h2>
+                <p class="text-xs text-rose-600 font-semibold">กรุณาปฏิบัติตามคำชี้แจงด้านล่างอย่างเคร่งครัด</p>
+            </div>
+            <div class="bg-rose-50 border border-rose-200 p-4 rounded-xl text-left text-xs text-rose-700 font-semibold leading-relaxed" id="warning-modal-message">กรุณาอย่าสลับหน้าจอ ระบบกำลังบันทึกพฤติกรรม</div>
+            <button onclick="acknowledgeWarning()" class="w-full py-3.5 text-white font-black text-xs rounded-2xl tracking-wider transition-all active:scale-[0.98] shadow-lg shadow-rose-500/20" style="background:linear-gradient(135deg,#dc2626,#b91c1c);">
+                รับทราบคำเตือนและเข้าสอบต่อ
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let examQuestions = [];
+        let currentStudentId = "";
+        let currentStudentName = "";
+        let currentStudentClass = "";
+        let currentRoomId = "";
+        let shouldRandomizeChoices = true;
+        let showScoreSetting = 1;
+        let examTimerInterval = null;
+        let announcementInterval = null;
+        let warningInterval = null;
+        let publishCheckInterval = null;
+        let activeWarningIds = [];
+        let isExamFinished = false;
+
+        const choiceLetters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
+
+
+
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length-1; i>0; i--) {
+                const j = Math.floor(Math.random()*(i+1));
+                [arr[i],arr[j]] = [arr[j],arr[i]];
+            }
+            return arr;
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => { await loadTeachers(); });
+
+        async function loadTeachers() {
+            try {
+                const res = await fetch('/api/teachers');
+                const teachers = await res.json();
+                const select = document.getElementById('teacher-selector');
+                if (teachers.length === 0) { select.innerHTML = '<option value="">ไม่พบรายชื่ออาจารย์</option>'; return; }
+                select.innerHTML = teachers.map(t => `<option value="${t.username}">${t.name}</option>`).join('');
+                await onTeacherChange();
+            } catch(e) {
+                document.getElementById('teacher-selector').innerHTML = '<option value="">เชื่อมต่อเซิร์ฟเวอร์ไม่ได้</option>';
+            }
+        }
+
+        async function onTeacherChange() {
+            // ระบบรหัสข้อสอบแบบกรอกเอง ไม่จำเป็นต้องโหลดรายชื่อห้องล่วงหน้า
+        }
+
+        async function startExam() {
+            const firstname = document.getElementById('student-firstname').value.trim();
+            const lastname = document.getElementById('student-lastname').value.trim();
+            currentStudentId = document.getElementById('student-id').value.trim();
+            currentStudentClass = document.getElementById('student-class').value.trim();
+            const teacherUsername = document.getElementById('teacher-selector').value;
+            const examCode = document.getElementById('exam-code-input').value.trim();
+
+            if (!firstname || !lastname || !currentStudentId || !currentStudentClass || !teacherUsername || !examCode) {
+                alert("กรุณากรอกข้อมูลผู้สอบ เลือกอาจารย์ผู้สอน และกรอกรหัสข้อสอบให้ครบถ้วนครับ");
+                return;
+            }
+            currentStudentName = `${firstname} ${lastname}`;
+            try {
+                // ค้นหาห้องสอบ (roomId) จากรหัสข้อสอบและอาจารย์ผู้สอน
+                const codeRes = await fetch(`/api/student/get-room-by-code?teacherUsername=${teacherUsername}&examCode=${encodeURIComponent(examCode)}`);
+                const codeData = await codeRes.json();
+                if (!codeRes.ok) {
+                    alert(codeData.message || "❌ ไม่พบรหัสข้อสอบนี้สำหรับอาจารย์ที่ระบุ");
+                    return;
+                }
+                currentRoomId = codeData.roomId;
+
+                const settingsRes = await fetch(`/api/room-settings?roomId=${currentRoomId}`);
+                const settings = await settingsRes.json();
+                showScoreSetting = settings.showScore;
+
+                const res = await fetch(`/api/get-questions?roomId=${currentRoomId}`);
+                const data = await res.json();
+                if (!res.ok) { alert(data.message || "❌ ไม่พบข้อสอบในห้องนี้"); return; }
+
+                // Handle new API format with examTitle
+                let questions = data;
+                let examTitle = '';
+                if (data.questions && Array.isArray(data.questions)) {
+                    questions = data.questions;
+                    examTitle = data.examTitle || '';
+                }
+
+                if (questions.length === 0) { alert("❌ ไม่พบข้อสอบในห้องรหัสนี้"); return; }
+
+                // Show exam title badge
+                if (examTitle) {
+                    const badge = document.getElementById('exam-title-display');
+                    badge.textContent = '🏷️ ' + examTitle;
+                    badge.classList.remove('hidden');
+                }
+
+                if (settings.randomize === 1) {
+                    examQuestions = shuffleArray(questions);
+                    shouldRandomizeChoices = true;
+                } else {
+                    examQuestions = questions;
+                    shouldRandomizeChoices = false;
+                }
+
+                fetch('/api/log-student-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ studentId: currentStudentId, name: currentStudentName, class: currentStudentClass, roomId: currentRoomId })
+                }).catch(e => console.error(e));
+
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('exam-screen').classList.remove('hidden');
+
+                document.getElementById('student-identity-display').innerHTML = `ผู้ทำข้อสอบ: <strong class="text-slate-800">${escapeHtml(currentStudentName)}</strong> | รหัส: <strong class="text-slate-800">${escapeHtml(currentStudentId)}</strong> | ชั้นเรียน: <strong class="text-slate-800">${escapeHtml(currentStudentClass)}</strong>`;
+
+                initAntiCheatProtection();
+                initTabSwitchMonitoring();
+                startExamTimer(settings.duration);
+                startAnnouncementStream(settings.announcement);
+                startWarningStream();
+                startPublishStatusCheck();
+                renderExamQuestions();
+            } catch(e) {
+                console.error(e);
+                alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+            }
+        }
+
+        function renderExamQuestions() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = examQuestions.map((q, qIndex) => {
+                let activeChoices = [];
+                choiceLetters.forEach(key => {
+                    const ct = q[key];
+                    if (ct !== null && ct !== undefined && String(ct).trim() !== '') {
+                        activeChoices.push({ key, text: String(ct).trim(), img: q[key+'_img'] || '' });
+                    }
+                });
+                const shuffledChoices = shouldRandomizeChoices ? shuffleArray(activeChoices) : activeChoices;
+                const choicesHtml = shuffledChoices.map(choice => `
+                    <label class="flex flex-col gap-2 p-3.5 glass-light rounded-2xl cursor-pointer hover:border-blue-500/40 active:scale-[0.99] transition-all duration-200 group" style="border:1px solid rgba(148, 163, 184, 0.25);">
+                        <div class="flex items-center gap-3">
+                            <input type="radio" name="q_${q.id}" value="${choice.key}" onchange="updateProgressBar()" class="w-4 h-4 accent-blue-500">
+                            <span class="text-xs text-slate-600 group-hover:text-slate-900 font-medium transition">${escapeHtml(choice.text)}</span>
+                        </div>
+                        ${choice.img ? `<div class="pl-7"><img src="${choice.img}" class="max-h-24 rounded-xl border border-slate-200 object-contain bg-slate-100"></div>` : ''}
+                    </label>
+                `).join('');
+                return `
+                    <div class="space-y-4 ${qIndex > 0 ? 'pt-8' : ''}">
+                        <p class="font-bold text-sm text-slate-800 flex items-start gap-2.5">
+                            <span class="bg-blue-500/10 border border-blue-500/20 text-blue-600 px-2.5 py-0.5 rounded-lg text-xs font-mono font-bold select-none shrink-0 mt-0.5">ข้อที่ ${qIndex+1}</span>
+                            <span class="pt-0.5 leading-relaxed">${escapeHtml(q.question)}</span>
+                        </p>
+                        ${q.question_img ? `<div class="pl-10"><img src="${q.question_img}" class="max-h-48 rounded-xl border border-slate-200 object-contain bg-slate-100"></div>` : ''}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">${choicesHtml}</div>
+                    </div>
+                `;
+            }).join('');
+            updateProgressBar();
+        }
+
+        function updateProgressBar() {
+            let answered = 0;
+            examQuestions.forEach(q => { if (document.querySelector(`input[name="q_${q.id}"]:checked`)) answered++; });
+            const total = examQuestions.length;
+            const pct = total > 0 ? Math.round((answered/total)*100) : 0;
+            document.getElementById('progress-percentage-label').textContent = `${pct}% (${answered}/${total})`;
+            document.getElementById('progress-bar-fill').style.width = `${pct}%`;
+        }
+
+        function initAntiCheatProtection() {
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            document.addEventListener('keydown', e => {
+                if (e.ctrlKey||e.metaKey) {
+                    if (['c','v','x','a','p'].includes(e.key.toLowerCase())) {
+                        e.preventDefault();
+                        alert("⚠️ ระบบความปลอดภัยล็อกคีย์ลัดในการสอบครับ!");
+                    }
+                }
+            });
+        }
+
+        let tabSwitchCount = 0;
+        let lastReportedTime = 0;
+
+        function initTabSwitchMonitoring() {
+            const handleTabLeave = async () => {
+                if (isExamFinished) return;
+                const now = Date.now();
+                if (now - lastReportedTime < 2000) return;
+                lastReportedTime = now;
+                
+                tabSwitchCount++;
+
+                try {
+                    await fetch('/api/report-cheat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            roomId: currentRoomId, 
+                            studentId: currentStudentId, 
+                            name: currentStudentName, 
+                            class: currentStudentClass, 
+                            action: `🚨 สลับแท็บเบราว์เซอร์ / ออกหน้าจออื่น (ครั้งที่ ${tabSwitchCount})` 
+                        })
+                    });
+                } catch(err) { console.error(err); }
+
+                const badge = document.getElementById('switch-warning-badge');
+                if (badge) {
+                    badge.classList.remove('hidden');
+                    badge.innerHTML = `⚠️ สลับหน้าจอแล้ว ${tabSwitchCount} ครั้ง (บันทึกเข้าระบบแล้ว)`;
+                }
+            };
+
+            const handleTabReturn = () => {
+                // ปิดการแจ้งเตือน alert() เพื่อป้องกันไม่ให้หน้าจอค้างหรือเกิดลูปแจ้งเตือนซ้ำๆ ขณะกลับเข้าทำข้อสอบ
+                // นักเรียนจะสามารถทำข้อสอบต่อได้ทันที แต่ระบบยังตรวจจับและบันทึกจำนวนครั้งเหมือนเดิม
+                /*
+                if (isExamFinished || tabSwitchCount === 0) return;
+                alert(`🚨 ระบบตรวจพบการสลับหน้าจอ / ออกจากหน้าสอบ! (ครั้งที่ ${tabSwitchCount})\n\n⚠️ คำเตือน: ประวัติการสลับหน้าจอถูกบันทึกและส่งไปยังอาจารย์ผู้คุมสอบเรียบร้อยแล้ว กรุณาอย่าออกจากหน้าทำข้อสอบครับ`);
+                */
+            };
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'hidden') {
+                    handleTabLeave();
+                } else if (document.visibilityState === 'visible') {
+                    handleTabReturn();
+                }
+            });
+
+            window.addEventListener('blur', () => {
+                handleTabLeave();
+            });
+
+            window.addEventListener('focus', () => {
+                handleTabReturn();
+            });
+        }
+
+        async function submitExam(isAutoSubmit = false) {
+            if (examTimerInterval) clearInterval(examTimerInterval);
+            if (announcementInterval) clearInterval(announcementInterval);
+            if (warningInterval) clearInterval(warningInterval);
+            if (publishCheckInterval) clearInterval(publishCheckInterval);
+            let answersPayload = {};
+            let unansweredCount = 0;
+            examQuestions.forEach(q => {
+                const checked = document.querySelector(`input[name="q_${q.id}"]:checked`);
+                if (checked) answersPayload[q.id] = checked.value;
+                else unansweredCount++;
+            });
+            if (!isAutoSubmit) {
+                if (unansweredCount > 0) {
+                    if (!confirm(`⚠️ ยังเหลือข้อที่ยังไม่ได้ตอบอีก ${unansweredCount} ข้อ\nต้องการยืนยันส่งคำตอบเลยหรือไม่?`)) return;
+                } else {
+                    if (!confirm("ยืนยันส่งคำตอบสอบของท่าน?")) return;
+                }
+            }
+            try {
+                const response = await fetch('/api/submit-exam', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomId: currentRoomId, studentId: currentStudentId, name: currentStudentName, class: currentStudentClass, answers: answersPayload })
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    isExamFinished = true;
+                    window.location.href = `finish.html?score=${result.score}&maxScore=${result.maxScore}&showScore=${showScoreSetting}&roomId=${currentRoomId}&studentName=${encodeURIComponent(currentStudentName)}&studentId=${currentStudentId}&class=${encodeURIComponent(currentStudentClass)}`;
+                } else {
+                    alert(`❌ ล้มเหลวในการส่งข้อสอบ: ${result.message}`);
+                }
+            } catch(err) {
+                console.error(err);
+                alert("เกิดปัญหาในการส่งข้อสอบ กรุณาติดต่อครูผู้คุมสอบ");
+            }
+        }
+
+        function startExamTimer(durationMinutes) {
+            if (!durationMinutes || durationMinutes <= 0) { document.getElementById('timer-banner').classList.add('hidden'); return; }
+            document.getElementById('timer-banner').classList.remove('hidden');
+            let timeLeftSeconds = durationMinutes * 60;
+            const updateClock = () => {
+                const h = Math.floor(timeLeftSeconds/3600);
+                const m = Math.floor((timeLeftSeconds%3600)/60);
+                const s = timeLeftSeconds%60;
+                const clockEl = document.getElementById('countdown-clock');
+                clockEl.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                if (timeLeftSeconds <= 60) { clockEl.style.color = '#ef4444'; } else { clockEl.style.color = '#3b82f6'; }
+            };
+            updateClock();
+            examTimerInterval = setInterval(() => {
+                timeLeftSeconds--;
+                if (timeLeftSeconds <= 0) { 
+                    clearInterval(examTimerInterval); 
+                    updateClock(); 
+                    handleExamEnd("⏱️ หมดเวลาทำข้อสอบ!", "หมดเวลาทำข้อสอบแล้ว ระบบได้ทำการบันทึกและส่งคำตอบของคุณเข้าระบบเรียบร้อยแล้ว"); 
+                }
+                else { updateClock(); }
+            }, 1000);
+        }
+
+        // 🛑 ตรวจสอบสถานะเผยแพร่ข้อสอบแบบ Real-Time (ทุก 5 วินาที)
+        function startPublishStatusCheck() {
+            if (!currentRoomId) return;
+            publishCheckInterval = setInterval(async () => {
+                if (isExamFinished) { clearInterval(publishCheckInterval); return; }
+                try {
+                    const res = await fetch(`/api/teacher/get-publish-status?roomId=${encodeURIComponent(currentRoomId)}`);
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    if (data.is_published !== 1) {
+                        clearInterval(publishCheckInterval);
+                        handleExamEnd("🛑 อาจารย์ได้ปิดการสอบแล้ว (หมดเวลาสอบ)", "อาจารย์ผู้คุมสอบได้ปิดการสอบเรียบร้อยแล้ว ระบบทำการบันทึกและส่งคำตอบของคุณเข้าระบบทันที");
+                    }
+                } catch(e) { /* network error, skip this check */ }
+            }, 5000);
+        }
+
+        // 🛑 จัดการจบการสอบเมื่อหมดเวลาหรืออาจารย์กดปิด
+        async function handleExamEnd(title, desc) {
+            if (isExamFinished) return;
+            isExamFinished = true;
+
+            if (examTimerInterval) clearInterval(examTimerInterval);
+            if (announcementInterval) clearInterval(announcementInterval);
+            if (warningInterval) clearInterval(warningInterval);
+            if (publishCheckInterval) clearInterval(publishCheckInterval);
+
+            let answersPayload = {};
+            examQuestions.forEach(q => {
+                const checked = document.querySelector(`input[name="q_${q.id}"]:checked`);
+                if (checked) answersPayload[q.id] = checked.value;
+            });
+
+            try {
+                await fetch('/api/submit-exam', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomId: currentRoomId, studentId: currentStudentId, name: currentStudentName, class: currentStudentClass, answers: answersPayload })
+                });
+            } catch(e) { console.error('Auto-submit on exam end failed:', e); }
+
+            document.getElementById('times-up-title').textContent = title;
+            document.getElementById('times-up-desc').textContent = desc;
+            document.getElementById('times-up-modal').classList.remove('hidden');
+
+            alert(`${title}\n${desc}`);
+        }
+
+        function startAnnouncementStream(initialAnnouncement) {
+            const banner = document.getElementById('announcement-banner');
+            const txt = document.getElementById('announcement-text');
+            if (initialAnnouncement && initialAnnouncement.trim() !== '') { txt.textContent = initialAnnouncement; banner.classList.remove('hidden'); }
+            else { banner.classList.add('hidden'); }
+            let currentAnn = initialAnnouncement || '';
+            announcementInterval = setInterval(async () => {
+                try {
+                    const res = await fetch(`/api/room-settings?roomId=${currentRoomId}`);
+                    const data = await res.json();
+                    if (data.announcement !== currentAnn) {
+                        currentAnn = data.announcement || '';
+                        if (currentAnn.trim() === '') { banner.classList.add('hidden'); }
+                        else { txt.textContent = currentAnn; banner.classList.remove('hidden'); }
+                    }
+                } catch(e) { console.error(e); }
+            }, 5000);
+        }
+
+        function startWarningStream() {
+            if (!currentRoomId || !currentStudentId) return;
+            warningInterval = setInterval(async () => {
+                try {
+                    const res = await fetch(`/api/get-warnings?roomId=${currentRoomId}&studentId=${currentStudentId}`);
+                    const data = await res.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                        activeWarningIds = data.map(w => w.id);
+                        const latestMsg = data[data.length-1].message;
+                        document.getElementById('warning-modal-message').textContent = latestMsg;
+                        const modal = document.getElementById('warning-modal');
+                        if (modal.classList.contains('hidden')) {
+                            modal.classList.remove('hidden');
+                            try {
+                                const ctx = new (window.AudioContext||window.webkitAudioContext)();
+                                const osc = ctx.createOscillator();
+                                const gain = ctx.createGain();
+                                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(350, ctx.currentTime);
+                                gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                                osc.connect(gain); gain.connect(ctx.destination);
+                                osc.start(); osc.stop(ctx.currentTime+0.4);
+                            } catch(e) {}
+                        }
+                    }
+                } catch(e) { console.error(e); }
+            }, 4000);
+        }
+
+        async function acknowledgeWarning() {
+            if (activeWarningIds.length === 0) { document.getElementById('warning-modal').classList.add('hidden'); return; }
+            try {
+                const res = await fetch('/api/mark-warning-read', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ids: activeWarningIds })
+                });
+                if (res.ok) { activeWarningIds = []; document.getElementById('warning-modal').classList.add('hidden'); }
+            } catch(err) { console.error(err); }
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+        }
+    </script>
+</body>
+</html>

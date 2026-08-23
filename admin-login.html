@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <script>
+    if (window.location.protocol === 'file:') {
+      const fileName = window.location.pathname.split('/').pop() || 'index.html';
+      window.location.href = 'http://localhost:5000/' + fileName;
+    }
+  </script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Super Admin Access - Tab-Lock Online Proctoring System</title>
+  <meta name="description" content="Super Admin Control Center - Tab-Lock Online Proctoring System" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+        html { font-size: 100%; }
+        @media (min-width: 640px) { html { font-size: 110%; } }
+        @media (min-width: 1024px) { html { font-size: 120%; } }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Kanit', 'Inter', sans-serif;
+      background: linear-gradient(to right, #fff5f5 0%, #fff1f2 50%, #fef2f2 100%);
+      background-attachment: fixed;
+      color: #334155;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; }
+
+    .grid-overlay {
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(244,63,94,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(244,63,94,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none; z-index: 0;
+    }
+    .blob {
+      position: fixed; border-radius: 50%;
+      filter: blur(100px); pointer-events: none; z-index: 0;
+    }
+    .blob-1 {
+      width: 550px; height: 550px;
+      background: radial-gradient(circle, rgba(244, 63, 94, 0.05) 0%, transparent 70%);
+      top: -180px; left: -180px;
+      animation: radial-pulse 8s ease-in-out infinite;
+    }
+    .blob-2 {
+      width: 450px; height: 450px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, transparent 70%);
+      bottom: -130px; right: -130px;
+      animation: radial-pulse 10s ease-in-out infinite reverse;
+    }
+    .blob-3 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(244, 63, 94, 0.02) 0%, transparent 70%);
+      top: 40%; left: 55%;
+      animation: radial-pulse 13s ease-in-out infinite 1s;
+    }
+    @keyframes radial-pulse {
+      0%, 100% { transform: scale(1); opacity: 0.7; }
+      50% { transform: scale(1.18); opacity: 1; }
+    }
+
+    .content-layer { position: relative; z-index: 10; }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(254, 226, 226, 0.8);
+      border-radius: 28px;
+      border-top: 1px solid rgba(244, 63, 94, 0.3);
+      box-shadow: 0 10px 30px rgba(157, 23, 77, 0.04);
+    }
+
+    .glass-input {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(254, 226, 226, 1);
+      color: #1e293b;
+      border-radius: 12px;
+      padding: 13px 14px 13px 44px;
+      width: 100%;
+      font-family: 'Kanit', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+    }
+    .glass-input::placeholder { color: #94a3b8; }
+    .glass-input:focus {
+      border-color: #f43f5e;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15);
+    }
+
+    .btn-admin {
+      background: linear-gradient(135deg, #f43f5e 0%, #be123c 100%);
+      box-shadow: 0 4px 15px rgba(244, 63, 94, 0.2);
+      transition: all 0.3s ease;
+      border: none; cursor: pointer;
+    }
+    .btn-admin:hover:not(:disabled) {
+      box-shadow: 0 4px 20px rgba(244, 63, 94, 0.35);
+      transform: translateY(-2px);
+    }
+    .btn-admin:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .toggle-pass {
+      background: none; border: none; cursor: pointer;
+      color: #64748b; padding: 0; transition: color 0.2s;
+    }
+    .toggle-pass:hover { color: #f43f5e; }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: #64748b; font-size: 0.8rem; transition: color 0.2s;
+    }
+    .back-link:hover { color: #be123c; }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(254, 226, 226, 0.8), transparent);
+    }
+
+    .shield-badge-red {
+      background: linear-gradient(135deg, rgba(244, 63, 94, 0.1), rgba(159, 18, 57, 0.1));
+      border: 1px solid rgba(244, 63, 94, 0.25);
+      border-radius: 16px; padding: 12px;
+      display: inline-flex; font-size: 1.8rem;
+      animation: red-glow 3s ease-in-out infinite;
+    }
+    @keyframes red-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(244, 63, 94, 0.1); }
+      50% { box-shadow: 0 0 45px rgba(244, 63, 94, 0.25); }
+    }
+
+    .warning-badge {
+      background: rgba(251, 191, 36, 0.05);
+      border: 1px solid rgba(251, 191, 36, 0.15);
+      border-radius: 12px;
+      padding: 10px 16px;
+      animation: warn-pulse 2s ease-in-out infinite;
+    }
+    @keyframes warn-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .input-wrapper { position: relative; }
+    .input-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      color: #94a3b8; pointer-events: none;
+    }
+    .input-action {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    }
+
+    /* Scan line overlay for admin feel */
+    .scan-overlay {
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(244, 63, 94, 0.01) 2px,
+        rgba(244, 63, 94, 0.01) 4px
+      );
+      pointer-events: none; z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="grid-overlay"></div>
+  <div class="scan-overlay"></div>
+
+  <div class="content-layer min-h-screen flex flex-col items-center justify-center px-4 py-10">
+    <div class="w-full max-w-md mx-auto">
+
+      <!-- Card -->
+      <div class="glass-card p-8 md:p-10">
+
+        <!-- Header -->
+        <div class="flex flex-col items-center text-center mb-6">
+          <div class="shield-badge-red mb-4 overflow-hidden bg-white p-2 flex items-center justify-center w-16 h-16 rounded-2xl">
+            <img src="logo.png" alt="Tab-Lock Logo" class="w-full h-full object-cover rounded-xl" />
+          </div>
+          <div class="text-xs font-black tracking-[0.4em] text-rose-500 uppercase mb-1">TAB-LOCK</div>
+          <h1 class="text-2xl font-black text-slate-800 tracking-wider mb-3 uppercase">SUPER ADMIN ACCESS</h1>
+
+          <!-- Warning badge -->
+          <div class="warning-badge flex items-center gap-2">
+            <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <span class="text-amber-700 text-xs font-bold">ระบบเข้าถึงสำหรับผู้ดูแลระบบเท่านั้น</span>
+          </div>
+        </div>
+
+        <!-- Error msg -->
+        <div id="error-msg" class="hidden mb-5 p-3.5 rounded-xl text-sm font-medium text-rose-700 flex items-center gap-2"
+             style="background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.25);">
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span></span>
+        </div>
+
+        <!-- Form -->
+        <div class="space-y-4 mb-6">
+          <!-- Username -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-600 mb-1.5">Admin Username</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </span>
+              <input id="username" type="text" class="glass-input" placeholder="กรอก admin username" autocomplete="username" />
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-600 mb-1.5">Admin Password</label>
+            <div class="input-wrapper">
+              <span class="input-icon">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+              </span>
+              <input id="password" type="password" class="glass-input" placeholder="กรอก admin password" autocomplete="current-password" />
+              <span class="input-action">
+                <button class="toggle-pass" id="toggle-pass-btn" type="button" aria-label="แสดง/ซ่อนรหัสผ่าน">
+                  <svg id="eye-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                  </svg>
+                </button>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button id="login-btn" class="btn-admin w-full py-3.5 rounded-xl text-white font-bold text-sm flex items-center justify-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+          เข้าสู่ระบบ Admin
+        </button>
+
+        <!-- Divider -->
+        <div class="divider my-6"></div>
+
+        <!-- Back link -->
+        <div class="text-center">
+          <a href="index.html" class="back-link justify-center">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            ย้อนกลับหน้าหลัก
+          </a>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <p class="text-center text-slate-500 text-xs mt-6 tracking-wider uppercase">ADMIN CONTROL CENTER • Tab-Lock v3.0</p>
+    </div>
+  </div>
+
+  <script>
+    function togglePassword() {
+      const input = document.getElementById('password');
+      const eyeIcon = document.getElementById('eye-icon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        eyeIcon.innerHTML = `
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+        `;
+      } else {
+        input.type = 'password';
+        eyeIcon.innerHTML = `
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+        `;
+      }
+    }
+
+    async function adminLogin() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      console.log('adminLogin triggered with username:', username);
+      if (!username || !password) { 
+        alert('กรุณากรอก Username และ Password ให้ครบถ้วนครับ');
+        showError('กรุณากรอก Username และ Password'); 
+        return; 
+      }
+      const btn = document.getElementById('login-btn');
+      btn.disabled = true;
+      btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> กำลังตรวจสอบสิทธิ์...`;
+      try {
+        console.log('Sending request to /api/teacher/login...');
+        const res = await fetch('/api/teacher/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        console.log('Response data:', data);
+        if (data.success && data.teacher.role === 'admin') {
+          localStorage.setItem('teacher_username', data.teacher.username);
+          localStorage.setItem('teacher_name', data.teacher.name);
+          localStorage.setItem('teacher_role', data.teacher.role);
+          localStorage.setItem('admin_username', data.teacher.username);
+          localStorage.setItem('admin_name', data.teacher.name);
+          window.location.href = 'super-admin.html';
+        } else if (data.success && data.teacher.role !== 'admin') {
+          alert('❌ บัญชีนี้ไม่มีสิทธิ์ Super Admin');
+          showError('❌ บัญชีนี้ไม่มีสิทธิ์ Super Admin');
+          btn.disabled = false;
+          btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg> เข้าสู่ระบบ Admin`;
+        } else {
+          alert('❌ เข้าสู่ระบบล้มเหลว: ' + (data.message || 'รหัสผ่านไม่ถูกต้อง'));
+          showError(data.message || 'เข้าสู่ระบบล้มเหลว');
+          btn.disabled = false;
+          btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg> เข้าสู่ระบบ Admin`;
+        }
+      } catch(e) {
+        console.error('Fetch error:', e);
+        alert('❌ ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์หลังบ้านได้ กรุณาตรวจสอบว่าเซิร์ฟเวอร์รันอยู่ครับ');
+        showError('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้');
+        btn.disabled = false;
+        btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg> เข้าสู่ระบบ Admin`;
+      }
+    }
+
+    function showError(msg) {
+      console.log('Displaying error message:', msg);
+      const el = document.getElementById('error-msg');
+      el.querySelector('span').textContent = msg;
+      el.classList.remove('hidden');
+    }
+
+    // Register event listeners dynamically
+    document.getElementById('login-btn').addEventListener('click', adminLogin);
+    document.getElementById('toggle-pass-btn').addEventListener('click', togglePassword);
+
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') adminLogin(); });
+  </script>
+</body>
+</html>
