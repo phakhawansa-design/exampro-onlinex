@@ -32,8 +32,8 @@
   <style>
     /* GLOBAL STYLES */
     html, body, #root {
-      background-color: #0C0C0C;
-      color: #D7E2EA;
+      background-color: #f8fafc;
+      color: #1e293b;
       font-family: 'Kanit', 'Inter', sans-serif;
       margin: 0;
       padding: 0;
@@ -46,7 +46,7 @@
     }
 
     .hero-heading {
-      background: linear-gradient(180deg, #FFFFFF 0%, #CBD5E1 100%);
+      background: linear-gradient(135deg, #0f172a 0%, #06b6d4 50%, #8b5cf6 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -268,15 +268,15 @@
     // --- SECTION 1: HERO SECTION ---
     const HeroSection = ({ onPortalClick }) => {
       return (
-        <section className="h-screen w-full flex flex-col justify-between relative overflow-hidden bg-[#0C0C0C]" style={{ overflowX: 'clip' }}>
+        <section className="h-screen w-full flex flex-col justify-between relative overflow-hidden bg-slate-50" style={{ overflowX: 'clip' }}>
           {/* Navbar */}
           <FadeIn delay={0} y={-20} as="nav" className="w-full px-4 sm:px-6 md:px-10 pt-4 sm:pt-6 md:pt-8 flex justify-between items-center z-30">
-            <div className="text-base sm:text-xl font-bold tracking-wider text-[#D7E2EA] whitespace-nowrap shrink-0">TAB-LOCK</div>
+            <div className="text-base sm:text-xl font-bold tracking-wider text-slate-800 whitespace-nowrap shrink-0">TAB-LOCK</div>
             <div className="flex gap-2 sm:gap-6 md:gap-10 items-center">
-              <a href="#about" className="text-[#D7E2EA] font-medium uppercase tracking-wider text-xs sm:text-sm md:text-lg lg:text-[1.4rem] hover:opacity-70 transition-opacity duration-200">About</a>
-              <a href="#features" className="text-[#D7E2EA] font-medium uppercase tracking-wider text-xs sm:text-sm md:text-lg lg:text-[1.4rem] hover:opacity-70 transition-opacity duration-200">Features</a>
-              <a href="#projects" className="text-[#D7E2EA] font-medium uppercase tracking-wider text-xs sm:text-sm md:text-lg lg:text-[1.4rem] hover:opacity-70 transition-opacity duration-200">Portal</a>
-              <a href="#" onClick={(e) => { e.preventDefault(); onPortalClick(); }} className="text-[#D7E2EA] font-semibold uppercase tracking-wider text-xs sm:text-sm md:text-lg lg:text-[1.4rem] hover:opacity-70 transition-opacity duration-200 text-cyan-400 whitespace-nowrap">เข้าสู่ระบบ 🔒</a>
+              <a href="#about" className="text-slate-600 font-medium uppercase tracking-wider text-xs sm:text-sm md:text-lg lg:text-[1.4rem] hover:text-slate-900 transition-colors duration-200">About</a>
+              <a href="#features" className="text-slate-600 font-medium uppercase tracking-wider text-xs sm:text-sm md:text-lg lg:text-[1.4rem] hover:text-slate-900 transition-colors duration-200">Features</a>
+              <a href="#projects" className="text-slate-600 font-medium uppercase tracking-wider text-xs sm:text-sm md:text-lg lg:text-[1.4rem] hover:text-slate-900 transition-colors duration-200">Portal</a>
+              <a href="#" onClick={(e) => { e.preventDefault(); onPortalClick(); }} className="text-cyan-600 font-semibold uppercase tracking-wider text-xs sm:text-sm md:text-lg lg:text-[1.4rem] hover:text-cyan-700 transition-colors duration-200 whitespace-nowrap">เข้าสู่ระบบ 🔒</a>
             </div>
           </FadeIn>
 
@@ -319,7 +319,7 @@
           <div className="w-full px-4 sm:px-6 md:px-10 pb-5 sm:pb-8 md:pb-10 flex flex-wrap sm:flex-nowrap justify-between items-end gap-3 z-30">
             <FadeIn delay={0.35} y={20} className="text-left">
               <p
-                className="text-[#D7E2EA] font-light uppercase tracking-wide leading-snug max-w-[150px] sm:max-w-[220px] md:max-w-[260px] text-xs sm:text-sm md:text-base"
+                className="text-slate-600 font-light uppercase tracking-wide leading-snug max-w-[150px] sm:max-w-[220px] md:max-w-[260px] text-xs sm:text-sm md:text-base"
               >
                 an online proctoring system designed to prevent cheating and secure exam environments
               </p>
@@ -433,7 +433,7 @@
     // --- SECTION 3: ABOUT SECTION ---
     const AboutSection = ({ onPortalClick }) => {
       return (
-        <section id="about" className="min-h-screen w-full relative bg-[#0C0C0C] px-5 sm:px-8 md:px-10 py-20 flex flex-col justify-center items-center overflow-hidden">
+        <section id="about" className="min-h-screen w-full relative bg-slate-50 px-5 sm:px-8 md:px-10 py-20 flex flex-col justify-center items-center overflow-hidden">
           {/* Moon icon */}
           <FadeIn
             delay={0.1}
@@ -508,7 +508,7 @@
 
             <AnimatedText
               text="ด้วยเทคโนโลยีป้องกันการทุจริตขั้นสูง Tab-Lock มุ่งเน้นไปที่ระบบตรวจจับการสลับหน้าต่าง (Window Switching), การสร้างข้อสอบที่มีความปลอดภัย และระบบตรวจข้อสอบอัตโนมัติ เรารู้สึกยินดีเป็นอย่างยิ่งที่ได้ช่วยเหลือสถาบันการศึกษาต่าง ๆ ที่ต้องการจัดสอบอย่างปลอดภัยและโปร่งใส มาร่วมกันทำให้การสอบของคุณปลอดภัยไปด้วยกัน!"
-              className="text-[#D7E2EA] font-medium leading-relaxed max-w-[560px] text-center justify-center"
+              className="text-slate-700 font-medium leading-relaxed max-w-[560px] text-center justify-center"
               style={{ fontSize: 'clamp(1rem, 2vw, 1.35rem)' }}
             />
 

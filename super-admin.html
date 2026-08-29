@@ -414,12 +414,16 @@
         async function loadStats() {
             try {
                 const res = await fetch('/api/superadmin/stats');
-                const stats = await res.json();
-                document.getElementById('stat-total-teachers').textContent = stats.teachers.total || 0;
-                document.getElementById('stat-pending').textContent = stats.teachers.pending || 0;
-                document.getElementById('stat-unique-students').textContent = stats.uniqueStudents || 0;
-                document.getElementById('stat-total-logins').textContent = stats.studentLogins || 0;
-            } catch(e) { console.error(e); }
+                if (res.ok) {
+                    const stats = await res.json();
+                    if (stats.teachers) {
+                        document.getElementById('stat-total-teachers').textContent = stats.teachers.total || 0;
+                        document.getElementById('stat-pending').textContent = stats.teachers.pending || 0;
+                    }
+                    document.getElementById('stat-unique-students').textContent = stats.uniqueStudents ?? stats.unique_students ?? 0;
+                    document.getElementById('stat-total-logins').textContent = stats.studentLogins ?? 0;
+                }
+            } catch(e) { console.error('loadStats error:', e); }
         }
 
         // โหลดรายชื่ออาจารย์
@@ -429,10 +433,18 @@
                 const teachers = await res.json();
                 const tbody = document.getElementById('teachers-table-body');
 
-                if (teachers.length === 0) {
+                if (!Array.isArray(teachers) || teachers.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-xs text-slate-600">ยังไม่มีอาจารย์ในระบบ</td></tr>';
+                    document.getElementById('stat-total-teachers').textContent = '0';
+                    document.getElementById('stat-pending').textContent = '0';
                     return;
                 }
+
+                // อัปเดตตัวเลขการ์ดทันทีจากรายการอาจารย์จริง
+                const totalTeachers = teachers.length;
+                const pendingTeachers = teachers.filter(t => t.status === 'pending').length;
+                document.getElementById('stat-total-teachers').textContent = totalTeachers;
+                document.getElementById('stat-pending').textContent = pendingTeachers;
 
                 tbody.innerHTML = teachers.map((t, i) => {
                     const statusBadge = t.status === 'pending' 

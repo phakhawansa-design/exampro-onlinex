@@ -1356,17 +1356,32 @@ app.get('/api/teacher/active-students', (req, res) => {
 // สรุปสถิติสำหรับ Super Admin Dashboard
 app.get('/api/superadmin/stats', (req, res) => {
     const stats = {};
-    db.get('SELECT COUNT(*) as total, SUM(CASE WHEN status = "pending" THEN 1 ELSE 0 END) as pending, SUM(CASE WHEN status = "approved" THEN 1 ELSE 0 END) as approved FROM teachers WHERE role != "admin"', [], (err, teacherStats) => {
-        if (err) return res.status(500).json({ message: err.message });
-        stats.teachers = teacherStats || { total: 0, pending: 0, approved: 0 };
+    db.get("SELECT COUNT(*) as total, SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending, SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved FROM teachers WHERE role != 'admin'", [], (err, teacherStats) => {
+        if (err) {
+            console.error('Error fetching teacher stats:', err.message);
+            return res.status(500).json({ message: err.message });
+        }
+        stats.teachers = {
+            total: parseInt(teacherStats?.total, 10) || 0,
+            pending: parseInt(teacherStats?.pending, 10) || 0,
+            approved: parseInt(teacherStats?.approved, 10) || 0
+        };
         
         db.get('SELECT COUNT(*) as total FROM student_logins', [], (err, studentStats) => {
-            if (err) return res.status(500).json({ message: err.message });
-            stats.studentLogins = studentStats ? studentStats.total : 0;
+            if (err) {
+                console.error('Error fetching student logins:', err.message);
+                stats.studentLogins = 0;
+            } else {
+                stats.studentLogins = parseInt(studentStats?.total, 10) || 0;
+            }
             
             db.get('SELECT COUNT(DISTINCT studentId) as unique_students FROM student_logins', [], (err, uniqueStats) => {
-                if (err) return res.status(500).json({ message: err.message });
-                stats.uniqueStudents = uniqueStats ? uniqueStats.unique_students : 0;
+                if (err) {
+                    console.error('Error fetching unique students:', err.message);
+                    stats.uniqueStudents = 0;
+                } else {
+                    stats.uniqueStudents = parseInt(uniqueStats?.unique_students ?? uniqueStats?.uniquestudents, 10) || 0;
+                }
                 res.json(stats);
             });
         });
