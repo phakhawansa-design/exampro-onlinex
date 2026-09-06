@@ -3,11 +3,6 @@
 <head>
   <script>
     if (window.location.protocol === 'file:') {
-<!DOCTYPE html>
-<html lang="th">
-<head>
-  <script>
-    if (window.location.protocol === 'file:') {
       const fileName = window.location.pathname.split('/').pop() || 'index.html';
       window.location.href = 'http://localhost:5000/' + fileName;
     }

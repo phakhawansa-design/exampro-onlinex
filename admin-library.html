@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>คลังข้อสอบสะสม - Tab-Lock Online Proctoring System</title>
+    <title>คลังข้อสอบ - Tab-Lock Online Proctoring System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Kanit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -197,7 +197,7 @@
                 </a>
                 <a href="admin-library.html" class="nav-link active">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
-                    <span>คลังข้อสอบสะสม</span>
+                    <span>คลังข้อสอบ</span>
                 </a>
                 <a href="admin-results.html" class="nav-link">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /></svg>
@@ -235,8 +235,13 @@
         <!-- Header -->
         <header id="top-header">
             <div class="flex justify-between items-center w-full">
-                <h1 class="text-xl md:text-2xl font-black text-slate-900">📚 คลังข้อสอบสะสม (My Exam Library)</h1>
-                <a href="dashboard.html" class="text-xs md:text-sm text-slate-500 hover:text-slate-800 font-bold">&larr; กลับแดชบอร์ด</a>
+                <h1 class="text-xl md:text-2xl font-black text-slate-900">📚 คลังข้อสอบ</h1>
+                <div class="flex items-center gap-3">
+                    <button onclick="window.TabLockGuide.open('library')" class="bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white font-extrabold px-3.5 py-2 rounded-xl text-xs md:text-sm transition duration-300 shadow-sm active:scale-95 flex items-center gap-1.5 cursor-pointer">
+                        <span>💡 คู่มือหน้านี้</span>
+                    </button>
+                    <a href="dashboard.html" class="text-xs md:text-sm text-slate-500 hover:text-slate-800 font-bold">&larr; กลับแดชบอร์ด</a>
+                </div>
             </div>
         </header>
 
@@ -246,27 +251,27 @@
             <!-- Library Header Control panel -->
             <div class="glass-card p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/90">
                 <div class="space-y-1">
-                    <h2 class="text-lg md:text-xl font-black text-slate-800">📚 คลังระบบสะสมข้อสอบอัตโนมัติ (My Exam Library)</h2>
-                    <p class="text-xs md:text-sm text-slate-600 font-medium leading-relaxed">ข้อสอบทุกชุดที่คุณนำเข้าผ่าน Excel หรือสร้างเองสดๆ ในระบบจะบันทึกซิงค์ลงในคลังสะสมนี้โดยอัตโนมัติ เพื่อดึงกลับมาใช้ใหม่หรือแก้ไขได้ตามชอบ</p>
+                    <h2 class="text-lg md:text-xl font-black text-slate-800">📚 คลังข้อสอบ</h2>
+                    <p class="text-xs md:text-sm text-slate-600 font-medium leading-relaxed">ข้อสอบทุกชุดที่คุณนำเข้าผ่าน Excel หรือสร้างเองสดๆ ในระบบจะบันทึกซิงค์ลงในคลังข้อสอบนี้โดยอัตโนมัติ เพื่อดึงกลับมาใช้ใหม่หรือแก้ไขได้ตามชอบ</p>
                 </div>
             </div>
 
             <!-- Templates Grid Container -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="library-templates-list">
-                <!-- ข้อมูลคลังข้อสอบสะสมจะโหลดมาแสดงตรงนี้ -->
+                <!-- ข้อมูลคลังข้อสอบจะโหลดมาแสดงตรงนี้ -->
             </div>
         </main>
     </div>
 
-    <!-- ✏️ Modal แก้ไขข้อสอบในคลังสะสม -->
+    <!-- ✏️ Modal แก้ไขข้อสอบในคลังข้อสอบ -->
     <div id="edit-template-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 select-none">
         <div class="w-full max-w-4xl bg-white border border-slate-200 p-8 rounded-3xl shadow-2xl space-y-6 text-slate-800 flex flex-col max-h-[90vh]">
             <div class="flex justify-between items-center border-b border-slate-100 pb-4">
                 <div class="flex items-center gap-2">
                     <span class="text-2xl">✏️</span>
                     <div>
-                        <h3 class="text-base font-extrabold text-slate-850">แก้ไขชุดข้อสอบในคลังสะสม</h3>
-                        <p class="text-[10px] text-slate-500 font-semibold mt-0.5">คุณกำลังทำการแก้ไขรายละเอียดโจทย์ ตัวเลือก และเฉลยภายในคลังสะสมโดยตรง</p>
+                        <h3 class="text-base font-extrabold text-slate-850">แก้ไขชุดข้อสอบในคลังข้อสอบ</h3>
+                        <p class="text-[10px] text-slate-500 font-semibold mt-0.5">คุณกำลังทำการแก้ไขรายละเอียดโจทย์ ตัวเลือก และเฉลยภายในคลังข้อสอบโดยตรง</p>
                     </div>
                 </div>
                 <button onclick="closeEditTemplateModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold p-1">&times;</button>
@@ -298,7 +303,7 @@
         // โหลดข้อมูลยืนยันตัวตน
         const username = localStorage.getItem('teacher_username');
         if (!username) {
-            alert("กรุณาเข้าสู่ระบบก่อนการใช้งานหน้าจัดการคลังข้อสอบสะสม");
+            alert("กรุณาเข้าสู่ระบบก่อนการใช้งานหน้าจัดการคลังข้อสอบ");
             window.location.href = 'teacher-login.html';
         } else {
             const teacherName = localStorage.getItem('teacher_name') || username;
@@ -312,10 +317,10 @@
             await loadLibraryTemplates();
         });
 
-        // ดึงรายการชุดข้อสอบสะสมในคลังทั้งหมดมาแสดง
+        // ดึงรายการชุดข้อสอบในคลังทั้งหมดมาแสดง
         async function loadLibraryTemplates() {
             const listContainer = document.getElementById('library-templates-list');
-            listContainer.innerHTML = '<div class="col-span-full text-center py-8 text-slate-400 font-semibold">กำลังโหลดคลังข้อสอบสะสม...</div>';
+            listContainer.innerHTML = '<div class="col-span-full text-center py-8 text-slate-400 font-semibold">กำลังโหลดคลังข้อสอบ...</div>';
 
             try {
                 const res = await fetch(`/api/library/get-templates?username=${username}`);
@@ -324,7 +329,7 @@
                 if (templates.length === 0) {
                     listContainer.innerHTML = `
                         <div class="col-span-full text-center py-12 text-slate-400 border-2 border-dashed border-slate-200 rounded-3xl bg-slate-50/50 shadow-inner">
-                            📭 ยังไม่มีข้อสอบบันทึกอยู่ในคลังสะสมของคุณ<br>
+                            📭 ยังไม่มีข้อสอบบันทึกอยู่ในคลังข้อสอบของคุณ<br>
                             <span class="text-[10px] text-slate-500 font-medium mt-1.5 block">เมื่อคุณสร้างหรือนำเข้าข้อสอบในวิชาใดก็ตาม ระบบจะจัดเก็บข้อมูลลงคลังนี้ให้โดยอัตโนมัติ</span>
                         </div>`;
                     return;
@@ -569,7 +574,7 @@
                 });
 
                 if (res.ok) {
-                    alert("💾 บันทึกการแก้ไขข้อสอบในคลังสะสมเรียบร้อยแล้ว!");
+                    alert("💾 บันทึกการแก้ไขข้อสอบในคลังเรียบร้อยแล้ว!");
                     closeEditTemplateModal();
                     loadLibraryTemplates();
                 } else {
@@ -582,9 +587,9 @@
             }
         }
 
-        // ลบเทมเพลตออกจากคลังสะสม
+        // ลบเทมเพลตออกจากคลัง
         async function deleteLibraryTemplate(templateId) {
-            const confirmDel = confirm("⚠️ คุณยืนยันที่จะลบชุดข้อสอบนี้ออกจากคลังสะสมส่วนตัวของคุณอย่างถาวรใช่หรือไม่?");
+            const confirmDel = confirm("⚠️ คุณยืนยันที่จะลบชุดข้อสอบนี้ออกจากคลังข้อสอบส่วนตัวของคุณอย่างถาวรใช่หรือไม่?");
             if (!confirmDel) return;
 
             try {
@@ -638,5 +643,6 @@
     }
 
 </script>
+<script src="user-guide-system.js"></script>
 </body>
 </html>
