@@ -631,11 +631,9 @@
         document.body.appendChild(btn);
     }
 
-    // ===== 8. เปิดหน้าต่างคู่มือการใช้งานอัตโนมัติทันทีสำหรับผู้ใช้ใหม่ =====
+    // ===== 8. เปิดหน้าต่างคู่มือการใช้งานอัตโนมัติทันทีเมื่อเข้าสู่หน้าเว็บ =====
     function checkAndShowFirstTimeBanner() {
         const pageKey = getCurrentPageKey();
-        if (hasSeenGuide(pageKey)) return;
-
         // เปิดหน้าต่างคู่มือแนะนำการใช้งานของหน้านั้นๆ ขึ้นมาทันทีแบบอัตโนมัติ
         window.TabLockGuide.open(pageKey);
     }
@@ -804,7 +802,7 @@
         injectGuideStyles();
         createGuideModal();
         createFloatingGuideButton();
-        setTimeout(checkAndShowFirstTimeBanner, 400);
+        setTimeout(checkAndShowFirstTimeBanner, 250);
     }
 
     if (document.readyState === 'loading') {
