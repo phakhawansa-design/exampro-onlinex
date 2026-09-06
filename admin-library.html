@@ -119,15 +119,33 @@
         }
         @keyframes sidebarDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         .sidebar-online-dot { animation: sidebarDot 2s ease-in-out infinite; }
-        select.dark-select, input.dark-input {
+        .header-card {
             background: #ffffff;
-            border: 1px solid rgba(226, 232, 240, 1);
-            color: #1e293b; border-radius: 10px;
-            padding: 10px 14px; font-size: 13px;
-            font-family: 'Kanit', sans-serif;
-            outline: none; width: 100%; transition: border-color 0.2s;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 18px;
+            padding: 8px 18px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
         }
-        select.dark-select:focus, input.dark-input:focus { border-color: rgba(6,182,212,0.5); }
+        select.dark-select, input.dark-input {
+            background: #f8fafc;
+            border: 1.5px solid #cbd5e1;
+            color: #1e293b; border-radius: 12px;
+            padding: 8px 14px; font-size: 13px;
+            font-weight: 600;
+            font-family: 'Kanit', sans-serif;
+            outline: none; width: 100%; transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+            cursor: pointer;
+        }
+        select.dark-select:hover, input.dark-input:hover {
+            background: #ffffff;
+            border-color: #64748b;
+        }
+        select.dark-select:focus, input.dark-input:focus {
+            background: #ffffff;
+            border-color: #06b6d4;
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+        }
         select.dark-select option { background: #ffffff; color: #1e293b; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -337,35 +355,35 @@
 
                 listContainer.innerHTML = templates.map(t => {
                     const ownerBadge = (username === 'admin' && t.teacherUsername)
-                        ? `<span class="bg-violet-50 border border-violet-100 text-violet-600 font-black text-[9px] px-2 py-0.5 rounded-lg">👤 ${t.teacherUsername}</span>`
+                        ? `<span class="bg-violet-50 border border-violet-200 text-violet-700 font-bold text-xs px-3 py-1 rounded-xl">👤 ${t.teacherUsername}</span>`
                         : '';
                     return `
-                        <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4 hover:shadow-md transition duration-300 flex flex-col justify-between" id="tpl-card-${t.id}">
-                            <div class="space-y-2">
+                        <div class="bg-white border-2 border-slate-200 hover:border-indigo-400 rounded-3xl p-6 md:p-7 shadow-sm space-y-4 hover:shadow-md transition-all duration-300 flex flex-col justify-between" id="tpl-card-${t.id}">
+                            <div class="space-y-3">
                                 <div class="flex items-start justify-between gap-3">
-                                    <h3 class="font-extrabold text-slate-800 text-sm leading-snug">${escapeHtml(t.templateName)}</h3>
-                                    <div class="flex flex-col items-end gap-1 shrink-0">
-                                        <span class="bg-cyan-50 border border-cyan-100 text-cyan-600 font-black text-[10px] px-2.5 py-1 rounded-xl">
+                                    <h3 class="font-black text-slate-900 text-lg md:text-xl leading-snug">${escapeHtml(t.templateName)}</h3>
+                                    <div class="flex flex-col items-end gap-1.5 shrink-0">
+                                        <span class="bg-cyan-50 border border-cyan-200 text-cyan-700 font-extrabold text-xs md:text-sm px-3.5 py-1 rounded-xl">
                                             ${t.questionCount} ข้อ
                                         </span>
                                         ${ownerBadge}
                                     </div>
                                 </div>
-                                <p class="text-[10px] text-slate-500 font-bold">📅 อัปเดตล่าสุด: ${t.created_at}</p>
+                                <p class="text-xs md:text-sm text-slate-500 font-semibold">📅 อัปเดตล่าสุด: ${t.created_at}</p>
                             </div>
 
                             <!-- ปุ่มสั่งการ -->
-                            <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
+                            <div class="flex flex-wrap gap-2.5 pt-3 border-t border-slate-100">
                                 <button onclick="openEditTemplateModal(${t.id}, '${escapeHtml(t.templateName)}')"
-                                    class="flex-1 min-w-[120px] bg-gradient-to-r from-cyan-500 to-indigo-500 hover:from-cyan-600 hover:to-indigo-600 text-white font-bold py-2 rounded-xl text-[10px] transition duration-200 active:scale-95 shadow-sm">
+                                    class="flex-1 min-w-[130px] bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white font-extrabold py-2.5 px-4 rounded-xl text-xs md:text-sm transition duration-200 active:scale-95 shadow-md shadow-cyan-600/10 cursor-pointer">
                                     ✏️ แก้ไขข้อสอบในคลัง
                                 </button>
                                 <button onclick="togglePreviewTemplate(${t.id}, this)"
-                                    class="bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 font-bold px-3 py-2 rounded-xl text-[10px] transition duration-200 active:scale-95">
+                                    class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold px-4 py-2.5 rounded-xl text-xs md:text-sm transition duration-200 active:scale-95 cursor-pointer">
                                     👁️ ดูข้อสอบ
                                 </button>
                                 <button onclick="deleteLibraryTemplate(${t.id})"
-                                    class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-100 font-bold px-3 py-2 rounded-xl text-[10px] transition duration-200 active:scale-95">
+                                    class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold px-4 py-2.5 rounded-xl text-xs md:text-sm transition duration-200 active:scale-95 cursor-pointer">
                                     🗑️ ลบ
                                 </button>
                             </div>

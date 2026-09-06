@@ -113,15 +113,15 @@
         }
         .header-card {
             background: #ffffff;
-            border: 1px solid #cbd5e1;
-            border-radius: 16px;
-            padding: 10px 20px;
-            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+            border: 1.5px solid #cbd5e1;
+            border-radius: 18px;
+            padding: 8px 18px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
         }
         .glass-card {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(226, 232, 240, 0.8);
+            border: 1.5px solid #cbd5e1;
             border-radius: 20px;
             box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);
         }
@@ -138,14 +138,25 @@
         @keyframes sidebarDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         .sidebar-online-dot { animation: sidebarDot 2s ease-in-out infinite; }
         select.dark-select, input.dark-input {
-            background: #ffffff;
-            border: 1px solid rgba(226, 232, 240, 1);
-            color: #1e293b; border-radius: 10px;
-            padding: 10px 14px; font-size: 13px;
+            background: #f8fafc;
+            border: 1.5px solid #cbd5e1;
+            color: #1e293b; border-radius: 12px;
+            padding: 8px 14px; font-size: 13px;
+            font-weight: 600;
             font-family: 'Kanit', sans-serif;
-            outline: none; width: 100%; transition: border-color 0.2s;
+            outline: none; width: 100%; transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+            cursor: pointer;
         }
-        select.dark-select:focus, input.dark-input:focus { border-color: rgba(6,182,212,0.5); }
+        select.dark-select:hover, input.dark-input:hover {
+            background: #ffffff;
+            border-color: #64748b;
+        }
+        select.dark-select:focus, input.dark-input:focus {
+            background: #ffffff;
+            border-color: #06b6d4;
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+        }
         select.dark-select option { background: #ffffff; color: #1e293b; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -445,24 +456,24 @@
 
                 <!-- 📂 Modal เลือกข้อสอบจากคลังข้อสอบ -->
                 <div id="library-selector-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 select-none">
-                    <div class="w-full max-w-2xl bg-white border border-slate-200 p-8 rounded-3xl shadow-2xl space-y-6 text-slate-800 flex flex-col max-h-[90vh]">
+                    <div class="w-full max-w-3xl bg-white border border-slate-200 p-8 md:p-9 rounded-3xl shadow-2xl space-y-6 text-slate-800 flex flex-col max-h-[90vh]">
                         <div class="flex justify-between items-center border-b border-slate-100 pb-4">
-                            <div class="flex items-center gap-2">
-                                <span class="text-2xl">📚</span>
+                            <div class="flex items-center gap-3">
+                                <span class="text-3xl">📚</span>
                                 <div>
-                                    <h3 class="text-base font-extrabold text-slate-850">เลือกชุดข้อสอบจากคลังข้อสอบ</h3>
-                                    <p class="text-[10px] text-slate-500 font-semibold mt-0.5">คลิกเลือกชุดข้อสอบที่คุณบันทึกไว้ในคลัง เพื่อดึงมาใช้งานในห้องสอบปัจจุบัน</p>
+                                    <h3 class="text-xl md:text-2xl font-black text-slate-900">เลือกชุดข้อสอบจากคลังข้อสอบ</h3>
+                                    <p class="text-xs md:text-sm text-slate-500 font-medium mt-1">คลิกเลือกชุดข้อสอบที่คุณบันทึกไว้ในคลัง เพื่อดึงมาใช้งานในห้องสอบปัจจุบัน</p>
                                 </div>
                             </div>
-                            <button onclick="closeSelectFromLibraryModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold p-1">&times;</button>
+                            <button onclick="closeSelectFromLibraryModal()" class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 text-base font-bold transition cursor-pointer">&times;</button>
                         </div>
                         
-                        <div id="modal-library-list" class="flex-grow overflow-y-auto space-y-4 pr-2 min-h-[300px] max-h-[50vh]">
+                        <div id="modal-library-list" class="flex-grow overflow-y-auto space-y-4 pr-2 min-h-[300px] max-h-[55vh]">
                             <!-- รายการชุดข้อสอบในคลังจะแสดงที่นี่ -->
                         </div>
                         
                         <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                            <button onclick="closeSelectFromLibraryModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition duration-200">
+                            <button onclick="closeSelectFromLibraryModal()" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold rounded-2xl transition duration-200 cursor-pointer">
                                 ยกเลิก
                             </button>
                         </div>
@@ -1524,23 +1535,24 @@
 
                 listContainer.innerHTML = templates.map(t => {
                     const ownerBadge = (username === 'admin' && t.teacherUsername)
-                        ? `<span class="bg-violet-50 border border-violet-100 text-violet-600 font-black text-[9px] px-2 py-0.5 rounded-lg">👤 ${t.teacherUsername}</span>`
+                        ? `<span class="bg-violet-50 border border-violet-200 text-violet-700 font-bold text-xs px-3 py-1 rounded-xl">👤 ${t.teacherUsername}</span>`
                         : '';
                     return `
-                        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:shadow-md transition">
-                            <div class="space-y-1.5">
-                                <h4 class="font-extrabold text-slate-800 text-sm leading-snug">${escapeHtml(t.templateName)}</h4>
-                                <div class="flex items-center gap-3">
-                                    <span class="bg-cyan-50 border border-cyan-100 text-cyan-600 font-black text-[9px] px-2 py-0.5 rounded-lg shrink-0">
+                        <div class="bg-white border-2 border-slate-200 hover:border-indigo-400 rounded-3xl p-5 md:p-6 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:shadow-md transition-all">
+                            <div class="space-y-2">
+                                <h4 class="font-black text-slate-900 text-lg md:text-xl leading-snug">${escapeHtml(t.templateName)}</h4>
+                                <div class="flex items-center gap-3 flex-wrap">
+                                    <span class="bg-cyan-50 border border-cyan-200 text-cyan-700 font-extrabold text-xs md:text-sm px-3.5 py-1 rounded-xl shrink-0">
                                         ${t.questionCount} ข้อ
                                     </span>
                                     ${ownerBadge}
-                                    <span class="text-[9px] text-slate-450 font-bold">📅 บันทึกเมื่อ: ${t.created_at}</span>
+                                    <span class="text-xs md:text-sm text-slate-500 font-medium">🗓️ บันทึกเมื่อ: ${t.created_at}</span>
                                 </div>
                             </div>
                             <button onclick="copyTemplateQuestionsToRoom(${t.id})"
-                                class="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold px-4 py-2 rounded-xl text-xs transition duration-200 active:scale-95 shadow-sm">
-                                📂 ดึงข้อสอบชุดนี้
+                                class="w-full sm:w-auto bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold px-6 py-3 rounded-2xl text-sm md:text-base transition duration-200 active:scale-95 shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 shrink-0 cursor-pointer">
+                                <span>📁</span>
+                                <span>ดึงข้อสอบชุดนี้</span>
                             </button>
                         </div>
                     `;

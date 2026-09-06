@@ -125,15 +125,33 @@
         .online-dot { animation: onlinePulse 2s ease-in-out infinite; }
         @keyframes sidebarDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         .sidebar-online-dot { animation: sidebarDot 2s ease-in-out infinite; }
-        select.dark-select, input.dark-input {
+        .header-card {
             background: #ffffff;
-            border: 1px solid rgba(226, 232, 240, 1);
-            color: #1e293b; border-radius: 10px;
-            padding: 10px 14px; font-size: 13px;
-            font-family: 'Kanit', sans-serif;
-            outline: none; width: 100%; transition: border-color 0.2s;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 18px;
+            padding: 8px 18px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
         }
-        select.dark-select:focus, input.dark-input:focus { border-color: rgba(6,182,212,0.5); }
+        select.dark-select, input.dark-input {
+            background: #f8fafc;
+            border: 1.5px solid #cbd5e1;
+            color: #1e293b; border-radius: 12px;
+            padding: 8px 14px; font-size: 13px;
+            font-weight: 600;
+            font-family: 'Kanit', sans-serif;
+            outline: none; width: 100%; transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+            cursor: pointer;
+        }
+        select.dark-select:hover, input.dark-input:hover {
+            background: #ffffff;
+            border-color: #64748b;
+        }
+        select.dark-select:focus, input.dark-input:focus {
+            background: #ffffff;
+            border-color: #06b6d4;
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+        }
         select.dark-select option { background: #ffffff; color: #1e293b; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }

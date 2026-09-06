@@ -114,15 +114,15 @@
         }
         .header-card {
             background: #ffffff;
-            border: 1px solid #cbd5e1;
-            border-radius: 16px;
-            padding: 10px 20px;
-            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+            border: 1.5px solid #cbd5e1;
+            border-radius: 18px;
+            padding: 8px 18px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
         }
         .glass-card {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(226, 232, 240, 0.8);
+            border: 1.5px solid #cbd5e1;
             border-radius: 20px;
             box-shadow: 0 4px 15px rgba(15, 23, 42, 0.04);
         }
@@ -134,14 +134,25 @@
         @keyframes sidebarDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         .sidebar-online-dot { animation: sidebarDot 2s ease-in-out infinite; }
         select.dark-select, input.dark-input {
-            background: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #1e293b; border-radius: 10px;
-            padding: 10px 14px; font-size: 13px;
+            background: #f8fafc;
+            border: 1.5px solid #cbd5e1;
+            color: #1e293b; border-radius: 12px;
+            padding: 8px 14px; font-size: 13px;
+            font-weight: 600;
             font-family: 'Kanit', sans-serif;
-            outline: none; width: 100%; transition: border-color 0.2s;
+            outline: none; width: 100%; transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+            cursor: pointer;
         }
-        select.dark-select:focus, input.dark-input:focus { border-color: rgba(6,182,212,0.5); }
+        select.dark-select:hover, input.dark-input:hover {
+            background: #ffffff;
+            border-color: #64748b;
+        }
+        select.dark-select:focus, input.dark-input:focus {
+            background: #ffffff;
+            border-color: #06b6d4;
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+        }
         select.dark-select option { background: #ffffff; color: #1e293b; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -316,7 +327,7 @@
                 <!-- 🎯 ปุ่มเลือกแยกตามชั้นเรียน (Class Filter) ตามต้องการ -->
                 <div class="flex items-center gap-3 w-full md:w-auto">
                     <span class="text-xs font-bold text-slate-500 shrink-0">🎯 เลือกชั้นเรียน:</span>
-                    <div class="relative w-full md:w-48">
+                    <div class="relative w-full md:w-56">
                         <select id="class-filter" onchange="filterAndRenderResults()"
                             class="dark-select">
                             <option value="ALL">แสดงทั้งหมดทุกชั้นเรียน</option>
@@ -334,8 +345,8 @@
                         <option value="score_desc">คะแนนสอบ (มาก &rarr; น้อย)</option>
                         <option value="time_desc">ลำดับการส่ง (ล่าสุดก่อน)</option>
                     </select>
-                    <button onclick="clearResults()" class="bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-450 px-3.5 py-2 rounded-xl font-bold text-xs transition whitespace-nowrap active:scale-95 shadow-md">
-                        🗑️ ล้างคะแนนห้องนี้
+                    <button onclick="clearResults()" class="bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 px-3.5 py-2 rounded-xl font-bold text-xs transition whitespace-nowrap active:scale-95 shadow-sm flex items-center gap-1.5 cursor-pointer" title="ลบประวัติการส่งคำตอบและคะแนนทั้งหมดของห้องนี้">
+                        🗑️ ลบประวัติการสอบ
                     </button>
                     <button onclick="exportToExcel()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-slate-800 px-3.5 py-2 rounded-xl font-bold text-xs transition whitespace-nowrap active:scale-95 shadow-md">
                         📥 ดาวน์โหลดรายงาน Excel
@@ -421,11 +432,16 @@
 
             <!-- 📊 Item Analysis Table Section -->
             <div id="item-analysis-box" class="glass-card p-8 space-y-6 shadow-2xl hidden select-none">
-                <div class="flex justify-between items-center border-b border-slate-200 pb-3">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-200 pb-3">
                     <h2 class="text-lg font-extrabold bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent flex items-center gap-2">
                         📊 ตารางวิเคราะห์คุณภาพข้อสอบรายข้อ (Item Analysis)
                     </h2>
-                    <span class="bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 font-extrabold text-xs px-3.5 py-1.5 rounded-xl">คำนวณอัตโนมัติ (Classical Test Theory)</span>
+                    <div class="flex items-center gap-2.5 flex-wrap">
+                        <span class="bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 font-extrabold text-xs px-3.5 py-1.5 rounded-xl">คำนวณอัตโนมัติ (Classical Test Theory)</span>
+                        <button onclick="clearResults()" class="bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 px-3.5 py-1.5 rounded-xl font-bold text-xs transition active:scale-95 shadow-sm flex items-center gap-1.5 cursor-pointer" title="ลบประวัติคำตอบและคะแนนสอบทั้งหมดเพื่อเริ่มใหม่">
+                            🗑️ ลบประวัติการสอบ
+                        </button>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
@@ -683,8 +699,8 @@
                                     👁️ ตรวจข้อสอบ
                                 </button>
                                 <button onclick="deleteStudentResult(${student.id}, '${escapeHtml(student.studentId)}')" 
-                                    class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-2.5 py-1.5 rounded-xl text-xs transition duration-300 font-bold shadow-sm">
-                                    🗑️ ลบออก
+                                    class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-2.5 py-1.5 rounded-xl text-xs transition duration-300 font-bold shadow-sm flex items-center gap-1 cursor-pointer" title="ลบประวัติคะแนนของนักศึกษาคนนี้">
+                                    🗑️ ลบประวัติ
                                 </button>
                             </div>
                         </td>
