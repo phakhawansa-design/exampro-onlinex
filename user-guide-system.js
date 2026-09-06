@@ -370,31 +370,42 @@
                 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
             }
 
-            /* First-Time Welcome Banner */
-            .tablock-welcome-banner {
-                background: linear-gradient(135deg, rgba(238, 242, 255, 0.95), rgba(240, 253, 250, 0.95));
-                backdrop-filter: blur(12px);
-                border: 1px solid rgba(199, 210, 254, 0.85);
-                border-radius: 20px;
-                padding: 16px 20px;
-                margin-bottom: 24px;
-                box-shadow: 0 4px 20px rgba(99, 102, 241, 0.08);
+            /* Spotlight Backdrop & Card for First-Time User Prompt */
+            .tablock-spotlight-backdrop {
+                position: fixed;
+                inset: 0;
+                z-index: 99980;
+                background: rgba(15, 23, 42, 0.72);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
                 display: flex;
-                flex-direction: column;
-                gap: 12px;
-                animation: tablockSlideDown 0.4s ease-out;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.35s ease, visibility 0.35s ease;
                 font-family: 'Kanit', sans-serif;
             }
-            @media (min-width: 640px) {
-                .tablock-welcome-banner {
-                    flex-direction: row;
-                    align-items: center;
-                    justify-content: space-between;
-                }
+            .tablock-spotlight-backdrop.active {
+                opacity: 1;
+                visibility: visible;
             }
-            @keyframes tablockSlideDown {
-                from { opacity: 0; transform: translateY(-12px); }
-                to { opacity: 1; transform: translateY(0); }
+            .tablock-spotlight-card {
+                background: #ffffff;
+                width: 100%;
+                max-width: 520px;
+                border-radius: 28px;
+                border: 2px solid rgba(255, 255, 255, 0.9);
+                box-shadow: 0 25px 60px -15px rgba(6, 182, 212, 0.3), 0 20px 30px -10px rgba(99, 102, 241, 0.25), 0 0 0 1px rgba(226, 232, 240, 0.8);
+                padding: 32px 28px;
+                text-align: center;
+                position: relative;
+                transform: scale(0.9) translateY(20px);
+                transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+            .tablock-spotlight-backdrop.active .tablock-spotlight-card {
+                transform: scale(1) translateY(0);
             }
 
             /* Guide Modal Backdrop & Container */
@@ -618,51 +629,84 @@
         document.body.appendChild(btn);
     }
 
-    // ===== 8. สร้าง Welcome Banner สำหรับผู้ใช้ใหม่ =====
+    // ===== 8. สร้าง Spotlight แจ้งเตือนแบบโฟกัส/เบลอพื้นหลัง สำหรับผู้ใช้ใหม่ =====
     function checkAndShowFirstTimeBanner() {
         const pageKey = getCurrentPageKey();
         if (hasSeenGuide(pageKey)) return;
 
-        // หาจุดที่จะแทรก Banner
-        const targetContainer = document.querySelector('main') || document.querySelector('#main-area') || document.body;
-        if (!targetContainer) return;
+        // ลบอันเดิมออกก่อนถ้ามี
+        const existingSpotlight = document.getElementById('tablock-first-time-spotlight');
+        if (existingSpotlight) existingSpotlight.remove();
 
         const data = GUIDE_DATA[pageKey] || GUIDE_DATA['dashboard'];
+        const cleanTitle = data.title.split('(')[0].trim();
 
-        const banner = document.createElement('div');
-        banner.id = 'tablock-first-time-banner';
-        banner.className = 'tablock-welcome-banner max-w-5xl mx-auto';
-        banner.innerHTML = `
-            <div class="flex items-center gap-3">
-                <span class="text-3xl p-2.5 bg-white rounded-2xl shadow-sm border border-indigo-100 flex items-center justify-center">${data.icon}</span>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <h4 class="text-sm md:text-base font-black text-slate-800">
-                            👋 เพิ่งเริ่มใช้งานหน้า ${data.title.split('(')[0].trim()} ใช่ไหมครับ?
-                        </h4>
-                        <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200">คู่มือแนะนำ</span>
+        // สร้าง Backdrop + Focused Spotlight Modal
+        const spotlight = document.createElement('div');
+        spotlight.id = 'tablock-first-time-spotlight';
+        spotlight.className = 'tablock-spotlight-backdrop';
+        spotlight.innerHTML = `
+            <div class="tablock-spotlight-card">
+                <!-- ปุ่มปิดมุมขวาบน -->
+                <button onclick="window.TabLockGuide.dismissFirstTimeBanner()" class="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition cursor-pointer font-bold text-base" title="ปิด">
+                    ✕
+                </button>
+
+                <!-- ไอคอนเด่น & แสงเรือง -->
+                <div class="relative inline-flex items-center justify-center mb-4">
+                    <div class="absolute inset-0 bg-gradient-to-r from-cyan-400 to-indigo-500 rounded-3xl blur-lg opacity-40 animate-pulse"></div>
+                    <div class="relative w-20 h-20 rounded-3xl bg-gradient-to-tr from-cyan-50 via-white to-indigo-50 border-2 border-indigo-100 flex items-center justify-center text-4xl shadow-xl shadow-indigo-100/50">
+                        ${data.icon}
                     </div>
-                    <p class="text-xs text-slate-600 font-medium mt-0.5">
-                        ดูคำแนะนำวิธีใช้งานหน้านี้สั้นๆ (1 นาที) เพื่อช่วยให้คุณจัดการข้อสอบได้อย่างคล่องแคล่ว
-                    </p>
                 </div>
-            </div>
-            <div class="flex items-center gap-2 shrink-0">
-                <button onclick="window.TabLockGuide.open('${pageKey}'); window.TabLockGuide.dismissFirstTimeBanner();" class="px-4 py-2.5 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white font-extrabold text-xs rounded-xl transition shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
-                    <span>✨ เริ่มดูวิธีใช้งาน</span>
-                </button>
-                <button onclick="window.TabLockGuide.dismissFirstTimeBanner()" class="px-3 py-2.5 bg-white/80 hover:bg-white text-slate-600 hover:text-slate-800 font-bold text-xs rounded-xl border border-slate-200 transition cursor-pointer">
-                    ✕ ข้ามไปก่อน
-                </button>
+
+                <!-- Badge -->
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/80 text-xs font-bold mb-3">
+                    <span class="w-2 h-2 rounded-full bg-indigo-500 animate-ping"></span>
+                    <span>คู่มือแนะนำการใช้งาน</span>
+                </div>
+
+                <!-- หัวข้อ -->
+                <h3 class="text-xl md:text-2xl font-black text-slate-900 mb-2 tracking-tight">
+                    ยินดีต้อนรับสู่หน้า <span class="bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-indigo-600">${cleanTitle}</span>
+                </h3>
+
+                <!-- คำอธิบาย -->
+                <p class="text-sm text-slate-600 font-medium mb-6 max-w-md mx-auto leading-relaxed">
+                    ${data.summary}
+                </p>
+
+                <!-- จุดเด่นของหน้านี้ -->
+                <div class="bg-gradient-to-br from-slate-50 to-indigo-50/40 rounded-2xl p-4 border border-slate-200/70 text-left mb-6 space-y-2">
+                    <div class="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1">
+                        <span>💡</span> สิ่งที่คุณทำได้ในหน้านี้:
+                    </div>
+                    ${data.steps.slice(0, 3).map(s => `
+                        <div class="flex items-start gap-2.5 text-xs text-slate-700 font-medium">
+                            <span class="shrink-0 text-indigo-600 font-bold">✓</span>
+                            <span><b>${s.title}</b> — ${s.badge}</span>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <!-- ปุ่ม Action -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button onclick="window.TabLockGuide.dismissFirstTimeBanner(); window.TabLockGuide.open('${pageKey}');" class="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-cyan-600 via-indigo-600 to-purple-600 hover:from-cyan-700 hover:to-indigo-700 text-white font-extrabold text-sm rounded-2xl transition-all shadow-lg shadow-indigo-500/25 active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                        <span>✨ เริ่มดูวิธีใช้งาน (1 นาที)</span>
+                    </button>
+                    <button onclick="window.TabLockGuide.dismissFirstTimeBanner()" class="w-full sm:w-auto px-5 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm rounded-2xl transition cursor-pointer">
+                        ✕ ข้ามไปก่อน
+                    </button>
+                </div>
             </div>
         `;
 
-        // แทรกเป็นชิ้นแรกใน main
-        if (targetContainer.firstChild) {
-            targetContainer.insertBefore(banner, targetContainer.firstChild);
-        } else {
-            targetContainer.appendChild(banner);
-        }
+        document.body.appendChild(spotlight);
+
+        // ให้ transition ทำงานสวยงาม
+        setTimeout(() => {
+            spotlight.classList.add('active');
+        }, 50);
     }
 
     // ===== 9. เรนเดอร์ข้อมูลใน Modal =====
@@ -795,6 +839,13 @@
         dismissFirstTimeBanner: function () {
             const pageKey = getCurrentPageKey();
             markGuideAsSeen(pageKey);
+            const spotlight = document.getElementById('tablock-first-time-spotlight');
+            if (spotlight) {
+                spotlight.classList.remove('active');
+                setTimeout(() => {
+                    spotlight.remove();
+                }, 350);
+            }
             const banner = document.getElementById('tablock-first-time-banner');
             if (banner) banner.remove();
         },
