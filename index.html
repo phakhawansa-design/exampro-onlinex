@@ -295,9 +295,9 @@
                   inactiveTransition="transform 0.6s ease-in-out"
                 >
                   <img
-                    src="https://shrug-person-78902957.figma.site/_components/v2/d24c01ad3a56fc65e942a1f501eb73db42d7cf9a/Rectangle_40443.81459862.png"
-                    alt="AI Guardian Guardian Mascot"
-                    className="w-[200px] sm:w-[320px] md:w-[440px] lg:w-[520px] h-auto object-contain pointer-events-none select-none opacity-60 sm:opacity-80"
+                    src="./images/hero_student_mascot.jpg"
+                    alt="Student Mascot"
+                    className="w-[200px] sm:w-[300px] md:w-[400px] lg:w-[480px] h-auto object-contain pointer-events-none select-none opacity-85 sm:opacity-95 rounded-3xl drop-shadow-2xl mix-blend-multiply"
                   />
                 </Magnet>
               </FadeIn>
@@ -786,7 +786,7 @@
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[99999] flex items-center justify-center p-4"
+                className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[99999] flex items-center justify-center p-3 sm:p-4"
                 onClick={() => setIsOpen(false)}
               >
                 <motion.div
@@ -794,75 +794,78 @@
                   animate={{ scale: 1, y: 0 }}
                   exit={{ scale: 0.9, y: 20 }}
                   transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-                  className="bg-white rounded-3xl p-8 md:p-10 max-w-2xl w-full shadow-2xl space-y-6 text-[#0C0C0C]"
+                  className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 max-w-xl w-full shadow-2xl space-y-4 sm:space-y-6 text-[#0C0C0C]"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="flex justify-between items-start">
                     <div className="space-y-1">
-                      <h3 className="text-2xl font-black text-slate-800 uppercase tracking-wide">เข้าสู่ระบบสอบออนไลน์</h3>
-                      <p className="text-sm text-slate-500 font-medium">กรุณาเลือกประเภทการใช้งานเพื่อเข้าสู่ระบบสอบ Tab-Lock</p>
+                      <h3 className="text-xl sm:text-2xl font-black text-slate-800 uppercase tracking-wide">เข้าสู่ระบบสอบออนไลน์</h3>
+                      <p className="text-xs sm:text-sm text-slate-500 font-medium">กรุณาเลือกประเภทการใช้งานเพื่อเข้าสู่ระบบสอบ Tab-Lock</p>
                     </div>
                     <button
                       onClick={() => setIsOpen(false)}
-                      className="text-slate-400 hover:text-slate-700 text-2xl font-bold p-1 hover:bg-slate-100 rounded-lg transition"
+                      className="text-slate-400 hover:text-slate-700 text-xl sm:text-2xl font-bold p-1 hover:bg-slate-100 rounded-lg transition shrink-0 ml-2"
                     >
                       ✕
                     </button>
                   </div>
 
-                  <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-3 sm:gap-4">
                     <a
                       href="Student-login.html"
-                      className="flex items-center justify-between p-4 rounded-2xl bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 transition-all font-bold group"
+                      className="flex items-center justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 transition-all font-bold group"
                     >
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                         <img
-                          src="/images/student_cartoon.jpg"
+                          src="./images/student_cartoon.jpg"
                           alt="Student 3D"
-                          className="w-16 h-16 rounded-2xl object-cover border border-cyan-150 shadow-sm"
+                          onError={(e) => { e.target.onerror = null; e.target.src = 'logo.png'; }}
+                          className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover border border-cyan-100 shadow-sm shrink-0"
                         />
-                        <div className="flex flex-col text-left">
-                          <span className="text-base sm:text-lg text-cyan-800 leading-tight">เข้าสู่ระบบนักศึกษา</span>
-                          <span className="text-xs sm:text-sm text-cyan-600 font-light">สำหรับเข้าทำข้อสอบ</span>
+                        <div className="flex flex-col text-left min-w-0">
+                          <span className="text-sm sm:text-base text-cyan-800 leading-tight truncate font-bold">เข้าสู่ระบบนักศึกษา</span>
+                          <span className="text-[11px] sm:text-xs text-cyan-600 font-light truncate">สำหรับเข้าทำข้อสอบ</span>
                         </div>
                       </div>
-                      <span className="text-cyan-400 group-hover:translate-x-1.5 transition-transform text-lg">➔</span>
+                      <span className="text-cyan-500 group-hover:translate-x-1 transition-transform text-base sm:text-lg shrink-0 ml-2">➔</span>
                     </a>
 
                     <a
                       href="teacher-login.html"
-                      className="flex items-center justify-between p-4 rounded-2xl bg-violet-50 hover:bg-violet-100 border border-violet-200 transition-all font-bold group"
+                      className="flex items-center justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-violet-50 hover:bg-violet-100 border border-violet-200 transition-all font-bold group"
                     >
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                         <img
-                          src="/images/teacher_cartoon.jpg"
+                          src="./images/teacher_cartoon.jpg"
                           alt="Teacher 3D"
-                          className="w-16 h-16 rounded-2xl object-cover border border-violet-150 shadow-sm"
+                          onError={(e) => { e.target.onerror = null; e.target.src = 'logo.png'; }}
+                          className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover border border-violet-100 shadow-sm shrink-0"
                         />
-                        <div className="flex flex-col text-left">
-                          <span className="text-base sm:text-lg text-violet-800 leading-tight">เข้าสู่ระบบอาจารย์</span>
-                          <span className="text-xs sm:text-sm text-violet-600 font-light">สำหรับสร้างข้อสอบและดูรายงาน</span>
+                        <div className="flex flex-col text-left min-w-0">
+                          <span className="text-sm sm:text-base text-violet-800 leading-tight truncate font-bold">เข้าสู่ระบบอาจารย์</span>
+                          <span className="text-[11px] sm:text-xs text-violet-600 font-light truncate">สำหรับสร้างข้อสอบและดูรายงาน</span>
                         </div>
                       </div>
-                      <span className="text-violet-400 group-hover:translate-x-1.5 transition-transform text-lg">➔</span>
+                      <span className="text-violet-500 group-hover:translate-x-1 transition-transform text-base sm:text-lg shrink-0 ml-2">➔</span>
                     </a>
 
                     <a
                       href="admin-login.html"
-                      className="flex items-center justify-between p-4 rounded-2xl bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-all font-bold group"
+                      className="flex items-center justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-all font-bold group"
                     >
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                         <img
-                          src="/images/admin_cartoon.jpg"
+                          src="./images/admin_cartoon.jpg"
                           alt="Admin 3D"
-                          className="w-16 h-16 rounded-2xl object-cover border border-rose-150 shadow-sm"
+                          onError={(e) => { e.target.onerror = null; e.target.src = 'logo.png'; }}
+                          className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover border border-rose-100 shadow-sm shrink-0"
                         />
-                        <div className="flex flex-col text-left">
-                          <span className="text-base sm:text-lg text-rose-800 leading-tight">ทางเข้าผู้ดูแลระบบ</span>
-                          <span className="text-xs sm:text-sm text-rose-600 font-light">Super Admin Dashboard</span>
+                        <div className="flex flex-col text-left min-w-0">
+                          <span className="text-sm sm:text-base text-rose-800 leading-tight truncate font-bold">ทางเข้าผู้ดูแลระบบ</span>
+                          <span className="text-[11px] sm:text-xs text-rose-600 font-light truncate">Super Admin Dashboard</span>
                         </div>
                       </div>
-                      <span className="text-rose-400 group-hover:translate-x-1.5 transition-transform text-lg">➔</span>
+                      <span className="text-rose-500 group-hover:translate-x-1 transition-transform text-base sm:text-lg shrink-0 ml-2">➔</span>
                     </a>
                   </div>
                 </motion.div>

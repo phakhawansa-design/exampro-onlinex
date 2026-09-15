@@ -13,10 +13,8 @@
   <meta name="description" content="ระบบเข้าสู่ระบบสำหรับอาจารย์ผู้สอน Tab-Lock Online Proctoring System" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-        html { font-size: 100%; }
-        @media (min-width: 640px) { html { font-size: 110%; } }
-        @media (min-width: 1024px) { html { font-size: 120%; } }
+    <style>
+        html { font-size: 100%; -webkit-text-size-adjust: 100%; }
     *, *::before, *::after { box-sizing: border-box; }
     body {
       margin: 0;
@@ -41,15 +39,15 @@
       filter: blur(100px); pointer-events: none; z-index: 0;
     }
     .blob-1 {
-      width: 550px; height: 550px;
+      width: 320px; height: 320px;
       background: radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
-      top: -180px; left: -180px;
+      top: -100px; left: -100px;
       animation: radial-pulse 8s ease-in-out infinite;
     }
     .blob-2 {
-      width: 450px; height: 450px;
+      width: 320px; height: 320px;
       background: radial-gradient(circle, rgba(139, 92, 246, 0.04) 0%, transparent 70%);
-      bottom: -130px; right: -130px;
+      bottom: -100px; right: -100px;
       animation: radial-pulse 10s ease-in-out infinite reverse;
     }
     @keyframes radial-pulse {
@@ -60,22 +58,22 @@
     .content-layer { position: relative; z-index: 10; }
 
     .glass-card {
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
       border: 1px solid rgba(226, 232, 240, 0.8);
       border-top: 1px solid rgba(6, 182, 212, 0.25);
       box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
-      border-radius: 28px;
+      border-radius: 24px;
     }
 
     /* Glass inputs */
     .glass-input {
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.95);
       border: 1px solid rgba(226, 232, 240, 1);
       color: #1e293b;
       border-radius: 12px;
-      padding: 13px 14px 13px 44px;
+      padding: 12px 14px 12px 42px;
       width: 100%;
       font-family: 'Kanit', sans-serif;
       font-size: 0.9rem;
@@ -135,7 +133,7 @@
       background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(139, 92, 246, 0.1));
       border: 1px solid rgba(6, 182, 212, 0.2);
       border-radius: 16px;
-      padding: 12px;
+      padding: 10px;
       display: inline-flex;
       font-size: 1.8rem;
       animation: shield-glow 3s ease-in-out infinite;
@@ -161,20 +159,20 @@
   <div class="blob blob-2"></div>
   <div class="grid-overlay"></div>
 
-  <div class="content-layer min-h-screen flex flex-col items-center justify-center px-4 py-10">
+  <div class="content-layer min-h-screen flex flex-col items-center justify-center px-3 sm:px-4 py-6 sm:py-10">
     <div class="w-full max-w-md mx-auto">
 
       <!-- Card -->
-      <div class="glass-card p-8 md:p-10">
+      <div class="glass-card p-5 sm:p-8 md:p-10">
 
         <!-- Header -->
-        <div class="flex flex-col items-center text-center mb-8">
-          <div class="shield-badge mb-4 overflow-hidden bg-white p-2 flex items-center justify-center w-16 h-16 rounded-2xl">
+        <div class="flex flex-col items-center text-center mb-6 sm:mb-8">
+          <div class="shield-badge mb-3 sm:mb-4 overflow-hidden bg-white p-2 flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl shadow-sm">
             <img src="logo.png" alt="Tab-Lock Logo" class="w-full h-full object-cover rounded-xl" />
           </div>
           <div class="text-xs font-bold tracking-[0.3em] text-cyan-600 uppercase mb-1">TAB-LOCK</div>
-          <h1 class="text-2xl font-bold text-slate-800 mb-1">เข้าสู่ระบบอาจารย์ผู้สอน</h1>
-          <p class="text-slate-500 text-sm">กรุณาใส่ข้อมูลเพื่อเข้าสู่ระบบ</p>
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-800 mb-1">เข้าสู่ระบบอาจารย์ผู้สอน</h1>
+          <p class="text-slate-500 text-xs sm:text-sm">กรุณาใส่ข้อมูลเพื่อเข้าสู่ระบบ</p>
         </div>
 
         <!-- Error msg -->

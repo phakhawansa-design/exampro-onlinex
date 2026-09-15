@@ -7,10 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Kanit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        html { font-size: 100%; }
-        @media (min-width: 640px) { html { font-size: 110%; } }
-        @media (min-width: 1024px) { html { font-size: 120%; } }
-
+        html { font-size: 100%; -webkit-text-size-adjust: 100%; }
         body {
             font-family: 'Kanit', 'Inter', sans-serif;
         }
@@ -34,13 +31,13 @@
     }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-700 min-h-screen flex flex-col justify-center items-center py-12 px-6 bg-grid relative overflow-y-auto" style="background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #faf5ff 100%);">
+<body class="bg-slate-50 text-slate-700 min-h-screen flex flex-col justify-center items-center py-8 sm:py-12 px-3 sm:px-6 bg-grid relative overflow-x-hidden overflow-y-auto" style="background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #faf5ff 100%);">
     
     <!-- Decorative Radial Glow Backgrounds -->
-    <div class="fixed w-[500px] h-[500px] bg-cyan-500/5 blur-[120px] rounded-full -top-20 -left-20 pointer-events-none"></div>
-    <div class="fixed w-[550px] h-[550px] bg-pink-500/5 blur-[130px] rounded-full -bottom-20 -right-20 pointer-events-none"></div>
+    <div class="fixed w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-cyan-500/5 blur-[100px] rounded-full -top-10 -left-10 pointer-events-none"></div>
+    <div class="fixed w-[320px] sm:w-[550px] h-[320px] sm:h-[550px] bg-pink-500/5 blur-[100px] rounded-full -bottom-10 -right-10 pointer-events-none"></div>
 
-    <div class="w-full max-w-md bg-white/85 border border-slate-200 backdrop-blur-xl shadow-2xl p-8 rounded-3xl text-center space-y-6 z-10 relative">
+    <div class="w-full max-w-md bg-white/90 border border-slate-200 backdrop-blur-xl shadow-2xl p-5 sm:p-8 rounded-2xl sm:rounded-3xl text-center space-y-5 sm:space-y-6 z-10 relative">
         
         <!-- Animated Mascot Icon -->
         <div class="inline-flex items-center justify-center w-20 h-20 bg-white border border-slate-200 text-slate-800 rounded-full text-4xl select-none animate-bounce-slow shadow-sm" id="mascot-emoji">
