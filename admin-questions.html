@@ -2059,6 +2059,7 @@
                 const statusRes = await fetch(`/api/teacher/get-publish-status?roomId=${encodeURIComponent(currentRoomId)}`);
                 const statusData = await statusRes.json();
                 const currentlyPublished = statusData.is_published === 1;
+                const nextPublishState = !currentlyPublished;
 
                 let resetResults = false;
                 if (nextPublishState) {
