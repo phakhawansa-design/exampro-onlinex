@@ -2060,11 +2060,17 @@
                 const statusData = await statusRes.json();
                 const currentlyPublished = statusData.is_published === 1;
 
-                const nextPublishState = !currentlyPublished;
-
+                let resetResults = false;
                 if (nextPublishState) {
-                    if (!confirm("⚠️ ยืนยันการเผยแพร่ข้อสอบ?\nนักเรียนจะสามารถเข้ามาทำข้อสอบชุดนี้ในห้องสอบได้ทันที")) {
-                        return;
+                    if (statusData.resultCount && statusData.resultCount > 0) {
+                        const resetConfirm = confirm(`⚠️ ห้องสอบนี้มีประวัติการสอบเดิมอยู่ ${statusData.resultCount} คน\n\nต้องการ "รีเซ็ตผลสอบเดิมเป็น 0 คน" เพื่อเริ่มรอบการสอบใหม่หรือไม่?\n\n• กด [ตกลง / OK] = ล้างผลสอบเดิม เริ่มนับ 0 คนใหม่\n• กด [ยกเลิก / Cancel] = เก็บผลสอบเดิมไว้และเปิดสอบต่อ`);
+                        if (resetConfirm) {
+                            resetResults = true;
+                        }
+                    } else {
+                        if (!confirm("⚠️ ยืนยันการเผยแพร่ข้อสอบ?\nนักเรียนจะสามารถเข้ามาทำข้อสอบชุดนี้ในห้องสอบได้ทันที")) {
+                            return;
+                        }
                     }
                 } else {
                     if (!confirm("⚠️ ยืนยันยกเลิกการเผยแพร่?\nระบบจะปิดไม่ให้นักเรียนเข้าทำข้อสอบ และกลับเข้าสู่โหมดแบบร่างเพื่อปรับปรุงข้อสอบ")) {
@@ -2075,7 +2081,7 @@
                 const res = await fetch('/api/teacher/publish-exam', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ roomId: currentRoomId, publish: nextPublishState })
+                    body: JSON.stringify({ roomId: currentRoomId, publish: nextPublishState, resetResults })
                 });
 
                 const data = await res.json();

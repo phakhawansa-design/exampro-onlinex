@@ -70,9 +70,7 @@ if (isPg) {
         a_img: 'a_img', b_img: 'b_img', c_img: 'c_img', d_img: 'd_img',
         e_img: 'e_img', f_img: 'f_img', g_img: 'g_img', h_img: 'h_img',
         i_img: 'i_img', j_img: 'j_img',
-        created_at: 'created_at', border_style: 'border_style',
-        sub_title: 'sub_title', footer_text: 'footer_text',
-        signature_img: 'signature_img', signature_name: 'signature_name',
+        created_at: 'created_at',
         logintime: 'loginTime', logindate: 'loginDate',
         teachername: 'teacherName',
         firstname: 'firstName', lastname: 'lastName',
@@ -226,17 +224,7 @@ db.serialize(() => {
         date TEXT
     )`);
 
-    // 7. ตารางการตั้งค่าเกียรติบัตร (Certificate Settings)
-    db.run(`CREATE TABLE IF NOT EXISTS certificate_settings (
-        roomId TEXT PRIMARY KEY,
-        title TEXT,
-        sub_title TEXT,
-        footer_text TEXT,
-        theme TEXT,
-        border_style TEXT,
-        signature_img TEXT,
-        signature_name TEXT
-    )`);
+
 
     // 9. ตารางประวัติการ login ของนักศึกษา
     db.run(`CREATE TABLE IF NOT EXISTS student_logins (
@@ -776,6 +764,12 @@ app.post('/api/upload-questions-excel', (req, res) => {
     db.run('DELETE FROM questions WHERE roomId = ?', [roomId], async (err) => {
         if (err) return res.status(500).json({ message: err.message });
 
+        // ล้างผลสอบเดิมของห้องนี้เมื่อมีการอัปโหลดชุดข้อสอบใหม่
+        db.run('DELETE FROM exam_results WHERE roomId = ?', [roomId]);
+        db.run('DELETE FROM cheat_logs WHERE roomId = ?', [roomId]);
+        db.run('DELETE FROM student_warnings WHERE roomId = ?', [roomId]);
+        db.run('DELETE FROM student_logins WHERE roomId = ?', [roomId]);
+
         try {
             for (const rawQ of questions) {
                 const q = {};
@@ -1308,53 +1302,7 @@ app.delete('/api/teacher/delete-question', (req, res) => {
     });
 });
 
-// ดึงข้อมูลการตั้งค่าเกียรติบัตรประจำห้อง
-app.get('/api/certificate-settings', (req, res) => {
-    const { roomId } = req.query;
-    if (!roomId) return res.status(400).json({ message: "กรุณาระบุรหัสห้องสอบ" });
 
-    db.get('SELECT * FROM certificate_settings WHERE roomId = ?', [roomId], (err, row) => {
-        if (err) return res.status(500).json({ message: err.message });
-        if (!row) {
-            return res.json({
-                roomId,
-                title: "ใบประกาศเกียรติคุณเพื่อรับรองผลสอบ",
-                sub_title: "ขอมอบใบรับรองฉบับนี้ให้ไว้เพื่อแสดงว่า",
-                footer_text: "ขอแสดงความชื่นชมและรับรองว่าได้ผ่านเกณฑ์มาตรฐานการสอบของทางระบบ",
-                theme: "gold",
-                border_style: "elegant",
-                signature_img: "",
-                signature_name: "อาจารย์ผู้ประเมินผล"
-            });
-        }
-        res.json(row);
-    });
-});
-
-// บันทึกการตั้งค่าเกียรติบัตร
-app.post('/api/save-certificate-settings', (req, res) => {
-    const { roomId, title, sub_title, footer_text, theme, border_style, signature_img, signature_name } = req.body;
-    if (!roomId) return res.status(400).json({ message: "กรุณาระบุรหัสห้องสอบ" });
-
-    db.run(`
-        INSERT OR REPLACE INTO certificate_settings (roomId, title, sub_title, footer_text, theme, border_style, signature_img, signature_name)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-            roomId,
-            title || "ใบประกาศเกียรติคุณเพื่อรับรองผลสอบ",
-            sub_title || "ขอมอบใบรับรองฉบับนี้ให้ไว้เพื่อแสดงว่า",
-            footer_text || "ขอแสดงความชื่นชมและรับรองว่าได้ผ่านเกณฑ์มาตรฐานการสอบของทางระบบ",
-            theme || "gold",
-            border_style || "elegant",
-            signature_img || "",
-            signature_name || "อาจารย์ผู้ประเมินผล"
-        ],
-        function(err) {
-            if (err) return res.status(500).json({ message: err.message });
-            res.json({ success: true, message: "บันทึกการตั้งค่าเกียรติบัตรสำเร็จ" });
-        }
-    );
-});
 
 // ==========================================
 // 🛡️ ระบบ Super Admin (อนุมัติอาจารย์ + ดูประวัตินักศึกษา)
@@ -1746,20 +1694,26 @@ app.post('/api/mark-warning-read', (req, res) => {
     });
 });
 
-// 🟢 ดึงสถานะการเผยแพร่ห้องสอบ
+// 🟢 ดึงสถานะการเผยแพร่ห้องสอบ พร้อมจำนวนประวัติผลสอบเดิม
 app.get('/api/teacher/get-publish-status', (req, res) => {
     const roomId = req.query.roomId;
     if (!roomId) return res.status(400).json({ message: "กรุณาระบุ roomId" });
 
     db.get('SELECT is_published FROM teacher_rooms WHERE roomId = ?', [roomId], (err, row) => {
         if (err) return res.status(500).json({ message: err.message });
-        res.json({ is_published: row ? (row.is_published || 0) : 0 });
+        
+        db.get('SELECT COUNT(*) as resultCount FROM exam_results WHERE roomId = ?', [roomId], (err2, rRow) => {
+            res.json({ 
+                is_published: row ? (row.is_published || 0) : 0,
+                resultCount: rRow ? (rRow.resultCount || 0) : 0
+            });
+        });
     });
 });
 
 // 🟢 สลับสถานะการเผยแพร่ห้องสอบ (Publish / Unpublish)
 app.post('/api/teacher/publish-exam', (req, res) => {
-    const { roomId, publish } = req.body;
+    const { roomId, publish, resetResults } = req.body;
     if (!roomId) return res.status(400).json({ message: "กรุณาระบุ roomId" });
 
     const publishVal = publish ? 1 : 0;
@@ -1772,10 +1726,27 @@ app.post('/api/teacher/publish-exam', (req, res) => {
                 return res.status(400).json({ message: "ไม่สามารถเผยแพร่ข้อสอบได้ เนื่องจากยังไม่มีข้อสอบในระบบคลัง" });
             }
 
-            db.run('UPDATE teacher_rooms SET is_published = 1 WHERE roomId = ?', [roomId], (err) => {
-                if (err) return res.status(500).json({ message: err.message });
-                res.json({ success: true, is_published: 1, message: "เผยแพร่ข้อสอบสำเร็จ นักศึกษาเข้าสอบได้แล้ว!" });
-            });
+            const doPublish = () => {
+                db.run('UPDATE teacher_rooms SET is_published = 1 WHERE roomId = ?', [roomId], (err) => {
+                    if (err) return res.status(500).json({ message: err.message });
+                    res.json({ success: true, is_published: 1, message: "เผยแพร่ข้อสอบสำเร็จ นักศึกษาเข้าสอบได้แล้ว!" });
+                });
+            };
+
+            if (resetResults) {
+                db.run('DELETE FROM exam_results WHERE roomId = ?', [roomId], () => {
+                    db.run('DELETE FROM cheat_logs WHERE roomId = ?', [roomId], () => {
+                        db.run('DELETE FROM student_warnings WHERE roomId = ?', [roomId], () => {
+                            db.run('DELETE FROM student_logins WHERE roomId = ?', [roomId], () => {
+                                console.log(`🔄 รีเซ็ตประวัติผลสอบและรายชื่อเข้าสอบของห้อง ${roomId} เพื่อเริ่มรอบใหม่เรียบร้อย`);
+                                doPublish();
+                            });
+                        });
+                    });
+                });
+            } else {
+                doPublish();
+            }
         });
     } else {
         db.run('UPDATE teacher_rooms SET is_published = 0 WHERE roomId = ?', [roomId], (err) => {
@@ -1977,8 +1948,12 @@ app.post('/api/library/load-template', (req, res) => {
                 });
                 stmt.finalize();
 
-                // ตั้งค่าเผยแพร่ห้องสอบเป็นแบบร่าง
+                // ตั้งค่าเผยแพร่ห้องสอบเป็นแบบร่าง และรีเซ็ตผลสอบของห้องเดิมเพื่อเริ่มนับใหม่
                 db.run('UPDATE teacher_rooms SET is_published = 0 WHERE roomId = ?', [roomId]);
+                db.run('DELETE FROM exam_results WHERE roomId = ?', [roomId]);
+                db.run('DELETE FROM cheat_logs WHERE roomId = ?', [roomId]);
+                db.run('DELETE FROM student_warnings WHERE roomId = ?', [roomId]);
+                db.run('DELETE FROM student_logins WHERE roomId = ?', [roomId]);
 
                 res.json({ success: true, count: tplQuestions.length });
             });

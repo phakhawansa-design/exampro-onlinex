@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>กิจกรรมทำแบบทดสอบ - Microsoft PowerPoint | Tab-Lock Office System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            user-select: none;
+        }
+        .option-label {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .option-label:hover {
+            border-color: #f97316;
+            background-color: #fff7ed;
+        }
+        .option-radio:checked + .option-label {
+            border-color: #ea580c;
+            background-color: #ffedd5;
+            color: #7c2d12;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-6 px-4 sm:px-6 lg:px-8 bg-slate-50 flex flex-col justify-between">
+
+    <!-- Top Navigation Bar & Exam Info -->
+    <header class="max-w-4xl mx-auto w-full flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200">
+        <div class="flex items-center gap-3">
+            <a href="office-menu.html" onclick="return confirmExit()" class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition" title="กลับหน้าเมนูหลัก">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            </a>
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-orange-600 text-white font-black text-lg flex items-center justify-center shadow-md shadow-orange-500/30">
+                    P
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base text-slate-900 leading-tight">แบบทดสอบ: Microsoft PowerPoint</h1>
+                    <p class="text-[11px] text-slate-500 font-medium">กิจกรรมประเมินผลความรู้ 10 ข้อ</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student & Timer Badges -->
+        <div class="flex items-center gap-3 flex-wrap">
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-semibold shadow-xs">
+                <span>👤</span>
+                <span id="student-name-display" class="font-bold text-slate-700">กำลังโหลด...</span>
+            </div>
+
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-mono font-bold shadow-xs">
+                <span>⏱️</span>
+                <span id="timer-display">10:00</span>
+            </div>
+
+            <div id="switch-badge" class="hidden flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-amber-100 text-amber-800 text-xs font-bold animate-pulse">
+                ⚠️ สลับจอ: <span id="switch-count">0</span> ครั้ง
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Exam Container -->
+    <main class="max-w-4xl mx-auto w-full my-6 space-y-6">
+        
+        <!-- Progress Bar Card -->
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm space-y-2">
+            <div class="flex items-center justify-between text-xs font-bold text-slate-600">
+                <span>ความคืบหน้าการตอบคำถาม</span>
+                <span id="progress-text" class="text-orange-600">0 จาก 10 ข้อ</span>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                <div id="progress-bar" class="bg-gradient-to-r from-orange-500 to-rose-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Questions Form -->
+        <form id="quiz-form" onsubmit="submitQuiz(event)" class="space-y-6">
+            <div id="questions-container" class="space-y-6">
+                <!-- Dynamically Rendered Questions -->
+            </div>
+
+            <!-- Submit Button (Flow to Leaderboard) -->
+            <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <a href="learn-ppt.html" onclick="return confirmExit()" class="text-xs text-slate-500 hover:text-slate-700 font-bold transition">
+                    📖 ทบทวนโหมดการเรียนรู้อีกครั้ง
+                </a>
+
+                <button type="submit" class="w-full sm:w-auto px-10 py-4 rounded-2xl bg-gradient-to-r from-orange-600 via-rose-600 to-red-600 hover:from-orange-700 hover:to-rose-700 text-white font-black text-sm transition shadow-lg shadow-orange-500/25 flex items-center justify-center gap-2 active:scale-98">
+                    <span>ส่งคำตอบและบันทึกคะแนน</span>
+                    <span class="text-base">➔</span>
+                </button>
+            </div>
+        </form>
+
+    </main>
+
+    <!-- Modal Anti-Cheat Warning -->
+    <div id="cheat-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-slate-900/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full text-center space-y-4 shadow-2xl border-2 border-rose-500 animate-bounce-short">
+            <div class="w-16 h-16 rounded-full bg-rose-100 text-rose-600 text-3xl flex items-center justify-center mx-auto">
+                ⚠️
+            </div>
+            <h3 class="text-xl font-black text-slate-900">ตรวจพบการสลับหน้าต่าง!</h3>
+            <p class="text-xs text-slate-600 leading-relaxed">
+                ระบบ Tab-Lock ได้บันทึกว่าคุณกำลังสลับไปหน้าต่างอื่น กรุณาทำข้อสอบให้เสร็จสิ้นในหน้านี้โดยไม่เปิดแท็บใหม่
+            </p>
+            <button onclick="dismissCheatModal()" class="w-full py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition">
+                รับทราบและทำข้อสอบต่อ
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal Score Result & Leaderboard Flow -->
+    <div id="result-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-slate-900/70 backdrop-blur-md p-4">
+        <div class="bg-white rounded-3xl p-6 sm:p-10 max-w-lg w-full text-center space-y-6 shadow-2xl border border-slate-200">
+            <div class="w-20 h-20 rounded-3xl bg-orange-100 text-orange-600 text-4xl flex items-center justify-center mx-auto shadow-inner" id="result-icon">
+                🎉
+            </div>
+
+            <div class="space-y-1">
+                <span class="px-3 py-1 rounded-full bg-orange-50 text-orange-700 text-xs font-bold border border-orange-200">
+                    สรุปผลการทำแบบทดสอบ PowerPoint
+                </span>
+                <h3 class="text-2xl sm:text-3xl font-black text-slate-900" id="result-title">ทำแบบทดสอบสำเร็จ!</h3>
+                <p class="text-xs text-slate-500" id="result-subtitle">ระบบได้บันทึกคะแนนเข้าสู่ฐานข้อมูลเรียบร้อยแล้ว</p>
+            </div>
+
+            <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 grid grid-cols-3 gap-2 text-center">
+                <div>
+                    <span class="text-[11px] text-slate-400 font-bold block">คะแนนที่ได้</span>
+                    <span class="text-2xl font-black text-orange-600 font-mono" id="score-display">0/10</span>
+                </div>
+                <div>
+                    <span class="text-[11px] text-slate-400 font-bold block">เวลาที่ใช้</span>
+                    <span class="text-2xl font-black text-slate-800 font-mono" id="time-taken-display">00:00</span>
+                </div>
+                <div>
+                    <span class="text-[11px] text-slate-400 font-bold block">สลับหน้าจอ</span>
+                    <span class="text-2xl font-black text-amber-600 font-mono" id="cheat-display">0 ครั้ง</span>
+                </div>
+            </div>
+
+            <!-- Action: Go to Leaderboard (Direct link as shown in sitemap) -->
+            <div class="space-y-3">
+                <a href="office-leaderboard.html" class="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-black text-sm transition shadow-lg flex items-center justify-center gap-2">
+                    <span>🏆 ไปดูอันดับในหน้ากระดานผู้นำ (Leaderboard)</span>
+                    <span>➔</span>
+                </a>
+
+                <div class="flex items-center justify-center gap-4 text-xs">
+                    <button type="button" onclick="reviewAnswers()" class="text-orange-600 hover:underline font-bold">
+                        🔍 ดูเฉลยละเอียดทุกข้อ
+                    </button>
+                    <span class="text-slate-300">|</span>
+                    <a href="office-menu.html" class="text-slate-500 hover:text-slate-800 font-bold">
+                        กลับหน้าเมนูหลัก
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="max-w-4xl mx-auto w-full text-center py-4 text-xs text-slate-400">
+        Tab-Lock Online Proctoring System &bull; กิจกรรมทำแบบทดสอบหมวด Microsoft PowerPoint
+    </footer>
+
+    <script>
+        const questions = [
+            {
+                q: "1. กฎ 6x6 (Rule of 6x6) ในการออกแบบสไลด์ Microsoft PowerPoint มีความหมายตรงกับข้อใด?",
+                options: [
+                    "ก. ใช้ขนาดฟอนต์ 6 พอยต์ และมี 6 สไลด์เท่านั้น",
+                    "ข. หนึ่งสไลด์ไม่ควรเกิน 6 บรรทัด และแต่ละบรรทัดไม่ควรเกิน 6 คำ",
+                    "ค. แบ่งสไลด์ออกเป็น 6 ช่องตาราง และใส่ 6 สี",
+                    "ง. แสดงสไลด์ได้นานสุด 6 วินาทีต่อหน้า"
+                ],
+                ans: 1,
+                exp: "กฎ 6x6 กำหนดให้มีไม่เกิน 6 บรรทัดต่อหน้า และไม่เกิน 6 คำต่อบรรทัด เพื่อให้สไลด์กระชับอ่านง่าย"
+            },
+            {
+                q: "2. เครื่องมือใดใน PowerPoint ที่ใช้ตั้งค่าโลโก้ พื้นหลัง และฟอนต์หลัก เพื่อให้มีผลกับทุกสไลด์พร้อมกันในครั้งเดียว?",
+                options: ["ก. WordArt", "ข. Slide Master (ต้นแบบสไลด์)", "ค. SmartArt", "ง. Format Painter"],
+                ans: 1,
+                exp: "Slide Master ในแถบ View ช่วยควบคุมเลย์เอาต์ ธีม และโครงสร้างแม่แบบของทุกสไลด์ในโปรเจกต์"
+            },
+            {
+                q: "3. ข้อใดอธิบายความแตกต่างระหว่าง 'การเปลี่ยน (Transitions)' และ 'ภาพเคลื่อนไหว (Animations)' ได้ถูกต้อง?",
+                options: [
+                    "ก. Transitions ใช้กับสไลด์ แต่ Animations ใช้กับไฟล์เสียง",
+                    "ข. Transitions คือการเคลื่อนไหวขณะสลับระหว่างหน้าสไลด์ ส่วน Animations คือการเคลื่อนไหวของวัตถุภายในหน้าสไลด์",
+                    "ค. Transitions ใช้เฉพาะข้อความ ส่วน Animations ใช้เฉพาะรูปภาพ",
+                    "ง. ทั้งสองคำสั่งทำงานเหมือนกันทุกประการ"
+                ],
+                ans: 1,
+                exp: "Transitions จัดการการเปลี่ยนระหว่างหน้าสไลด์ ส่วน Animations จัดการการเคลื่อนไหวของข้อความ/รูปภาพในสไลด์"
+            },
+            {
+                q: "4. หากต้องการเริ่มการนำเสนอสไลด์ตั้งแต่ 'สไลด์แรกสุด' ต้องกดคีย์ลัดใด?",
+                options: ["ก. F1", "ข. F5", "ค. Shift + F5", "ง. Ctrl + F5"],
+                ans: 1,
+                exp: "กด F5 จะเริ่มนำเสนอตั้งแต่สไลด์ที่ 1 ส่วน Shift + F5 จะเริ่มจากสไลด์ปัจจุบัน"
+            },
+            {
+                q: "5. หากต้องการนำเสนอสไลด์โดยเริ่มจาก 'สไลด์ปัจจุบันที่เลือกอยู่' ทันที ต้องกดคีย์ลัดใด?",
+                options: ["ก. Shift + F5", "ข. Alt + F5", "ค. Ctrl + S", "ง. F8"],
+                ans: 0,
+                exp: "Shift + F5 คือคีย์ลัดสำหรับนำเสนอต่อจากหน้าสไลด์ปัจจุบันทันที"
+            },
+            {
+                q: "6. ขณะกำลังนำเสนอสไลด์ (Slide Show) หากต้องการพักหน้าจอเป็น 'สีดำ' เพื่อให้ผู้ฟังหันมาสนใจผู้พูด ต้องกดปุ่มใด?",
+                options: ["ก. ปุ่ม B (Black)", "ข. ปุ่ม W (White)", "ค. ปุ่ม D (Dark)", "ง. ปุ่ม Spacebar"],
+                ans: 0,
+                exp: "กดปุ่ม B ย่อมาจาก Black จะทำให้หน้าจอมืดเป็นสีดำสนิท และกดอีกครั้งเพื่อเปิดภาพกลับมา"
+            },
+            {
+                q: "7. หากต้องการพักหน้าจอเป็น 'สีขาว' ขณะนำเสนอสไลด์ ต้องกดปุ่มใดบนคีย์บอร์ด?",
+                options: ["ก. ปุ่ม C", "ข. ปุ่ม W (White)", "ค. ปุ่ม N", "ง. ปุ่ม Enter"],
+                ans: 1,
+                exp: "กดปุ่ม W ย่อมาจาก White จะเปลี่ยนหน้าจอเป็นสีขาวล้วน"
+            },
+            {
+                q: "8. ฟีเจอร์ใดของ PowerPoint ที่ช่วยแปลงรายการข้อความธรรมดาให้กลายเป็นผังงาน แผนภาพกระบวนการ หรือโครงสร้างองค์กรอย่างสวยงาม?",
+                options: ["ก. SmartArt Graphics", "ข. PivotTable", "ค. Quick Table", "ง. Equation"],
+                ans: 0,
+                exp: "SmartArt Graphics ช่วยแปลงข้อมูลข้อความเป็นแผนภาพเชิงกราฟิกได้อย่างรวดเร็ว"
+            },
+            {
+                q: "9. หากต้องการให้ไฟล์เสียงบรรเลงวนซ้ำไปเรื่อยๆ จนกว่าจะสั่งหยุดหรือเปลี่ยนหน้า ต้องเลือกตัวเลือกใดในแถบ Playback?",
+                options: ["ก. Play in Background", "ข. Loop until Stopped", "ค. Hide During Show", "ง. Rewind after Playing"],
+                ans: 1,
+                exp: "Loop until Stopped เป็นคำสั่งให้เล่นสื่อวนซ้ำไม่รู้จบจนกว่าจะสั่งหยุด"
+            },
+            {
+                q: "10. ต้องการออกจากโหมดการนำเสนอสไลด์ (Slide Show) กลับสู่หน้าต่างปกติ ต้องกดปุ่มใด?",
+                options: ["ก. Esc", "ข. Tab", "ค. Backspace", "ง. Delete"],
+                ans: 0,
+                exp: "กดปุ่ม Esc (Escape) บนแป้นพิมพ์เพื่อสิ้นสุดและออกจากโหมด Slide Show ทันที"
+            }
+        ];
+
+        let student = { fullname: "นักศึกษาทั่วไป", studentId: "66300000", studentClass: "ทั่วไป" };
+        let cheatCount = 0;
+        let timeLeft = 600; // 10 minutes
+        let timerInterval = null;
+        let startTime = Date.now();
+        let isSubmitted = false;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                const raw = localStorage.getItem('office_user') || sessionStorage.getItem('office_user');
+                if (raw) student = JSON.parse(raw);
+            } catch (e) {}
+
+            document.getElementById('student-name-display').textContent = student.fullname || student.firstname || "นักศึกษา";
+
+            renderQuestions();
+            startTimer();
+            setupAntiCheat();
+        });
+
+        function renderQuestions() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = questions.map((item, qIdx) => `
+                <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-4" id="card-q-${qIdx}">
+                    <div class="font-bold text-sm sm:text-base text-slate-800 leading-relaxed">
+                        ${item.q}
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        ${item.options.map((opt, oIdx) => `
+                            <div class="relative">
+                                <input type="radio" name="q_${qIdx}" id="q_${qIdx}_opt_${oIdx}" value="${oIdx}" 
+                                       onchange="updateProgress()" class="option-radio sr-only">
+                                <label for="q_${qIdx}_opt_${oIdx}" class="option-label block p-3.5 rounded-xl border border-slate-200 text-xs sm:text-sm text-slate-700 select-none">
+                                    ${opt}
+                                </label>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div id="exp-${qIdx}" class="hidden p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 mt-2">
+                        💡 <strong class="text-slate-800">เฉลย:</strong> ${item.options[item.ans]}<br>
+                        <span class="text-slate-500">${item.exp}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateProgress() {
+            let answered = 0;
+            questions.forEach((_, idx) => {
+                if (document.querySelector(`input[name="q_${idx}"]:checked`)) answered++;
+            });
+            const pct = Math.round((answered / questions.length) * 100);
+            document.getElementById('progress-bar').style.width = pct + '%';
+            document.getElementById('progress-text').textContent = `${answered} จาก ${questions.length} ข้อ`;
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert("หมดเวลาทำแบบทดสอบ! ระบบจะส่งคำตอบของคุณโดยอัตโนมัติ");
+                    document.getElementById('quiz-form').requestSubmit();
+                    return;
+                }
+                timeLeft--;
+                const mins = Math.floor(timeLeft / 60);
+                const secs = timeLeft % 60;
+                document.getElementById('timer-display').textContent = 
+                    `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function setupAntiCheat() {
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden && !isSubmitted) {
+                    cheatCount++;
+                    document.getElementById('switch-badge').classList.remove('hidden');
+                    document.getElementById('switch-count').textContent = cheatCount;
+                    document.getElementById('cheat-modal').classList.remove('hidden');
+                }
+            });
+        }
+
+        function dismissCheatModal() {
+            document.getElementById('cheat-modal').classList.add('hidden');
+        }
+
+        function confirmExit() {
+            if (isSubmitted) return true;
+            return confirm("คุณกำลังทำแบบทดสอบอยู่ หากออกจากหน้านี้ คำตอบของคุณจะไม่ถูกบันทึก ยืนยันที่จะออกหรือไม่?");
+        }
+
+        async function submitQuiz(e) {
+            e.preventDefault();
+            if (isSubmitted) return;
+
+            let unanswered = 0;
+            questions.forEach((_, idx) => {
+                if (!document.querySelector(`input[name="q_${idx}"]:checked`)) unanswered++;
+            });
+
+            if (unanswered > 0) {
+                if (!confirm(`คุณยังไม่ได้ตอบคำถามอีก ${unanswered} ข้อ ยืนยันที่จะส่งกระดาษคำตอบหรือไม่?`)) {
+                    return;
+                }
+            }
+
+            isSubmitted = true;
+            clearInterval(timerInterval);
+
+            let score = 0;
+            questions.forEach((item, idx) => {
+                const sel = document.querySelector(`input[name="q_${idx}"]:checked`);
+                if (sel && parseInt(sel.value) === item.ans) {
+                    score++;
+                }
+            });
+
+            const timeTakenSec = Math.floor((Date.now() - startTime) / 1000);
+            const mins = Math.floor(timeTakenSec / 60);
+            const secs = timeTakenSec % 60;
+            const timeStr = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+            const payload = {
+                category: 'powerpoint',
+                studentId: student.studentId || '66300000',
+                name: student.fullname || student.firstname || 'นักศึกษา',
+                studentClass: student.studentClass || 'ทั่วไป',
+                score: score,
+                maxScore: 10,
+                timeTaken: timeTakenSec,
+                cheatCount: cheatCount
+            };
+
+            try {
+                await fetch('/api/office/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+            } catch (err) {
+                console.log('Server submit fallback to local storage');
+            }
+
+            try {
+                const localList = JSON.parse(localStorage.getItem('office_local_results') || '[]');
+                localList.unshift({
+                    ...payload,
+                    date: new Date().toLocaleDateString('th-TH'),
+                    time: new Date().toLocaleTimeString('th-TH')
+                });
+                localStorage.setItem('office_local_results', JSON.stringify(localList));
+            } catch (e) {}
+
+            document.getElementById('score-display').textContent = `${score}/10`;
+            document.getElementById('time-taken-display').textContent = timeStr;
+            document.getElementById('cheat-display').textContent = `${cheatCount} ครั้ง`;
+
+            if (score >= 8) {
+                document.getElementById('result-icon').textContent = '🏆';
+                document.getElementById('result-title').textContent = 'ยอดเยี่ยมมาก!';
+            } else if (score >= 5) {
+                document.getElementById('result-icon').textContent = '👍';
+                document.getElementById('result-title').textContent = 'ผ่านเกณฑ์แล้ว!';
+            } else {
+                document.getElementById('result-icon').textContent = '📚';
+                document.getElementById('result-title').textContent = 'ลองทบทวนอีกครั้งนะ!';
+            }
+
+            document.getElementById('result-modal').classList.remove('hidden');
+        }
+
+        function reviewAnswers() {
+            document.getElementById('result-modal').classList.add('hidden');
+            questions.forEach((item, idx) => {
+                const expBox = document.getElementById(`exp-${idx}`);
+                const card = document.getElementById(`card-q-${idx}`);
+                const sel = document.querySelector(`input[name="q_${idx}"]:checked`);
+                
+                expBox.classList.remove('hidden');
+                if (sel && parseInt(sel.value) === item.ans) {
+                    card.classList.add('border-emerald-400', 'bg-emerald-50/20');
+                } else {
+                    card.classList.add('border-rose-300', 'bg-rose-50/20');
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

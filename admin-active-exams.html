@@ -252,7 +252,16 @@
                                     </div>
                                     <div class="flex justify-between items-center text-slate-600">
                                         <span class="font-bold flex items-center gap-1.5">✅ ส่งข้อสอบสำเร็จแล้ว:</span>
-                                        <span class="font-bold text-slate-800">${submittedCount} คน</span>
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-bold text-slate-800">${submittedCount} คน</span>
+                                            ${submittedCount > 0 ? `
+                                            <button onclick="resetRoomExamSession('${r.roomId}', '${escapeHtml(examTitle)}')" 
+                                                class="text-[10px] font-extrabold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-lg transition active:scale-95 flex items-center gap-1 cursor-pointer shadow-xs" 
+                                                title="รีเซ็ตผลสอบและประวัติผู้เข้าสอบของห้องนี้เป็น 0 คนเพื่อเริ่มรอบสอบใหม่">
+                                                🔄 เริ่มนับ 0 ใหม่
+                                            </button>
+                                            ` : ''}
+                                        </div>
                                     </div>
                                     <div class="flex justify-between items-center text-slate-600">
                                         <span class="font-bold flex items-center gap-1.5">🔑 รหัสข้อสอบ (EXAM CODE):</span>
@@ -286,6 +295,30 @@
             } catch (err) {
                 console.error(err);
                 container.innerHTML = `<div class="p-6 text-center text-rose-500 text-xs font-bold">ไม่สามารถดึงข้อมูลห้องสอบที่กำลังเปิดเผยแพร่ได้</div>`;
+            }
+        }
+
+        async function resetRoomExamSession(roomId, title) {
+            if (!confirm(`⚠️ ยืนยันการรีเซ็ตรอบสอบสำหรับ "${title}" (${roomId})?\n\nระบบจะล้างประวัติการส่งคำตอบและรายชื่อผู้เข้าสอบเดิมของห้องนี้ทั้งหมด เพื่อให้จำนวนผู้ส่งเริ่มต้นนับ 0 คนใหม่สำหรับการสอบรอบนี้`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/clear-results', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomId })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    alert(`✅ รีเซ็ตรอบการสอบของห้อง ${roomId} เรียบร้อยแล้ว (จำนวนผู้ส่งเริ่มต้นที่ 0 คน)`);
+                    await loadActiveExams();
+                } else {
+                    alert(`❌ เกิดข้อผิดพลาด: ${data.message || 'ไม่สามารถรีเซ็ตได้'}`);
+                }
+            } catch (err) {
+                console.error(err);
+                alert("ไม่สามารถติดต่อเซิร์ฟเวอร์เพื่อรีเซ็ตผลสอบได้");
             }
         }
 
