@@ -63,12 +63,12 @@
             border-color: #e2e8f0 !important;
         }
         /* Tab panels */
-        #panel-teachers, #panel-storage {
+        #panel-teachers, #panel-students, #panel-storage {
             background: #ffffff !important;
             border-color: rgba(226, 232, 240, 0.8) !important;
             box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04) !important;
         }
-        #panel-teachers h2, #panel-storage h2 {
+        #panel-teachers h2, #panel-students h2, #panel-storage h2 {
             color: #1e293b !important;
         }
         /* Storage bar */
@@ -184,46 +184,61 @@
     <main class="max-w-6xl mx-auto p-6 md:p-8 space-y-6">
 
         <!-- Stats Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-            <div class="bg-white border border-rose-100 rounded-2xl p-5 flex items-center gap-4 shadow-md">
-                <span class="p-3 bg-rose-50 border border-rose-100 rounded-xl text-xl">👨‍🏫</span>
-                <div>
-                    <div class="text-[10px] font-bold text-slate-550 uppercase tracking-wider">อาจารย์ทั้งหมด</div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+            <div class="bg-white border border-rose-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition">
+                <span class="p-3 bg-rose-50 border border-rose-100 rounded-xl text-xl flex-shrink-0">👨‍🏫</span>
+                <div class="min-w-0">
+                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider truncate">อาจารย์ทั้งหมด</div>
                     <div class="text-lg font-extrabold text-slate-800" id="stat-total-teachers">0</div>
                 </div>
             </div>
-            <div class="bg-white border border-rose-100 rounded-2xl p-5 flex items-center gap-4 shadow-md">
-                <span class="p-3 bg-rose-50 border border-rose-100 rounded-xl text-xl">⏳</span>
-                <div>
-                    <div class="text-[10px] font-bold text-slate-550 uppercase tracking-wider">รออนุมัติ</div>
-                    <div class="text-lg font-extrabold text-yellow-400" id="stat-pending">0</div>
+            <div onclick="switchTab('teachers')" class="bg-white border border-rose-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition cursor-pointer group">
+                <span class="p-3 bg-amber-50 border border-amber-100 rounded-xl text-xl flex-shrink-0 group-hover:scale-105 transition">⏳</span>
+                <div class="min-w-0">
+                    <div class="text-[10px] font-bold text-amber-700 uppercase tracking-wider truncate">อาจารย์รออนุมัติ</div>
+                    <div class="text-lg font-extrabold text-amber-600" id="stat-pending">0</div>
                 </div>
             </div>
-            <div class="bg-white border border-rose-100 rounded-2xl p-5 flex items-center gap-4 shadow-md">
-                <span class="p-3 bg-rose-50 border border-rose-100 rounded-xl text-xl">👨‍🎓</span>
-                <div>
-                    <div class="text-[10px] font-bold text-slate-550 uppercase tracking-wider">นักศึกษา (ไม่ซ้ำ)</div>
-                    <div class="text-lg font-extrabold text-emerald-400" id="stat-unique-students">0</div>
+            <div onclick="switchTab('students')" class="bg-white border border-rose-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition cursor-pointer group relative overflow-hidden">
+                <span class="p-3 bg-rose-50 border border-rose-100 rounded-xl text-xl flex-shrink-0 group-hover:scale-105 transition">🎓</span>
+                <div class="min-w-0">
+                    <div class="text-[10px] font-bold text-rose-600 uppercase tracking-wider truncate flex items-center gap-1">
+                        นักศึกษารออนุมัติ
+                        <span id="card-pending-pulse" class="hidden w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+                    </div>
+                    <div class="text-lg font-extrabold text-rose-600" id="stat-pending-students">0</div>
                 </div>
             </div>
-            <div class="bg-white border border-rose-100 rounded-2xl p-5 flex items-center gap-4 shadow-md">
-                <span class="p-3 bg-rose-50 border border-rose-100 rounded-xl text-xl">📊</span>
-                <div>
-                    <div class="text-[10px] font-bold text-slate-550 uppercase tracking-wider">ครั้งที่เข้าสอบ</div>
-                    <div class="text-lg font-extrabold text-cyan-400" id="stat-total-logins">0</div>
+            <div onclick="switchTab('students')" class="bg-white border border-rose-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition cursor-pointer">
+                <span class="p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-xl flex-shrink-0">👥</span>
+                <div class="min-w-0">
+                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider truncate">นักศึกษาในระบบ</div>
+                    <div class="text-lg font-extrabold text-emerald-600" id="stat-unique-students">0</div>
+                </div>
+            </div>
+            <div class="bg-white border border-rose-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition">
+                <span class="p-3 bg-cyan-50 border border-cyan-100 rounded-xl text-xl flex-shrink-0">📊</span>
+                <div class="min-w-0">
+                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider truncate">ครั้งที่เข้าสอบ</div>
+                    <div class="text-lg font-extrabold text-cyan-600" id="stat-total-logins">0</div>
                 </div>
             </div>
         </div>
 
         <!-- Tab Navigation -->
-        <div class="flex gap-2">
+        <div class="flex gap-2 flex-wrap items-center">
             <button onclick="switchTab('teachers')" id="tab-teachers"
-                class="tab-btn active px-5 py-2.5 rounded-xl text-xs font-bold transition duration-300 border">
-                📋 จัดการบัญชีอาจารย์
+                class="tab-btn active px-5 py-2.5 rounded-xl text-xs font-bold transition duration-300 border flex items-center gap-2">
+                <span>📋 จัดการบัญชีอาจารย์</span>
+            </button>
+            <button onclick="switchTab('students')" id="tab-students"
+                class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition duration-300 border flex items-center gap-2">
+                <span>👨‍🎓 อนุมัติ & จัดการบัญชีนักศึกษา</span>
+                <span id="badge-pending-students" class="hidden px-2 py-0.5 rounded-full text-[10px] bg-rose-500 text-white font-black animate-pulse">0</span>
             </button>
             <button onclick="switchTab('storage')" id="tab-storage"
-                class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition duration-300 border">
-                🗄️ พื้นที่จัดเก็บข้อมูล
+                class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition duration-300 border flex items-center gap-2">
+                <span>🗄️ พื้นที่จัดเก็บข้อมูล</span>
             </button>
         </div>
 
@@ -255,7 +270,67 @@
             </div>
         </div>
 
-        <!-- Tab 2: Storage Overview -->
+        <!-- Tab 2: Students Management & Approvals -->
+        <div id="panel-students" class="hidden bg-white/80 backdrop-blur-sm border border-rose-150 rounded-3xl p-6 space-y-5 shadow-md">
+            <!-- Header & Action Buttons -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                    <h2 class="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+                        <span>🎓 ระบบอนุมัติและจัดการบัญชีนักศึกษา</span>
+                    </h2>
+                    <p class="text-[11px] text-slate-500 mt-0.5">ตรวจสอบและอนุมัติคำขอสมัครสมาชิกของนักศึกษาก่อนอนุญาตให้เข้าห้องสอบ</p>
+                </div>
+
+                <div class="flex items-center gap-2 flex-wrap">
+                    <button onclick="approveAllStudents()" id="btn-approve-all-students" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition shadow-sm active:scale-95 flex items-center gap-1.5">
+                        ⚡ อนุมัติคำขอทั้งหมด (Approve All)
+                    </button>
+                    <button onclick="loadStudentsData()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-1">
+                        🔄 รีเฟรช
+                    </button>
+                </div>
+            </div>
+
+            <!-- Subtabs & Search Bar -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                <div class="inline-flex p-1 bg-slate-100 rounded-xl gap-1">
+                    <button onclick="setStudentFilter('pending')" id="filter-pending-btn" class="px-4 py-1.5 rounded-lg text-xs font-bold transition bg-white text-slate-800 shadow-sm flex items-center gap-1.5">
+                        <span>⏳ รออนุมัติ</span>
+                        <span id="subtab-pending-count" class="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-500 text-white font-bold">0</span>
+                    </button>
+                    <button onclick="setStudentFilter('all')" id="filter-all-btn" class="px-4 py-1.5 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900 flex items-center gap-1.5">
+                        <span>👥 นักศึกษาทั้งหมด</span>
+                        <span id="subtab-all-count" class="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-200 text-slate-700 font-bold">0</span>
+                    </button>
+                </div>
+
+                <div class="relative min-w-[260px]">
+                    <input type="text" id="student-search-input" oninput="filterStudentTable()" placeholder="🔍 ค้นหารหัสนักศึกษา, ชื่อ, ชั้นเรียน..." class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-rose-400 outline-none">
+                </div>
+            </div>
+
+            <!-- Students Table -->
+            <div class="overflow-x-auto rounded-2xl border border-slate-100">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b border-slate-100 bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                            <th class="py-3.5 px-4">#</th>
+                            <th class="py-3.5 px-4">รหัสนักศึกษา</th>
+                            <th class="py-3.5 px-4">ชื่อ - นามสกุล</th>
+                            <th class="py-3.5 px-4">ชั้นเรียน / แผนก</th>
+                            <th class="py-3.5 px-4">วันที่สมัคร</th>
+                            <th class="py-3.5 px-4 text-center">สถานะบัญชี</th>
+                            <th class="py-3.5 px-4 text-center">การดำเนินการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="students-table-body">
+                        <tr><td colspan="7" class="py-8 text-center text-xs text-slate-400">กำลังโหลดข้อมูลนักศึกษา...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 3: Storage Overview -->
         <div id="panel-storage" class="hidden space-y-4">
             <!-- Storage Summary -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -315,18 +390,24 @@
         window.addEventListener('DOMContentLoaded', () => {
             loadStats();
             loadTeachers();
+            loadStudentsData();
         });
 
         // Tab Switching
         function switchTab(tab) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            ['teachers','storage'].forEach(p => {
+            ['teachers','students','storage'].forEach(p => {
                 const el = document.getElementById('panel-' + p);
                 if (el) el.classList.add('hidden');
             });
-            document.getElementById('tab-' + tab).classList.add('active');
-            document.getElementById('panel-' + tab).classList.remove('hidden');
+            const activeBtn = document.getElementById('tab-' + tab);
+            if (activeBtn) activeBtn.classList.add('active');
+            const activePanel = document.getElementById('panel-' + tab);
+            if (activePanel) activePanel.classList.remove('hidden');
+
             if (tab === 'storage') loadStorageStats();
+            if (tab === 'students') loadStudentsData();
+            if (tab === 'teachers') loadTeachers();
         }
 
         // Storage Stats
@@ -418,7 +499,25 @@
                         document.getElementById('stat-total-teachers').textContent = stats.teachers.total || 0;
                         document.getElementById('stat-pending').textContent = stats.teachers.pending || 0;
                     }
-                    document.getElementById('stat-unique-students').textContent = stats.uniqueStudents ?? stats.unique_students ?? 0;
+
+                    const pendingStudentsCount = stats.pendingStudents ?? (stats.students ? stats.students.pending : 0) ?? 0;
+                    document.getElementById('stat-pending-students').textContent = pendingStudentsCount;
+                    
+                    const badge = document.getElementById('badge-pending-students');
+                    const pulse = document.getElementById('card-pending-pulse');
+                    if (badge) {
+                        if (pendingStudentsCount > 0) {
+                            badge.textContent = pendingStudentsCount;
+                            badge.classList.remove('hidden');
+                            if (pulse) pulse.classList.remove('hidden');
+                        } else {
+                            badge.classList.add('hidden');
+                            if (pulse) pulse.classList.add('hidden');
+                        }
+                    }
+
+                    const totalStudents = stats.totalStudents ?? (stats.students ? stats.students.total : 0) ?? (stats.uniqueStudents ?? stats.unique_students ?? 0);
+                    document.getElementById('stat-unique-students').textContent = totalStudents;
                     document.getElementById('stat-total-logins').textContent = stats.studentLogins ?? 0;
                 }
             } catch(e) { console.error('loadStats error:', e); }
@@ -534,6 +633,215 @@
         }
 
 
+
+        // ==========================================
+        // 👨‍🎓 ระบบอนุมัติและจัดการบัญชีนักศึกษา (Super Admin)
+        // ==========================================
+        let allStudentsList = [];
+        let currentStudentFilter = 'pending'; // 'pending' | 'all'
+
+        async function loadStudentsData() {
+            const tbody = document.getElementById('students-table-body');
+            tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-xs text-slate-500">⏳ กำลังโหลดข้อมูลนักศึกษา...</td></tr>';
+            try {
+                const res = await fetch('/api/students?username=admin');
+                const data = await res.json();
+                allStudentsList = Array.isArray(data) ? data : [];
+                updateStudentCounts();
+                renderStudentsTable();
+            } catch(e) {
+                console.error(e);
+                tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-xs text-rose-500">❌ โหลดข้อมูลนักศึกษาล้มเหลว</td></tr>';
+            }
+        }
+
+        function updateStudentCounts() {
+            const pendingCount = allStudentsList.filter(s => (s.status || 'approved') === 'pending').length;
+            const totalCount = allStudentsList.length;
+
+            document.getElementById('stat-pending-students').textContent = pendingCount;
+            document.getElementById('subtab-pending-count').textContent = pendingCount;
+            document.getElementById('subtab-all-count').textContent = totalCount;
+
+            const badge = document.getElementById('badge-pending-students');
+            const pulse = document.getElementById('card-pending-pulse');
+            if (badge) {
+                if (pendingCount > 0) {
+                    badge.textContent = pendingCount;
+                    badge.classList.remove('hidden');
+                    if (pulse) pulse.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                    if (pulse) pulse.classList.add('hidden');
+                }
+            }
+        }
+
+        function setStudentFilter(filter) {
+            currentStudentFilter = filter;
+            const pendingBtn = document.getElementById('filter-pending-btn');
+            const allBtn = document.getElementById('filter-all-btn');
+            if (filter === 'pending') {
+                pendingBtn.className = 'px-4 py-1.5 rounded-lg text-xs font-bold transition bg-white text-slate-800 shadow-sm flex items-center gap-1.5';
+                allBtn.className = 'px-4 py-1.5 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900 flex items-center gap-1.5';
+            } else {
+                allBtn.className = 'px-4 py-1.5 rounded-lg text-xs font-bold transition bg-white text-slate-800 shadow-sm flex items-center gap-1.5';
+                pendingBtn.className = 'px-4 py-1.5 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900 flex items-center gap-1.5';
+            }
+            renderStudentsTable();
+        }
+
+        function filterStudentTable() {
+            renderStudentsTable();
+        }
+
+        function renderStudentsTable() {
+            const tbody = document.getElementById('students-table-body');
+            const q = (document.getElementById('student-search-input')?.value || '').trim().toLowerCase();
+
+            let list = allStudentsList;
+            if (currentStudentFilter === 'pending') {
+                list = list.filter(s => (s.status || 'approved') === 'pending');
+            }
+
+            if (q) {
+                list = list.filter(s => 
+                    (s.studentId && s.studentId.toLowerCase().includes(q)) ||
+                    (s.firstName && s.firstName.toLowerCase().includes(q)) ||
+                    (s.lastName && s.lastName.toLowerCase().includes(q)) ||
+                    (s.class && s.class.toLowerCase().includes(q))
+                );
+            }
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-12 text-center text-slate-400">
+                    <div class="text-3xl mb-2">${currentStudentFilter === 'pending' ? '🎉' : '📭'}</div>
+                    <div class="font-bold text-xs text-slate-600">${currentStudentFilter === 'pending' ? 'ไม่มีคำขอรออนุมัติในขณะนี้' : 'ไม่พบข้อมูลนักศึกษา'}</div>
+                </td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map((s, i) => {
+                const sid = escapeHtml(s.studentId);
+                const fn = escapeHtml(s.firstName || '');
+                const ln = escapeHtml(s.lastName || '');
+                const cls = escapeHtml(s.class || '-');
+                const regDate = s.created_at ? new Date(s.created_at).toLocaleDateString('th-TH', { dateStyle: 'short' }) : '-';
+                const status = s.status || 'approved';
+
+                const statusBadge = status === 'pending'
+                    ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> รออนุมัติ</span>`
+                    : status === 'approved'
+                    ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">✅ อนุมัติแล้ว</span>`
+                    : `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">❌ ปฏิเสธ</span>`;
+
+                let actions = '';
+                if (status === 'pending') {
+                    actions = `
+                        <div class="flex justify-center gap-1.5">
+                            <button onclick="approveSingleStudent('${sid}', 'approve')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-bold transition shadow-sm active:scale-95 flex items-center gap-1">✔ อนุมัติ</button>
+                            <button onclick="approveSingleStudent('${sid}', 'reject')" class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg text-[10px] font-bold transition active:scale-95">✕ ปฏิเสธ</button>
+                        </div>
+                    `;
+                } else if (status === 'approved') {
+                    actions = `
+                        <div class="flex justify-center gap-1.5">
+                            <button onclick="approveSingleStudent('${sid}', 'reject')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-lg text-[10px] font-bold transition active:scale-95">⛔ ระงับ</button>
+                            <button onclick="deleteSingleStudent('${sid}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[10px] font-bold transition active:scale-95">🗑️ ลบ</button>
+                        </div>
+                    `;
+                } else {
+                    actions = `
+                        <div class="flex justify-center gap-1.5">
+                            <button onclick="approveSingleStudent('${sid}', 'approve')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-bold transition active:scale-95">✔ อนุมัติใหม่</button>
+                            <button onclick="deleteSingleStudent('${sid}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[10px] font-bold transition active:scale-95">🗑️ ลบ</button>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
+                        <td class="py-3 px-4 text-xs text-slate-500 font-mono">${i + 1}</td>
+                        <td class="py-3 px-4 text-xs font-mono font-bold text-slate-800">${sid}</td>
+                        <td class="py-3 px-4 text-xs font-bold text-slate-800">${fn} ${ln}</td>
+                        <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 text-[10px] font-bold">${cls}</span></td>
+                        <td class="py-3 px-4 text-[10px] text-slate-500 font-mono">${regDate}</td>
+                        <td class="py-3 px-4 text-center">${statusBadge}</td>
+                        <td class="py-3 px-4 text-center">${actions}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function approveSingleStudent(studentId, action) {
+            const actionText = action === 'approve' ? 'อนุมัติ' : 'ปฏิเสธ/ระงับ';
+            if (!confirm(`ต้องการ "${actionText}" บัญชีนักศึกษารหัส "${studentId}" ใช่หรือไม่?`)) return;
+            try {
+                const res = await fetch('/api/admin/approve-student', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ studentId, action })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(data.message);
+                    await loadStudentsData();
+                    await loadStats();
+                } else {
+                    alert('❌ ไม่สามารถดำเนินการได้: ' + (data.message || ''));
+                }
+            } catch(e) {
+                alert('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์');
+            }
+        }
+
+        async function approveAllStudents() {
+            const pendingCount = allStudentsList.filter(s => (s.status || 'approved') === 'pending').length;
+            if (pendingCount === 0) {
+                alert('ไม่มีคำขอนักศึกษาที่รออนุมัติในขณะนี้ครับ');
+                return;
+            }
+            if (!confirm(`ต้องการอนุมัติบัญชีนักศึกษาที่รออยู่ทั้งหมด ${pendingCount} คนพร้อมกันใช่หรือไม่?`)) return;
+
+            try {
+                const res = await fetch('/api/admin/approve-all-students', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert('🎉 ' + data.message);
+                    await loadStudentsData();
+                    await loadStats();
+                } else {
+                    alert('❌ ไม่สามารถดำเนินการได้: ' + (data.message || ''));
+                }
+            } catch(e) {
+                alert('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์');
+            }
+        }
+
+        async function deleteSingleStudent(studentId) {
+            if (!confirm(`⚠️ ยืนยันการลบบัญชีนักศึกษารหัส "${studentId}" หรือไม่? (ข้อมูลจะไม่สามารถกู้คืนได้)`)) return;
+            try {
+                const res = await fetch('/api/admin/delete-student', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ studentId })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(data.message);
+                    await loadStudentsData();
+                    await loadStats();
+                } else {
+                    alert('❌ ไม่สามารถลบได้: ' + (data.message || ''));
+                }
+            } catch(e) {
+                alert('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์');
+            }
+        }
 
         function escapeHtml(text) {
             if (!text) return '';

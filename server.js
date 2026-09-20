@@ -831,6 +831,17 @@ app.post('/api/admin/approve-all-students', (req, res) => {
         }
     );
 });
+
+// 6. แอดมินลบบัญชีนักศึกษา (Delete Student)
+app.post('/api/admin/delete-student', (req, res) => {
+    const { studentId } = req.body;
+    if (!studentId) return res.status(400).json({ message: "กรุณาระบุ studentId" });
+    db.run('DELETE FROM students WHERE studentId = ?', [studentId], function(err) {
+        if (err) return res.status(500).json({ message: err.message });
+        res.json({ success: true, message: `ลบบัญชีนักศึกษารหัส ${studentId} เรียบร้อยแล้ว` });
+    });
+});
+
 app.get('/api/teacher/active-published-rooms', (req, res) => {
     const username = req.query.username;
     if (!username || username === 'undefined') return res.status(400).json({ message: "กรุณาระบุ username ของอาจารย์" });
@@ -1711,7 +1722,16 @@ app.get('/api/superadmin/stats', (req, res) => {
                 } else {
                     stats.uniqueStudents = parseInt(uniqueStats?.unique_students ?? uniqueStats?.uniquestudents, 10) || 0;
                 }
-                res.json(stats);
+                
+                db.get("SELECT COUNT(*) as total, SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending FROM students", [], (err3, stStats) => {
+                    stats.students = {
+                        total: parseInt(stStats?.total, 10) || 0,
+                        pending: parseInt(stStats?.pending, 10) || 0
+                    };
+                    stats.pendingStudents = parseInt(stStats?.pending, 10) || 0;
+                    stats.totalStudents = parseInt(stStats?.total, 10) || 0;
+                    res.json(stats);
+                });
             });
         });
     });
