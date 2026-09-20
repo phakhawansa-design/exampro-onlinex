@@ -891,6 +891,31 @@ app.get('/api/student/get-room-by-code', (req, res) => {
         });
 
         if (!match) {
+            // ถ้าค้นหาโดยจำกัดอาจารย์แล้วไม่พบ ให้ค้นหาจากห้องสอบทั้งหมดในระบบอีกรอบ (กรณีรหัส PIN 6 หลัก)
+            if (teacherUsername && teacherUsername.trim() !== '') {
+                db.all(`SELECT roomId, roomName, exam_title, exam_code, is_published, teacherUsername FROM teacher_rooms`, [], (errAll, allRooms) => {
+                    if (!errAll && allRooms && allRooms.length > 0) {
+                        const globalMatch = allRooms.find(r => {
+                            const exCode = String(r.exam_code || r.examCode || '').trim().replace(/\s+/g, '').toLowerCase();
+                            const rId = String(r.roomId || '').trim().toLowerCase();
+                            return (exCode && exCode === cleanCode) || (rId && rId === cleanCode);
+                        });
+                        if (globalMatch) {
+                            if (globalMatch.is_published !== 1) {
+                                return res.status(403).json({ message: "⏳ ข้อสอบชุดนี้ยังไม่ได้เปิดให้สอบ (สถานะแบบร่าง) กรุณาแจ้งอาจารย์ผู้สอนกดยืนยันเผยแพร่ข้อสอบก่อนครับ" });
+                            }
+                            return res.json({ 
+                                success: true, 
+                                roomId: globalMatch.roomId, 
+                                examTitle: globalMatch.exam_title || globalMatch.roomName,
+                                teacherUsername: globalMatch.teacherUsername
+                            });
+                        }
+                    }
+                    return res.status(404).json({ message: "❌ ไม่พบรหัส PIN หรือห้องสอบนี้ กรุณาตรวจสอบอีกครั้งครับ" });
+                });
+                return;
+            }
             return res.status(404).json({ message: "❌ ไม่พบรหัส PIN หรือห้องสอบนี้ กรุณาตรวจสอบอีกครั้งครับ" });
         }
 
