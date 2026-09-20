@@ -463,10 +463,24 @@ app.post('/api/teacher/login', (req, res) => {
     });
 });
 
-// 🏠 API สำหรับดึงห้องสอบ 10 ห้องของอาจารย์คนนั้นๆ (สร้างให้อัตโนมัติหากยังไม่มี)
+// 🏠 API สำหรับดึงห้องสอบ 10 ห้องของอาจารย์คนนั้นๆ (หรือดึงทุกห้องในระบบหากเป็น admin)
 app.get('/api/teacher/rooms', (req, res) => {
     const username = req.query.username;
     if (!username || username === 'undefined') return res.status(400).json({ message: "กรุณาระบุ username ของอาจารย์" });
+
+    // หากเป็น admin ให้ดึงห้องของอาจารย์ทุกคน เพื่อให้ผู้ดูแลระบบสามารถมอนิเตอร์ได้ทุกห้องสอบ
+    if (username === 'admin') {
+        const sqlQuery = `
+            SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published, tr.teacherUsername,
+            (SELECT COUNT(*) FROM questions q WHERE q.roomId = tr.roomId) as questionCount
+            FROM teacher_rooms tr
+            ORDER BY tr.is_published DESC, tr.id ASC
+        `;
+        return db.all(sqlQuery, [], (err, rows) => {
+            if (err) return res.status(500).json({ message: err.message });
+            res.json(rows || []);
+        });
+    }
 
     const sqlQuery = `
         SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published,
@@ -1154,16 +1168,27 @@ app.get('/api/cheat-logs', (req, res) => {
     const roomId = req.query.roomId;
     const username = req.query.username;
     
-    if (roomId === 'ALL' && username) {
-        db.all(`
-            SELECT studentId, name, class, action, time, roomId 
-            FROM cheat_logs 
-            WHERE roomId IN (SELECT roomId FROM teacher_rooms WHERE teacherUsername = ?)
-            ORDER BY id DESC
-        `, [username], (err, rows) => {
-            if (err) return res.status(500).json({ message: err.message });
-            res.json(rows);
-        });
+    if (roomId === 'ALL') {
+        if (username && username !== 'admin') {
+            db.all(`
+                SELECT studentId, name, class, action, time, roomId 
+                FROM cheat_logs 
+                WHERE roomId IN (SELECT roomId FROM teacher_rooms WHERE teacherUsername = ?)
+                ORDER BY id DESC
+            `, [username], (err, rows) => {
+                if (err) return res.status(500).json({ message: err.message });
+                res.json(rows);
+            });
+        } else {
+            db.all(`
+                SELECT studentId, name, class, action, time, roomId 
+                FROM cheat_logs 
+                ORDER BY id DESC
+            `, [], (err, rows) => {
+                if (err) return res.status(500).json({ message: err.message });
+                res.json(rows);
+            });
+        }
     } else if (roomId) {
         db.all('SELECT studentId, name, class, action, time, roomId FROM cheat_logs WHERE roomId = ? ORDER BY id DESC', [roomId], (err, rows) => {
             if (err) return res.status(500).json({ message: err.message });
@@ -1652,8 +1677,13 @@ app.get('/api/teacher/active-students', (req, res) => {
     const { username } = req.query;
     if (!username || username === 'undefined') return res.status(400).json({ message: "กรุณาระบุ username" });
 
-    // ดึงห้องทั้งหมดของอาจารย์ท่านนี้
-    db.all('SELECT roomId, roomName FROM teacher_rooms WHERE teacherUsername = ?', [username], (err, rooms) => {
+    // ดึงห้องทั้งหมดของอาจารย์ท่านนี้ (หรือทุกห้องหากเป็น admin)
+    const sqlRooms = username === 'admin' 
+        ? 'SELECT roomId, roomName FROM teacher_rooms' 
+        : 'SELECT roomId, roomName FROM teacher_rooms WHERE teacherUsername = ?';
+    const paramsRooms = username === 'admin' ? [] : [username];
+
+    db.all(sqlRooms, paramsRooms, (err, rooms) => {
         if (err) return res.status(500).json({ message: err.message });
         const roomIds = (rooms || []).map(r => r.roomId);
         if (roomIds.length === 0) {

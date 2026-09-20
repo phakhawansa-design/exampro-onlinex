@@ -284,7 +284,8 @@
 
             const all = [{ roomId: 'ALL', roomName: '📝 ทุกห้องรวม' }, ...activeRooms];
             tabsEl.innerHTML = all.map(r => {
-                const displayName = r.roomId === 'ALL' ? r.roomName : (r.roomName || r.exam_title || r.roomId);
+                const teacherTag = (username === 'admin' && r.teacherUsername) ? `[${r.teacherUsername}] ` : '';
+                const displayName = r.roomId === 'ALL' ? r.roomName : `${teacherTag}${r.roomName || r.exam_title || r.roomId}`;
                 const count = roomCounts[r.roomId] || 0;
                 const isLive = r.is_published === 1;
                 return `
