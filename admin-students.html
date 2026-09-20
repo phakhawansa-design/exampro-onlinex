@@ -201,26 +201,60 @@
             </div>
         </div>
 
-        <!-- Table Card -->
+        <!-- Table Card with Approval Tabs -->
         <div class="glass-card overflow-hidden">
-            <div class="p-5 border-b border-slate-100 flex items-center justify-between">
-                <h2 class="text-sm font-extrabold text-slate-800">รายชื่อนักศึกษาทั้งหมด</h2>
-                <span class="text-[10px] text-slate-400 font-bold" id="student-count-label">0 คน</span>
+            <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div class="flex items-center gap-2">
+                    <button onclick="switchStudentTab('all')" id="tab-btn-all" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shadow-sm shadow-indigo-500/20 active:scale-95">
+                        👥 นักศึกษาทั้งหมด <span id="student-count-badge" class="ml-1 text-[10px] bg-white/25 px-2 py-0.5 rounded-full font-black">0</span>
+                    </button>
+                    <button onclick="switchStudentTab('pending')" id="tab-btn-pending" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 active:scale-95">
+                        ⏳ คำขอรออนุมัติ <span id="pending-count-badge" class="ml-1 text-[10px] bg-amber-500 text-white px-2 py-0.5 rounded-full font-black hidden">0</span>
+                    </button>
+                </div>
+                <div id="pending-action-bar" class="hidden flex items-center gap-2">
+                    <button onclick="approveAllStudents()" class="px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-black rounded-xl transition shadow-md shadow-emerald-500/20 flex items-center gap-1.5 active:scale-95">
+                        ⚡ อนุมัติทั้งหมด (Approve All)
+                    </button>
+                </div>
+                <span class="text-[10px] text-slate-400 font-bold hidden sm:inline" id="student-count-label">0 คน</span>
             </div>
-            <div class="overflow-x-auto">
+
+            <!-- View 1: All Students Table -->
+            <div id="view-all-students" class="overflow-x-auto">
                 <table class="w-full text-xs">
                     <thead>
                         <tr class="bg-slate-50/80 border-b border-slate-100">
                             <th class="text-left px-5 py-3 font-extrabold text-slate-400 uppercase tracking-wider text-[9px]">รหัสนักศึกษา</th>
                             <th class="text-left px-5 py-3 font-extrabold text-slate-400 uppercase tracking-wider text-[9px]">ชื่อ-นามสกุล</th>
                             <th class="text-left px-5 py-3 font-extrabold text-slate-400 uppercase tracking-wider text-[9px]">ชั้น / ห้อง</th>
+                            <th class="text-center px-4 py-3 font-extrabold text-slate-400 uppercase tracking-wider text-[9px]">สถานะบัญชี</th>
                             <th class="text-center px-4 py-3 font-extrabold text-slate-400 uppercase tracking-wider text-[9px]">สอบแล้ว</th>
                             <th class="text-center px-4 py-3 font-extrabold text-slate-400 uppercase tracking-wider text-[9px] min-w-[110px]">คะแนนเฉลี่ย</th>
                             <th class="text-center px-4 py-3 font-extrabold text-slate-400 uppercase tracking-wider text-[9px]">จัดการ</th>
                         </tr>
                     </thead>
                     <tbody id="student-table-body">
-                        <tr><td colspan="6" class="text-center py-16 text-slate-400 font-semibold">กำลังโหลดข้อมูล...</td></tr>
+                        <tr><td colspan="7" class="text-center py-16 text-slate-400 font-semibold">กำลังโหลดข้อมูล...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- View 2: Pending Approvals Table -->
+            <div id="view-pending-students" class="overflow-x-auto hidden">
+                <table class="w-full text-xs">
+                    <thead>
+                        <tr class="bg-amber-50/50 border-b border-amber-100/60">
+                            <th class="text-left px-5 py-3 font-extrabold text-amber-700 uppercase tracking-wider text-[9px]">วันที่ลงทะเบียน</th>
+                            <th class="text-left px-5 py-3 font-extrabold text-amber-700 uppercase tracking-wider text-[9px]">รหัสนักศึกษา</th>
+                            <th class="text-left px-5 py-3 font-extrabold text-amber-700 uppercase tracking-wider text-[9px]">ชื่อ-นามสกุล</th>
+                            <th class="text-left px-5 py-3 font-extrabold text-amber-700 uppercase tracking-wider text-[9px]">ชั้น / ห้อง</th>
+                            <th class="text-center px-4 py-3 font-extrabold text-amber-700 uppercase tracking-wider text-[9px]">สถานะ</th>
+                            <th class="text-center px-4 py-3 font-extrabold text-amber-700 uppercase tracking-wider text-[9px]">การอนุมัติ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pending-table-body">
+                        <tr><td colspan="6" class="text-center py-16 text-slate-400 font-semibold">กำลังโหลดคำขอ...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -337,11 +371,16 @@
     }
 
     let allStudents = [];
+    let pendingStudents = [];
     let currentEditId = null;
     let currentHistStudentId = null;
     let currentHistTab = 'exam';
+    let currentActiveTab = 'all';
 
-    window.addEventListener('DOMContentLoaded', loadStudents);
+    window.addEventListener('DOMContentLoaded', () => {
+        loadStudents();
+        loadPendingStudents();
+    });
 
     async function loadStudents() {
         try {
@@ -366,7 +405,139 @@
             updateStats();
             renderTable(allStudents);
         } catch(e) {
-            document.getElementById('student-table-body').innerHTML = '<tr><td colspan="6" class="text-center py-10 text-rose-500 font-bold">❌ เกิดข้อผิดพลาดในการโหลด</td></tr>';
+            document.getElementById('student-table-body').innerHTML = '<tr><td colspan="7" class="text-center py-10 text-rose-500 font-bold">❌ เกิดข้อผิดพลาดในการโหลด</td></tr>';
+        }
+    }
+
+    async function loadPendingStudents() {
+        try {
+            const res = await fetch('/api/admin/pending-students');
+            pendingStudents = await res.json();
+            const badge = document.getElementById('pending-count-badge');
+            if (pendingStudents.length > 0) {
+                badge.textContent = pendingStudents.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+            renderPendingTable();
+        } catch(e) {
+            console.error("โหลดคำขอรออนุมัติล้มเหลว:", e);
+        }
+    }
+
+    function switchStudentTab(tab) {
+        currentActiveTab = tab;
+        const btnAll = document.getElementById('tab-btn-all');
+        const btnPending = document.getElementById('tab-btn-pending');
+        const viewAll = document.getElementById('view-all-students');
+        const viewPending = document.getElementById('view-pending-students');
+        const pendingBar = document.getElementById('pending-action-bar');
+
+        if (tab === 'all') {
+            btnAll.className = "px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shadow-sm shadow-indigo-500/20 active:scale-95";
+            btnPending.className = "px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 active:scale-95";
+            viewAll.classList.remove('hidden');
+            viewPending.classList.add('hidden');
+            pendingBar.classList.add('hidden');
+        } else {
+            btnPending.className = "px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-sm shadow-amber-500/20 active:scale-95";
+            btnAll.className = "px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 active:scale-95";
+            viewAll.classList.add('hidden');
+            viewPending.classList.remove('hidden');
+            pendingBar.classList.remove('hidden');
+            loadPendingStudents();
+        }
+    }
+
+    function renderPendingTable() {
+        const tbody = document.getElementById('pending-table-body');
+        if (!pendingStudents.length) {
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-16 text-slate-400">
+                <div class="text-4xl mb-3">🎉</div>
+                <div class="font-bold text-slate-600">ไม่มีคำขอที่รอการอนุมัติในขณะนี้</div>
+                <div class="text-[10px] mt-1.5 text-slate-400">เมื่อมีนักศึกษาสมัครสมาชิกใหม่ รายชื่อจะปรากฏที่นี่เพื่อให้แอดมินอนุมัติ</div>
+            </td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = pendingStudents.map(p => {
+            const sid = esc(p.studentId);
+            const fn = esc(p.firstName);
+            const ln = esc(p.lastName || '');
+            const cls = esc(p.class || '-');
+            const regDate = p.created_at ? new Date(p.created_at).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' }) : '-';
+
+            return `<tr class="border-b border-slate-100 hover:bg-amber-50/30 transition">
+                <td class="px-5 py-3.5 text-slate-500 font-mono text-[11px]">${regDate}</td>
+                <td class="px-5 py-3.5"><span class="font-mono font-bold text-slate-800 text-[11px]">${sid}</span></td>
+                <td class="px-5 py-3.5"><div class="font-bold text-slate-800">${fn} ${ln}</div></td>
+                <td class="px-5 py-3.5"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded-lg font-bold text-[9px]">${cls}</span></td>
+                <td class="px-4 py-3.5 text-center">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> รอแอดมินอนุมัติ
+                    </span>
+                </td>
+                <td class="px-4 py-3.5 text-center">
+                    <div class="flex justify-center gap-2">
+                        <button onclick="approveSingleStudent('${sid}', 'approve')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold text-[11px] transition shadow-sm active:scale-95 flex items-center gap-1">
+                            ✔ อนุมัติ
+                        </button>
+                        <button onclick="approveSingleStudent('${sid}', 'reject')" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg font-bold text-[11px] transition active:scale-95 flex items-center gap-1">
+                            ✕ ปฏิเสธ
+                        </button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    async function approveSingleStudent(studentId, action) {
+        const actionText = action === 'approve' ? 'อนุมัติ' : 'ปฏิเสธ';
+        if (!confirm(`ยืนยันการ "${actionText}" บัญชีนักศึกษารหัส ${studentId} หรือไม่?`)) return;
+
+        try {
+            const res = await fetch('/api/admin/approve-student', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ studentId, action })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert(`✅ ${data.message}`);
+                await loadPendingStudents();
+                await loadStudents();
+            } else {
+                alert(`❌ ไม่สามารถดำเนินการได้: ${data.message}`);
+            }
+        } catch(e) {
+            console.error(e);
+            alert("❌ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
+        }
+    }
+
+    async function approveAllStudents() {
+        if (!pendingStudents.length) return;
+        if (!confirm(`ยืนยันการอนุมัตินักศึกษาทั้งหมด ${pendingStudents.length} คนในครั้งเดียวหรือไม่?`)) return;
+
+        try {
+            const res = await fetch('/api/admin/approve-all-students', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({})
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert(`🎉 ${data.message}`);
+                await loadPendingStudents();
+                await loadStudents();
+                switchStudentTab('all');
+            } else {
+                alert(`❌ ไม่สามารถดำเนินการได้: ${data.message}`);
+            }
+        } catch(e) {
+            console.error(e);
+            alert("❌ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
         }
     }
 
@@ -378,6 +549,8 @@
         document.getElementById('stat-exam').textContent = totalExams;
         document.getElementById('stat-avg').textContent = overallAvg ? overallAvg.toFixed(1) + '%' : '—';
         document.getElementById('student-count-label').textContent = allStudents.length + ' คน';
+        const badge = document.getElementById('student-count-badge');
+        if (badge) badge.textContent = allStudents.length;
     }
 
     async function importStudents() {
@@ -417,10 +590,10 @@
     function renderTable(students) {
         const tbody = document.getElementById('student-table-body');
         if (!students.length) {
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-16 text-slate-400">
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-16 text-slate-400">
                 <div class="text-4xl mb-3">📭</div>
                 <div class="font-bold text-slate-500">ยังไม่มีข้อมูลนักศึกษา</div>
-                <div class="text-[10px] mt-1.5 text-slate-400">กดปุ่ม "เพิ่มนักศึกษา" เพื่อเริ่มบันทึกข้อมูลครับ</div>
+                <div class="text-[10px] mt-1.5 text-slate-400">กดปุ่ม "เพิ่มนักศึกษา" หรือรอนักศึกษาสมัครสมาชิกผ่านหน้าเว็บครับ</div>
             </td></tr>`;
             return;
         }
@@ -429,6 +602,14 @@
             const avgColor = !avg ? 'text-slate-400' : parseFloat(avg) >= 70 ? 'text-emerald-600' : parseFloat(avg) >= 50 ? 'text-amber-600' : 'text-rose-500';
             const barColor = !avg ? '#e2e8f0' : parseFloat(avg) >= 70 ? '#10b981' : parseFloat(avg) >= 50 ? '#f59e0b' : '#ef4444';
             const sid = esc(s.studentId), fn = esc(s.firstName), ln = esc(s.lastName), cls = esc(s.class||''), note = esc(s.note||'');
+            
+            const statusVal = s.status || 'approved';
+            const statusBadge = statusVal === 'approved'
+                ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">🟢 อนุมัติแล้ว</span>`
+                : statusVal === 'pending'
+                ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200">🟡 รออนุมัติ</span>`
+                : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-rose-50 text-rose-700 border border-rose-200">🔴 ปฏิเสธ</span>`;
+
             return `<tr class="border-b border-slate-50 hover:bg-slate-50/60 transition group">
                 <td class="px-5 py-3.5"><span class="font-mono font-bold text-slate-700 text-[11px]">${sid}</span></td>
                 <td class="px-5 py-3.5">
@@ -437,6 +618,9 @@
                 </td>
                 <td class="px-5 py-3.5">
                     <span class="bg-cyan-50 border border-cyan-100 text-cyan-700 px-2 py-0.5 rounded-lg font-bold text-[9px]">${cls || '—'}</span>
+                </td>
+                <td class="px-4 py-3.5 text-center">
+                    ${statusBadge}
                 </td>
                 <td class="px-4 py-3.5 text-center font-extrabold text-slate-700">${s.examCount || 0} ครั้ง</td>
                 <td class="px-4 py-3.5 text-center min-w-[110px]">

@@ -59,44 +59,119 @@
                 </div>
             </div>
 
-            <!-- Exam Tab Content -->
-            <div id="exam-tab-content" class="space-y-3.5 sm:space-y-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div class="space-y-1.5">
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">ชื่อจริง</label>
-                        <input type="text" id="student-firstname" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm placeholder-slate-400 focus:ring-0 transition-all" placeholder="ชื่อจริง">
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">นามสกุล</label>
-                        <input type="text" id="student-lastname" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm placeholder-slate-400 transition-all" placeholder="นามสกุล">
-                    </div>
+            <!-- QR Code Scan Detection Banner -->
+            <div id="qr-detected-banner" class="hidden p-3 bg-emerald-50 border border-emerald-300 rounded-2xl text-xs font-bold text-emerald-800 flex items-center gap-2.5 shadow-sm">
+                <span class="text-base">📷</span>
+                <div class="leading-tight">
+                    <div>ตรวจพบรหัสจาก QR Code สำเร็จ!</div>
+                    <div class="text-[11px] text-emerald-600 font-normal">รหัส PIN: <strong id="qr-detected-pin" class="font-mono font-bold text-emerald-800"></strong></div>
+                </div>
+            </div>
+
+            <!-- Tab Switcher: Login / Register -->
+            <div class="flex p-1 bg-slate-100 rounded-2xl border border-slate-200">
+                <button type="button" onclick="switchAuthTab('login')" id="auth-tab-login-btn"
+                    class="flex-1 py-2 text-xs font-black rounded-xl transition-all shadow-sm bg-white text-slate-800">
+                    🔑 เข้าสู่ระบบเพื่อสอบ
+                </button>
+                <button type="button" onclick="switchAuthTab('register')" id="auth-tab-register-btn"
+                    class="flex-1 py-2 text-xs font-bold rounded-xl transition-all text-slate-500 hover:text-slate-800">
+                    📝 สมัครสมาชิกใหม่
+                </button>
+            </div>
+
+            <!-- TAB 1: Login & Join Exam Form -->
+            <div id="auth-login-view" class="space-y-3.5 sm:space-y-4">
+                <div class="space-y-1.5">
+                    <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">รหัสนักศึกษา *</label>
+                    <input type="text" id="student-id" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm font-mono transition-all" placeholder="เช่น 66101001">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">รหัสนักศึกษา</label>
-                    <input type="text" id="student-id" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm font-mono transition-all" placeholder="กรอกรหัสประจำตัวนักศึกษา">
+                    <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">รหัสผ่าน *</label>
+                    <input type="password" id="student-password" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="กรอกรหัสผ่านของคุณ">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">ชั้นเรียน / กลุ่มเรียน</label>
-                    <input type="text" id="student-class" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="เช่น TEC3N">
+                    <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">รหัส PIN เข้าสอบ 6 หลัก (Exam PIN) *</label>
+                    <input type="text" id="exam-code-input" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm font-mono font-bold text-cyan-600 transition-all tracking-wider" placeholder="เช่น 849 201">
+                    <p class="text-[9px] text-slate-400">กรอกรหัส PIN ที่อาจารย์ฉายหน้าห้อง หรือสแกน QR Code</p>
                 </div>
-                <!-- Teacher & Room Selector -->
+
+                <!-- Optional Teacher Selector (Collapsible) -->
                 <div class="space-y-1.5">
-                    <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">เลือกอาจารย์ผู้สอน</label>
-                    <div class="relative">
-                        <select id="teacher-selector" onchange="onTeacherChange()" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm appearance-none cursor-pointer">
+                    <button type="button" onclick="toggleTeacherSelect()" class="text-[10px] text-slate-400 hover:text-slate-600 font-bold flex items-center gap-1 focus:outline-none cursor-pointer">
+                        <span>⚙️ เลือกอาจารย์ผู้สอนด้วยตนเอง (กรณีใช้รหัสวิชา)</span>
+                        <span id="teacher-select-caret">▼</span>
+                    </button>
+                    <div id="teacher-select-box" class="hidden relative mt-1">
+                        <select id="teacher-selector" class="input-dark w-full px-3.5 py-2 rounded-xl text-xs appearance-none cursor-pointer">
                             <option value="">กำลังโหลดรายชื่ออาจารย์...</option>
                         </select>
                         <span class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-500 text-xs">▼</span>
                     </div>
                 </div>
-                <div class="space-y-1.5">
-                    <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">กรอกรหัสข้อสอบ (Exam Code)</label>
-                    <input type="text" id="exam-code-input" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="รหัสข้อสอบ เช่น MATH101">
-                </div>
-                <button onclick="startExam()" class="btn-primary w-full text-white py-3.5 rounded-xl sm:rounded-2xl font-black text-sm flex items-center justify-center gap-2 mt-2">
+
+                <button onclick="startExam()" id="btn-login-submit" class="btn-primary w-full text-white py-3.5 rounded-xl sm:rounded-2xl font-black text-sm flex items-center justify-center gap-2 mt-2 shadow-lg shadow-cyan-500/20 active:scale-[0.98]">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    เริ่มทำข้อสอบ
+                    เข้าสู่ระบบและเริ่มทำข้อสอบ
                 </button>
+
+                <div class="text-center pt-1">
+                    <p class="text-xs text-slate-400">
+                        ยังไม่มีบัญชีนักศึกษา? 
+                        <button type="button" onclick="switchAuthTab('register')" class="text-indigo-600 font-bold hover:underline cursor-pointer">
+                            สมัครสมาชิกที่นี่
+                        </button>
+                    </p>
+                </div>
+            </div>
+
+            <!-- TAB 2: Register New Student Form -->
+            <div id="auth-register-view" class="space-y-3 sm:space-y-3.5 hidden">
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">รหัสนักศึกษา *</label>
+                    <input type="text" id="reg-student-id" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm font-mono transition-all" placeholder="เช่น 66101001">
+                </div>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">ชื่อจริง *</label>
+                        <input type="text" id="reg-firstname" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="ชื่อจริง">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">นามสกุล</label>
+                        <input type="text" id="reg-lastname" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="นามสกุล">
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">ชั้นเรียน / กลุ่มเรียน *</label>
+                    <input type="text" id="reg-class" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="เช่น วศ.บ.คอมพิวเตอร์ 3">
+                </div>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">กำหนดรหัสผ่าน *</label>
+                        <input type="password" id="reg-password" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="อย่างน้อย 4 ตัว">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">ยืนยันรหัสผ่าน *</label>
+                        <input type="password" id="reg-confirm-password" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="พิมพ์ซ้ำอีกครั้ง">
+                    </div>
+                </div>
+
+                <div class="p-3 bg-indigo-50/70 border border-indigo-100 rounded-xl text-[10px] text-indigo-800 leading-relaxed">
+                    ℹ️ <strong>เงื่อนไขความปลอดภัย:</strong> เมื่อสมัครแล้ว คำขอจะถูกส่งให้ผู้ดูแลระบบ (Admin) ตรวจสอบและอนุมัติก่อน จึงจะเข้าทำข้อสอบได้ครับ
+                </div>
+
+                <button onclick="registerStudent()" id="btn-register-submit" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white rounded-xl sm:rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition cursor-pointer">
+                    📝 ยืนยันการสมัครสมาชิก
+                </button>
+
+                <div class="text-center pt-1">
+                    <p class="text-xs text-slate-400">
+                        มีบัญชีอยู่แล้ว? 
+                        <button type="button" onclick="switchAuthTab('login')" class="text-cyan-600 font-bold hover:underline cursor-pointer">
+                            เข้าสู่ระบบที่นี่
+                        </button>
+                    </p>
+                </div>
             </div>
 
         </div>
@@ -245,7 +320,59 @@
             return arr;
         }
 
-        window.addEventListener('DOMContentLoaded', async () => { await loadTeachers(); });
+        window.addEventListener('DOMContentLoaded', async () => { 
+            await loadTeachers();
+
+            // ตรวจสอบ URL query parameters สำหรับการสแกน QR Code หรือกดลิงก์มา
+            const urlParams = new URLSearchParams(window.location.search);
+            const codeParam = urlParams.get('code');
+            const roomParam = urlParams.get('room');
+
+            if (codeParam) {
+                const codeInput = document.getElementById('exam-code-input');
+                if (codeInput) {
+                    codeInput.value = codeParam;
+                    codeInput.classList.add('border-emerald-500', 'bg-emerald-50/50');
+                }
+                const qrBanner = document.getElementById('qr-detected-banner');
+                const qrPin = document.getElementById('qr-detected-pin');
+                if (qrBanner && qrPin) {
+                    qrPin.textContent = codeParam;
+                    qrBanner.classList.remove('hidden');
+                }
+            }
+        });
+
+        function switchAuthTab(tab) {
+            const loginBtn = document.getElementById('auth-tab-login-btn');
+            const registerBtn = document.getElementById('auth-tab-register-btn');
+            const loginView = document.getElementById('auth-login-view');
+            const registerView = document.getElementById('auth-register-view');
+
+            if (tab === 'login') {
+                loginBtn.className = "flex-1 py-2 text-xs font-black rounded-xl transition-all shadow-sm bg-white text-slate-800";
+                registerBtn.className = "flex-1 py-2 text-xs font-bold rounded-xl transition-all text-slate-500 hover:text-slate-800";
+                loginView.classList.remove('hidden');
+                registerView.classList.add('hidden');
+            } else {
+                registerBtn.className = "flex-1 py-2 text-xs font-black rounded-xl transition-all shadow-sm bg-white text-slate-800";
+                loginBtn.className = "flex-1 py-2 text-xs font-bold rounded-xl transition-all text-slate-500 hover:text-slate-800";
+                registerView.classList.remove('hidden');
+                loginView.classList.add('hidden');
+            }
+        }
+
+        function toggleTeacherSelect() {
+            const box = document.getElementById('teacher-select-box');
+            const caret = document.getElementById('teacher-select-caret');
+            if (box.classList.contains('hidden')) {
+                box.classList.remove('hidden');
+                caret.textContent = '▲';
+            } else {
+                box.classList.add('hidden');
+                caret.textContent = '▼';
+            }
+        }
 
         async function loadTeachers() {
             try {
@@ -264,25 +391,111 @@
             // ระบบรหัสข้อสอบแบบกรอกเอง ไม่จำเป็นต้องโหลดรายชื่อห้องล่วงหน้า
         }
 
-        async function startExam() {
-            const firstname = document.getElementById('student-firstname').value.trim();
-            const lastname = document.getElementById('student-lastname').value.trim();
-            currentStudentId = document.getElementById('student-id').value.trim();
-            currentStudentClass = document.getElementById('student-class').value.trim();
-            const teacherUsername = document.getElementById('teacher-selector').value;
-            const examCode = document.getElementById('exam-code-input').value.trim();
+        async function registerStudent() {
+            const studentId = document.getElementById('reg-student-id').value.trim();
+            const firstName = document.getElementById('reg-firstname').value.trim();
+            const lastName = document.getElementById('reg-lastname').value.trim();
+            const cls = document.getElementById('reg-class').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const confirmPassword = document.getElementById('reg-confirm-password').value;
+            const submitBtn = document.getElementById('btn-register-submit');
 
-            if (!firstname || !lastname || !currentStudentId || !currentStudentClass || !teacherUsername || !examCode) {
-                alert("กรุณากรอกข้อมูลผู้สอบ เลือกอาจารย์ผู้สอน และกรอกรหัสข้อสอบให้ครบถ้วนครับ");
+            if (!studentId || !firstName || !cls || !password) {
+                alert("⚠️ กรุณากรอกรหัสนักศึกษา, ชื่อจริง, ชั้นเรียน และรหัสผ่านให้ครบถ้วนครับ");
                 return;
             }
-            currentStudentName = `${firstname} ${lastname}`;
+
+            if (password.length < 4) {
+                alert("⚠️ รหัสผ่านต้องมีความยาวอย่างน้อย 4 ตัวอักษร");
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert("⚠️ รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน กรุณาตรวจสอบอีกครั้ง");
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = "⏳ กำลังส่งข้อมูลสมัครสมาชิก...";
+
             try {
-                // ค้นหาห้องสอบ (roomId) จากรหัสข้อสอบและอาจารย์ผู้สอน
-                const codeRes = await fetch(`/api/student/get-room-by-code?teacherUsername=${teacherUsername}&examCode=${encodeURIComponent(examCode)}`);
+                const res = await fetch('/api/student/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ studentId, firstName, lastName, class: cls, password })
+                });
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    alert(`🎉 ${data.message}`);
+                    switchAuthTab('login');
+                    document.getElementById('student-id').value = studentId;
+                    document.getElementById('student-password').value = '';
+                    document.getElementById('student-password').focus();
+                } else {
+                    alert(`❌ ${data.message || 'เกิดข้อผิดพลาดในการลงทะเบียน'}`);
+                }
+            } catch(e) {
+                console.error(e);
+                alert("❌ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = "📝 ยืนยันการสมัครสมาชิก";
+            }
+        }
+
+        async function startExam() {
+            const studentId = document.getElementById('student-id').value.trim();
+            const password = document.getElementById('student-password').value;
+            const examCode = document.getElementById('exam-code-input').value.trim();
+            const teacherUsername = document.getElementById('teacher-selector').value;
+            const loginBtn = document.getElementById('btn-login-submit');
+
+            if (!studentId || !password) {
+                alert("⚠️ กรุณากรอกรหัสนักศึกษาและรหัสผ่าน");
+                return;
+            }
+
+            if (!examCode) {
+                alert("⚠️ กรุณากรอกรหัส PIN เข้าสอบ 6 หลัก หรือสแกน QR Code หน้าห้องเรียนครับ");
+                return;
+            }
+
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = "⏳ กำลังตรวจสอบสิทธิ์และดึงข้อสอบ...";
+
+            try {
+                // 1. ตรวจสอบ Login & สถานะการอนุมัติ
+                const loginRes = await fetch('/api/student/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ studentId, password })
+                });
+                const loginData = await loginRes.json();
+
+                if (!loginRes.ok || !loginData.success) {
+                    alert(loginData.message || "❌ เข้าสู่ระบบไม่สำเร็จ กรุณาตรวจสอบรหัสนักศึกษาหรือรหัสผ่าน");
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> เข้าสู่ระบบและเริ่มทำข้อสอบ`;
+                    return;
+                }
+
+                currentStudentId = loginData.student.studentId;
+                currentStudentName = loginData.student.name;
+                currentStudentClass = loginData.student.class || '';
+
+                // 2. ค้นหาห้องสอบ (roomId) จากรหัส PIN / examCode
+                let queryUrl = `/api/student/get-room-by-code?examCode=${encodeURIComponent(examCode)}`;
+                if (teacherUsername) {
+                    queryUrl += `&teacherUsername=${encodeURIComponent(teacherUsername)}`;
+                }
+
+                const codeRes = await fetch(queryUrl);
                 const codeData = await codeRes.json();
                 if (!codeRes.ok) {
-                    alert(codeData.message || "❌ ไม่พบรหัสข้อสอบนี้สำหรับอาจารย์ที่ระบุ");
+                    alert(codeData.message || "❌ ไม่พบรหัส PIN หรือข้อสอบสำหรับรหัสที่ระบุ");
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> เข้าสู่ระบบและเริ่มทำข้อสอบ`;
                     return;
                 }
                 currentRoomId = codeData.roomId;
@@ -293,9 +506,13 @@
 
                 const res = await fetch(`/api/get-questions?roomId=${currentRoomId}`);
                 const data = await res.json();
-                if (!res.ok) { alert(data.message || "❌ ไม่พบข้อสอบในห้องนี้"); return; }
+                if (!res.ok) { 
+                    alert(data.message || "❌ ไม่พบข้อสอบในห้องนี้"); 
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> เข้าสู่ระบบและเริ่มทำข้อสอบ`;
+                    return; 
+                }
 
-                // Handle new API format with examTitle
                 let questions = data;
                 let examTitle = '';
                 if (data.questions && Array.isArray(data.questions)) {
@@ -303,7 +520,12 @@
                     examTitle = data.examTitle || '';
                 }
 
-                if (questions.length === 0) { alert("❌ ไม่พบข้อสอบในห้องรหัสนี้"); return; }
+                if (questions.length === 0) { 
+                    alert("❌ ไม่พบข้อสอบในห้องรหัสนี้"); 
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> เข้าสู่ระบบและเริ่มทำข้อสอบ`;
+                    return; 
+                }
 
                 // Show exam title badge
                 if (examTitle) {

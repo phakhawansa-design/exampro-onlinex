@@ -439,7 +439,10 @@
                                 </div>
                                 <p class="text-xs text-slate-400 mt-1 font-medium" id="publish-status-desc">ข้อสอบที่เพิ่งถูกเพิ่ม/แก้ไข จะยังไม่เปิดให้คนเข้าสอบ กรุณากดเผยแพร่ด้านขวาเพื่อเปิดระบบ</p>
                             </div>
-                            <div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <button id="view-qr-btn" onclick="openPublishModal()" class="hidden px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs md:text-sm font-black rounded-xl transition duration-300 shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95">
+                                    📱 ดู QR Code & PIN
+                                </button>
                                 <button id="publish-btn" onclick="togglePublishExam()" class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs md:text-sm font-black rounded-xl transition duration-300 shadow-md">
                                     🟢 ยืนยันเผยแพร่ให้นักศึกษาเข้าสอบ
                                 </button>
@@ -563,13 +566,6 @@
                             </div>
                         </div>
 
-                        <!-- Exam Code -->
-                        <div class="space-y-1.5">
-                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">รหัสข้อสอบ (Exam Code)</label>
-                            <input type="text" id="modal-exam-code" class="dark-input" placeholder="พิมพ์รหัสข้อสอบ เช่น CHEM402">
-                            <p class="text-[9px] text-slate-400">ใช้รหัสนี้ให้นักเรียนป้อนเพื่อเชื่อมโยงเข้าห้องสอบในหน้าล็อกอิน</p>
-                        </div>
-
                         <!-- Duration -->
                         <div class="space-y-2">
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">⏱️ เวลาทำข้อสอบ</label>
@@ -679,6 +675,63 @@
                     </button>
                     <button onclick="saveExamSettingsFromModal()" class="px-5 py-2.5 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold text-xs rounded-xl shadow-md transition active:scale-95">
                         💾 บันทึกการตั้งค่า
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📱 Modal แสดงรหัส PIN 6 หลัก และ QR Code เมื่อเผยแพร่ข้อสอบ -->
+        <div id="publish-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center hidden p-4 select-none">
+            <div id="publish-modal-card" class="w-full max-w-lg bg-white border border-slate-200 p-6 sm:p-8 rounded-3xl shadow-2xl text-slate-800 space-y-5 transition-all duration-300">
+                <!-- Header -->
+                <div class="flex justify-between items-start">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-2xl">🎉</span>
+                            <h3 class="text-lg sm:text-xl font-black text-slate-900">เผยแพร่ข้อสอบสำเร็จ!</h3>
+                        </div>
+                        <p class="text-xs text-slate-500" id="pub-modal-room-info">ห้องสอบพร้อมให้นักเรียนเข้าทำข้อสอบแล้ว</p>
+                    </div>
+                    <button onclick="closePublishModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-lg transition">&times;</button>
+                </div>
+
+                <!-- Big PIN Code Card -->
+                <div class="bg-gradient-to-br from-slate-900 to-indigo-950 p-5 rounded-2xl text-center text-white space-y-2 relative overflow-hidden shadow-lg shadow-indigo-950/20">
+                    <div class="text-[10px] uppercase font-bold text-cyan-400 tracking-widest">รหัสเข้าสอบ (Exam PIN)</div>
+                    <div id="pub-modal-pin" onclick="copyPinOnly()" class="text-3xl sm:text-4xl font-black font-mono tracking-widest text-white py-1 cursor-pointer select-all hover:text-cyan-300 transition" title="คลิกเพื่อคัดลอก PIN">
+                        ------
+                    </div>
+                    <p class="text-[10px] text-slate-400">ให้นักเรียนกรอกรหัส PIN 6 หลักนี้ หรือสแกน QR Code ด้านล่าง</p>
+                </div>
+
+                <!-- QR Code Display -->
+                <div class="flex flex-col items-center justify-center p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+                    <div class="w-52 h-52 bg-white p-2 rounded-xl border border-slate-200 shadow-sm flex items-center justify-center">
+                        <img id="pub-modal-qrcode" src="" alt="Exam QR Code" class="w-full h-full object-contain rounded-lg" />
+                    </div>
+                    <p class="text-[11px] font-bold text-slate-600 flex items-center gap-1.5">
+                        <span>📷</span> ยกมือถือ/แท็บเล็ตสแกน เพื่อเข้าทำข้อสอบได้ทันที
+                    </p>
+                </div>
+
+                <!-- Direct Link Box -->
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">ลิงก์ตรงเข้าสู่ห้องสอบ</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="pub-modal-link" readonly class="flex-1 px-3.5 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs font-mono text-slate-700 select-all" />
+                        <button onclick="copyPublishLink()" id="btn-copy-link" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-1 shrink-0 active:scale-95">
+                            📋 คัดลอก
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="grid grid-cols-2 gap-3 pt-1">
+                    <button onclick="toggleProjectorMode()" id="btn-projector" class="py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white font-black text-xs rounded-xl transition flex items-center justify-center gap-2 active:scale-95">
+                        <span>📺</span> ฉายจอโปรเจกเตอร์
+                    </button>
+                    <button onclick="closePublishModal()" class="py-3 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl transition flex items-center justify-center gap-1 active:scale-95">
+                        <span>✅</span> เรียบร้อย
                     </button>
                 </div>
             </div>
@@ -1667,7 +1720,6 @@
                 }
 
                 document.getElementById('modal-announcement').value = data.announcement || '';
-                document.getElementById('modal-exam-code').value = data.examCode || '';
 
                 // การสลับประเภทการสอบ
                 const presetEl = document.getElementById('modal-exam-title-preset');
@@ -1783,7 +1835,6 @@
             const isTimerSet = timerBox && !timerBox.classList.contains('hidden');
             const duration = isTimerSet ? (parseInt(document.getElementById('modal-duration').value) || 0) : 0;
             const announcement = document.getElementById('modal-announcement').value.trim();
-            const examCode = document.getElementById('modal-exam-code').value.trim();
             
             const preset = document.getElementById('modal-exam-title-preset').value;
             const custom = document.getElementById('modal-exam-title-custom').value.trim();
@@ -1805,7 +1856,6 @@
                         announcement, 
                         showScore, 
                         showLeaderboard, 
-                        examCode,
                         coverImg: currentCoverBase64,
                         examTitle,
                         roomName
@@ -2011,6 +2061,8 @@
             reader.readAsText(file);
         }
 
+        let currentPublishedPin = '';
+
         // 🟢 อัปเดตแบนเนอร์สถานะการเผยแพร่ข้อสอบ
         async function updatePublishBanner() {
             const banner = document.getElementById('publish-status-banner');
@@ -2027,21 +2079,26 @@
                 const title = document.getElementById('publish-status-title');
                 const desc = document.getElementById('publish-status-desc');
                 const btn = document.getElementById('publish-btn');
+                const qrBtn = document.getElementById('view-qr-btn');
 
                 if (data.is_published === 1) {
+                    currentPublishedPin = data.exam_code || '';
                     pulse.className = "w-2.5 h-2.5 rounded-full bg-emerald-500/100 animate-pulse";
-                    title.textContent = "สถานะห้องสอบ: 🟢 เผยแพร่แล้ว (เปิดสอบจริง)";
-                    title.className = "text-xs font-bold text-emerald-400";
-                    desc.textContent = "นักศึกษาสามารถกรอกรหัสห้องสอบนี้และเข้าทำข้อสอบได้ทันที";
+                    title.innerHTML = `สถานะห้องสอบ: 🟢 เผยแพร่แล้ว • รหัส PIN: <span class="font-mono font-black text-cyan-300 bg-slate-800 px-2 py-0.5 rounded-lg border border-slate-700">${data.exam_code || '-'}</span>`;
+                    title.className = "text-xs font-bold text-emerald-400 flex items-center gap-1.5 flex-wrap";
+                    desc.textContent = "นักศึกษาสามารถสแกน QR Code หรือกรอกรหัส PIN นี้เพื่อเข้าทำข้อสอบได้ทันที";
                     btn.textContent = "🛑 ยกเลิกการเผยแพร่ข้อสอบ (กลับเป็นแบบร่าง)";
-                    btn.className = "px-4 py-2 bg-rose-600 hover:bg-rose-500/100 text-white text-[10px] font-extrabold rounded-xl transition duration-300 shadow-md cursor-pointer";
+                    btn.className = "px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-extrabold rounded-xl transition duration-300 shadow-md cursor-pointer";
+                    if (qrBtn) qrBtn.classList.remove('hidden');
                 } else {
+                    currentPublishedPin = '';
                     pulse.className = "w-2.5 h-2.5 rounded-full bg-amber-500/100 animate-pulse";
                     title.textContent = "สถานะห้องสอบ: 📝 แบบร่างข้อสอบ (ยังไม่เผยแพร่)";
                     title.className = "text-xs font-bold text-amber-400";
                     desc.textContent = "ข้อสอบที่เพิ่มหรือแก้ไข จะยังไม่เปิดให้นักศึกษาสอบจนกว่าท่านจะกดยืนยันเผยแพร่ด้านขวา";
                     btn.textContent = "🟢 ยืนยันเผยแพร่ให้นักศึกษาเข้าสอบ";
                     btn.className = "px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-[10px] font-extrabold rounded-xl transition duration-300 shadow-md cursor-pointer";
+                    if (qrBtn) qrBtn.classList.add('hidden');
                 }
                 banner.classList.remove('hidden');
             } catch (err) {
@@ -2050,7 +2107,7 @@
             }
         }
 
-        // 🟢 สลับสถานะเผยแพร่ข้อสอบ
+        // 🟢 สลับสถานะเผยแพร่ข้อสอบ พร้อมสร้างรหัส PIN & QR Code อัตโนมัติ
         async function togglePublishExam() {
             if (!currentRoomId) return;
             
@@ -2069,7 +2126,7 @@
                             resetResults = true;
                         }
                     } else {
-                        if (!confirm("⚠️ ยืนยันการเผยแพร่ข้อสอบ?\nนักเรียนจะสามารถเข้ามาทำข้อสอบชุดนี้ในห้องสอบได้ทันที")) {
+                        if (!confirm("⚠️ ยืนยันการเผยแพร่ข้อสอบ?\nระบบจะสร้างรหัส PIN และ QR Code สำหรับให้นักเรียนเข้าสอบทันที")) {
                             return;
                         }
                     }
@@ -2087,14 +2144,84 @@
 
                 const data = await res.json();
                 if (res.ok && data.success) {
-                    alert(`✅ ${data.message}`);
                     await updatePublishBanner();
+                    if (nextPublishState && data.exam_code) {
+                        openPublishModal(data.exam_code);
+                    } else {
+                        alert(`✅ ${data.message}`);
+                    }
                 } else {
                     alert(`❌ ล้มเหลว: ${data.message}`);
                 }
             } catch (err) {
                 console.error(err);
                 alert("ไม่สามารถติดต่อเซิร์ฟเวอร์เพื่อปรับปรุงสถานะได้");
+            }
+        }
+
+        // 📱 เปิด Modal แสดงรหัส PIN และ QR Code
+        function openPublishModal(pinCode) {
+            const pin = pinCode || currentPublishedPin;
+            if (!pin) {
+                alert("ห้องสอบนี้ยังไม่ได้เผยแพร่ หรือยังไม่มีรหัส PIN");
+                return;
+            }
+            currentPublishedPin = pin;
+
+            const formattedPin = pin.length === 6 ? `${pin.slice(0,3)} ${pin.slice(3)}` : pin;
+            document.getElementById('pub-modal-pin').textContent = formattedPin;
+
+            const joinUrl = `${window.location.origin}/Student-login.html?room=${encodeURIComponent(currentRoomId)}&code=${encodeURIComponent(pin)}`;
+            document.getElementById('pub-modal-link').value = joinUrl;
+
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(joinUrl)}`;
+            document.getElementById('pub-modal-qrcode').src = qrUrl;
+
+            const roomPreset = document.getElementById('modal-exam-title-preset');
+            const roomTitle = roomPreset ? roomPreset.value : '';
+            document.getElementById('pub-modal-room-info').textContent = `ห้อง: ${currentRoomId} ${roomTitle ? '• ' + roomTitle : ''}`;
+
+            document.getElementById('publish-modal').classList.remove('hidden');
+        }
+
+        function closePublishModal() {
+            document.getElementById('publish-modal').classList.add('hidden');
+            if (document.fullscreenElement) {
+                document.exitFullscreen().catch(() => {});
+            }
+        }
+
+        function copyPublishLink() {
+            const linkInput = document.getElementById('pub-modal-link');
+            linkInput.select();
+            navigator.clipboard.writeText(linkInput.value).then(() => {
+                const btn = document.getElementById('btn-copy-link');
+                const oldText = btn.innerHTML;
+                btn.innerHTML = '✔ คัดลอกแล้ว!';
+                setTimeout(() => { btn.innerHTML = oldText; }, 2000);
+            }).catch(() => {
+                alert("คัดลอกลิงก์เรียบร้อยแล้ว: " + linkInput.value);
+            });
+        }
+
+        function copyPinOnly() {
+            if (!currentPublishedPin) return;
+            navigator.clipboard.writeText(currentPublishedPin).then(() => {
+                alert(`📋 คัดลอกรหัส PIN: ${currentPublishedPin} เรียบร้อยแล้ว`);
+            }).catch(() => {});
+        }
+
+        function toggleProjectorMode() {
+            const card = document.getElementById('publish-modal-card');
+            const modal = document.getElementById('publish-modal');
+            if (!document.fullscreenElement) {
+                modal.requestFullscreen().catch(() => {});
+                card.classList.remove('max-w-lg');
+                card.classList.add('max-w-3xl', 'p-10');
+            } else {
+                document.exitFullscreen().catch(() => {});
+                card.classList.remove('max-w-3xl', 'p-10');
+                card.classList.add('max-w-lg');
             }
         }
     

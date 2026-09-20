@@ -4,6 +4,11 @@ const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
+
+function hashPassword(str) {
+    return crypto.createHash('sha256').update(str || '').digest('hex');
+}
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -77,7 +82,8 @@ if (isPg) {
         examcount: 'examCount', avgscore: 'avgScore',
         roomcount: 'roomCount', questioncount: 'questionCount',
         resultcount: 'resultCount', questionbytes: 'questionBytes',
-        resultbytes: 'resultBytes'
+        resultbytes: 'resultBytes',
+        password_hash: 'password_hash', status: 'status', approved_at: 'approved_at', approved_by: 'approved_by'
     };
     function transformRow(row) {
         if (!row || typeof row !== 'object') return row;
@@ -270,12 +276,16 @@ db.serialize(() => {
     db.run(`CREATE TABLE IF NOT EXISTS students (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         teacherUsername TEXT,
-        studentId TEXT,
+        studentId TEXT UNIQUE,
         firstName TEXT,
         lastName TEXT,
         class TEXT,
+        password_hash TEXT DEFAULT '',
+        status TEXT DEFAULT 'pending',
         note TEXT,
-        created_at TEXT
+        created_at TEXT,
+        approved_at TEXT,
+        approved_by TEXT
     )`);
 
     // ==========================================
@@ -355,6 +365,20 @@ db.serialize(() => {
     });
     db.run("ALTER TABLE teachers ADD COLUMN phone TEXT", (err) => {
         if (!err) console.log("✔ Added column 'phone' to teachers table");
+    });
+
+    // อัปเกรดตารางนักศึกษา (students) เพิ่ม password_hash, status, approved_at, approved_by
+    db.run("ALTER TABLE students ADD COLUMN password_hash TEXT DEFAULT ''", (err) => {
+        if (!err) console.log("✔ Added column 'password_hash' to students table");
+    });
+    db.run("ALTER TABLE students ADD COLUMN status TEXT DEFAULT 'approved'", (err) => {
+        if (!err) console.log("✔ Added column 'status' to students table");
+    });
+    db.run("ALTER TABLE students ADD COLUMN approved_at TEXT", (err) => {
+        if (!err) console.log("✔ Added column 'approved_at' to students table");
+    });
+    db.run("ALTER TABLE students ADD COLUMN approved_by TEXT", (err) => {
+        if (!err) console.log("✔ Added column 'approved_by' to students table");
     });
 
     // 🛡️ Seed บัญชี Super Admin เริ่มต้น (admin / admin123)
@@ -500,18 +524,20 @@ app.get('/api/students', (req, res) => {
             s.lastName, 
             s.class, 
             s.note, 
+            COALESCE(s.status, 'approved') as status,
             s.created_at,
+            s.approved_at,
             COUNT(er.id) as examCount,
             AVG(CASE WHEN er.maxScore > 0 THEN (CAST(er.score AS FLOAT) / er.maxScore) * 100 ELSE NULL END) as avgScore
         FROM students s
         LEFT JOIN teacher_rooms tr ON tr.teacherUsername = s.teacherUsername
         LEFT JOIN exam_results er ON er.roomId = tr.roomId AND er.studentId = s.studentId
-        WHERE s.teacherUsername = ?
-        GROUP BY s.id, s.studentId, s.firstName, s.lastName, s.class, s.note, s.created_at
+        WHERE (s.teacherUsername = ? OR s.teacherUsername IS NULL OR s.teacherUsername = '' OR ? = 'admin')
+        GROUP BY s.id, s.studentId, s.firstName, s.lastName, s.class, s.note, s.status, s.created_at, s.approved_at
         ORDER BY s.studentId ASC
     `;
 
-    db.all(sql, [username], (err, rows) => {
+    db.all(sql, [username, username], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
         res.json(rows || []);
     });
@@ -647,7 +673,164 @@ app.get('/api/students/cheat-history', (req, res) => {
     });
 });
 
-// 🟢 API สำหรับดึงเฉพาะห้องสอบที่กำลังเผยแพร่อยู่ (is_published = 1) ของอาจารย์
+// ==========================================
+// 👨‍🎓 ระบบสมัครและอนุมัติบัญชีนักศึกษา (Student Registration & Admin Approval)
+// ==========================================
+
+// 1. นักศึกษาสมัครสมาชิกใหม่ (สถานะเริ่มต้น: pending รอ Admin อนุมัติ)
+app.post('/api/student/register', (req, res) => {
+    const { studentId, firstName, lastName, class: cls, password } = req.body;
+    if (!studentId || !firstName || !password) {
+        return res.status(400).json({ success: false, message: "กรุณากรอกรหัสนักศึกษา, ชื่อจริง, และรหัสผ่านให้ครบถ้วน" });
+    }
+
+    const cleanStudentId = studentId.trim();
+    const cleanFirstName = firstName.trim();
+    const cleanLastName = (lastName || '').trim();
+    const cleanClass = (cls || '').trim();
+    const passwordHash = hashPassword(password);
+    const now = new Date().toISOString();
+
+    // ตรวจสอบว่ามีรหัสนักศึกษานี้อยู่แล้วหรือไม่
+    db.get('SELECT id, status FROM students WHERE studentId = ?', [cleanStudentId], (err, existing) => {
+        if (err) return res.status(500).json({ success: false, message: err.message });
+        if (existing) {
+            return res.status(400).json({ 
+                success: false, 
+                message: existing.status === 'pending'
+                    ? "รหัสนักศึกษานี้ได้ลงทะเบียนไว้แล้ว และอยู่ระหว่างรอแอดมินอนุมัติครับ" 
+                    : "รหัสนักศึกษานี้มีอยู่ในระบบแล้ว กรุณาเข้าสู่ระบบได้เลยครับ"
+            });
+        }
+
+        db.run(
+            `INSERT INTO students (studentId, firstName, lastName, class, password_hash, status, created_at)
+             VALUES (?, ?, ?, ?, ?, 'pending', ?)`,
+            [cleanStudentId, cleanFirstName, cleanLastName, cleanClass, passwordHash, now],
+            function(insertErr) {
+                if (insertErr) return res.status(500).json({ success: false, message: insertErr.message });
+                console.log(`👨‍🎓 ลงทะเบียนนักศึกษาใหม่ (รออนุมัติ): ${cleanStudentId} (${cleanFirstName} ${cleanLastName})`);
+                res.json({
+                    success: true,
+                    message: "สมัครสมาชิกสำเร็จ! กรุณารอผู้ดูแลระบบ (Admin) ตรวจสอบและอนุมัติบัญชีก่อนเข้าทำข้อสอบครับ"
+                });
+            }
+        );
+    });
+});
+
+// 2. นักศึกษาเข้าสู่ระบบ (Student Login)
+app.post('/api/student/login', (req, res) => {
+    const { studentId, password } = req.body;
+    if (!studentId) {
+        return res.status(400).json({ success: false, message: "กรุณากรอกรหัสนักศึกษา" });
+    }
+
+    const cleanStudentId = studentId.trim();
+
+    db.get('SELECT * FROM students WHERE studentId = ?', [cleanStudentId], (err, student) => {
+        if (err) return res.status(500).json({ success: false, message: err.message });
+        if (!student) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "ไม่พบรหัสนักศึกษานี้ในระบบ กรุณาสมัครสมาชิกก่อนครับ" 
+            });
+        }
+
+        // ตรวจสอบรหัสผ่าน (ถ้ามี password_hash ในระบบ)
+        if (student.password_hash) {
+            if (!password) {
+                return res.status(400).json({ success: false, message: "กรุณากรอกรหัสผ่าน" });
+            }
+            const hash = hashPassword(password);
+            if (student.password_hash !== hash) {
+                return res.status(401).json({ success: false, message: "รหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง" });
+            }
+        }
+
+        // ตรวจสอบสถานะการอนุมัติ
+        const status = student.status || 'approved';
+        if (status === 'pending') {
+            return res.status(403).json({ 
+                success: false, 
+                isPending: true,
+                message: "⏳ บัญชีของคุณยังอยู่ระหว่างรอการอนุมัติจากผู้ดูแลระบบ (Admin) กรุณารอสักครู่หรือแจ้งแอดมินครับ" 
+            });
+        }
+        if (status === 'rejected') {
+            return res.status(403).json({ 
+                success: false, 
+                isRejected: true,
+                message: "❌ บัญชีของคุณไม่ได้รับการอนุมัติ กรุณาติดต่อผู้ดูแลระบบ (Admin)" 
+            });
+        }
+
+        res.json({
+            success: true,
+            student: {
+                studentId: student.studentId,
+                firstName: student.firstName,
+                lastName: student.lastName,
+                name: `${student.firstName} ${student.lastName}`.trim(),
+                class: student.class || ''
+            }
+        });
+    });
+});
+
+// 3. แอดมินดึงรายชื่อนักศึกษาที่รออนุมัติ (Pending Students)
+app.get('/api/admin/pending-students', (req, res) => {
+    const sql = `
+        SELECT id, studentId, firstName, lastName, class, note, status, created_at
+        FROM students
+        WHERE status = 'pending'
+        ORDER BY id DESC
+    `;
+    db.all(sql, [], (err, rows) => {
+        if (err) return res.status(500).json({ message: err.message });
+        res.json(rows || []);
+    });
+});
+
+// 4. แอดมินอนุมัติหรือปฏิเสธบัญชีนักศึกษารายคน
+app.post('/api/admin/approve-student', (req, res) => {
+    const { studentId, action } = req.body; // action: 'approve' หรือ 'reject'
+    if (!studentId) return res.status(400).json({ message: "กรุณาระบุ studentId" });
+
+    const newStatus = action === 'reject' ? 'rejected' : 'approved';
+    const now = new Date().toISOString();
+
+    db.run(
+        'UPDATE students SET status = ?, approved_at = ?, approved_by = ? WHERE studentId = ?',
+        [newStatus, now, 'admin', studentId],
+        function(err) {
+            if (err) return res.status(500).json({ message: err.message });
+            res.json({
+                success: true,
+                status: newStatus,
+                message: newStatus === 'approved' ? "อนุมัติบัญชีนักศึกษาเรียบร้อยแล้ว" : "ปฏิเสธบัญชีนักศึกษาเรียบร้อยแล้ว"
+            });
+        }
+    );
+});
+
+// 5. แอดมินอนุมัติบัญชีนักศึกษาทั้งหมดในคลิกเดียว (Approve All)
+app.post('/api/admin/approve-all-students', (req, res) => {
+    const now = new Date().toISOString();
+    db.run(
+        "UPDATE students SET status = 'approved', approved_at = ?, approved_by = ? WHERE status = 'pending'",
+        [now, 'admin'],
+        function(err) {
+            if (err) return res.status(500).json({ message: err.message });
+            const affected = this.changes !== undefined ? this.changes : 0;
+            res.json({
+                success: true,
+                count: affected,
+                message: `อนุมัติบัญชีนักศึกษาทั้งหมดเรียบร้อยแล้ว (${affected} คน)`
+            });
+        }
+    );
+});
 app.get('/api/teacher/active-published-rooms', (req, res) => {
     const username = req.query.username;
     if (!username || username === 'undefined') return res.status(400).json({ message: "กรุณาระบุ username ของอาจารย์" });
@@ -664,44 +847,52 @@ app.get('/api/teacher/active-published-rooms', (req, res) => {
     });
 });
 
-// 🔍 API สำหรับนักศึกษาค้นหาห้องสอบจากรหัสข้อสอบ (examCode) และอาจารย์ผู้สอน (teacherUsername)
+// 🔍 API สำหรับนักศึกษาค้นหาห้องสอบจากรหัสข้อสอบ (examCode) และอาจารย์ผู้สอน (teacherUsername หรือค้นหาจาก PIN โดยตรง)
 app.get('/api/student/get-room-by-code', (req, res) => {
-    const { teacherUsername, examCode } = req.query;
-    if (!teacherUsername || !examCode) {
-        return res.status(400).json({ message: "กรุณาระบุอาจารย์ผู้สอนและรหัสข้อสอบ" });
+    const { teacherUsername, examCode, roomId } = req.query;
+    const queryCode = examCode || roomId;
+    if (!queryCode) {
+        return res.status(400).json({ message: "กรุณาระบุรหัสเข้าสอบ (PIN)" });
     }
 
-    const cleanCode = String(examCode).trim().toLowerCase();
+    const cleanCode = String(queryCode).trim().replace(/\s+/g, '').toLowerCase();
 
-    db.all(`
-        SELECT roomId, roomName, exam_title, exam_code, is_published 
-        FROM teacher_rooms 
-        WHERE teacherUsername = ?
-    `, [teacherUsername], (err, rooms) => {
+    let sql = `SELECT roomId, roomName, exam_title, exam_code, is_published, teacherUsername FROM teacher_rooms WHERE 1=1`;
+    let params = [];
+
+    if (teacherUsername && teacherUsername.trim() !== '') {
+        sql += ` AND teacherUsername = ?`;
+        params.push(teacherUsername.trim());
+    }
+
+    db.all(sql, params, (err, rooms) => {
         if (err) return res.status(500).json({ message: err.message });
         if (!rooms || rooms.length === 0) {
-            return res.status(404).json({ message: "ไม่พบห้องสอบสำหรับอาจารย์ท่านนี้" });
+            return res.status(404).json({ message: "ไม่พบห้องสอบในระบบ" });
         }
 
-        // ค้นหาห้องที่มี exam_code หรือ exam_title หรือ roomId หรือ roomName ตรงกับ examCode
         const match = rooms.find(r => {
-            const exCode = r.exam_code || r.examCode;
-            const codeMatch = exCode && String(exCode).trim().toLowerCase() === cleanCode;
-            const titleMatch = r.exam_title && String(r.exam_title).trim().toLowerCase() === cleanCode;
-            const roomIdMatch = r.roomId && String(r.roomId).trim().toLowerCase() === cleanCode;
-            const roomNameMatch = r.roomName && String(r.roomName).trim().toLowerCase() === cleanCode;
-            return codeMatch || titleMatch || roomIdMatch || roomNameMatch;
+            const exCode = String(r.exam_code || r.examCode || '').trim().replace(/\s+/g, '').toLowerCase();
+            const rId = String(r.roomId || '').trim().toLowerCase();
+            const title = String(r.exam_title || '').trim().toLowerCase();
+            const name = String(r.roomName || '').trim().toLowerCase();
+            return (exCode && exCode === cleanCode) || (rId && rId === cleanCode) || (title && title === cleanCode) || (name && name === cleanCode);
         });
 
         if (!match) {
-            return res.status(404).json({ message: "❌ ไม่พบรหัสข้อสอบนี้สำหรับอาจารย์ที่เลือก กรุณาตรวจสอบรหัสข้อสอบอีกครั้งครับ" });
+            return res.status(404).json({ message: "❌ ไม่พบรหัส PIN หรือห้องสอบนี้ กรุณาตรวจสอบอีกครั้งครับ" });
         }
 
         if (match.is_published !== 1) {
             return res.status(403).json({ message: "⏳ ข้อสอบชุดนี้ยังไม่ได้เปิดให้สอบ (สถานะแบบร่าง) กรุณาแจ้งอาจารย์ผู้สอนกดยืนยันเผยแพร่ข้อสอบก่อนครับ" });
         }
 
-        res.json({ success: true, roomId: match.roomId, examTitle: match.exam_title || match.roomName });
+        res.json({ 
+            success: true, 
+            roomId: match.roomId, 
+            examTitle: match.exam_title || match.roomName,
+            teacherUsername: match.teacherUsername
+        });
     });
 });
 
@@ -1694,24 +1885,27 @@ app.post('/api/mark-warning-read', (req, res) => {
     });
 });
 
-// 🟢 ดึงสถานะการเผยแพร่ห้องสอบ พร้อมจำนวนประวัติผลสอบเดิม
+// 🟢 ดึงสถานะการเผยแพร่ห้องสอบ พร้อมจำนวนประวัติผลสอบเดิม และรหัส PIN
 app.get('/api/teacher/get-publish-status', (req, res) => {
     const roomId = req.query.roomId;
     if (!roomId) return res.status(400).json({ message: "กรุณาระบุ roomId" });
 
-    db.get('SELECT is_published FROM teacher_rooms WHERE roomId = ?', [roomId], (err, row) => {
+    db.get('SELECT is_published, exam_code, roomName, exam_title FROM teacher_rooms WHERE roomId = ?', [roomId], (err, row) => {
         if (err) return res.status(500).json({ message: err.message });
         
         db.get('SELECT COUNT(*) as resultCount FROM exam_results WHERE roomId = ?', [roomId], (err2, rRow) => {
             res.json({ 
                 is_published: row ? (row.is_published || 0) : 0,
+                exam_code: row ? (row.exam_code || '') : '',
+                roomName: row ? (row.roomName || '') : '',
+                exam_title: row ? (row.exam_title || '') : '',
                 resultCount: rRow ? (rRow.resultCount || 0) : 0
             });
         });
     });
 });
 
-// 🟢 สลับสถานะการเผยแพร่ห้องสอบ (Publish / Unpublish)
+// 🟢 สลับสถานะการเผยแพร่ห้องสอบ (Publish / Unpublish) พร้อมสร้างรหัส PIN 6 หลักอัตโนมัติ
 app.post('/api/teacher/publish-exam', (req, res) => {
     const { roomId, publish, resetResults } = req.body;
     if (!roomId) return res.status(400).json({ message: "กรุณาระบุ roomId" });
@@ -1726,10 +1920,23 @@ app.post('/api/teacher/publish-exam', (req, res) => {
                 return res.status(400).json({ message: "ไม่สามารถเผยแพร่ข้อสอบได้ เนื่องจากยังไม่มีข้อสอบในระบบคลัง" });
             }
 
+            // สุ่มสร้างรหัส PIN 6 หลักใหม่ (เช่น 849201)
+            const dynamicPin = Math.floor(100000 + Math.random() * 900000).toString();
+
             const doPublish = () => {
-                db.run('UPDATE teacher_rooms SET is_published = 1 WHERE roomId = ?', [roomId], (err) => {
+                db.run('UPDATE teacher_rooms SET is_published = 1, exam_code = ? WHERE roomId = ?', [dynamicPin, roomId], (err) => {
                     if (err) return res.status(500).json({ message: err.message });
-                    res.json({ success: true, is_published: 1, message: "เผยแพร่ข้อสอบสำเร็จ นักศึกษาเข้าสอบได้แล้ว!" });
+                    db.get('SELECT roomId, roomName, exam_title, exam_code FROM teacher_rooms WHERE roomId = ?', [roomId], (gErr, rData) => {
+                        res.json({ 
+                            success: true, 
+                            is_published: 1, 
+                            exam_code: dynamicPin,
+                            roomId: roomId,
+                            roomName: rData ? rData.roomName : '',
+                            exam_title: rData ? rData.exam_title : '',
+                            message: `เผยแพร่ข้อสอบสำเร็จ! รหัส PIN เข้าสอบคือ: ${dynamicPin}` 
+                        });
+                    });
                 });
             };
 
