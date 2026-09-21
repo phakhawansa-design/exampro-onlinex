@@ -6,7 +6,7 @@
     <title>แผงควบคุมหลัก - Tab-Lock Online Proctoring System</title>
     <meta name="description" content="แผงควบคุมหลักระบบสอบออนไลน์ Tab-Lock สำหรับอาจารย์ผู้ดูแลห้องสอบ">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Kanit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
     <style>
         html { font-size: 100%; -webkit-text-size-adjust: 100%; }
 
@@ -23,7 +23,7 @@
         }
 
         * { box-sizing: border-box; }
-                /* ===== SIDEBAR (REDESIGNED FOR 25-60 Y.O. TEACHERS) ===== */
+                /* ===== SIDEBAR (STANDARDIZED UX/UI FOR 25-60 Y.O. TEACHERS) ===== */
         #sidebar {
             background: #ffffff;
             width: 280px;
@@ -37,6 +37,7 @@
             flex-shrink: 0;
             transition: width 0.25s ease-in-out;
             box-shadow: 2px 0 12px rgba(15, 23, 42, 0.03);
+            font-family: 'Kanit', sans-serif;
         }
         #sidebar::before {
             content: '';
@@ -74,19 +75,28 @@
             padding: 8px 12px 4px 12px;
         }
         .nav-section-title {
-            font-size: 12px;
-            font-weight: 900;
+            font-size: 13px;
+            font-weight: 800;
             letter-spacing: 0.04em;
             color: #475569;
             text-transform: uppercase;
+            font-family: 'Kanit', sans-serif;
         }
         .nav-link {
             display: flex; align-items: center; gap: 12px;
             padding: 12px 16px; border-radius: 16px;
-            font-size: 15px; font-weight: 800;
+            font-size: 16px; font-weight: 800;
             color: #1e293b; text-decoration: none;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1.5px solid transparent;
+            font-family: 'Kanit', sans-serif;
+        }
+        .nav-link svg {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            min-width: 24px;
+            min-height: 24px;
         }
         .nav-link:hover {
             color: #0284c7; background: #f1f5f9;
@@ -94,7 +104,7 @@
         }
         .nav-link.active {
             background: linear-gradient(135deg, #06b6d4 0%, #4f46e5 50%, #8b5cf6 100%);
-            color: #ffffff !important; font-weight: 900 !important;
+            color: #ffffff !important; font-weight: 800 !important;
             box-shadow: 0 8px 24px rgba(79, 70, 229, 0.35);
             border-color: transparent;
         }
@@ -201,7 +211,7 @@
 
 <!-- ===== SIDEBAR ===== -->
 <aside id="sidebar">
-    <button id="sidebar-toggle" title="ย่อ/ขยายเมนู">◀</button>
+    <button id="sidebar-toggle" title="ย่อ/ขยายเมนู" onclick="document.getElementById('sidebar').classList.toggle('collapsed')">◀</button>
 
     <div class="sidebar-inner p-4 sm:p-5 space-y-4 flex-1 overflow-y-auto">
         <!-- Logo Header -->
@@ -250,7 +260,7 @@
                         <span>4. คลังข้อสอบ</span>
                     </a>
                     <a href="admin-questions.html" class="nav-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
                         <span>5. จัดการข้อสอบ</span>
                     </a>
                     <a href="admin-rooms.html" class="nav-link">
@@ -297,11 +307,6 @@
         <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-black flex items-center justify-center gap-2 border border-red-200 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H2.25" /></svg>
             <span class="logout-btn-text">ออกจากระบบ</span>
-        </a>
-    </div>
-</aside>bold transition-all duration-200">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
-            ออกจากระบบ
         </a>
     </div>
 </aside>
