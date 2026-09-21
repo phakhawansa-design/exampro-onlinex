@@ -499,45 +499,47 @@
     <!-- ======================================================== -->
     <!-- 3. LIVE STUDENTS LIST MODAL                              -->
     <!-- ======================================================== -->
-    <div id="live-students-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[85vh]">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="text-indigo-600 text-lg">👨‍🎓</span>
+    <!-- 3. LIVE STUDENTS LIST MODAL                              -->
+    <!-- ======================================================== -->
+    <div id="live-students-modal" class="fixed inset-0 bg-slate-950/75 backdrop-blur-md z-50 flex items-center justify-center hidden p-4 sm:p-6 md:p-8">
+        <div class="bg-white rounded-3xl w-full max-w-4xl lg:max-w-5xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
+            <div class="px-7 py-5 bg-gradient-to-r from-slate-50 via-indigo-50/40 to-purple-50/30 border-b border-slate-200 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="text-indigo-600 text-2xl p-2 bg-white rounded-2xl shadow-xs border border-slate-100">👨‍🎓</span>
                     <div>
-                        <h3 class="text-base font-extrabold text-slate-800">รายชื่อนักศึกษาในรายวิชา & สถานะการเข้าสอบ</h3>
-                        <p id="live-students-room-name" class="text-[11px] text-slate-400 font-semibold">-</p>
+                        <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">รายชื่อนักศึกษาในรายวิชา & สถานะการเข้าสอบ</h3>
+                        <p id="live-students-room-name" class="text-xs sm:text-sm text-indigo-700 font-extrabold mt-0.5">-</p>
                     </div>
                 </div>
-                <button onclick="closeLiveStudentsModal()" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 flex items-center justify-center font-bold text-sm transition cursor-pointer">
+                <button onclick="closeLiveStudentsModal()" class="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-lg transition cursor-pointer active:scale-95 shadow-xs">
                     ✕
                 </button>
             </div>
 
             <!-- Summary stats bar -->
-            <div class="p-3 border-b border-slate-100 bg-indigo-50/40 grid grid-cols-3 gap-2 text-center text-xs font-bold">
-                <div class="p-2 bg-white rounded-xl border border-indigo-100">
-                    <div class="text-[10px] text-slate-500 font-bold">👥 ทั้งหมดในวิชา</div>
-                    <div id="students-modal-enrolled" class="text-base font-black text-indigo-700">0</div>
+            <div class="p-4 border-b border-slate-200 bg-indigo-50/50 grid grid-cols-3 gap-4 text-center font-bold">
+                <div class="p-3.5 bg-white rounded-2xl border border-indigo-200/80 shadow-xs">
+                    <div class="text-xs sm:text-sm text-slate-500 font-bold">👥 ทั้งหมดในวิชา</div>
+                    <div id="students-modal-enrolled" class="text-xl sm:text-2xl font-black text-indigo-700 mt-1">0</div>
                 </div>
-                <div class="p-2 bg-white rounded-xl border border-emerald-100">
-                    <div class="text-[10px] text-emerald-600 font-bold">🟢 เข้าสอบแล้ว</div>
-                    <div id="students-modal-joined" class="text-base font-black text-emerald-700">0</div>
+                <div class="p-3.5 bg-white rounded-2xl border border-emerald-200/80 shadow-xs">
+                    <div class="text-xs sm:text-sm text-emerald-600 font-bold">🟢 เข้าสอบแล้ว</div>
+                    <div id="students-modal-joined" class="text-xl sm:text-2xl font-black text-emerald-700 mt-1">0</div>
                 </div>
-                <div class="p-2 bg-white rounded-xl border border-rose-100">
-                    <div class="text-[10px] text-rose-600 font-bold">🔴 ยังไม่เข้าสอบ</div>
-                    <div id="students-modal-not-joined" class="text-base font-black text-rose-700">0</div>
+                <div class="p-3.5 bg-white rounded-2xl border border-rose-200/80 shadow-xs">
+                    <div class="text-xs sm:text-sm text-rose-600 font-bold">🔴 ยังไม่เข้าสอบ</div>
+                    <div id="students-modal-not-joined" class="text-xl sm:text-2xl font-black text-rose-700 mt-1">0</div>
                 </div>
             </div>
 
             <!-- Filter tabs -->
-            <div class="px-6 py-2 bg-slate-50/70 border-b border-slate-100 flex items-center gap-2 text-xs font-bold">
-                <button onclick="filterLiveModalStudents('all')" id="tab-live-all" class="px-3 py-1 bg-indigo-600 text-white rounded-lg transition shadow-xs cursor-pointer">ทั้งหมด</button>
-                <button onclick="filterLiveModalStudents('joined')" id="tab-live-joined" class="px-3 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg transition cursor-pointer">🟢 เข้าสอบแล้ว</button>
-                <button onclick="filterLiveModalStudents('not_joined')" id="tab-live-not-joined" class="px-3 py-1 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg transition cursor-pointer">🔴 ยังไม่เข้าสอบ</button>
+            <div class="px-7 py-3 bg-slate-50/80 border-b border-slate-200 flex items-center gap-3 text-xs sm:text-sm font-bold">
+                <button onclick="filterLiveModalStudents('all')" id="tab-live-all" class="px-4 py-2 bg-indigo-600 text-white rounded-xl transition shadow-xs cursor-pointer font-bold">ทั้งหมด</button>
+                <button onclick="filterLiveModalStudents('joined')" id="tab-live-joined" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl transition cursor-pointer font-bold">🟢 เข้าสอบแล้ว</button>
+                <button onclick="filterLiveModalStudents('not_joined')" id="tab-live-not-joined" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl transition cursor-pointer font-bold">🔴 ยังไม่เข้าสอบ</button>
             </div>
 
-            <div id="students-modal-list" class="p-4 overflow-y-auto space-y-2 text-xs max-h-[50vh]"></div>
+            <div id="students-modal-list" class="p-6 overflow-y-auto space-y-3 text-sm max-h-[55vh]"></div>
         </div>
     </div>
 
@@ -775,6 +777,8 @@
                 const qCount = room.questionCount || 0;
                 const announcement = room.announcement || 'อย่าแอบใช้ AI นะจ้ะ';
 
+                const classNameStr = room.roomName || room.className || room.class || '';
+
                 html += `
                     <div class="bg-white rounded-3xl p-6 shadow-md hover:shadow-xl border-2 ${isPub ? 'border-emerald-400' : 'border-slate-200'} transition flex flex-col justify-between space-y-4 relative">
                         
@@ -803,10 +807,17 @@
                             </div>
                         </div>
 
-                        <!-- Course & Exam Title -->
+                        <!-- Course & Exam Title & Class/Section Badge -->
                         <div>
-                            <div class="text-xs font-bold text-indigo-600 uppercase tracking-wider truncate mb-1">
-                                📚 ${escapeHtml(courseNameStr)}
+                            <div class="flex items-center gap-2 flex-wrap mb-1">
+                                <div class="text-xs font-bold text-indigo-600 uppercase tracking-wider truncate">
+                                    📚 ${escapeHtml(courseNameStr)}
+                                </div>
+                                ${classNameStr ? `
+                                    <span class="text-[11px] font-extrabold text-purple-700 bg-purple-100 border border-purple-200 px-2.5 py-0.5 rounded-lg flex items-center gap-1 shadow-2xs">
+                                        <span>🏫</span> <span>กลุ่ม/ชั้น: ${escapeHtml(classNameStr)}</span>
+                                    </span>
+                                ` : ''}
                             </div>
                             <h3 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight leading-tight">
                                 ${escapeHtml(examTitleStr)}
@@ -826,15 +837,19 @@
                             </div>
                         </div>
 
-                        <!-- 4 Stat Counters in Grid -->
-                        <div class="grid grid-cols-2 gap-2 text-xs">
-                            <div class="p-2.5 bg-slate-50 border border-slate-100 rounded-xl flex flex-col">
+                        <!-- Stat Counters in Grid (Includes Class / Section) -->
+                        <div class="grid grid-cols-3 gap-2 text-xs">
+                            <div class="p-2.5 bg-slate-50 border border-slate-100 rounded-xl flex flex-col justify-center">
                                 <span class="text-[10px] text-slate-400 font-bold">⏱️ เวลาสอบ</span>
-                                <span class="text-sm font-bold text-slate-800">${duration} นาที</span>
+                                <span class="text-xs sm:text-sm font-bold text-slate-800">${duration} นาที</span>
                             </div>
-                            <div class="p-2.5 bg-slate-50 border border-slate-100 rounded-xl flex flex-col">
+                            <div class="p-2.5 bg-slate-50 border border-slate-100 rounded-xl flex flex-col justify-center">
                                 <span class="text-[10px] text-slate-400 font-bold">📝 จำนวนข้อสอบ</span>
-                                <span class="text-sm font-bold text-slate-800">${qCount} ข้อ</span>
+                                <span class="text-xs sm:text-sm font-bold text-slate-800">${qCount} ข้อ</span>
+                            </div>
+                            <div class="p-2.5 bg-purple-50/70 border border-purple-100 rounded-xl flex flex-col justify-center">
+                                <span class="text-[10px] text-purple-600 font-bold">🏫 กลุ่ม/ชั้นเรียน</span>
+                                <span class="text-xs font-extrabold text-purple-900 truncate" title="${escapeHtml(classNameStr || 'ทุกกลุ่มเรียน')}">${escapeHtml(classNameStr || 'ทุกกลุ่มเรียน')}</span>
                             </div>
                         </div>
 

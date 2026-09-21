@@ -529,6 +529,7 @@
     // ===== 2. ตรวจสอบหน้าปัจจุบันอย่างแม่นยำ =====
     function getCurrentPageKey() {
         const path = window.location.pathname.toLowerCase();
+        if (path === '/' || path.endsWith('/index.html') || path.includes('index.html') || path.endsWith('/')) return 'none';
         if (path.includes('admin-questions')) return 'questions';
         if (path.includes('admin-rooms')) return 'rooms';
         if (path.includes('admin-courses')) return 'courses';
@@ -543,7 +544,6 @@
         if (path.includes('admin-excel')) return 'excel';
         if (path.includes('dashboard')) return 'dashboard';
         if (path.includes('exam.html')) return 'exam';
-        if (path.includes('index.html') || path.includes('student-login')) return 'index';
         return 'dashboard';
     }
 
@@ -995,6 +995,8 @@
 
     // ===== 11. Initializer =====
     function init() {
+        const pageKey = getCurrentPageKey();
+        if (pageKey === 'none') return;
         injectGuideStyles();
         createGuideModal();
         createFloatingGuideButton();
