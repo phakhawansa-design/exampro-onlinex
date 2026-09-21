@@ -645,22 +645,23 @@
         async function refreshAllRoomsData() {
             try {
                 const res = await fetch(`/api/teacher/rooms?username=${encodeURIComponent(username)}`);
-                if (!res.ok) return;
-                const rawRooms = await res.json();
-                
-                // กรองเฉพาะห้องที่มีการใช้งานจริง (มีชื่อข้อสอบ, มีวิชา, มีคำถาม, หรือเปิดเผยแพร่แล้ว)
-                allRooms = (rawRooms || []).filter(r => {
-                    const hasTitle = r.exam_title && r.exam_title.trim() !== '' && !r.exam_title.startsWith('ห้องสอบที่');
-                    const hasCourse = r.courseId !== null && r.courseId !== undefined && r.courseId !== 0;
-                    const hasQuestions = (r.questionCount || 0) > 0;
-                    const isPub = r.is_published === 1;
-                    const isCustomRoom = r.roomId && r.roomId.includes('_room_');
-                    return hasTitle || hasCourse || hasQuestions || isPub || isCustomRoom;
-                });
-
-                renderRoomsGrid();
+                if (res.ok) {
+                    const rawRooms = await res.json();
+                    
+                    // กรองเฉพาะห้องที่มีการใช้งานจริง (มีชื่อข้อสอบ, มีวิชา, มีคำถาม, หรือเปิดเผยแพร่แล้ว)
+                    allRooms = (rawRooms || []).filter(r => {
+                        const hasTitle = r.exam_title && r.exam_title.trim() !== '' && !r.exam_title.startsWith('ห้องสอบที่');
+                        const hasCourse = r.courseId !== null && r.courseId !== undefined && r.courseId !== 0;
+                        const hasQuestions = (r.questionCount || 0) > 0;
+                        const isPub = r.is_published === 1;
+                        const isCustomRoom = r.roomId && r.roomId.includes('_room_');
+                        return hasTitle || hasCourse || hasQuestions || isPub || isCustomRoom;
+                    });
+                }
             } catch(e) {
                 console.error("โหลดข้อมูลห้องสอบผิดพลาด:", e);
+            } finally {
+                renderRoomsGrid();
             }
         }
 
