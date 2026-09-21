@@ -163,34 +163,8 @@
         <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
             <div class="max-w-7xl mx-auto space-y-8">
 
-                <!-- 1. SECTION: หน้าเปิดห้องสอบ (เลือกรายวิชาเพื่อเปิดสอบ) -->
+                <!-- SECTION: รายการห้องสอบที่เปิดใช้งานอยู่ (Active Exam Rooms) -->
                 <div class="space-y-4">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 bg-gradient-to-r from-indigo-900 via-indigo-950 to-purple-950 rounded-3xl text-white shadow-xl relative overflow-hidden">
-                        <div class="relative z-10 space-y-1">
-                            <div class="flex items-center gap-2">
-                                <span class="px-2.5 py-0.5 rounded-full bg-cyan-400/20 text-cyan-300 font-mono text-[10px] font-black uppercase tracking-wider">Exam Room Opener</span>
-                                <h2 class="text-lg sm:text-xl font-black tracking-tight">🚀 เลือกรายวิชาเพื่อเปิดห้องสอบ</h2>
-                            </div>
-                            <p class="text-xs text-slate-300 font-medium max-w-2xl leading-relaxed">
-                                คลิกเลือกรายวิชาที่ต้องการ เพื่อเลือกชุดข้อสอบ รับรหัส PIN 6 หลัก & QR Code ฉายจอให้นักศึกษามารอสอบ (นักศึกษาจะยังทำข้อสอบไม่ได้จนกว่าอาจารย์จะกดเปิดเผยแพร่)
-                            </p>
-                        </div>
-                        <div class="relative z-10 shrink-0">
-                            <button onclick="openCreateRoomModal()" class="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white rounded-2xl text-xs font-black shadow-md transition active:scale-95 flex items-center gap-1.5 cursor-pointer">
-                                <span>➕</span>
-                                <span>เปิดห้องสอบด่วน</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Course Selection Cards Grid -->
-                    <div id="courses-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                        <div class="col-span-full py-8 text-center text-slate-400 font-bold">กำลังโหลดรายวิชาทั้งหมด...</div>
-                    </div>
-                </div>
-
-                <!-- 2. SECTION: รายการห้องสอบที่เปิดใช้งานอยู่ (Active Exam Rooms) -->
-                <div class="space-y-4 pt-4 border-t border-slate-200/80">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2.5">
                             <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-black text-sm">
@@ -209,14 +183,20 @@
                     </div>
 
                     <!-- Empty State (Shown when no active rooms) -->
-                    <div id="rooms-empty-state" class="hidden flex flex-col items-center justify-center p-8 bg-white rounded-3xl border-2 border-dashed border-slate-200 text-center space-y-3 max-w-lg mx-auto">
-                        <span class="text-3xl">⏳</span>
-                        <div class="space-y-1">
-                            <h4 class="text-sm font-black text-slate-700">ยังไม่มีห้องสอบที่เปิดใช้งาน</h4>
-                            <p class="text-xs text-slate-400 font-medium">
-                                เลือกรายวิชาจากด้านบนเพื่อเลือกชุดข้อสอบและเปิดห้องรอสอบได้ทันที
+                    <div id="rooms-empty-state" class="hidden flex flex-col items-center justify-center p-8 sm:p-12 bg-white rounded-3xl border-2 border-dashed border-slate-200 text-center space-y-4 max-w-lg mx-auto my-6 shadow-sm">
+                        <div class="w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-3xl shadow-inner">
+                            🏫
+                        </div>
+                        <div class="space-y-1.5">
+                            <h4 class="text-base font-black text-slate-800">ยังไม่มีห้องสอบที่เปิดใช้งาน</h4>
+                            <p class="text-xs text-slate-400 font-medium leading-relaxed">
+                                กดปุ่ม <strong>"+ สร้างห้องสอบ"</strong> ด้านบนเพื่อเลือกรายวิชา ชุดข้อสอบ และเปิดห้องรอสอบได้ทันที
                             </p>
                         </div>
+                        <button onclick="openCreateRoomModal()" class="px-5 py-2.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl text-xs font-black shadow-md transition active:scale-95 flex items-center gap-1.5 cursor-pointer mt-2">
+                            <span>➕</span>
+                            <span>สร้างห้องสอบใหม่</span>
+                        </button>
                     </div>
                 </div>
 
@@ -418,9 +398,12 @@
             </div>
 
             <!-- Utility Buttons -->
-            <div class="flex items-center gap-2 pt-1">
+            <div class="flex items-center gap-2 pt-1 flex-wrap sm:flex-nowrap">
                 <button onclick="toggleProjectorMode()" class="flex-1 py-2 bg-slate-900 hover:bg-slate-800 text-white font-black text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
                     <span>📺</span> ฉายจอโปรเจกเตอร์
+                </button>
+                <button onclick="openMonitoringFromModal()" class="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white font-black text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+                    <span>🛡️</span> ตรวจจับพฤติกรรมสด
                 </button>
                 <button onclick="copyPublishLink()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition active:scale-95 cursor-pointer">
                     📋 คัดลอกลิงก์
@@ -715,7 +698,13 @@
                                 <span>ฉายจอ PIN & QR Code (ห้องรอสอบ)</span>
                             </button>
 
-                            <!-- Button 2: Start / Stop Exam -->
+                            <!-- Button 2: ตรวจสอบพฤติกรรมน่าสงสัย -->
+                            <a href="admin-monitoring.html?room=${encodeURIComponent(room.roomId)}" class="w-full py-2.5 bg-gradient-to-r from-rose-500 via-pink-600 to-amber-500 hover:from-rose-600 hover:to-amber-600 text-white rounded-xl text-xs font-black shadow-md transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                                <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                                <span>🛡️ ตรวจสอบพฤติกรรมน่าสงสัย</span>
+                            </a>
+
+                            <!-- Button 3 & 4: Start / Stop Exam & ดูรายชื่อ -->
                             <div class="grid grid-cols-2 gap-2">
                                 ${isPub ? `
                                     <button onclick="togglePublishExam('${room.roomId}', false)" class="py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-black shadow-sm transition active:scale-95 flex items-center justify-center gap-1 cursor-pointer">
@@ -994,6 +983,11 @@
                 waitingStudentsInterval = null;
             }
             document.getElementById('publish-modal').classList.add('hidden');
+        }
+
+        function openMonitoringFromModal() {
+            if (!activeModalRoomId) return;
+            window.location.href = `admin-monitoring.html?room=${encodeURIComponent(activeModalRoomId)}`;
         }
 
         async function pollWaitingStudents(roomId) {

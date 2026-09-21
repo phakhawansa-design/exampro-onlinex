@@ -280,12 +280,12 @@
                     </p>
                 </div>
 
-                <!-- Room Selector Dropdown Frame -->
+                <!-- Course Selector Dropdown Frame -->
                 <div class="header-card flex items-center gap-3 w-full sm:w-auto shrink-0 justify-end">
-                    <span class="text-sm font-bold text-slate-700">เลือกห้องสอบ:</span>
-                    <select id="room-selector" onchange="fetchResults()" 
-                        class="dark-select max-w-[200px] text-sm">
-                        <!-- โดนโหลดห้องสอบอาจารย์มาใส่ -->
+                    <span class="text-sm font-bold text-slate-700">เลือกรายวิชา:</span>
+                    <select id="course-selector" onchange="onCourseChange()" 
+                        class="dark-select min-w-[220px] max-w-[320px] text-sm font-semibold">
+                        <!-- โดนโหลดรายวิชาของอาจารย์มาใส่ -->
                     </select>
                     <button onclick="window.TabLockGuide.open('results')" class="bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white font-extrabold px-3.5 py-2 rounded-xl text-xs md:text-sm transition duration-300 shadow-sm active:scale-95 flex items-center gap-1.5 shrink-0 cursor-pointer">
                         <span>💡 คู่มือหน้านี้</span>
@@ -297,7 +297,21 @@
         <!-- Main Workspace -->
         <main class="p-6 md:p-8 flex-grow space-y-6 max-w-[1400px] w-full mx-auto overflow-y-auto">
             
-            <!-- Cards Summary Stats -->
+            <!-- 📘 Card แสดงเมื่อยังไม่ได้เลือกรายวิชา -->
+            <div id="no-course-card" class="glass-card p-10 sm:p-14 text-center space-y-4 max-w-xl mx-auto shadow-2xl my-8 border-2 border-indigo-200/60 bg-gradient-to-b from-white via-indigo-50/30 to-white">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-indigo-100 text-indigo-600 text-4xl shadow-inner animate-pulse">
+                    📘
+                </div>
+                <div class="space-y-2">
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-800">กรุณาเลือกรายวิชาเพื่อดูผลการสอบ</h3>
+                    <p class="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed max-w-md mx-auto">
+                        เลือกรายวิชาจากเมนูด้านบน เพื่อเรียกดูข้อมูลรายชื่อนักศึกษา คะแนนสอบแบบเรียลไทม์ และรายงานสถิติการสอบของวิชานั้นๆ
+                    </p>
+                </div>
+            </div>
+
+            <!-- 📊 ส่วนแสดงผลข้อมูลคะแนน (จะแสดงเมื่อเลือกวิชาแล้วเท่านั้น) -->
+            <div id="results-content-area" class="space-y-6 hidden">
             <div class="grid grid-cols-2 lg:grid-cols-5 gap-6">
                 <!-- Total -->
                 <div class="bg-white border border-slate-100/80 p-6 rounded-3xl flex flex-col justify-between shadow-sm hover:shadow-md transition">
@@ -464,7 +478,7 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </div><!-- End results-content-area -->
 
         </main>
 
@@ -481,50 +495,65 @@
         document.getElementById('teacher-display').textContent = `อาจารย์ผู้ดูแลระบบ: ${teacherName}`;
         document.getElementById('sidebar-teacher-name').textContent = `อาจารย์: ${teacherName}`;
 
-        let rawResultsData = [];
-        let currentRoomId = '';
+        let currentCourseId = '';
 
         window.addEventListener('DOMContentLoaded', async () => {
-            await loadTeacherRooms();
-            await fetchResults();
+            await loadTeacherCourses();
         });
 
-        // ดึงข้อมูลห้องของอาจารย์
-        async function loadTeacherRooms() {
+        // ดึงข้อมูลรายวิชาของอาจารย์
+        async function loadTeacherCourses() {
             try {
-                const res = await fetch(`/api/teacher/rooms?username=${username}`);
-                const rooms = await res.json();
+                const res = await fetch(`/api/teacher/courses?username=${username}`);
+                const courses = await res.json();
                 
-                if (rooms.length === 0) {
-                    alert("ไม่พบรหัสห้องสอบประจำตัวของท่าน");
+                const select = document.getElementById('course-selector');
+                if (!courses || courses.length === 0) {
+                    select.innerHTML = `<option value="">-- ไม่พบรายวิชาในระบบ --</option>`;
                     return;
                 }
 
-                const select = document.getElementById('room-selector');
-                select.innerHTML = `<option value="ALL">📈 ภาพรวมทุกห้องเรียนสะสม</option>` + 
-                    rooms.map(r => `<option value="${r.roomId}">${r.roomName}</option>`).join('');
+                select.innerHTML = `<option value="">-- กรุณาเลือกรายวิชาเพื่อดูผลการสอบ --</option>` + 
+                    courses.map(c => `<option value="${c.id}">[${c.courseCode}] ${c.courseName} ${c.description ? '(' + c.description + ')' : ''}</option>`).join('');
                 
-                const savedActiveRoom = localStorage.getItem('active_room_id');
-                if (savedActiveRoom && (savedActiveRoom === 'ALL' || rooms.some(r => r.roomId === savedActiveRoom))) {
-                    select.value = savedActiveRoom;
-                } else {
-                    localStorage.setItem('active_room_id', select.value);
+                const savedCourseId = localStorage.getItem('active_course_id');
+                if (savedCourseId && courses.some(c => String(c.id) === String(savedCourseId))) {
+                    select.value = savedCourseId;
+                    await onCourseChange();
                 }
-                currentRoomId = select.value;
             } catch(e) {
-                console.error(e);
+                console.error("Load courses error:", e);
             }
         }
 
-        // ดึงคะแนนผลสอบของห้องที่เลือก
-        async function fetchResults() {
-            const selectRoom = document.getElementById('room-selector').value;
-            if(!selectRoom) return;
-            currentRoomId = selectRoom;
-            localStorage.setItem('active_room_id', currentRoomId);
+        // เมื่อผู้ใช้อยู่ในสถานะเลือกรายวิชา
+        async function onCourseChange() {
+            const courseId = document.getElementById('course-selector').value;
+            const noCourseCard = document.getElementById('no-course-card');
+            const contentArea = document.getElementById('results-content-area');
+
+            if (!courseId) {
+                localStorage.removeItem('active_course_id');
+                if (noCourseCard) noCourseCard.classList.remove('hidden');
+                if (contentArea) contentArea.classList.add('hidden');
+                return;
+            }
+
+            localStorage.setItem('active_course_id', courseId);
+            currentCourseId = courseId;
+            if (noCourseCard) noCourseCard.classList.add('hidden');
+            if (contentArea) contentArea.classList.remove('hidden');
+
+            await fetchResults(courseId);
+        }
+
+        // ดึงคะแนนผลสอบของรายวิชาที่เลือก
+        async function fetchResults(courseIdOverride) {
+            const courseId = courseIdOverride || document.getElementById('course-selector').value;
+            if (!courseId) return;
 
             try {
-                const response = await fetch(`/api/exam-results?roomId=${currentRoomId}&username=${username}`);
+                const response = await fetch(`/api/exam-results?courseId=${encodeURIComponent(courseId)}&username=${username}`);
                 rawResultsData = await response.json();
                 
                 // คำนวณสถิติ
@@ -539,7 +568,7 @@
                 console.error(err);
                 document.getElementById('results-table-body').innerHTML = `
                     <tr>
-                        <td colspan="7" class="p-16 text-center text-rose-500 font-bold">
+                        <td colspan="10" class="p-16 text-center text-rose-500 font-bold">
                             ❌ ไม่สามารถเชื่อมต่อระบบหลังบ้านได้ กรุณาตรวจสอบการรันเซิร์ฟเวอร์
                         </td>
                     </tr>`;

@@ -240,6 +240,13 @@
 
         let rooms = [];
         let currentRoomId = 'ALL';
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomParam = urlParams.get('room') || urlParams.get('roomId');
+        if (roomParam) {
+            currentRoomId = roomParam;
+        }
+
         let lastLogsLength = 0;
         let roomLogCounts = {}; // { roomId: count }
 
@@ -276,8 +283,8 @@
                 } catch(e) {}
             }));
 
-            // กรองห้องที่มีการเผยแพร่ข้อสอบ (is_published === 1) หรือห้องที่มีข้อสอบ หรือห้องที่มีประวัติทุจริต
-            const activeRooms = rooms.filter(r => r.is_published === 1 || r.questionCount > 0 || (roomCounts[r.roomId] && roomCounts[r.roomId] > 0));
+            // กรองห้องที่มีการเผยแพร่ข้อสอบ (is_published === 1) หรือห้องที่มีข้อสอบ หรือห้องที่มีประวัติทุจริต หรือห้องที่เลือกผ่าน URL
+            const activeRooms = rooms.filter(r => r.is_published === 1 || r.questionCount > 0 || (roomCounts[r.roomId] && roomCounts[r.roomId] > 0) || r.roomId === currentRoomId);
 
             if (activeRooms.length === 0) {
                 tabsEl.innerHTML = '<div class="text-xs text-slate-400 py-2 px-3">📭 ไม่มีห้องสอบที่กำลังเปิดสอบอยู่ขณะนี้</div>';
