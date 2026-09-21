@@ -263,107 +263,112 @@
 
 <!-- MAIN AREA -->
 <div id="main-area">
-    <header id="top-header">
-        <div class="flex items-center gap-3">
-            <span class="text-2xl">👨‍🎓</span>
-            <h1 class="text-xl md:text-2xl font-black text-slate-900">ประวัตินักศึกษา</h1>
-            <span class="text-xs bg-indigo-50 border border-indigo-100 text-indigo-700 font-extrabold px-3 py-1 rounded-full">Student Profiles</span>
+    <header id="top-header" class="py-4 px-6 md:px-8">
+        <div class="flex items-center gap-3.5">
+            <span class="text-3xl md:text-4xl">👨‍🎓</span>
+            <div>
+                <h1 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">ประวัตินักศึกษา</h1>
+                <p class="text-sm md:text-base text-slate-500 font-semibold mt-0.5">จัดการข้อมูล ตรวจสอบสถานะบัญชี และประวัติการสอบของนักศึกษา</p>
+            </div>
+            <span class="text-xs sm:text-sm bg-indigo-50 border border-indigo-200 text-indigo-800 font-black px-3.5 py-1 rounded-full hidden sm:inline-block">Student Profiles</span>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-3 flex-wrap">
             <input type="text" id="search-input" placeholder="🔍 ค้นหา รหัส / ชื่อ / ชั้น..." onkeyup="filterStudents()"
-                class="w-56 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-cyan-400 transition" />
+                class="w-60 sm:w-64 px-4 py-3 bg-white border-2 border-slate-300 rounded-2xl text-sm font-bold text-slate-900 focus:outline-none focus:border-cyan-500 transition shadow-xs" />
             <button onclick="importStudents()" id="btn-import-students"
-                class="flex items-center gap-1.5 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs md:text-sm font-extrabold rounded-xl transition shadow-md shadow-emerald-500/20 active:scale-95">
-                🔄 ดึงข้อมูลจากผลสอบ
+                class="flex items-center gap-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs md:text-sm font-black rounded-2xl transition shadow-md shadow-emerald-500/20 active:scale-95 cursor-pointer">
+                <span>🔄</span>
+                <span>ดึงข้อมูลจากผลสอบ</span>
             </button>
             <button onclick="openAddModal()" id="btn-add-student"
-                class="flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white text-xs md:text-sm font-extrabold rounded-xl transition shadow-md shadow-cyan-500/20 active:scale-95">
-                ➕ เพิ่มนักศึกษา
+                class="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white text-xs md:text-sm font-black rounded-2xl transition shadow-lg shadow-cyan-500/25 active:scale-95 cursor-pointer">
+                <span>➕</span>
+                <span>เพิ่มนักศึกษา</span>
             </button>
         </div>
     </header>
 
-    <main class="p-6 md:p-8 flex-grow max-w-[1400px] w-full mx-auto space-y-5 overflow-y-auto">
+    <main class="p-6 md:p-8 flex-grow max-w-[1500px] w-full mx-auto space-y-6 overflow-y-auto">
 
         <!-- Stats -->
-        <div class="grid grid-cols-3 gap-4">
-            <div class="glass-card p-4 flex items-center gap-3">
-                <div class="w-10 h-10 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-xl flex-shrink-0">👤</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <div class="glass-card p-5 sm:p-6 flex items-center gap-4 border-2 border-slate-200/90 shadow-sm">
+                <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-2xl flex-shrink-0">👤</div>
                 <div>
-                    <div class="text-2xl font-extrabold text-slate-800" id="stat-total">0</div>
-                    <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wide">นักศึกษาทั้งหมด</div>
+                    <div class="text-3xl font-black text-slate-900" id="stat-total">0</div>
+                    <div class="text-xs text-slate-500 font-extrabold uppercase tracking-wide">นักศึกษาทั้งหมด</div>
                 </div>
             </div>
-            <div class="glass-card p-4 flex items-center gap-3">
-                <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-xl flex-shrink-0">📝</div>
+            <div class="glass-card p-5 sm:p-6 flex items-center gap-4 border-2 border-slate-200/90 shadow-sm">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-2xl flex-shrink-0">📝</div>
                 <div>
-                    <div class="text-2xl font-extrabold text-slate-800" id="stat-exam">0</div>
-                    <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wide">บันทึกผลสอบรวม</div>
+                    <div class="text-3xl font-black text-slate-900" id="stat-exam">0</div>
+                    <div class="text-xs text-slate-500 font-extrabold uppercase tracking-wide">บันทึกผลสอบรวม</div>
                 </div>
             </div>
-            <div class="glass-card p-4 flex items-center gap-3">
-                <div class="w-10 h-10 rounded-2xl bg-violet-500/10 flex items-center justify-center text-xl flex-shrink-0">📊</div>
+            <div class="glass-card p-5 sm:p-6 flex items-center gap-4 border-2 border-slate-200/90 shadow-sm">
+                <div class="w-12 h-12 rounded-2xl bg-violet-500/10 flex items-center justify-center text-2xl flex-shrink-0">📊</div>
                 <div>
-                    <div class="text-2xl font-extrabold text-slate-800" id="stat-avg">—</div>
-                    <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wide">คะแนนเฉลี่ยรวม %</div>
+                    <div class="text-3xl font-black text-slate-900" id="stat-avg">—</div>
+                    <div class="text-xs text-slate-500 font-extrabold uppercase tracking-wide">คะแนนเฉลี่ยรวม %</div>
                 </div>
             </div>
         </div>
 
         <!-- Table Card with Approval Tabs -->
-        <div class="glass-card overflow-hidden">
-            <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <div class="flex items-center gap-2">
-                    <button onclick="switchStudentTab('all')" id="tab-btn-all" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shadow-sm shadow-indigo-500/20 active:scale-95">
-                        👥 นักศึกษาทั้งหมด <span id="student-count-badge" class="ml-1 text-[10px] bg-white/25 px-2 py-0.5 rounded-full font-black">0</span>
+        <div class="glass-card overflow-hidden border-2 border-slate-200/90 shadow-sm">
+            <div class="p-5 sm:p-6 border-b-2 border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <button onclick="switchStudentTab('all')" id="tab-btn-all" class="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition flex items-center gap-2 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shadow-md shadow-indigo-500/20 active:scale-95 cursor-pointer">
+                        👥 นักศึกษาทั้งหมด <span id="student-count-badge" class="ml-1 text-xs bg-white/30 px-2.5 py-0.5 rounded-full font-black">0</span>
                     </button>
-                    <button onclick="switchStudentTab('pending')" id="tab-btn-pending" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 active:scale-95">
-                        ⏳ คำขอรออนุมัติ <span id="pending-count-badge" class="ml-1 text-[10px] bg-amber-500 text-white px-2 py-0.5 rounded-full font-black hidden">0</span>
+                    <button onclick="switchStudentTab('pending')" id="tab-btn-pending" class="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-black transition flex items-center gap-2 bg-slate-100 text-slate-700 hover:bg-slate-200 active:scale-95 cursor-pointer border border-slate-200">
+                        ⏳ คำขอรออนุมัติ <span id="pending-count-badge" class="ml-1 text-xs bg-amber-500 text-white px-2.5 py-0.5 rounded-full font-black hidden">0</span>
                     </button>
                 </div>
-                <div id="pending-action-bar" class="hidden flex items-center gap-2">
-                    <button onclick="approveAllStudents()" class="px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-black rounded-xl transition shadow-md shadow-emerald-500/20 flex items-center gap-1.5 active:scale-95">
+                <div id="pending-action-bar" class="hidden flex items-center gap-3">
+                    <button onclick="approveAllStudents()" class="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs sm:text-sm font-black rounded-2xl transition shadow-md shadow-emerald-500/20 flex items-center gap-2 active:scale-95 cursor-pointer">
                         ⚡ อนุมัติทั้งหมด (Approve All)
                     </button>
                 </div>
-                <span class="text-[10px] text-slate-400 font-bold hidden sm:inline" id="student-count-label">0 คน</span>
+                <span class="text-xs sm:text-sm text-slate-500 font-extrabold hidden sm:inline" id="student-count-label">0 คน</span>
             </div>
 
             <!-- View 1: All Students Table -->
             <div id="view-all-students" class="overflow-x-auto">
-                <table class="w-full text-xs">
+                <table class="w-full text-sm">
                     <thead>
-                        <tr class="bg-slate-50/80 border-b border-slate-100">
-                            <th class="text-left px-5 py-3 font-extrabold text-slate-400 uppercase tracking-wider text-[9px]">รหัสนักศึกษา</th>
-                            <th class="text-left px-5 py-3 font-extrabold text-slate-400 uppercase tracking-wider text-[9px]">ชื่อ-นามสกุล</th>
-                            <th class="text-left px-5 py-3 font-extrabold text-slate-400 uppercase tracking-wider text-[9px]">ชั้น / ห้อง</th>
-                            <th class="text-center px-4 py-3 font-extrabold text-slate-400 uppercase tracking-wider text-[9px]">สถานะบัญชี</th>
-                            <th class="text-center px-4 py-3 font-extrabold text-slate-400 uppercase tracking-wider text-[9px]">สอบแล้ว</th>
-                            <th class="text-center px-4 py-3 font-extrabold text-slate-400 uppercase tracking-wider text-[9px] min-w-[110px]">คะแนนเฉลี่ย</th>
-                            <th class="text-center px-4 py-3 font-extrabold text-slate-400 uppercase tracking-wider text-[9px]">จัดการ</th>
+                        <tr class="bg-slate-100 border-b-2 border-slate-200">
+                            <th class="text-left px-5 py-3.5 font-black text-slate-700 uppercase tracking-wider text-xs">รหัสนักศึกษา</th>
+                            <th class="text-left px-5 py-3.5 font-black text-slate-700 uppercase tracking-wider text-xs">ชื่อ-นามสกุล</th>
+                            <th class="text-left px-5 py-3.5 font-black text-slate-700 uppercase tracking-wider text-xs">ชั้น / ห้อง</th>
+                            <th class="text-center px-4 py-3.5 font-black text-slate-700 uppercase tracking-wider text-xs">สถานะบัญชี</th>
+                            <th class="text-center px-4 py-3.5 font-black text-slate-700 uppercase tracking-wider text-xs">สอบแล้ว</th>
+                            <th class="text-center px-4 py-3.5 font-black text-slate-700 uppercase tracking-wider text-xs min-w-[120px]">คะแนนเฉลี่ย</th>
+                            <th class="text-center px-4 py-3.5 font-black text-slate-700 uppercase tracking-wider text-xs">จัดการ</th>
                         </tr>
                     </thead>
                     <tbody id="student-table-body">
-                        <tr><td colspan="7" class="text-center py-16 text-slate-400 font-semibold">กำลังโหลดข้อมูล...</td></tr>
+                        <tr><td colspan="7" class="text-center py-16 text-slate-400 font-bold text-base">กำลังโหลดข้อมูล...</td></tr>
                     </tbody>
                 </table>
             </div>
 
             <!-- View 2: Pending Approvals Table -->
             <div id="view-pending-students" class="overflow-x-auto hidden">
-                <table class="w-full text-xs">
+                <table class="w-full text-sm">
                     <thead>
-                        <tr class="bg-amber-50/50 border-b border-amber-100/60">
-                            <th class="text-left px-5 py-3 font-extrabold text-amber-700 uppercase tracking-wider text-[9px]">วันที่ลงทะเบียน</th>
-                            <th class="text-left px-5 py-3 font-extrabold text-amber-700 uppercase tracking-wider text-[9px]">รหัสนักศึกษา</th>
-                            <th class="text-left px-5 py-3 font-extrabold text-amber-700 uppercase tracking-wider text-[9px]">ชื่อ-นามสกุล</th>
-                            <th class="text-left px-5 py-3 font-extrabold text-amber-700 uppercase tracking-wider text-[9px]">ชั้น / ห้อง</th>
-                            <th class="text-center px-4 py-3 font-extrabold text-amber-700 uppercase tracking-wider text-[9px]">สถานะ</th>
-                            <th class="text-center px-4 py-3 font-extrabold text-amber-700 uppercase tracking-wider text-[9px]">การอนุมัติ</th>
+                        <tr class="bg-amber-100/60 border-b-2 border-amber-200">
+                            <th class="text-left px-5 py-3.5 font-black text-amber-900 uppercase tracking-wider text-xs">วันที่ลงทะเบียน</th>
+                            <th class="text-left px-5 py-3.5 font-black text-amber-900 uppercase tracking-wider text-xs">รหัสนักศึกษา</th>
+                            <th class="text-left px-5 py-3.5 font-black text-amber-900 uppercase tracking-wider text-xs">ชื่อ-นามสกุล</th>
+                            <th class="text-left px-5 py-3.5 font-black text-amber-900 uppercase tracking-wider text-xs">ชั้น / ห้อง</th>
+                            <th class="text-center px-4 py-3.5 font-black text-amber-900 uppercase tracking-wider text-xs">สถานะ</th>
+                            <th class="text-center px-4 py-3.5 font-black text-amber-900 uppercase tracking-wider text-xs">การอนุมัติ</th>
                         </tr>
                     </thead>
                     <tbody id="pending-table-body">
-                        <tr><td colspan="6" class="text-center py-16 text-slate-400 font-semibold">กำลังโหลดคำขอ...</td></tr>
+                        <tr><td colspan="6" class="text-center py-16 text-slate-400 font-bold text-base">กำลังโหลดคำขอ...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -373,48 +378,48 @@
 
 <!-- MODAL: เพิ่ม/แก้ไขนักศึกษา -->
 <div id="add-modal" class="modal-overlay hidden">
-    <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-7 space-y-5 fade-in">
-        <div class="flex justify-between items-start">
+    <div class="w-full max-w-lg bg-white rounded-3xl shadow-2xl p-7 sm:p-8 space-y-5 fade-in border-2 border-slate-200">
+        <div class="flex justify-between items-start border-b border-slate-200 pb-3">
             <div>
-                <h3 class="text-sm font-extrabold text-slate-800" id="modal-title">➕ เพิ่มนักศึกษาใหม่</h3>
-                <p class="text-[10px] text-slate-400 mt-0.5">กรอกข้อมูลให้ครบถ้วนแล้วกดบันทึก</p>
+                <h3 class="text-lg sm:text-xl font-black text-slate-900" id="modal-title">➕ เพิ่มนักศึกษาใหม่</h3>
+                <p class="text-xs text-slate-500 font-semibold mt-0.5">กรอกข้อมูลให้ครบถ้วนแล้วกดบันทึก</p>
             </div>
-            <button onclick="closeAddModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold leading-none">&times;</button>
+            <button onclick="closeAddModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-lg transition">&times;</button>
         </div>
 
-        <div class="space-y-3">
+        <div class="space-y-4 text-sm">
             <div>
-                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">รหัสนักศึกษา *</label>
+                <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-1.5">รหัสนักศึกษา *</label>
                 <input type="text" id="input-student-id" placeholder="เช่น 66101001"
-                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-cyan-400 transition font-mono" />
+                    class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-2xl text-base font-mono font-bold text-slate-900 focus:outline-none focus:border-cyan-500 transition" />
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">ชื่อ *</label>
+                    <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-1.5">ชื่อ *</label>
                     <input type="text" id="input-first-name" placeholder="ชื่อ"
-                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-cyan-400 transition" />
+                        class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-2xl text-base font-bold text-slate-900 focus:outline-none focus:border-cyan-500 transition" />
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">นามสกุล *</label>
+                    <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-1.5">นามสกุล *</label>
                     <input type="text" id="input-last-name" placeholder="นามสกุล"
-                        class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-cyan-400 transition" />
+                        class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-2xl text-base font-bold text-slate-900 focus:outline-none focus:border-cyan-500 transition" />
                 </div>
             </div>
             <div>
-                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">ชั้น / ห้อง</label>
+                <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-1.5">ชั้น / ห้อง</label>
                 <input type="text" id="input-class" placeholder="เช่น ปี 1 ห้อง A หรือ 66IT-01"
-                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-cyan-400 transition" />
+                    class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-2xl text-base font-bold text-slate-900 focus:outline-none focus:border-cyan-500 transition" />
             </div>
             <div>
-                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">หมายเหตุ</label>
+                <label class="block text-xs font-black text-slate-700 uppercase tracking-wider mb-1.5">หมายเหตุ</label>
                 <textarea id="input-note" rows="2" placeholder="บันทึกเพิ่มเติม (ถ้ามี)"
-                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-cyan-400 transition resize-none"></textarea>
+                    class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-300 rounded-2xl text-sm font-bold text-slate-900 focus:outline-none focus:border-cyan-500 transition resize-none"></textarea>
             </div>
         </div>
 
-        <div class="flex gap-3">
-            <button onclick="closeAddModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">ยกเลิก</button>
-            <button onclick="saveStudent()" class="flex-1 py-2.5 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white text-xs font-bold rounded-xl shadow-md active:scale-95 transition">
+        <div class="flex gap-3 pt-3 border-t border-slate-200">
+            <button onclick="closeAddModal()" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-extrabold rounded-2xl transition">ยกเลิก</button>
+            <button onclick="saveStudent()" class="flex-1 py-3 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white text-sm font-black rounded-2xl shadow-md active:scale-95 transition cursor-pointer">
                 💾 บันทึกข้อมูล
             </button>
         </div>
@@ -423,61 +428,58 @@
 
 <!-- MODAL: ประวัติการสอบ -->
 <div id="history-modal" class="modal-overlay hidden">
-    <div class="w-full max-w-xl bg-white rounded-3xl shadow-2xl flex flex-col max-h-[88vh] fade-in">
+    <div class="w-full max-w-2xl bg-white rounded-3xl shadow-2xl flex flex-col max-h-[88vh] fade-in border-2 border-slate-200">
         <!-- Header -->
-        <div class="p-6 border-b border-slate-100 flex justify-between items-start shrink-0">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-full bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center text-base font-black text-white" id="hist-avatar">ก</div>
+        <div class="p-6 border-b border-slate-200 flex justify-between items-start shrink-0">
+            <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center text-lg font-black text-white shadow-sm" id="hist-avatar">ก</div>
                 <div>
-                    <div class="text-sm font-extrabold text-slate-800" id="hist-name">ชื่อนักศึกษา</div>
-                    <div class="flex items-center gap-2 mt-0.5">
-                        <span class="text-[9px] font-mono font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full" id="hist-id">รหัส</span>
-                        <span class="text-[9px] font-bold bg-cyan-50 text-cyan-700 border border-cyan-100 px-2 py-0.5 rounded-full" id="hist-class">ชั้น</span>
+                    <div class="text-lg font-black text-slate-900" id="hist-name">ชื่อนักศึกษา</div>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="text-xs font-mono font-black bg-slate-100 text-slate-700 px-3 py-1 rounded-full border border-slate-200" id="hist-id">รหัส</span>
+                        <span class="text-xs font-extrabold bg-cyan-50 text-cyan-800 border border-cyan-200 px-3 py-1 rounded-full" id="hist-class">ชั้น</span>
                     </div>
                 </div>
             </div>
-            <button onclick="closeHistoryModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold">&times;</button>
+            <button onclick="closeHistoryModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-lg transition">&times;</button>
         </div>
 
         <!-- Stats -->
-        <div class="px-6 py-4 grid grid-cols-3 gap-3 border-b border-slate-100 shrink-0 bg-slate-50/50">
+        <div class="px-6 py-4 grid grid-cols-3 gap-4 border-b border-slate-200 shrink-0 bg-slate-50/70">
             <div class="text-center">
-                <div class="text-xl font-extrabold text-slate-800" id="hist-exam-count">0</div>
-                <div class="text-[9px] text-slate-400 font-bold">ครั้งที่สอบ</div>
+                <div class="text-2xl font-black text-slate-900" id="hist-exam-count">0</div>
+                <div class="text-xs text-slate-500 font-extrabold">ครั้งที่สอบ</div>
             </div>
             <div class="text-center">
-                <div class="text-xl font-extrabold text-emerald-600" id="hist-avg">—</div>
-                <div class="text-[9px] text-slate-400 font-bold">คะแนนเฉลี่ย</div>
+                <div class="text-2xl font-black text-emerald-600" id="hist-avg">—</div>
+                <div class="text-xs text-slate-500 font-extrabold">คะแนนเฉลี่ย</div>
             </div>
             <div class="text-center">
-                <div class="text-xl font-extrabold text-rose-500" id="hist-cheat-count">0</div>
-                <div class="text-[9px] text-slate-400 font-bold">ตรวจพบสลับแท็บ</div>
+                <div class="text-2xl font-black text-rose-500" id="hist-cheat-count">0</div>
+                <div class="text-xs text-slate-500 font-extrabold">ตรวจพบสลับแท็บ</div>
             </div>
         </div>
 
         <!-- Tabs -->
-        <div class="flex border-b border-slate-100 shrink-0">
+        <div class="flex border-b border-slate-200 shrink-0">
             <button onclick="switchHistTab('exam')" id="tab-exam"
-                class="flex-1 py-3 text-xs font-bold text-cyan-600 border-b-2 border-cyan-500 transition">📝 ประวัติการสอบ</button>
+                class="flex-1 py-3.5 text-sm font-black text-cyan-600 border-b-2 border-cyan-500 transition cursor-pointer">📝 ประวัติการสอบ</button>
             <button onclick="switchHistTab('cheat')" id="tab-cheat"
-                class="flex-1 py-3 text-xs font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-700 transition">🚨 พฤติกรรมน่าสงสัย</button>
+                class="flex-1 py-3.5 text-sm font-black text-slate-400 border-b-2 border-transparent hover:text-slate-700 transition cursor-pointer">🚨 พฤติกรรมน่าสงสัย</button>
         </div>
 
         <!-- Content -->
-        <div class="flex-grow overflow-y-auto p-5 space-y-3" id="hist-content">
-            <div class="text-center py-8 text-slate-400">กำลังโหลด...</div>
+        <div class="flex-grow overflow-y-auto p-6 space-y-4" id="hist-content">
+            <div class="text-center py-8 text-slate-400 font-bold">กำลังโหลด...</div>
         </div>
     </div>
 </div>
 
 <script>
-    const username = localStorage.getItem('teacher_username');
-    if (!username) { 
-        window.location.href = 'teacher-login.html'; 
-    } else { 
-        const teacherName = localStorage.getItem('teacher_name') || username;
-        document.getElementById('sidebar-teacher-name').textContent = `อาจารย์: ${teacherName}`; 
-    }
+    const username = localStorage.getItem('teacher_username') || localStorage.getItem('teacherUsername') || 'aom1';
+    const teacherName = localStorage.getItem('teacher_name') || username;
+    const nameEl = document.getElementById('sidebar-teacher-name');
+    if (nameEl) nameEl.textContent = `อาจารย์: ${teacherName}`;
 
     let allStudents = [];
     let pendingStudents = [];
@@ -701,8 +703,8 @@
         if (!students.length) {
             tbody.innerHTML = `<tr><td colspan="7" class="text-center py-16 text-slate-400">
                 <div class="text-4xl mb-3">📭</div>
-                <div class="font-bold text-slate-500">ยังไม่มีข้อมูลนักศึกษา</div>
-                <div class="text-[10px] mt-1.5 text-slate-400">กดปุ่ม "เพิ่มนักศึกษา" หรือรอนักศึกษาสมัครสมาชิกผ่านหน้าเว็บครับ</div>
+                <div class="font-bold text-slate-500 text-base">ยังไม่มีข้อมูลนักศึกษา</div>
+                <div class="text-xs mt-1.5 text-slate-400 font-medium">กดปุ่ม "เพิ่มนักศึกษา" หรือดึงข้อมูลจากผลสอบครับ</div>
             </td></tr>`;
             return;
         }
@@ -714,38 +716,38 @@
             
             const statusVal = s.status || 'approved';
             const statusBadge = statusVal === 'approved'
-                ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">🟢 อนุมัติแล้ว</span>`
+                ? `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">🟢 อนุมัติแล้ว</span>`
                 : statusVal === 'pending'
-                ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200">🟡 รออนุมัติ</span>`
-                : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-rose-50 text-rose-700 border border-rose-200">🔴 ปฏิเสธ</span>`;
+                ? `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">🟡 รออนุมัติ</span>`
+                : `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">🔴 ปฏิเสธ</span>`;
 
-            return `<tr class="border-b border-slate-50 hover:bg-slate-50/60 transition group">
-                <td class="px-5 py-3.5"><span class="font-mono font-bold text-slate-700 text-[11px]">${sid}</span></td>
-                <td class="px-5 py-3.5">
-                    <div class="font-bold text-slate-800">${fn} ${ln}</div>
-                    ${note ? `<div class="text-[9px] text-slate-400 mt-0.5">${note}</div>` : ''}
+            return `<tr class="border-b border-slate-200 hover:bg-slate-50 transition group">
+                <td class="px-5 py-4"><span class="font-mono font-black text-cyan-700 text-sm sm:text-base">${sid}</span></td>
+                <td class="px-5 py-4">
+                    <div class="font-black text-slate-900 text-sm sm:text-base">${fn} ${ln}</div>
+                    ${note ? `<div class="text-xs text-slate-400 mt-0.5 font-medium">${note}</div>` : ''}
                 </td>
-                <td class="px-5 py-3.5">
-                    <span class="bg-cyan-50 border border-cyan-100 text-cyan-700 px-2 py-0.5 rounded-lg font-bold text-[9px]">${cls || '—'}</span>
+                <td class="px-5 py-4">
+                    <span class="bg-cyan-50 border border-cyan-200 text-cyan-800 px-3 py-1 rounded-xl font-bold text-xs sm:text-sm">${cls || '—'}</span>
                 </td>
-                <td class="px-4 py-3.5 text-center">
+                <td class="px-4 py-4 text-center">
                     ${statusBadge}
                 </td>
-                <td class="px-4 py-3.5 text-center font-extrabold text-slate-700">${s.examCount || 0} ครั้ง</td>
-                <td class="px-4 py-3.5 text-center min-w-[110px]">
+                <td class="px-4 py-4 text-center font-black text-slate-800 text-sm sm:text-base">${s.examCount || 0} ครั้ง</td>
+                <td class="px-4 py-4 text-center min-w-[120px]">
                     ${avg
-                        ? `<div class="${avgColor} font-extrabold text-xs">${avg}%</div>
+                        ? `<div class="${avgColor} font-black text-sm sm:text-base">${avg}%</div>
                            <div class="score-bar mt-1.5"><div class="score-bar-fill" style="width:${Math.min(avg,100)}%;background:${barColor}"></div></div>`
-                        : `<span class="text-slate-300 font-bold">—</span>`}
+                        : `<span class="text-slate-300 font-bold text-base">—</span>`}
                 </td>
-                <td class="px-4 py-3.5 text-center">
-                    <div class="flex justify-center gap-1.5">
+                <td class="px-4 py-4 text-center">
+                    <div class="flex justify-center items-center gap-2">
                         <button onclick='openHistoryModal(${JSON.stringify(s.studentId)},${JSON.stringify(fn+" "+ln)},${JSON.stringify(s.class||"")},${s.examCount||0})'
-                            class="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-100 rounded-lg text-[9px] font-bold transition">📋 ดูประวัติ</button>
+                            class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 rounded-xl text-xs font-black transition cursor-pointer">📋 ดูประวัติ</button>
                         <button onclick='openEditModal(${JSON.stringify(s.studentId)},${JSON.stringify(s.firstName)},${JSON.stringify(s.lastName)},${JSON.stringify(s.class||"")},${JSON.stringify(s.note||"")})'
-                            class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-100 rounded-lg text-[9px] font-bold transition">✏️</button>
+                            class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-xl text-xs font-bold transition cursor-pointer text-sm">✏️</button>
                         <button onclick='deleteStudent(${JSON.stringify(s.studentId)},${JSON.stringify(fn+" "+ln)})'
-                            class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-100 rounded-lg text-[9px] font-bold transition">🗑️</button>
+                            class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition cursor-pointer text-sm">🗑️</button>
                     </div>
                 </td>
             </tr>`;

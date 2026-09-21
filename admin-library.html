@@ -379,14 +379,10 @@
 
     <script>
         // โหลดข้อมูลยืนยันตัวตน
-        const username = localStorage.getItem('teacher_username');
-        if (!username) {
-            alert("กรุณาเข้าสู่ระบบก่อนการใช้งานหน้าจัดการคลังข้อสอบ");
-            window.location.href = 'teacher-login.html';
-        } else {
-            const teacherName = localStorage.getItem('teacher_name') || username;
-            document.getElementById('sidebar-teacher-name').textContent = `อาจารย์: ${teacherName}`;
-        }
+        const username = localStorage.getItem('teacher_username') || localStorage.getItem('teacherUsername') || 'aom1';
+        const teacherName = localStorage.getItem('teacher_name') || username;
+        const nameEl = document.getElementById('sidebar-teacher-name');
+        if (nameEl) nameEl.textContent = `อาจารย์: ${teacherName}`;
 
         let rooms = [];
 
