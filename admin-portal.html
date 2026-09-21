@@ -45,13 +45,13 @@
         #sidebar::after { content: ''; position: absolute; bottom: -60px; right: -40px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, transparent 70%); border-radius: 50%; animation: blobPulse 8s ease-in-out infinite reverse; pointer-events: none; z-index: 0; }
         @keyframes blobPulse { 0%, 100% { transform: scale(1) translate(0, 0); opacity: 0.6; } 33% { transform: scale(1.15) translate(10px, -10px); opacity: 1; } 66% { transform: scale(0.9) translate(-5px, 8px); opacity: 0.7; } }
         .sidebar-inner { position: relative; z-index: 1; }
-        .logo-gradient { background: linear-gradient(135deg, #06b6d4, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .logo-gradient { background: linear-gradient(135deg, #ec4899, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .logo-shield { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
         .nav-section-header { display: flex; align-items: center; gap: 6px; padding: 8px 12px 4px 12px; }
         .nav-section-title { font-size: 12px; font-weight: 900; letter-spacing: 0.04em; color: #475569; text-transform: uppercase; }
         .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 16px; font-size: 15px; font-weight: 800; color: #1e293b; text-decoration: none; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border: 1.5px solid transparent; }
-        .nav-link:hover { color: #0284c7; background: #f1f5f9; border-color: #cbd5e1; transform: translateX(3px); }
-        .nav-link.active { background: linear-gradient(135deg, #06b6d4 0%, #4f46e5 50%, #8b5cf6 100%); color: #ffffff !important; font-weight: 900 !important; box-shadow: 0 8px 24px rgba(79, 70, 229, 0.35); border-color: transparent; }
+        .nav-link:hover { color: #ec4899; background: #fdf2f8; border-color: #cbd5e1; transform: translateX(3px); }
+        .nav-link.active { background: linear-gradient(135deg, #f472b6 0%, #818cf8 50%, #38bdf8 100%); color: #ffffff !important; font-weight: 900 !important; box-shadow: 0 8px 24px rgba(79, 70, 229, 0.35); border-color: transparent; }
         .nav-link.active svg { color: #ffffff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
         #sidebar.collapsed { width: 78px !important; }
         #sidebar.collapsed .logo-text, #sidebar.collapsed nav span, #sidebar.collapsed .nav-section-title, #sidebar.collapsed .flex-1.min-w-0, #sidebar.collapsed .logout-btn-text { display: none !important; }
