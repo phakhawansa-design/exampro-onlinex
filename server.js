@@ -2899,7 +2899,6 @@ app.get('/api/library/get-templates', (req, res) => {
         if (err) return res.status(500).json({ message: err.message });
         res.json(rows || []);
     });
-    });
 });
 
 // 2. ดึงข้อสอบรายข้อในเทมเพลตที่เลือก
