@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ห้องสอบ - Tab-Lock Online Proctoring System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,300&display=swap" rel="stylesheet">
+    <style>
+        html { font-size: 100%; -webkit-text-size-adjust: 100%; }
+
+        @media (max-width: 768px) {
+            #sidebar {
+                position: fixed;
+                top: 0; bottom: 0; left: -280px;
+                z-index: 9999;
+                width: 260px !important;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+                transition: left 0.3s ease-in-out;
+            }
+            #sidebar.mobile-open { left: 0 !important; }
+        }
+        * { box-sizing: border-box; }
+        body { font-family: 'Kanit', 'Inter', sans-serif; background-color: #f8fafc; color: #334155; }
+        .glass-card { background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 24px; box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04); }
+        #sidebar { width: 256px; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; transition: width 0.2s ease-in-out; flex-shrink: 0; background: #ffffff; border-right: 1px solid rgba(226,232,240,0.8); position: relative; overflow: hidden; }
+        #sidebar.collapsed { width: 72px !important; }
+        #sidebar.collapsed .logo-text, #sidebar.collapsed nav a span, #sidebar.collapsed .sidebar-user-info { display: none !important; }
+        #sidebar.collapsed .nav-link { justify-content: center; padding: 10px; }
+        #sidebar.collapsed .logo-shield { margin: 0 auto; }
+        .nav-link { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; font-size: 13px; font-weight: 700; color: #64748b; transition: all 0.2s ease; text-decoration: none; }
+        .nav-link:hover { color: #1e293b; background: rgba(15,23,42,0.04); }
+        .nav-link.active { background: linear-gradient(135deg, #06b6d4, #8b5cf6); color: #ffffff; font-weight: 700; box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2); }
+        .nav-link svg { width: 18px; height: 18px; flex-shrink: 0; }
+        .logo-gradient { background: linear-gradient(135deg, #06b6d4, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .logo-shield { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        #sidebar-toggle { position: absolute; right: 12px; top: 24px; width: 24px; height: 24px; border-radius: 50%; background: #ffffff; border: 1px solid #e2e8f0; color: #64748b; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: all 0.2s; z-index: 100; }
+        #sidebar-toggle:hover { color: #1e293b; background: #f8fafc; }
+        #sidebar.collapsed #sidebar-toggle { right: 0; left: 0; margin: 0 auto; top: 60px; }
+        
+        .template-item-card {
+            transition: all 0.15s ease-in-out;
+            cursor: pointer;
+        }
+        .template-item-card:hover {
+            border-color: #6366f1;
+            background-color: #f8fafc;
+        }
+        .template-item-card.selected {
+            border-color: #4f46e5 !important;
+            background-color: #eef2ff !important;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.25);
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- 📊 Left Sidebar Navigation (With "ห้องสอบ" menu item) -->
+    <aside id="sidebar">
+        <button id="sidebar-toggle" title="ย่อ/ขยายเมนู">◀</button>
+        <div class="sidebar-inner p-5 space-y-6 flex-1">
+            <div class="flex items-center gap-3 pb-2">
+                <div class="logo-shield overflow-hidden bg-white p-1 border border-slate-100">
+                    <img src="logo.png" alt="Tab-Lock Logo" class="w-full h-full object-cover rounded-lg" />
+                </div>
+                <div class="leading-tight logo-text">
+                    <div class="font-extrabold text-base tracking-tight text-slate-800">Tab-<span class="logo-gradient">Lock</span></div>
+                    <div class="text-[8px] sm:text-[9px] text-slate-500 uppercase tracking-widest font-bold">Online Proctoring System</div>
+                </div>
+            </div>
+            <nav class="space-y-1">
+                <a href="dashboard.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+                    <span>แดชบอร์ดหลัก</span>
+                </a>
+                <!-- เมนูห้องสอบ (ACTIVE) -->
+                <a href="admin-rooms.html" class="nav-link active">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 21h18M4.5 21V5.25A2.25 2.25 0 0 1 6.75 3h10.5a2.25 2.25 0 0 1 2.25 2.25V21" /></svg>
+                    <span>ห้องสอบ</span>
+                </a>
+                <a href="admin-active-exams.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" /></svg>
+                    <span>กำลังดำเนินการสอบ</span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-auto"></span>
+                </a>
+                <a href="admin-courses.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
+                    <span>จัดการรายวิชา</span>
+                </a>
+                <a href="admin-questions.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+                    <span>จัดการข้อสอบ</span>
+                </a>
+                <a href="admin-library.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+                    <span>คลังข้อสอบ</span>
+                </a>
+                <a href="admin-students.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.62 48.62 0 0112 20.904a48.62 48.62 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0112 13.489a50.702 50.702 0 017.74-3.342M12 2.25V4.5m0 10.5v1.5c0 .9-.6 1.6-1.5 1.6a1.5 1.5 0 010-3c.9 0 1.5.7 1.5 1.4z" /></svg>
+                    <span>ประวัตินักศึกษา</span>
+                </a>
+                <a href="admin-results.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /></svg>
+                    <span>ตรวจสอบผลการสอบ</span>
+                </a>
+                <a href="admin-monitoring.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" /></svg>
+                    <span>ตรวจสอบพฤติกรรมน่าสงสัย</span>
+                </a>
+            </nav>
+        </div>
+
+        <div class="sidebar-inner p-5 border-t border-slate-100 space-y-3">
+            <div class="flex items-center gap-2.5">
+                <div class="relative">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-xs font-bold text-white" id="user-avatar-text">อ</div>
+                    <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white"></span>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-xs font-semibold text-slate-800 truncate" id="sidebar-teacher-name">อาจารย์ผู้สอน</div>
+                    <div class="text-[10px] text-slate-500">ออนไลน์ • ผู้ดูแลระบบ</div>
+                </div>
+            </div>
+            <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();"
+               class="flex items-center justify-center gap-2 w-full py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl text-xs font-bold transition">
+                🚪 ออกจากระบบ
+            </a>
+        </div>
+    </aside>
+
+    <!-- 📺 MAIN CONTENT AREA: หน้า "ห้องสอบ" ตามภาพ Wireframe media_1789992840822.png -->
+    <div class="flex-1 flex flex-col overflow-hidden bg-slate-100/80">
+        
+        <!-- Top Header Bar of Room Page -->
+        <header class="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0 shadow-xs z-20">
+            <!-- Left: Heading "ห้องสอบ" -->
+            <div class="flex items-center gap-3">
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight">
+                    ห้องสอบ
+                </h1>
+                <span class="text-xs text-slate-400 font-semibold hidden sm:inline">| ศูนย์ควบคุมห้องสอบ & เผยแพร่</span>
+            </div>
+
+            <!-- Right: "เลือกรายวิชา" & "เลือกข้อสอบ" -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- 1. เลือกรายวิชา -->
+                <div class="flex items-center gap-1.5 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 transition">
+                    <label for="room-course-selector" class="text-xs font-black text-slate-600 shrink-0 hidden md:inline">เลือกรายวิชา:</label>
+                    <select id="room-course-selector" onchange="onCourseSelected(this.value)" class="bg-transparent text-xs sm:text-sm font-black text-slate-800 outline-none cursor-pointer max-w-[170px] sm:max-w-[240px] truncate">
+                        <option value="">กำลังโหลดรายวิชา...</option>
+                    </select>
+                </div>
+
+                <!-- 2. เลือกข้อสอบ -->
+                <button onclick="openExamSelectorPopup()" class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl text-xs sm:text-sm font-black shadow-md shadow-indigo-600/20 transition active:scale-95 flex items-center gap-1.5 cursor-pointer">
+                    <span>📝</span>
+                    <span>เลือกข้อสอบ</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Body: Section "แสดง" -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col items-center">
+            
+            <div class="w-full max-w-2xl mb-4 flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
+                        แสดง
+                    </h2>
+                    <p class="text-xs text-slate-500 font-bold mt-0.5">สถานะและข้อมูลการเปิดห้องสอบสด</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <select id="room-instance-selector" onchange="onRoomInstanceChanged(this.value)" class="bg-white border border-slate-200 text-xs font-black text-slate-700 rounded-xl px-3 py-1.5 outline-none cursor-pointer shadow-xs">
+                        <option value="">กำลังโหลดห้อง...</option>
+                    </select>
+                    <button onclick="refreshLiveRoomCard()" title="รีเฟรชข้อมูลสด" class="p-2 bg-white border border-slate-200 text-slate-600 rounded-xl text-xs font-bold shadow-xs hover:bg-slate-50 active:scale-95 transition cursor-pointer">
+                        🔄
+                    </button>
+                </div>
+            </div>
+
+            <!-- Live Exam Room Card (Matching media_1789992840822.png) -->
+            <div class="w-full max-w-2xl bg-white rounded-3xl p-6 md:p-8 shadow-xl border-2 border-emerald-400 relative space-y-5 transition hover:shadow-2xl">
+                <!-- Status Badge & Monospace Room ID -->
+                <div class="flex items-center justify-between">
+                    <div id="card-status-badge" class="px-3.5 py-1.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-700 flex items-center gap-2 shadow-xs">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>กำลังเปิดสอบ (LIVE)</span>
+                    </div>
+                    <div id="card-room-id" class="font-mono text-xs text-slate-500 font-extrabold bg-slate-100 px-3 py-1 rounded-lg">
+                        ------
+                    </div>
+                </div>
+
+                <!-- Exam Title & Course Name -->
+                <div>
+                    <h3 id="card-exam-title" class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
+                        สอบปลายภาค
+                    </h3>
+                    <div id="card-course-name" class="text-sm md:text-base font-extrabold text-slate-500 mt-1">
+                        ปวช
+                    </div>
+                </div>
+
+                <!-- Metrics Rows -->
+                <div class="space-y-2.5 text-xs sm:text-sm">
+                    <!-- Row 1: Active students -->
+                    <div class="flex items-center justify-between p-3.5 bg-slate-50 hover:bg-slate-100/80 rounded-2xl border border-slate-100 transition">
+                        <span class="font-extrabold text-slate-700 flex items-center gap-2">
+                            <span>👨‍🎓</span> <span>กำลังเข้าทำข้อสอบอยู่:</span>
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <span id="card-active-students" class="font-black text-indigo-700 text-base">0</span>
+                            <span class="font-bold text-slate-500">คน</span>
+                            <button onclick="openLiveStudentsModal()" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-extrabold text-xs rounded-lg transition active:scale-95 flex items-center gap-1 cursor-pointer">
+                                <span>👁️</span> <span>ดูรายชื่อ</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Submitted students -->
+                    <div class="flex items-center justify-between p-3.5 bg-slate-50 hover:bg-slate-100/80 rounded-2xl border border-slate-100 transition">
+                        <span class="font-extrabold text-slate-700 flex items-center gap-2">
+                            <span class="text-emerald-500">🟢</span> <span>ส่งข้อสอบสำเร็จแล้ว:</span>
+                        </span>
+                        <div>
+                            <span id="card-submitted-students" class="font-black text-emerald-600 text-base">0</span>
+                            <span class="font-bold text-slate-500">คน</span>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Exam Code / PIN -->
+                    <div class="flex items-center justify-between p-3.5 bg-slate-50 hover:bg-slate-100/80 rounded-2xl border border-slate-100 transition">
+                        <span class="font-extrabold text-slate-700 flex items-center gap-2">
+                            <span>🔑</span> <span>รหัสข้อสอบ (EXAM CODE):</span>
+                        </span>
+                        <div id="card-exam-pin" onclick="copyPinOnly()" title="คลิกเพื่อคัดลอก PIN" class="px-4 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl font-mono font-black text-lg sm:text-xl cursor-pointer tracking-wider transition active:scale-95 flex items-center gap-1.5 shadow-xs">
+                            <span>------</span>
+                            <span class="text-xs text-blue-400 font-normal">📋</span>
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Duration -->
+                    <div class="flex items-center justify-between p-3.5 bg-slate-50 hover:bg-slate-100/80 rounded-2xl border border-slate-100 transition">
+                        <span class="font-extrabold text-slate-700 flex items-center gap-2">
+                            <span>⏱️</span> <span>ระยะเวลาทำข้อสอบ:</span>
+                        </span>
+                        <div>
+                            <span id="card-exam-duration" class="font-black text-slate-800 text-base">60</span>
+                            <span class="font-bold text-slate-500">นาที</span>
+                        </div>
+                    </div>
+
+                    <!-- Row 5: Total Questions -->
+                    <div class="flex items-center justify-between p-3.5 bg-slate-50 hover:bg-slate-100/80 rounded-2xl border border-slate-100 transition">
+                        <span class="font-extrabold text-slate-700 flex items-center gap-2">
+                            <span>📝</span> <span>จำนวนข้อสอบในคลัง:</span>
+                        </span>
+                        <div>
+                            <span id="card-question-count" class="font-black text-slate-800 text-base">0</span>
+                            <span class="font-bold text-slate-500">ข้อ</span>
+                        </div>
+                    </div>
+
+                    <!-- Row 6: Announcement -->
+                    <div id="card-announcement-box" class="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl text-xs font-bold text-rose-700 flex items-start gap-2">
+                        <span class="text-rose-500 shrink-0 text-sm">📢</span>
+                        <span id="card-announcement-text" class="leading-relaxed">กรุณานั่งประจำที่และเตรียมความพร้อม ห้ามสลับหน้าระหว่างสอบ</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons matching wireframe -->
+                <div class="space-y-2.5 pt-2">
+                    <!-- Stop Exam Button (Red button in sketch) -->
+                    <button id="card-btn-stop" onclick="stopCurrentExam()" class="w-full py-3.5 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl font-black text-sm md:text-base shadow-lg shadow-rose-600/25 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                        <span>🛑</span>
+                        <span>หยุดเผยแพร่ (ปิดการสอบ)</span>
+                    </button>
+
+                    <!-- Start Exam Button -->
+                    <button id="card-btn-start" onclick="startCurrentExam()" class="hidden w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-2xl font-black text-sm md:text-base shadow-lg shadow-emerald-600/25 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                        <span>🚀</span>
+                        <span>เริ่มการสอบทันที (เผยแพร่ให้นักศึกษาทำพร้อมกัน)</span>
+                    </button>
+
+                    <!-- Sub Actions: Projector Lounge & Edit Questions -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <button onclick="openWaitingLoungeModal()" class="py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-black text-xs transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+                            <span>📱</span>
+                            <span>ฉายจอ PIN & QR Code</span>
+                        </button>
+                        <a href="admin-questions.html" class="py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black text-xs shadow-md shadow-indigo-600/20 transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+                            <span>✍️</span>
+                            <span>จัดการ / สร้างข้อสอบ</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- MODALS: EXAM SELECTOR, LIVE STUDENTS, PROJECTOR LOUNGE   -->
+    <!-- ======================================================== -->
+
+    <!-- 📝 1. POPUP: เลือกชุดข้อสอบสำหรับรายวิชา -->
+    <div id="course-exam-popup-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
+            <div class="px-6 py-4 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border-b border-slate-100 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">📝</span>
+                    <div>
+                        <h3 class="text-base font-black text-slate-900">
+                            เลือกข้อสอบสำหรับวิชา: <span id="popup-course-name-display" class="text-indigo-600 font-black">...</span>
+                        </h3>
+                        <p class="text-[11px] text-slate-500 font-medium">เลือกชุดข้อสอบที่มีอยู่ในระบบ เพื่อเปิดห้องรอสอบและเผยแพร่ทันที</p>
+                    </div>
+                </div>
+                <button onclick="closeCourseExamPopupModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold">✕</button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-4 text-xs">
+                <div class="space-y-2">
+                    <label class="font-extrabold text-slate-700 flex items-center justify-between">
+                        <span>1. เลือกชุดข้อสอบที่ต้องการใช้:</span>
+                        <span id="popup-template-count" class="text-[10px] text-indigo-600 font-extrabold">0 ชุด</span>
+                    </label>
+                    <div id="popup-template-list" class="space-y-2 max-h-52 overflow-y-auto pr-1"></div>
+                </div>
+
+                <div class="space-y-3 pt-2 border-t border-slate-100">
+                    <div class="space-y-1">
+                        <label class="font-extrabold text-slate-700">ชื่อการสอบ / หัวข้อ:</label>
+                        <input type="text" id="popup-input-exam-title" class="w-full p-2.5 rounded-xl border border-slate-200 font-bold outline-none focus:border-indigo-500 bg-slate-50 focus:bg-white text-slate-800" placeholder="เช่น สอบปลายภาค">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="font-extrabold text-slate-700">⏱️ ระยะเวลาทำข้อสอบ (นาที):</label>
+                        <input type="number" id="popup-input-duration" value="60" min="0" max="600" class="w-full p-2.5 rounded-xl border border-slate-200 font-bold outline-none focus:border-indigo-500 bg-slate-50 focus:bg-white text-slate-800">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="font-extrabold text-slate-700">📢 ข้อความประกาศเตือนนักศึกษา:</label>
+                        <input type="text" id="popup-input-announcement" value="กรุณานั่งประจำที่และเตรียมความพร้อม ห้ามสลับหน้าระหว่างสอบ" class="w-full p-2.5 rounded-xl border border-slate-200 font-bold outline-none focus:border-indigo-500 bg-slate-50 focus:bg-white text-slate-800">
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2">
+                <button onclick="closeCourseExamPopupModal()" class="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs transition">
+                    ยกเลิก
+                </button>
+                <button id="btn-popup-publish" onclick="handlePublishFromPopup()" class="px-6 py-3 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-black rounded-xl text-xs sm:text-sm shadow-md shadow-emerald-600/25 transition active:scale-95 flex items-center gap-2 cursor-pointer">
+                    <span>🚀</span>
+                    <span>เผยแพร่ / เปิดห้องรอสอบทันที (รับ PIN & QR Code)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 👁️ 2. LIVE STUDENTS LIST MODAL -->
+    <div id="live-students-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[85vh]">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="text-indigo-600 text-lg">👨‍🎓</span>
+                    <h3 class="text-base font-extrabold text-slate-800">รายชื่อนักศึกษาในห้องสอบ</h3>
+                </div>
+                <button onclick="closeLiveStudentsModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold">✕</button>
+            </div>
+            <div class="p-3 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between text-xs font-bold text-slate-600">
+                <span>ทั้งหมด: <b id="students-modal-total" class="text-indigo-600">0</b> คน</span>
+                <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-0.5 bg-emerald-100 text-emerald-700 rounded-md">ส่งแล้ว: <b id="students-modal-submitted">0</b></span>
+                    <span class="px-2.5 py-0.5 bg-indigo-100 text-indigo-700 rounded-md">กำลังทำ/รอ: <b id="students-modal-active">0</b></span>
+                </div>
+            </div>
+            <div id="students-modal-list" class="p-6 overflow-y-auto space-y-2 text-xs"></div>
+        </div>
+    </div>
+
+    <!-- 📱 3. WAITING LOUNGE MODAL (PIN & QR CODE) -->
+    <div id="publish-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+        <div id="publish-modal-card" class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden border border-slate-100 flex flex-col p-6 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                    <span id="pub-modal-icon" class="text-2xl">⏳</span>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 id="pub-modal-title" class="font-black text-slate-800 text-base">ห้องรอสอบ (Waiting Lounge)</h3>
+                            <span id="pub-modal-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-700">⏳ รอกดเริ่มสอบ</span>
+                        </div>
+                        <p id="pub-modal-room-info" class="text-[11px] text-slate-400 font-semibold">ห้องสอบ...</p>
+                    </div>
+                </div>
+                <button onclick="closePublishModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold">✕</button>
+            </div>
+
+            <!-- PIN Code Box -->
+            <div class="bg-gradient-to-br from-slate-900 to-indigo-950 p-4 rounded-2xl text-center text-white space-y-1">
+                <div class="text-[10px] uppercase font-bold text-cyan-400 tracking-widest">รหัสเข้าห้องสอบ (PIN 6 หลัก)</div>
+                <div id="pub-modal-pin" onclick="copyPinOnly()" class="text-4xl font-black font-mono tracking-widest text-white py-1 cursor-pointer hover:text-cyan-300 transition" title="คลิกเพื่อคัดลอก PIN">
+                    ------
+                </div>
+                <p class="text-[10px] text-slate-300">ให้นักศึกษาเข้าหน้าเว็บ แล้วกรอกรหัส PIN นี้เพื่อเข้ามารอในห้องสอบ</p>
+            </div>
+
+            <!-- QR Code -->
+            <div class="flex flex-col items-center justify-center p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+                <div class="w-40 h-40 bg-white p-2 rounded-xl border border-slate-200 shadow-xs flex items-center justify-center">
+                    <img id="pub-modal-qrcode" src="" alt="QR Code" class="w-full h-full object-contain">
+                </div>
+                <p class="text-[11px] font-bold text-slate-600">📷 สแกนด้วยกล้องมือถือ/แท็บเล็ตเพื่อเข้าห้องรอสอบทันที</p>
+            </div>
+
+            <!-- Real-time Waiting Students Count -->
+            <div class="p-3 bg-indigo-50/80 border border-indigo-200 rounded-2xl flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-xs font-bold text-slate-700">นักศึกษาที่เข้าห้องรอสอบ:</span>
+                    <span id="pub-waiting-count" class="text-lg font-black text-indigo-700">0</span>
+                    <span class="text-xs font-bold text-slate-500">คน</span>
+                </div>
+                <button onclick="toggleWaitingStudentsList()" class="text-xs text-indigo-600 hover:underline font-extrabold">ดูรายชื่อ</button>
+            </div>
+
+            <div id="pub-waiting-list-container" class="hidden max-h-28 overflow-y-auto p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1">
+                <div id="pub-waiting-students-list">ยังไม่มีนักศึกษา...</div>
+            </div>
+
+            <!-- Start Exam Now -->
+            <div class="space-y-2 pt-1">
+                <button id="btn-lounge-start-exam" onclick="startExamFromLounge()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm rounded-xl shadow-lg shadow-emerald-600/30 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                    <span>🚀</span>
+                    <span>เริ่มการสอบทันที (เผยแพร่ให้นักศึกษาทำพร้อมกัน)</span>
+                </button>
+                <button id="btn-lounge-stop-exam" onclick="stopExamFromLounge()" class="hidden w-full py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-black text-xs rounded-xl shadow-md transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                    <span>🛑</span>
+                    <span>ปิดห้องสอบ / สลับกลับเป็นแบบร่าง</span>
+                </button>
+            </div>
+
+            <div class="flex items-center gap-2 pt-1">
+                <button onclick="toggleProjectorMode()" class="flex-1 py-2 bg-slate-900 hover:bg-slate-800 text-white font-black text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5">
+                    <span>📺</span> ฉายจอโปรเจกเตอร์
+                </button>
+                <button onclick="copyPublishLink()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition active:scale-95">
+                    📋 คัดลอกลิงก์
+                </button>
+            </div>
+            <input type="hidden" id="pub-modal-link">
+        </div>
+    </div>
+
+    <!-- CORE JAVASCRIPT LOGIC -->
+    <script>
+        const username = localStorage.getItem('teacher_username') || 'admin';
+        const teacherName = localStorage.getItem('teacher_name') || 'อาจารย์ผู้สอน';
+
+        document.getElementById('sidebar-teacher-name').textContent = `อาจารย์: ${teacherName}`;
+        document.getElementById('user-avatar-text').textContent = teacherName.charAt(0);
+
+        // Sidebar Toggle
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('sidebar-toggle');
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            toggleBtn.textContent = sidebar.classList.contains('collapsed') ? '▶' : '◀';
+        });
+
+        let courses = [];
+        let rooms = [];
+        let currentRoomId = '';
+        let currentPublishedPin = '';
+        let selectedPopupTemplateId = null;
+        let waitingStudentsInterval = null;
+        let activePollingInterval = null;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadTeacherCourses();
+            await loadTeacherRooms();
+            if (currentRoomId) {
+                await refreshLiveRoomCard();
+            }
+            startActivePolling();
+        });
+
+        async function loadTeacherCourses() {
+            const select = document.getElementById('room-course-selector');
+            try {
+                const res = await fetch(`/api/teacher/courses?username=${encodeURIComponent(username)}`);
+                if (res.ok) {
+                    courses = await res.json();
+                    if (Array.isArray(courses) && courses.length > 0) {
+                        select.innerHTML = '<option value="">-- เลือกรายวิชา --</option>' +
+                            courses.map(c => `<option value="${c.id}">[${escapeHtml(c.courseCode || 'วิชา')}] ${escapeHtml(c.courseName)}</option>`).join('');
+                    } else {
+                        select.innerHTML = '<option value="">-- ยังไม่มีรายวิชา --</option>';
+                    }
+                }
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        async function loadTeacherRooms() {
+            try {
+                const res = await fetch(`/api/teacher/rooms?username=${encodeURIComponent(username)}`);
+                if (!res.ok) return;
+                rooms = await res.json();
+
+                const select = document.getElementById('room-instance-selector');
+                if (!rooms || rooms.length === 0) {
+                    select.innerHTML = '<option value="">ไม่มีห้องสอบ</option>';
+                    return;
+                }
+
+                select.innerHTML = rooms.map(r => `<option value="${r.roomId}">${escapeHtml(r.roomName || r.roomId)}</option>`).join('');
+
+                const savedRoom = localStorage.getItem('active_room_id');
+                if (savedRoom && rooms.some(r => r.roomId === savedRoom)) {
+                    select.value = savedRoom;
+                }
+                currentRoomId = select.value;
+                localStorage.setItem('active_room_id', currentRoomId);
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        async function onRoomInstanceChanged(rId) {
+            currentRoomId = rId;
+            localStorage.setItem('active_room_id', currentRoomId);
+            await refreshLiveRoomCard();
+        }
+
+        function onCourseSelected(courseId) {
+            if (!courseId) return;
+            openExamSelectorPopup(courseId);
+        }
+
+        async function openExamSelectorPopup(targetCourseId) {
+            const courseSelect = document.getElementById('room-course-selector');
+            const courseId = targetCourseId || courseSelect.value;
+
+            let courseObj = courses.find(c => String(c.id) === String(courseId));
+            if (!courseObj && courses.length > 0) {
+                courseObj = courses[0];
+                courseSelect.value = courseObj.id;
+            }
+
+            const courseNameText = courseObj ? `[${courseObj.courseCode || 'วิชา'}] ${courseObj.courseName}` : 'ทั่วไป';
+            document.getElementById('popup-course-name-display').textContent = courseNameText;
+
+            const listContainer = document.getElementById('popup-template-list');
+            listContainer.innerHTML = '<div class="text-center py-4 text-slate-400">กำลังโหลดชุดข้อสอบ...</div>';
+            document.getElementById('course-exam-popup-modal').classList.remove('hidden');
+
+            try {
+                const res = await fetch(`/api/library/get-templates?username=${encodeURIComponent(username)}`);
+                const templates = await res.json();
+                
+                document.getElementById('popup-template-count').textContent = `${(templates || []).length} ชุดในคลัง`;
+
+                let html = '';
+                if (Array.isArray(templates) && templates.length > 0) {
+                    templates.forEach(t => {
+                        html += `
+                            <div onclick="selectPopupTemplate(${t.id}, '${escapeHtml(t.templateName)}')" id="tpl-card-${t.id}" class="template-item-card border-2 border-slate-200 rounded-2xl p-3 flex items-center justify-between transition">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="text-xl">📝</span>
+                                    <div>
+                                        <div class="font-black text-slate-800 text-xs">${escapeHtml(t.templateName)}</div>
+                                        <div class="text-[10px] text-slate-400 font-semibold">${t.questionCount} ข้อ | ${t.created_at || ''}</div>
+                                    </div>
+                                </div>
+                                <span class="card-radio text-xs text-slate-300">⚪</span>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html = '<div class="text-center py-6 text-slate-400">ยังไม่มีข้อสอบในคลัง (สร้างได้ที่เมนู "จัดการข้อสอบ")</div>';
+                }
+
+                listContainer.innerHTML = html;
+                if (templates.length > 0) {
+                    selectPopupTemplate(templates[0].id, templates[0].templateName);
+                }
+            } catch(e) {
+                listContainer.innerHTML = '<div class="text-center py-4 text-rose-500 font-bold">โหลดข้อสอบไม่สำเร็จ</div>';
+            }
+        }
+
+        function selectPopupTemplate(tplId, tplName) {
+            selectedPopupTemplateId = tplId;
+            document.querySelectorAll('.template-item-card').forEach(el => {
+                el.classList.remove('selected');
+                const r = el.querySelector('.card-radio');
+                if (r) r.textContent = '⚪';
+            });
+            const c = document.getElementById(`tpl-card-${tplId}`);
+            if (c) {
+                c.classList.add('selected');
+                const r = c.querySelector('.card-radio');
+                if (r) r.textContent = '🟢';
+            }
+            const titleInput = document.getElementById('popup-input-exam-title');
+            if (titleInput && tplName) titleInput.value = tplName;
+        }
+
+        function closeCourseExamPopupModal() {
+            document.getElementById('course-exam-popup-modal').classList.add('hidden');
+        }
+
+        async function handlePublishFromPopup() {
+            const courseSelect = document.getElementById('room-course-selector');
+            const courseId = courseSelect.value ? parseInt(courseSelect.value, 10) : null;
+            const examTitle = document.getElementById('popup-input-exam-title').value.trim() || 'สอบเก็บคะแนน';
+            const duration = parseInt(document.getElementById('popup-input-duration').value, 10) || 60;
+            const announcement = document.getElementById('popup-input-announcement').value.trim();
+
+            const btn = document.getElementById('btn-popup-publish');
+            btn.disabled = true;
+            btn.innerHTML = '⏳ กำลังเผยแพร่...';
+
+            try {
+                let targetRoomId = currentRoomId;
+                if (!targetRoomId) {
+                    const cRes = await fetch('/api/teacher/create-room', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, roomName: examTitle, examTitle, courseId, duration, announcement })
+                    });
+                    const cData = await cRes.json();
+                    targetRoomId = cData.roomId;
+                    currentRoomId = targetRoomId;
+                } else {
+                    await fetch('/api/teacher/update-room-settings', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ roomId: targetRoomId, roomName: examTitle, examTitle, courseId, duration, announcement })
+                    });
+                }
+
+                if (selectedPopupTemplateId) {
+                    await fetch('/api/library/load-template', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ roomId: targetRoomId, templateId: parseInt(selectedPopupTemplateId, 10) })
+                    });
+                }
+
+                const pubRes = await fetch('/api/teacher/publish-exam', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomId: targetRoomId, publish: true })
+                });
+                const pubData = await pubRes.json();
+
+                if (pubRes.ok && pubData.success) {
+                    closeCourseExamPopupModal();
+                    await loadTeacherRooms();
+                    document.getElementById('room-instance-selector').value = targetRoomId;
+                    await refreshLiveRoomCard();
+                    alert(`🎉 เผยแพร่ข้อสอบสำเร็จแล้ว!\nรหัส PIN: ${pubData.exam_code}`);
+                } else {
+                    alert(`❌ ไม่สามารถเผยแพร่ได้: ${pubData.message}`);
+                }
+            } catch(e) {
+                console.error(e);
+                alert("เกิดข้อผิดพลาดในการเผยแพร่ข้อสอบ");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>🚀</span> <span>เผยแพร่ / เปิดห้องรอสอบทันที (รับ PIN & QR Code)</span>';
+            }
+        }
+
+        async function refreshLiveRoomCard() {
+            if (!currentRoomId) return;
+
+            try {
+                const sRes = await fetch(`/api/room-settings?roomId=${encodeURIComponent(currentRoomId)}`);
+                if (!sRes.ok) return;
+                const roomData = await sRes.json();
+
+                let activeCount = 0;
+                let submittedCount = 0;
+                try {
+                    const aRes = await fetch(`/api/teacher/active-students?username=${encodeURIComponent(username)}`);
+                    if (aRes.ok) {
+                        const aData = await aRes.json();
+                        if (aData.rooms && aData.rooms[currentRoomId]) {
+                            activeCount = aData.rooms[currentRoomId].active || 0;
+                            submittedCount = aData.rooms[currentRoomId].submitted || 0;
+                        }
+                    }
+                } catch(e) {}
+
+                if (activeCount === 0) {
+                    try {
+                        const wRes = await fetch(`/api/teacher/waiting-students?roomId=${encodeURIComponent(currentRoomId)}`);
+                        if (wRes.ok) {
+                            const wData = await wRes.json();
+                            activeCount = wData.count || 0;
+                        }
+                    } catch(e) {}
+                }
+
+                document.getElementById('card-room-id').textContent = currentRoomId;
+                document.getElementById('card-exam-title').textContent = roomData.examTitle || roomData.roomName || 'สอบเก็บคะแนน';
+
+                const courseNameStr = roomData.courseName 
+                    ? `[${roomData.courseCode || 'วิชา'}] ${roomData.courseName}`
+                    : (courses.find(c => c.id === roomData.courseId)?.courseName || 'ไม่ระบุรายวิชา (ทั่วไป)');
+                document.getElementById('card-course-name').textContent = courseNameStr;
+
+                if (roomData.courseId) {
+                    const topCourse = document.getElementById('room-course-selector');
+                    if (topCourse) topCourse.value = roomData.courseId;
+                }
+
+                document.getElementById('card-active-students').textContent = activeCount;
+                document.getElementById('card-submitted-students').textContent = submittedCount;
+
+                currentPublishedPin = roomData.examCode || '------';
+                document.getElementById('card-exam-pin').innerHTML = `<span>${currentPublishedPin}</span> <span class="text-xs text-blue-400 font-normal">📋</span>`;
+
+                document.getElementById('card-exam-duration').textContent = roomData.duration || 60;
+                document.getElementById('card-question-count').textContent = roomData.questionCount || 0;
+
+                const ann = roomData.announcement || 'กรุณานั่งประจำที่และเตรียมความพร้อม ห้ามสลับหน้าระหว่างสอบ';
+                document.getElementById('card-announcement-text').textContent = ann;
+
+                const isPub = roomData.is_published === 1;
+                const statusBadge = document.getElementById('card-status-badge');
+                const btnStop = document.getElementById('card-btn-stop');
+                const btnStart = document.getElementById('card-btn-start');
+
+                if (isPub) {
+                    statusBadge.className = 'px-3.5 py-1.5 rounded-full text-xs font-black bg-emerald-100 text-emerald-700 flex items-center gap-2 shadow-xs';
+                    statusBadge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> <span>กำลังเปิดสอบ (LIVE)</span>`;
+                    btnStop.classList.remove('hidden');
+                    btnStart.classList.add('hidden');
+                } else {
+                    statusBadge.className = 'px-3.5 py-1.5 rounded-full text-xs font-black bg-amber-100 text-amber-700 flex items-center gap-2 shadow-xs';
+                    statusBadge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> <span>⏳ ห้องรอสอบ (ยังไม่เริ่ม)</span>`;
+                    btnStop.classList.add('hidden');
+                    btnStart.classList.remove('hidden');
+                }
+
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        function startActivePolling() {
+            if (activePollingInterval) clearInterval(activePollingInterval);
+            activePollingInterval = setInterval(() => {
+                if (currentRoomId) refreshLiveRoomCard();
+            }, 3000);
+        }
+
+        async function stopCurrentExam() {
+            if (!currentRoomId) return;
+            if (!confirm("🛑 ยืนยันหยุดเผยแพร่การสอบห้องนี้?")) return;
+
+            try {
+                const res = await fetch('/api/teacher/publish-exam', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomId: currentRoomId, publish: false })
+                });
+                if (res.ok) {
+                    alert("🛑 ปิดห้องสอบเรียบร้อยแล้ว");
+                    await refreshLiveRoomCard();
+                }
+            } catch(e) {}
+        }
+
+        async function startCurrentExam() {
+            if (!currentRoomId) return;
+            if (!confirm("🚀 ยืนยันเริ่มการสอบทันที?")) return;
+
+            try {
+                const res = await fetch('/api/teacher/publish-exam', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomId: currentRoomId, publish: true })
+                });
+                if (res.ok) {
+                    alert("🎉 เริ่มการสอบเรียบร้อยแล้ว!");
+                    await refreshLiveRoomCard();
+                }
+            } catch(e) {}
+        }
+
+        async function openLiveStudentsModal() {
+            if (!currentRoomId) return;
+            const modal = document.getElementById('live-students-modal');
+            const list = document.getElementById('students-modal-list');
+            list.innerHTML = '<div class="text-center py-6 text-slate-400">กำลังโหลด...</div>';
+            modal.classList.remove('hidden');
+
+            try {
+                const rRes = await fetch(`/api/exam-results?roomId=${encodeURIComponent(currentRoomId)}`);
+                const results = rRes.ok ? await rRes.json() : [];
+                const wRes = await fetch(`/api/teacher/waiting-students?roomId=${encodeURIComponent(currentRoomId)}`);
+                const wData = wRes.ok ? await wRes.json() : { students: [] };
+
+                const submittedMap = new Map();
+                (results || []).forEach(r => submittedMap.set(r.studentId, r));
+
+                const allIds = new Set([
+                    ...(wData.students || []).map(s => s.studentId),
+                    ...Array.from(submittedMap.keys())
+                ]);
+
+                document.getElementById('students-modal-total').textContent = allIds.size;
+                document.getElementById('students-modal-submitted').textContent = submittedMap.size;
+                document.getElementById('students-modal-active').textContent = Math.max(0, allIds.size - submittedMap.size);
+
+                if (allIds.size === 0) {
+                    list.innerHTML = '<div class="text-center py-8 text-slate-400">ยังไม่มีนักศึกษาเข้าสอบในห้องนี้</div>';
+                    return;
+                }
+
+                let html = '';
+                allIds.forEach(sId => {
+                    const resItem = submittedMap.get(sId);
+                    const waitItem = (wData.students || []).find(w => w.studentId === sId);
+                    const name = resItem ? resItem.name : (waitItem ? waitItem.name : 'นักศึกษา');
+                    const cls = resItem ? (resItem.class || '-') : (waitItem ? (waitItem.class || '-') : '-');
+
+                    if (resItem) {
+                        html += `
+                            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between">
+                                <div>
+                                    <div class="font-extrabold text-slate-800 text-sm">${escapeHtml(name)}</div>
+                                    <div class="text-[11px] text-slate-500 font-mono">รหัส: ${escapeHtml(sId)} | ห้อง: ${escapeHtml(cls)}</div>
+                                </div>
+                                <div class="text-right">
+                                    <span class="px-2 py-0.5 bg-emerald-600 text-white rounded text-[10px] font-black">ส่งแล้ว</span>
+                                    <div class="text-xs font-black text-emerald-700 mt-0.5">${resItem.score} / ${resItem.maxScore} คะแนน</div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        html += `
+                            <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between">
+                                <div>
+                                    <div class="font-extrabold text-slate-800 text-sm">${escapeHtml(name)}</div>
+                                    <div class="text-[11px] text-slate-500 font-mono">รหัส: ${escapeHtml(sId)} | ห้อง: ${escapeHtml(cls)}</div>
+                                </div>
+                                <span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded text-[10px] font-black">กำลังสอบ</span>
+                            </div>
+                        `;
+                    }
+                });
+                list.innerHTML = html;
+            } catch(e) {
+                list.innerHTML = '<div class="text-center py-6 text-rose-500 font-bold">เกิดข้อผิดพลาดในการโหลด</div>';
+            }
+        }
+
+        function closeLiveStudentsModal() {
+            document.getElementById('live-students-modal').classList.add('hidden');
+        }
+
+        async function openWaitingLoungeModal() {
+            const rId = currentRoomId;
+            if (!rId) return;
+
+            try {
+                const res = await fetch(`/api/room-settings?roomId=${encodeURIComponent(rId)}`);
+                const roomData = res.ok ? await res.json() : {};
+
+                const examCode = roomData.examCode || '------';
+                currentPublishedPin = examCode;
+
+                document.getElementById('pub-modal-pin').textContent = examCode;
+                document.getElementById('pub-modal-room-info').textContent = `${roomData.examTitle || roomData.roomName} (${rId})`;
+
+                const joinUrl = `${window.location.origin}/index.html?pin=${encodeURIComponent(examCode)}`;
+                document.getElementById('pub-modal-link').value = joinUrl;
+                document.getElementById('pub-modal-qrcode').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(joinUrl)}`;
+
+                const icon = document.getElementById('pub-modal-icon');
+                const title = document.getElementById('pub-modal-title');
+                const badge = document.getElementById('pub-modal-badge');
+                const startBtn = document.getElementById('btn-lounge-start-exam');
+                const stopBtn = document.getElementById('btn-lounge-stop-exam');
+
+                if (roomData.is_published === 1) {
+                    if (icon) icon.textContent = '🟢';
+                    if (title) title.textContent = 'การสอบกำลังดำเนินการอยู่ (LIVE)';
+                    if (badge) {
+                        badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-700';
+                        badge.textContent = '🟢 กำลังเปิดสอบ';
+                    }
+                    if (startBtn) startBtn.classList.add('hidden');
+                    if (stopBtn) stopBtn.classList.remove('hidden');
+                } else {
+                    if (icon) icon.textContent = '⏳';
+                    if (title) title.textContent = 'ห้องรอสอบ (Waiting Lounge)';
+                    if (badge) {
+                        badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-700';
+                        badge.textContent = '⏳ รอกดเริ่มสอบ';
+                    }
+                    if (startBtn) startBtn.classList.remove('hidden');
+                    if (stopBtn) stopBtn.classList.add('hidden');
+                }
+
+                await pollWaitingStudents(rId);
+                if (waitingStudentsInterval) clearInterval(waitingStudentsInterval);
+                waitingStudentsInterval = setInterval(() => pollWaitingStudents(rId), 2000);
+
+                document.getElementById('publish-modal').classList.remove('hidden');
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        function closePublishModal() {
+            if (waitingStudentsInterval) {
+                clearInterval(waitingStudentsInterval);
+                waitingStudentsInterval = null;
+            }
+            document.getElementById('publish-modal').classList.add('hidden');
+        }
+
+        async function pollWaitingStudents(rId) {
+            try {
+                const res = await fetch(`/api/teacher/waiting-students?roomId=${encodeURIComponent(rId)}`);
+                if (!res.ok) return;
+                const data = await res.json();
+                document.getElementById('pub-waiting-count').textContent = data.count || 0;
+                const list = document.getElementById('pub-waiting-students-list');
+                if (data.students && data.students.length > 0) {
+                    list.innerHTML = data.students.map(s => `
+                        <div class="flex items-center justify-between py-1 border-b border-slate-100 last:border-b-0">
+                            <span class="font-bold text-slate-800">${escapeHtml(s.name)}</span>
+                            <span class="font-mono text-slate-400 text-[11px]">${escapeHtml(s.studentId)}</span>
+                        </div>
+                    `).join('');
+                } else {
+                    list.innerHTML = '<p class="text-slate-400 text-center py-1">ยังไม่มีนักศึกษาเข้ามารอ...</p>';
+                }
+            } catch(e) {}
+        }
+
+        function toggleWaitingStudentsList() {
+            document.getElementById('pub-waiting-list-container').classList.toggle('hidden');
+        }
+
+        async function startExamFromLounge() {
+            await startCurrentExam();
+            openWaitingLoungeModal();
+        }
+
+        async function stopExamFromLounge() {
+            await stopCurrentExam();
+            openWaitingLoungeModal();
+        }
+
+        function copyPublishLink() {
+            const link = document.getElementById('pub-modal-link').value;
+            navigator.clipboard.writeText(link).then(() => {
+                alert("📋 คัดลอกลิงก์เรียบร้อยแล้ว!");
+            });
+        }
+
+        function copyPinOnly() {
+            if (!currentPublishedPin || currentPublishedPin === '------') return;
+            navigator.clipboard.writeText(currentPublishedPin).then(() => {
+                alert(`📋 คัดลอกรหัส PIN: ${currentPublishedPin} เรียบร้อยแล้ว`);
+            });
+        }
+
+        function toggleProjectorMode() {
+            const card = document.getElementById('publish-modal-card');
+            const modal = document.getElementById('publish-modal');
+            if (!document.fullscreenElement) {
+                modal.requestFullscreen().catch(() => {});
+                card.classList.remove('max-w-lg');
+                card.classList.add('max-w-3xl', 'p-10');
+            } else {
+                document.exitFullscreen().catch(() => {});
+                card.classList.remove('max-w-3xl', 'p-10');
+                card.classList.add('max-w-lg');
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
