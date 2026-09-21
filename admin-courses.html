@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการรายวิชาและนักศึกษา - Tab-Lock Online Proctoring System</title>
+    <meta name="description" content="สร้างรายวิชาและนำเข้ารายชื่อนักศึกษาประจำวิชา">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Kanit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- SheetJS for Excel (.xlsx/.xls) parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        html { font-size: 100%; -webkit-text-size-adjust: 100%; }
+        @media (max-width: 768px) {
+            #sidebar {
+                position: fixed;
+                top: 0; bottom: 0; left: -280px;
+                z-index: 9999;
+                width: 260px !important;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+                transition: left 0.3s ease-in-out;
+            }
+            #sidebar.mobile-open { left: 0 !important; }
+        }
+        * { box-sizing: border-box; }
+        body { font-family: 'Kanit', 'Inter', sans-serif; background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #faf5ff 100%); background-attachment: fixed; color: #334155; }
+        #sidebar { background: #ffffff; width: 256px; min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; border-right: 1px solid rgba(226,232,240,0.8); flex-shrink: 0; transition: width 0.2s ease-in-out; }
+        .sidebar-inner { position: relative; z-index: 1; }
+        .logo-gradient { background: linear-gradient(135deg, #06b6d4, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .logo-shield { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
+        .nav-link { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; font-size: 13px; font-weight: 700; color: #64748b; text-decoration: none; transition: all 0.2s ease; }
+        .nav-link:hover { color: #1e293b; background: rgba(15,23,42,0.04); }
+        .nav-link.active { background: linear-gradient(135deg, #06b6d4, #8b5cf6); color: #ffffff; font-weight: 700; box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2); }
+        .nav-link svg { width: 18px; height: 18px; flex-shrink: 0; }
+        #main-area { flex: 1; background: #f8fafc; background-image: linear-gradient(to right, rgba(99,102,241,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.03) 1px, transparent 1px); background-size: 32px 32px; display: flex; flex-direction: column; overflow-x: hidden; }
+        #top-header { background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(226,232,240,0.8); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+        .glass-card { background: rgba(255,255,255,0.9); backdrop-filter: blur(20px); border: 1px solid rgba(226,232,240,0.8); border-radius: 20px; box-shadow: 0 4px 20px rgba(15,23,42,0.04); }
+        input, select, textarea { font-family: 'Kanit', sans-serif; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.65); backdrop-filter: blur(5px); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+<div class="fixed w-96 h-96 bg-cyan-500/5 blur-[100px] rounded-full -top-16 -left-16 pointer-events-none"></div>
+<div class="fixed w-96 h-96 bg-violet-500/5 blur-[100px] rounded-full -bottom-16 -right-16 pointer-events-none"></div>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+    <div class="sidebar-inner p-5 space-y-6 flex-1">
+        <div class="flex items-center gap-3">
+            <div class="logo-shield bg-white p-1 border border-slate-100">
+                <img src="logo.png" alt="Logo" class="w-full h-full object-cover rounded-lg" />
+            </div>
+            <div>
+                <div class="font-extrabold text-base tracking-tight text-slate-800">Tab-<span class="logo-gradient">Lock</span></div>
+                <div class="text-[8px] sm:text-[9px] text-slate-500 uppercase tracking-widest font-bold">Online Proctoring System</div>
+            </div>
+        </div>
+        <nav class="space-y-1">
+            <a href="dashboard.html" class="nav-link">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+                <span>แดชบอร์ดหลัก</span>
+            </a>
+            <a href="admin-active-exams.html" class="nav-link">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" /></svg>
+                <span>กำลังดำเนินการสอบ</span>
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-auto"></span>
+            </a>
+            <a href="admin-courses.html" class="nav-link active">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
+                <span>จัดการรายวิชา</span>
+            </a>
+            <a href="admin-portal.html" class="nav-link">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+                <span>จัดการข้อสอบ</span>
+            </a>
+            <a href="admin-library.html" class="nav-link">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+                <span>คลังข้อสอบ</span>
+            </a>
+            <a href="admin-students.html" class="nav-link">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.62 48.62 0 0112 20.904a48.62 48.62 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0112 13.489a50.702 50.702 0 017.74-3.342M12 2.25V4.5m0 10.5v1.5c0 .9-.6 1.6-1.5 1.6a1.5 1.5 0 010-3c.9 0 1.5.7 1.5 1.4z" /></svg>
+                <span>ประวัตินักศึกษา</span>
+            </a>
+            <a href="admin-results.html" class="nav-link">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /></svg>
+                <span>ตรวจสอบผลการสอบ</span>
+            </a>
+            <a href="admin-monitoring.html" class="nav-link">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" /></svg>
+                <span>ตรวจสอบพฤติกรรมน่าสงสัย</span>
+            </a>
+        </nav>
+    </div>
+    <div class="sidebar-inner p-5 border-t border-slate-200 space-y-3">
+        <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white">อ</div>
+            <div class="flex-1 min-w-0">
+                <div class="text-xs font-semibold text-slate-800 truncate" id="sidebar-teacher-name">อาจารย์ผู้ดูแล</div>
+                <div class="text-[10px] text-slate-500">ออนไลน์ • ผู้ดูแลระบบ</div>
+            </div>
+        </div>
+        <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();"
+           class="flex items-center justify-center gap-2 w-full py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl text-xs font-bold transition">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+            ออกจากระบบ
+        </a>
+    </div>
+</aside>
+
+<!-- MAIN AREA -->
+<div id="main-area">
+    <header id="top-header">
+        <div class="flex items-center gap-3">
+            <span class="text-2xl">📚</span>
+            <div>
+                <h1 class="text-xl md:text-2xl font-black text-slate-900">จัดการรายวิชาและรายชื่อนักศึกษา</h1>
+                <p class="text-xs text-slate-500 font-medium">สร้างรายวิชาและนำเข้ารายชื่อนักศึกษาเพื่อคัดกรองสิทธิ์ก่อนเข้าสอบ</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="openCourseModal()"
+                class="flex items-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white text-xs md:text-sm font-extrabold rounded-xl transition shadow-md shadow-cyan-500/20 active:scale-95">
+                ➕ สร้างรายวิชาใหม่
+            </button>
+        </div>
+    </header>
+
+    <main class="p-6 md:p-8 flex-grow max-w-[1400px] w-full mx-auto space-y-6 overflow-y-auto">
+        <!-- Courses Grid -->
+        <div>
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                    <span>📖 รายการวิชาที่สอน</span>
+                    <span id="course-count-badge" class="text-xs bg-indigo-100 text-indigo-700 font-bold px-2 py-0.5 rounded-full">0 วิชา</span>
+                </h2>
+            </div>
+            
+            <div id="courses-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div class="col-span-full py-16 text-center text-slate-400 font-medium glass-card">
+                    กำลังโหลดรายวิชา...
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- MODAL: สร้าง / แก้ไข รายวิชา -->
+<div id="course-modal" class="modal-overlay hidden">
+    <div class="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl space-y-4 relative border border-slate-100">
+        <div class="flex justify-between items-center border-b pb-3">
+            <h3 class="text-lg font-black text-slate-800" id="course-modal-title">➕ สร้างรายวิชาใหม่</h3>
+            <button onclick="closeCourseModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+        </div>
+        <input type="hidden" id="modal-course-id">
+        <div class="space-y-3 text-xs">
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">รหัสวิชา *</label>
+                <input type="text" id="modal-course-code" placeholder="เช่น 04-06-101 หรือ CS101" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:border-cyan-500 focus:outline-none">
+            </div>
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">ชื่อรายวิชา *</label>
+                <input type="text" id="modal-course-name" placeholder="เช่น การเขียนโปรแกรมคอมพิวเตอร์เบื้องต้น" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:border-cyan-500 focus:outline-none">
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">ภาคเรียน / ปีการศึกษา</label>
+                    <input type="text" id="modal-course-semester" placeholder="เช่น 1/2567" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:border-cyan-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">กลุ่มเรียนเป้าหมาย (เช่น TEC3N)</label>
+                    <input type="text" id="modal-course-desc" placeholder="เช่น TEC3N, DTE1" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:border-cyan-500 focus:outline-none">
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t">
+            <button onclick="closeCourseModal()" class="px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-xl text-xs font-bold transition">ยกเลิก</button>
+            <button onclick="saveCourse()" id="btn-save-course" class="px-5 py-2 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white rounded-xl text-xs font-extrabold shadow-md shadow-cyan-500/20 active:scale-95 transition">
+                💾 บันทึกรายวิชา
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: จัดการรายชื่อนักศึกษาประจำวิชา (Student Roster) -->
+<div id="roster-modal" class="modal-overlay hidden">
+    <div class="bg-white rounded-3xl p-6 max-w-4xl w-full shadow-2xl space-y-4 relative border border-slate-100 max-h-[90vh] flex flex-col">
+        <!-- Header -->
+        <div class="flex justify-between items-start border-b pb-3">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">👥</span>
+                    <h3 class="text-lg font-black text-slate-800" id="roster-modal-course-title">รายชื่อนักศึกษาประจำวิชา</h3>
+                </div>
+                <p class="text-xs text-slate-500 mt-0.5" id="roster-modal-course-subtitle">รายชื่อผู้มีสิทธิ์เข้าสอบในรายวิชานี้</p>
+            </div>
+            <button onclick="closeRosterModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold">&times;</button>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="flex flex-wrap items-center justify-between gap-2.5 py-1">
+            <div class="flex items-center gap-2">
+                <input type="text" id="roster-search-input" placeholder="🔍 ค้นหารหัส / ชื่อ..." onkeyup="filterRoster()"
+                    class="w-52 px-3.5 py-2 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-cyan-400">
+                <span id="roster-count-label" class="text-xs font-bold text-slate-400">0 คน</span>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+                <!-- Import Excel/CSV Button -->
+                <input type="file" id="roster-file-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleRosterFileUpload(event)">
+                <button onclick="document.getElementById('roster-file-input').click()"
+                    class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm shadow-emerald-500/20 active:scale-95">
+                    📥 นำเข้า Excel / CSV
+                </button>
+                <!-- Download Template -->
+                <button onclick="downloadRosterTemplate()"
+                    class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5 active:scale-95">
+                    📄 โหลดตัวอย่าง CSV
+                </button>
+                <!-- Add Single Student -->
+                <button onclick="openAddStudentToCourseModal()"
+                    class="px-3 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 active:scale-95">
+                    ➕ เพิ่มรายคน
+                </button>
+                <!-- Clear All -->
+                <button onclick="clearAllRosterStudents()"
+                    class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl text-xs font-bold transition active:scale-95">
+                    🗑️ ล้างทั้งหมด
+                </button>
+            </div>
+        </div>
+
+        <!-- Format Helper Banner -->
+        <div class="p-3 bg-amber-50 border border-amber-200 rounded-2xl text-[11px] text-amber-800 flex items-start gap-2">
+            <span class="text-base shrink-0">💡</span>
+            <div class="leading-relaxed">
+                <strong>รูปแบบไฟล์ที่รองรับ:</strong> คอลัมน์ <code>STUDENT_NO</code> (รหัสนักศึกษา เช่น 69325110007-0), <code>FULLNAME</code> (ชื่อ-นามสกุล ภาษาไทย เช่น นาย ธนนันท์ มุขธระโกษา), <code>FULLNAME_EN</code> (ภาษาอังกฤษ). ระบบจะแยกคำนำหน้าและเปิดบัญชีให้นักศึกษาเข้าใช้งานได้ทันที!
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-y-auto flex-1 border border-slate-100 rounded-2xl">
+            <table class="w-full text-xs">
+                <thead class="sticky top-0 bg-slate-50 border-b border-slate-200 z-10">
+                    <tr>
+                        <th class="text-left px-4 py-3 font-extrabold text-slate-500 uppercase text-[10px]">ลำดับ</th>
+                        <th class="text-left px-4 py-3 font-extrabold text-slate-500 uppercase text-[10px]">รหัสนักศึกษา</th>
+                        <th class="text-left px-4 py-3 font-extrabold text-slate-500 uppercase text-[10px]">ชื่อ-นามสกุล (ภาษาไทย)</th>
+                        <th class="text-left px-4 py-3 font-extrabold text-slate-500 uppercase text-[10px]">Full Name (EN)</th>
+                        <th class="text-left px-4 py-3 font-extrabold text-slate-500 uppercase text-[10px]">กลุ่มเรียน / ชั้น</th>
+                        <th class="text-center px-4 py-3 font-extrabold text-slate-500 uppercase text-[10px]">จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="roster-table-body">
+                    <tr><td colspan="6" class="text-center py-12 text-slate-400">ยังไม่มีรายชื่อนักศึกษาในวิชานี้</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: เพิ่มนักศึกษาเดี่ยวในวิชา -->
+<div id="add-student-modal" class="modal-overlay hidden" style="z-index: 60;">
+    <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4 border border-slate-100">
+        <div class="flex justify-between items-center border-b pb-2.5">
+            <h3 class="text-base font-black text-slate-800">➕ เพิ่มนักศึกษาในวิชา</h3>
+            <button onclick="closeAddStudentToCourseModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+        </div>
+        <div class="space-y-3 text-xs">
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">รหัสนักศึกษา *</label>
+                <input type="text" id="add-s-id" placeholder="เช่น 69325110007-0" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-cyan-500 font-mono">
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">คำนำหน้า</label>
+                    <input type="text" id="add-s-prefix" placeholder="นาย / น.ส." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-cyan-500">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">ชื่อจริง (ไทย) *</label>
+                    <input type="text" id="add-s-first" placeholder="ชื่อจริงภาษาไทย" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-cyan-500">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">นามสกุล (ไทย)</label>
+                    <input type="text" id="add-s-last" placeholder="นามสกุลภาษาไทย" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-cyan-500">
+                </div>
+            </div>
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">ชื่อ-นามสกุล ภาษาอังกฤษ (ถ้ามี)</label>
+                <input type="text" id="add-s-en" placeholder="Mr. THANANAN MUKHATHRAKOSA" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-cyan-500">
+            </div>
+            <div>
+                <label class="block font-bold text-slate-700 mb-1">กลุ่มเรียน / ชั้น</label>
+                <input type="text" id="add-s-class" placeholder="เช่น TEC3N" class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-sm focus:outline-none focus:border-cyan-500">
+            </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-3 border-t">
+            <button onclick="closeAddStudentToCourseModal()" class="px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-xl text-xs font-bold transition">ยกเลิก</button>
+            <button onclick="saveStudentToCourse()" class="px-5 py-2 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white rounded-xl text-xs font-extrabold shadow-md active:scale-95 transition">บันทึก</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const currentUsername = localStorage.getItem('teacherUsername') || 'aom1';
+    let coursesList = [];
+    let currentCourseId = null;
+    let currentRosterList = [];
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const nameEl = document.getElementById('sidebar-teacher-name');
+        if (nameEl) nameEl.textContent = 'อ. ' + (localStorage.getItem('teacherName') || currentUsername);
+        loadCourses();
+    });
+
+    async function loadCourses() {
+        try {
+            const res = await fetch(`/api/teacher/courses?username=${encodeURIComponent(currentUsername)}`);
+            coursesList = await res.json();
+            renderCourses();
+        } catch(e) {
+            console.error(e);
+            document.getElementById('courses-container').innerHTML = `<div class="col-span-full py-8 text-center text-rose-500 font-bold">❌ โหลดข้อมูลไม่สำเร็จ</div>`;
+        }
+    }
+
+    function renderCourses() {
+        const container = document.getElementById('courses-container');
+        document.getElementById('course-count-badge').textContent = `${coursesList.length} วิชา`;
+
+        if (!coursesList || coursesList.length === 0) {
+            container.innerHTML = `
+                <div class="col-span-full py-16 text-center text-slate-400 glass-card space-y-3">
+                    <span class="text-4xl">📚</span>
+                    <div class="font-bold text-slate-600">ยังไม่มีรายวิชาที่สร้างไว้</div>
+                    <p class="text-xs text-slate-400">กดปุ่ม "+ สร้างรายวิชาใหม่" ด้านบน เพื่อเริ่มต้นสร้างรายวิชาและนำเข้ารายชื่อนักศึกษา</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = coursesList.map(c => `
+            <div class="glass-card p-5 rounded-3xl flex flex-col justify-between hover:border-cyan-400/40 transition shadow-sm hover:shadow-md">
+                <div class="space-y-3">
+                    <div class="flex items-start justify-between gap-2">
+                        <span class="px-2.5 py-1 bg-gradient-to-r from-cyan-500 to-indigo-600 text-white rounded-xl text-[11px] font-mono font-black shadow-sm">
+                            ${escapeHtml(c.courseCode)}
+                        </span>
+                        <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-lg">
+                            ${escapeHtml(c.semester || 'ภาคเรียนทั่วไป')}
+                        </span>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-black text-slate-800 line-clamp-1">${escapeHtml(c.courseName)}</h3>
+                        <p class="text-xs text-slate-400 font-medium mt-0.5 line-clamp-2">${escapeHtml(c.description || 'ไม่มีคำอธิบายเพิ่มเติม')}</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100 text-[11px]">
+                        <div class="flex items-center gap-1.5 text-slate-600 font-bold">
+                            <span>👥 นักศึกษา:</span>
+                            <span class="text-cyan-600 font-black">${c.studentCount || 0} คน</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 text-slate-600 font-bold">
+                            <span>📝 ห้องสอบ:</span>
+                            <span class="text-indigo-600 font-black">${c.roomCount || 0} ห้อง</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <button onclick="openRosterModal(${c.id})"
+                        class="flex-1 py-2 px-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-black rounded-xl transition shadow-sm active:scale-95 flex items-center justify-center gap-1.5">
+                        👥 รายชื่อนักศึกษา (${c.studentCount || 0})
+                    </button>
+                    <button onclick="openEditCourseModal(${c.id})" title="แก้ไข"
+                        class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition">
+                        ✏️
+                    </button>
+                    <button onclick="deleteCourse(${c.id})" title="ลบรายวิชา"
+                        class="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition">
+                        🗑️
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function openCourseModal() {
+        document.getElementById('modal-course-id').value = '';
+        document.getElementById('course-modal-title').textContent = '➕ สร้างรายวิชาใหม่';
+        document.getElementById('modal-course-code').value = '';
+        document.getElementById('modal-course-name').value = '';
+        document.getElementById('modal-course-semester').value = '';
+        document.getElementById('modal-course-desc').value = '';
+        document.getElementById('course-modal').classList.remove('hidden');
+    }
+
+    function openEditCourseModal(courseId) {
+        const c = coursesList.find(x => x.id === courseId);
+        if (!c) return;
+        document.getElementById('modal-course-id').value = c.id;
+        document.getElementById('course-modal-title').textContent = '✏️ แก้ไขรายวิชา';
+        document.getElementById('modal-course-code').value = c.courseCode || '';
+        document.getElementById('modal-course-name').value = c.courseName || '';
+        document.getElementById('modal-course-semester').value = c.semester || '';
+        document.getElementById('modal-course-desc').value = c.description || '';
+        document.getElementById('course-modal').classList.remove('hidden');
+    }
+
+    function closeCourseModal() {
+        document.getElementById('course-modal').classList.add('hidden');
+    }
+
+    async function saveCourse() {
+        const id = document.getElementById('modal-course-id').value;
+        const courseCode = document.getElementById('modal-course-code').value.trim();
+        const courseName = document.getElementById('modal-course-name').value.trim();
+        const semester = document.getElementById('modal-course-semester').value.trim();
+        const description = document.getElementById('modal-course-desc').value.trim();
+        const btn = document.getElementById('btn-save-course');
+
+        if (!courseCode || !courseName) {
+            alert("⚠️ กรุณาระบุรหัสวิชาและชื่อวิชา");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "กำลังบันทึก...";
+
+        try {
+            const url = id ? `/api/teacher/courses/${id}` : '/api/teacher/courses';
+            const method = id ? 'PUT' : 'POST';
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: currentUsername, courseCode, courseName, semester, description })
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                closeCourseModal();
+                loadCourses();
+            } else {
+                alert(`❌ ล้มเหลว: ${data.message}`);
+            }
+        } catch(e) {
+            console.error(e);
+            alert("❌ ไม่สามารถติดต่อเซิร์ฟเวอร์ได้");
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "💾 บันทึกรายวิชา";
+        }
+    }
+
+    async function deleteCourse(id) {
+        if (!confirm("⚠️ ยืนยันการลบรายวิชานี้?\nข้อมูลรายชื่อนักศึกษาที่ผูกกับวิชานี้จะถูกนำออก")) return;
+        try {
+            const res = await fetch(`/api/teacher/courses/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (res.ok) {
+                loadCourses();
+            } else {
+                alert(`❌ ${data.message}`);
+            }
+        } catch(e) {
+            console.error(e);
+            alert("❌ เกิดข้อผิดพลาด");
+        }
+    }
+
+    // ==========================================
+    // 👥 Roster Management Functions
+    // ==========================================
+
+    async function openRosterModal(courseId) {
+        currentCourseId = courseId;
+        const c = coursesList.find(x => x.id === courseId);
+        if (c) {
+            document.getElementById('roster-modal-course-title').textContent = `[${c.courseCode}] ${c.courseName}`;
+            document.getElementById('roster-modal-course-subtitle').textContent = `ภาคเรียน: ${c.semester || '-'} • กลุ่มเรียน: ${c.description || '-'}`;
+        }
+        document.getElementById('roster-search-input').value = '';
+        document.getElementById('roster-modal').classList.remove('hidden');
+        await loadCourseStudents();
+    }
+
+    function closeRosterModal() {
+        document.getElementById('roster-modal').classList.add('hidden');
+        loadCourses(); // refresh counts
+    }
+
+    async function loadCourseStudents() {
+        if (!currentCourseId) return;
+        try {
+            const res = await fetch(`/api/courses/${currentCourseId}/students`);
+            currentRosterList = await res.json();
+            renderRosterTable(currentRosterList);
+        } catch(e) {
+            console.error(e);
+        }
+    }
+
+    function renderRosterTable(list) {
+        const tbody = document.getElementById('roster-table-body');
+        document.getElementById('roster-count-label').textContent = `${list.length} คน`;
+
+        if (!list || list.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-12 text-slate-400 font-medium">ยังไม่มีรายชื่อนักศึกษาในวิชานี้ • กด "นำเข้า Excel / CSV" เพื่ออัปโหลดรายชื่อ</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = list.map((s, idx) => `
+            <tr class="border-b border-slate-100 hover:bg-slate-50/80 transition">
+                <td class="px-4 py-2.5 text-slate-400 font-mono text-center w-12">${idx + 1}</td>
+                <td class="px-4 py-2.5 font-mono font-bold text-cyan-700">${escapeHtml(s.studentId)}</td>
+                <td class="px-4 py-2.5 font-bold text-slate-800">${escapeHtml((s.prefix ? s.prefix + ' ' : '') + s.firstName + ' ' + (s.lastName || ''))}</td>
+                <td class="px-4 py-2.5 text-slate-500 font-medium">${escapeHtml(s.fullNameEn || '-')}</td>
+                <td class="px-4 py-2.5 text-slate-600 font-medium">${escapeHtml(s.class || '-')}</td>
+                <td class="px-4 py-2.5 text-center">
+                    <button onclick="deleteRosterStudent(${s.id})" title="ลบ" class="text-rose-500 hover:text-rose-700 p-1 hover:bg-rose-50 rounded-lg transition">
+                        🗑️
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function filterRoster() {
+        const q = document.getElementById('roster-search-input').value.trim().toLowerCase();
+        if (!q) {
+            renderRosterTable(currentRosterList);
+            return;
+        }
+        const filtered = currentRosterList.filter(s => {
+            const id = (s.studentId || '').toLowerCase();
+            const name = `${s.prefix || ''} ${s.firstName || ''} ${s.lastName || ''}`.toLowerCase();
+            const en = (s.fullNameEn || '').toLowerCase();
+            const cls = (s.class || '').toLowerCase();
+            return id.includes(q) || name.includes(q) || en.includes(q) || cls.includes(q);
+        });
+        renderRosterTable(filtered);
+    }
+
+    // 📥 นำเข้าไฟล์ Excel / CSV
+    function handleRosterFileUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        const ext = file.name.split('.').pop().toLowerCase();
+
+        reader.onload = async (evt) => {
+            try {
+                let parsedRows = [];
+
+                if (ext === 'csv') {
+                    // Parse CSV text
+                    const csvText = evt.target.result;
+                    parsedRows = parseCSV(csvText);
+                } else {
+                    // Parse Excel with SheetJS
+                    const data = new Uint8Array(evt.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    parsedRows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+                }
+
+                if (!parsedRows || parsedRows.length === 0) {
+                    alert("⚠️ ไม่พบข้อมูลในไฟล์ กรุณาตรวจสอบหัวคอลัมน์ STUDENT_NO และ FULLNAME ครับ");
+                    return;
+                }
+
+                const c = coursesList.find(x => x.id === currentCourseId);
+                const defaultClass = c ? c.description : '';
+
+                if (!confirm(`📥 ตรวจพบข้อมูลนักศึกษา ${parsedRows.length} รายการ\nต้องการนำเข้าสู่รายวิชานี้หรือไม่?`)) {
+                    return;
+                }
+
+                const res = await fetch(`/api/courses/${currentCourseId}/students/import`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ students: parsedRows, defaultClass })
+                });
+                const result = await res.json();
+
+                if (res.ok && result.success) {
+                    alert(`🎉 ${result.message}`);
+                    await loadCourseStudents();
+                } else {
+                    alert(`❌ ล้มเหลว: ${result.message}`);
+                }
+            } catch(err) {
+                console.error(err);
+                alert("❌ เกิดข้อผิดพลาดในการอ่านไฟล์ กรุณาตรวจสอบว่าเป็นไฟล์ Excel หรือ CSV ที่ถูกต้อง");
+            } finally {
+                e.target.value = '';
+            }
+        };
+
+        if (ext === 'csv') {
+            reader.readAsText(file, 'UTF-8');
+        } else {
+            reader.readAsArrayBuffer(file);
+        }
+    }
+
+    function parseCSV(text) {
+        const lines = text.split(/\r\n|\n/).filter(line => line.trim().length > 0);
+        if (lines.length < 2) return [];
+        const headers = lines[0].split(',').map(h => h.replace(/^["']|["']$/g, '').trim());
+        const rows = [];
+        for (let i = 1; i < lines.length; i++) {
+            const currentline = lines[i].split(',');
+            if (currentline.length < headers.length) continue;
+            const obj = {};
+            for (let j = 0; j < headers.length; j++) {
+                obj[headers[j]] = (currentline[j] || '').replace(/^["']|["']$/g, '').trim();
+            }
+            rows.push(obj);
+        }
+        return rows;
+    }
+
+    // 📄 ดาวน์โหลดไฟล์ตัวอย่างแม่แบบ CSV ตามที่กำหนด
+    function downloadRosterTemplate() {
+        const csvContent = "\uFEFFSTUDENT_NO,FULLNAME,FULLNAME_EN\n" +
+            "69325110007-0,นาย ธนนันท์ มุขธระโกษา,Mr. THANANAN MUKHATHRAKOSA\n" +
+            "69325110008-0,นาย อดิศักดิ์ นารีดอกไม้,Mr. ADISAK NAREEDOKMAI\n" +
+            "69325110009-0,นางสาว นันทิยา ใจดี,Ms. NANTIYA JAIDEE\n";
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute("download", "student_roster_template.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // ➕ Modal เพิ่มนักศึกษาเดี่ยว
+    function openAddStudentToCourseModal() {
+        document.getElementById('add-s-id').value = '';
+        document.getElementById('add-s-prefix').value = 'นาย';
+        document.getElementById('add-s-first').value = '';
+        document.getElementById('add-s-last').value = '';
+        document.getElementById('add-s-en').value = '';
+        const c = coursesList.find(x => x.id === currentCourseId);
+        document.getElementById('add-s-class').value = c ? c.description : '';
+        document.getElementById('add-student-modal').classList.remove('hidden');
+    }
+
+    function closeAddStudentToCourseModal() {
+        document.getElementById('add-student-modal').classList.add('hidden');
+    }
+
+    async function saveStudentToCourse() {
+        const studentId = document.getElementById('add-s-id').value.trim();
+        const prefix = document.getElementById('add-s-prefix').value.trim();
+        const firstName = document.getElementById('add-s-first').value.trim();
+        const lastName = document.getElementById('add-s-last').value.trim();
+        const fullNameEn = document.getElementById('add-s-en').value.trim();
+        const cls = document.getElementById('add-s-class').value.trim();
+
+        if (!studentId || !firstName) {
+            alert("⚠️ กรุณาระบุรหัสนักศึกษาและชื่อจริง");
+            return;
+        }
+
+        const thaiRegex = /^[\u0E00-\u0E7F\s.]+$/;
+        if (!thaiRegex.test(firstName) || (lastName && !thaiRegex.test(lastName))) {
+            alert("⚠️ ชื่อและนามสกุลต้องเป็นภาษาไทยเท่านั้นครับ");
+            return;
+        }
+
+        try {
+            const res = await fetch(`/api/courses/${currentCourseId}/students`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ studentId, prefix, firstName, lastName, fullNameEn, class: cls })
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                closeAddStudentToCourseModal();
+                loadCourseStudents();
+            } else {
+                alert(`❌ ${data.message}`);
+            }
+        } catch(e) {
+            console.error(e);
+            alert("❌ ไม่สามารถติดต่อเซิร์ฟเวอร์ได้");
+        }
+    }
+
+    async function deleteRosterStudent(id) {
+        if (!confirm("ต้องการลบนักศึกษาคนนี้ออกจากรายวิชาใช่หรือไม่?")) return;
+        try {
+            const res = await fetch(`/api/courses/${currentCourseId}/students/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                loadCourseStudents();
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    async function clearAllRosterStudents() {
+        if (!confirm("⚠️ ต้องการล้างรายชื่อนักศึกษาทั้งหมดในวิชานี้ใช่หรือไม่?")) return;
+        try {
+            const res = await fetch(`/api/courses/${currentCourseId}/students-all`, { method: 'DELETE' });
+            if (res.ok) {
+                loadCourseStudents();
+            }
+        } catch(e) { console.error(e); }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+</script>
+</body>
+</html>

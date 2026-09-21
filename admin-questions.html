@@ -219,6 +219,10 @@
                     <span>กำลังดำเนินการสอบ</span>
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-auto"></span>
                 </a>
+                <a href="admin-courses.html" class="nav-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
+                    <span>จัดการรายวิชา</span>
+                </a>
                 <a href="admin-portal.html" class="nav-link active">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
                     <span>จัดการข้อสอบ</span>
@@ -440,7 +444,7 @@
                                 <p class="text-xs text-slate-400 mt-1 font-medium" id="publish-status-desc">ข้อสอบที่เพิ่งถูกเพิ่ม/แก้ไข จะยังไม่เปิดให้คนเข้าสอบ กรุณากดเผยแพร่ด้านขวาเพื่อเปิดระบบ</p>
                             </div>
                             <div class="flex items-center gap-2 flex-wrap">
-                                <button id="view-qr-btn" onclick="openPublishModal()" class="hidden px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs md:text-sm font-black rounded-xl transition duration-300 shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95">
+                                <button id="view-qr-btn" onclick="openPublishModal()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs md:text-sm font-black rounded-xl transition duration-300 shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95">
                                     📱 ดู QR Code & PIN
                                 </button>
                                 <button id="publish-btn" onclick="togglePublishExam()" class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs md:text-sm font-black rounded-xl transition duration-300 shadow-md">
@@ -544,6 +548,15 @@
                 <div class="p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-5 gap-6">
                     <!-- Left: Settings Form (3 cols) -->
                     <div class="md:col-span-3 space-y-4">
+                        <!-- Select Course (ผูกกับรายวิชา) -->
+                        <div class="space-y-1.5">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">📚 ผูกกับรายวิชา (Course Link)</label>
+                            <select id="modal-room-course-id" class="dark-select">
+                                <option value="0">-- ทั่วไป (ไม่จำกัดเฉพาะรายวิชา) --</option>
+                            </select>
+                            <p class="text-[10px] text-slate-400 font-medium">หากเลือกรายวิชา ระบบจะคัดกรองเฉพาะนักศึกษาที่มีรายชื่อในวิชานั้นเท่านั้นจึงจะเข้าสอบได้</p>
+                        </div>
+
                         <!-- Room Name -->
                         <div class="space-y-1.5">
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">ชื่อวิชา / ห้องเรียน</label>
@@ -1719,6 +1732,17 @@
                     selectTimerMode('none');
                 }
 
+                // โหลดรายวิชาทั้งหมดของอาจารย์มาใส่ในตัวเลือก
+                try {
+                    const cRes = await fetch(`/api/teacher/courses?username=${encodeURIComponent(currentTeacherUsername)}`);
+                    const courses = await cRes.json();
+                    const cSelect = document.getElementById('modal-room-course-id');
+                    if (cSelect && Array.isArray(courses)) {
+                        cSelect.innerHTML = `<option value="0">-- ทั่วไป (ไม่จำกัดเฉพาะรายวิชา) --</option>` +
+                            courses.map(c => `<option value="${c.id}" ${c.id === (data.courseId || 0) ? 'selected' : ''}>[${c.courseCode}] ${c.courseName} (${c.semester || 'ทั่วไป'})</option>`).join('');
+                    }
+                } catch(cErr) { console.error(cErr); }
+
                 document.getElementById('modal-announcement').value = data.announcement || '';
 
                 // การสลับประเภทการสอบ
@@ -1863,6 +1887,14 @@
                 });
                 
                 if (response.ok) {
+                    const courseSelect = document.getElementById('modal-room-course-id');
+                    const courseId = courseSelect ? (parseInt(courseSelect.value) || 0) : 0;
+                    await fetch('/api/teacher/link-room-course', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ roomId: currentRoomId, courseId })
+                    }).catch(e => console.error(e));
+
                     closeExamSettingsModal();
                     
                     // โหลดรายการห้องและตั้งค่าห้องปัจจุบันใหม่
@@ -2081,24 +2113,23 @@
                 const btn = document.getElementById('publish-btn');
                 const qrBtn = document.getElementById('view-qr-btn');
 
+                currentPublishedPin = data.exam_code || '';
+                if (qrBtn) qrBtn.classList.remove('hidden');
+
                 if (data.is_published === 1) {
-                    currentPublishedPin = data.exam_code || '';
                     pulse.className = "w-2.5 h-2.5 rounded-full bg-emerald-500/100 animate-pulse";
-                    title.innerHTML = `สถานะห้องสอบ: 🟢 เผยแพร่แล้ว • รหัส PIN: <span class="font-mono font-black text-cyan-300 bg-slate-800 px-2 py-0.5 rounded-lg border border-slate-700">${data.exam_code || '-'}</span>`;
+                    title.innerHTML = `สถานะห้องสอบ: 🟢 เผยแพร่แล้ว (กำลังสอบ) • รหัส PIN: <span class="font-mono font-black text-cyan-300 bg-slate-800 px-2 py-0.5 rounded-lg border border-slate-700">${data.exam_code || '-'}</span>`;
                     title.className = "text-xs font-bold text-emerald-400 flex items-center gap-1.5 flex-wrap";
                     desc.textContent = "นักศึกษาสามารถสแกน QR Code หรือกรอกรหัส PIN นี้เพื่อเข้าทำข้อสอบได้ทันที";
                     btn.textContent = "🛑 ยกเลิกการเผยแพร่ข้อสอบ (กลับเป็นแบบร่าง)";
                     btn.className = "px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-extrabold rounded-xl transition duration-300 shadow-md cursor-pointer";
-                    if (qrBtn) qrBtn.classList.remove('hidden');
                 } else {
-                    currentPublishedPin = '';
                     pulse.className = "w-2.5 h-2.5 rounded-full bg-amber-500/100 animate-pulse";
-                    title.textContent = "สถานะห้องสอบ: 📝 แบบร่างข้อสอบ (ยังไม่เผยแพร่)";
-                    title.className = "text-xs font-bold text-amber-400";
-                    desc.textContent = "ข้อสอบที่เพิ่มหรือแก้ไข จะยังไม่เปิดให้นักศึกษาสอบจนกว่าท่านจะกดยืนยันเผยแพร่ด้านขวา";
+                    title.innerHTML = `สถานะห้องสอบ: 📝 แบบร่าง (ยังไม่เผยแพร่) • รหัส PIN: <span class="font-mono font-black text-amber-300 bg-slate-800 px-2 py-0.5 rounded-lg border border-slate-700">${data.exam_code || '-'}</span>`;
+                    title.className = "text-xs font-bold text-amber-400 flex items-center gap-1.5 flex-wrap";
+                    desc.textContent = "นักศึกษาสามารถสแกน QR หรือใส่รหัส PIN เข้ามารอในห้องรอสอบได้ล่วงหน้า เมื่อท่านกดยืนยันเผยแพร่ นักศึกษาจะเริ่มทำข้อสอบพร้อมกันทันที";
                     btn.textContent = "🟢 ยืนยันเผยแพร่ให้นักศึกษาเข้าสอบ";
                     btn.className = "px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-[10px] font-extrabold rounded-xl transition duration-300 shadow-md cursor-pointer";
-                    if (qrBtn) qrBtn.classList.add('hidden');
                 }
                 banner.classList.remove('hidden');
             } catch (err) {

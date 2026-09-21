@@ -91,17 +91,24 @@
                     <input type="password" id="student-password" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="กรอกรหัสผ่านของคุณ">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">รหัส PIN เข้าสอบ 6 หลัก (Exam PIN) *</label>
+                    <div class="flex items-center justify-between">
+                        <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">รหัส PIN เข้าสอบ 6 หลัก (Exam PIN)</label>
+                        <span class="text-[9px] text-slate-400 font-medium">(ไม่บังคับ หากต้องการเข้าหน้าหลัก)</span>
+                    </div>
                     <input type="text" id="exam-code-input" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm font-mono font-bold text-cyan-600 transition-all tracking-wider" placeholder="เช่น 849 201">
                     <p class="text-[9px] text-slate-400">กรอกรหัส PIN ที่อาจารย์ฉายหน้าห้อง หรือสแกน QR Code</p>
                 </div>
 
+                <div class="space-y-2 pt-1">
+                    <button onclick="handleLoginAndEnter(false)" id="btn-login-submit" class="btn-primary w-full text-white py-3.5 rounded-xl sm:rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-[0.98]">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        เข้าสู่ระบบและเริ่มทำข้อสอบ
+                    </button>
 
-
-                <button onclick="startExam()" id="btn-login-submit" class="btn-primary w-full text-white py-3.5 rounded-xl sm:rounded-2xl font-black text-sm flex items-center justify-center gap-2 mt-2 shadow-lg shadow-cyan-500/20 active:scale-[0.98]">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    เข้าสู่ระบบและเริ่มทำข้อสอบ
-                </button>
+                    <button onclick="handleLoginAndEnter(true)" type="button" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-[0.98]">
+                        <span>🎓</span> เข้าสู่หน้าหลักนักศึกษา (Student Portal / ดูประวัติ / ห้องรอสอบ)
+                    </button>
+                </div>
 
                 <div class="text-center pt-1">
                     <p class="text-xs text-slate-400">
@@ -121,12 +128,12 @@
                 </div>
                 <div class="grid grid-cols-2 gap-2.5">
                     <div class="space-y-1">
-                        <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">ชื่อจริง *</label>
-                        <input type="text" id="reg-firstname" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="ชื่อจริง">
+                        <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">ชื่อจริง (ภาษาไทย) *</label>
+                        <input type="text" id="reg-firstname" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="เช่น ธนนันท์">
                     </div>
                     <div class="space-y-1">
-                        <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">นามสกุล</label>
-                        <input type="text" id="reg-lastname" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="นามสกุล">
+                        <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">นามสกุล (ภาษาไทย) *</label>
+                        <input type="text" id="reg-lastname" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="เช่น มุขธระโกษา">
                     </div>
                 </div>
                 <div class="space-y-1">
@@ -144,8 +151,8 @@
                     </div>
                 </div>
 
-                <div class="p-3 bg-indigo-50/70 border border-indigo-100 rounded-xl text-[10px] text-indigo-800 leading-relaxed">
-                    ℹ️ <strong>เงื่อนไขความปลอดภัย:</strong> เมื่อสมัครแล้ว คำขอจะถูกส่งให้ผู้ดูแลระบบ (Admin) ตรวจสอบและอนุมัติก่อน จึงจะเข้าทำข้อสอบได้ครับ
+                <div class="p-3 bg-emerald-50/70 border border-emerald-200 rounded-xl text-[10px] text-emerald-800 leading-relaxed">
+                    🎉 <strong>สมัครแล้วเข้าใช้งานได้ทันที:</strong> บัญชีจะได้รับการอนุมัติอัตโนมัติ ไม่ต้องรอ Admin ตรวจสอบ สามารถเข้าสู่ระบบเพื่อสอบหรือดูประวัติได้ทันทีครับ
                 </div>
 
                 <button onclick="registerStudent()" id="btn-register-submit" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white rounded-xl sm:rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition cursor-pointer">
@@ -313,6 +320,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const codeParam = urlParams.get('code');
             const roomParam = urlParams.get('room');
+            const autostartParam = urlParams.get('autostart');
 
             if (codeParam) {
                 const codeInput = document.getElementById('exam-code-input');
@@ -325,6 +333,23 @@
                 if (qrBanner && qrPin) {
                     qrPin.textContent = codeParam;
                     qrBanner.classList.remove('hidden');
+                }
+            }
+
+            // ถ้ามีการส่ง autostart=1 มา (เช่น จาก Waiting Room เมื่ออาจารย์กดเริ่มสอบ)
+            const savedStudentRaw = localStorage.getItem('currentStudent');
+            if (autostartParam === '1' && savedStudentRaw && (codeParam || roomParam)) {
+                try {
+                    const studentObj = JSON.parse(savedStudentRaw);
+                    currentStudentId = studentObj.studentId;
+                    currentStudentName = `${studentObj.firstName || ''} ${studentObj.lastName || ''}`.trim() || studentObj.name || 'นักศึกษา';
+                    currentStudentClass = studentObj.class || '';
+
+                    // นำเข้าทำข้อสอบทันทีโดยไม่ต้องถามรหัสผ่านซ้ำ
+                    await launchExamDirectly(codeParam, roomParam);
+                    return;
+                } catch(e) {
+                    console.error("Auto-start error:", e);
                 }
             }
         });
@@ -348,7 +373,6 @@
             }
         }
 
-
         async function registerStudent() {
             const studentId = document.getElementById('reg-student-id').value.trim();
             const firstName = document.getElementById('reg-firstname').value.trim();
@@ -360,6 +384,13 @@
 
             if (!studentId || !firstName || !cls || !password) {
                 alert("⚠️ กรุณากรอกรหัสนักศึกษา, ชื่อจริง, ชั้นเรียน และรหัสผ่านให้ครบถ้วนครับ");
+                return;
+            }
+
+            // ตรวจสอบชื่อ-นามสกุลภาษาไทยเท่านั้น (ไม่ใช้ภาษาอังกฤษหรืออักขระพิเศษ)
+            const thaiRegex = /^[\u0E00-\u0E7F\s.]+$/;
+            if (!thaiRegex.test(firstName) || (lastName && !thaiRegex.test(lastName))) {
+                alert("⚠️ ชื่อจริงและนามสกุลต้องเป็นภาษาไทยเท่านั้นครับ (ไม่ใช้ภาษาอังกฤษหรืออักขระพิเศษ)");
                 return;
             }
 
@@ -402,7 +433,7 @@
             }
         }
 
-        async function startExam() {
+        async function handleLoginAndEnter(goToPortalOnly = false) {
             const studentId = document.getElementById('student-id').value.trim();
             const password = document.getElementById('student-password').value;
             const examCode = document.getElementById('exam-code-input').value.trim();
@@ -413,16 +444,11 @@
                 return;
             }
 
-            if (!examCode) {
-                alert("⚠️ กรุณากรอกรหัส PIN เข้าสอบ 6 หลัก หรือสแกน QR Code หน้าห้องเรียนครับ");
-                return;
-            }
-
             loginBtn.disabled = true;
-            loginBtn.innerHTML = "⏳ กำลังตรวจสอบสิทธิ์และดึงข้อสอบ...";
+            loginBtn.innerHTML = "⏳ กำลังเข้าสู่ระบบ...";
 
             try {
-                // 1. ตรวจสอบ Login & สถานะการอนุมัติ
+                // 1. ตรวจสอบ Login
                 const loginRes = await fetch('/api/student/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -437,86 +463,129 @@
                     return;
                 }
 
+                // บันทึก Session นักศึกษาลง LocalStorage เพื่อให้ student-portal และระบบสอบใช้งานร่วมกันได้
+                localStorage.setItem('currentStudent', JSON.stringify(loginData.student));
+
                 currentStudentId = loginData.student.studentId;
                 currentStudentName = loginData.student.name;
                 currentStudentClass = loginData.student.class || '';
 
-                // 2. ค้นหาห้องสอบ (roomId) จากรหัส PIN / examCode ทั่วทั้งระบบ
-                const queryUrl = `/api/student/get-room-by-code?examCode=${encodeURIComponent(examCode)}`;
-                const codeRes = await fetch(queryUrl);
-                const codeData = await codeRes.json();
-                if (!codeRes.ok) {
-                    alert(codeData.message || "❌ ไม่พบรหัส PIN หรือข้อสอบสำหรับรหัสที่ระบุ");
+                // หากกดเข้าสู่ Portal หรือไม่ได้กรอก PIN ให้พาไปที่หน้า Student Portal
+                if (goToPortalOnly || !examCode) {
+                    window.location.href = 'student-portal.html';
+                    return;
+                }
+
+                // 2. หากกรอก PIN: ตรวจสอบสิทธิ์กับรายวิชาและข้อมูลชื่อ-นามสกุล (Gatekeeper Verification)
+                loginBtn.innerHTML = "⏳ กำลังตรวจสอบสิทธิ์รายวิชา...";
+                const accessRes = await fetch('/api/student/check-exam-access', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ studentId: currentStudentId, examCode: examCode })
+                });
+                const accessData = await accessRes.json();
+
+                if (!accessRes.ok || !accessData.success) {
+                    alert(`❌ ปฏิเสธการเข้าสอบ:\n\n${accessData.message || 'ไม่สามารถเข้าห้องสอบนี้ได้'}`);
                     loginBtn.disabled = false;
                     loginBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> เข้าสู่ระบบและเริ่มทำข้อสอบ`;
                     return;
                 }
-                currentRoomId = codeData.roomId;
 
-                const settingsRes = await fetch(`/api/room-settings?roomId=${currentRoomId}`);
-                const settings = await settingsRes.json();
-                showScoreSetting = settings.showScore;
-
-                const res = await fetch(`/api/get-questions?roomId=${currentRoomId}`);
-                const data = await res.json();
-                if (!res.ok) { 
-                    alert(data.message || "❌ ไม่พบข้อสอบในห้องนี้"); 
-                    loginBtn.disabled = false;
-                    loginBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> เข้าสู่ระบบและเริ่มทำข้อสอบ`;
-                    return; 
+                // ถ้ายังไม่เผยแพร่ ให้พาไปที่ห้องรอสอบ (Waiting Room) ใน Portal ทันที
+                if (!accessData.is_published) {
+                    alert("⏳ ข้อสอบในห้องนี้ยังไม่เริ่มสอบ (รออาจารย์กดเผยแพร่)\nระบบจะนำท่านเข้าสู่ 'ห้องรอสอบ'");
+                    window.location.href = `student-portal.html?code=${encodeURIComponent(examCode)}`;
+                    return;
                 }
 
-                let questions = data;
-                let examTitle = '';
-                if (data.questions && Array.isArray(data.questions)) {
-                    questions = data.questions;
-                    examTitle = data.examTitle || '';
-                }
+                // ถ้าเผยแพร่แล้ว ให้เปิดข้อสอบทันที
+                await launchExamDirectly(examCode, accessData.roomId);
 
-                if (questions.length === 0) { 
-                    alert("❌ ไม่พบข้อสอบในห้องรหัสนี้"); 
-                    loginBtn.disabled = false;
-                    loginBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> เข้าสู่ระบบและเริ่มทำข้อสอบ`;
-                    return; 
-                }
-
-                // Show exam title badge
-                if (examTitle) {
-                    const badge = document.getElementById('exam-title-display');
-                    badge.textContent = '🏷️ ' + examTitle;
-                    badge.classList.remove('hidden');
-                }
-
-                if (settings.randomize === 1) {
-                    examQuestions = shuffleArray(questions);
-                    shouldRandomizeChoices = true;
-                } else {
-                    examQuestions = questions;
-                    shouldRandomizeChoices = false;
-                }
-
-                fetch('/api/log-student-login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ studentId: currentStudentId, name: currentStudentName, class: currentStudentClass, roomId: currentRoomId })
-                }).catch(e => console.error(e));
-
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('exam-screen').classList.remove('hidden');
-
-                document.getElementById('student-identity-display').innerHTML = `ผู้ทำข้อสอบ: <strong class="text-slate-800">${escapeHtml(currentStudentName)}</strong> | รหัส: <strong class="text-slate-800">${escapeHtml(currentStudentId)}</strong> | ชั้นเรียน: <strong class="text-slate-800">${escapeHtml(currentStudentClass)}</strong>`;
-
-                initAntiCheatProtection();
-                initTabSwitchMonitoring();
-                startExamTimer(settings.duration);
-                startAnnouncementStream(settings.announcement);
-                startWarningStream();
-                startPublishStatusCheck();
-                renderExamQuestions();
             } catch(e) {
                 console.error(e);
                 alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> เข้าสู่ระบบและเริ่มทำข้อสอบ`;
             }
+        }
+
+        // สำหรับปุ่มเดิม
+        function startExam() {
+            handleLoginAndEnter(false);
+        }
+
+        async function launchExamDirectly(examCode, explicitRoomId) {
+            let roomId = explicitRoomId;
+            if (!roomId && examCode) {
+                const queryUrl = `/api/student/get-room-by-code?examCode=${encodeURIComponent(examCode)}`;
+                const codeRes = await fetch(queryUrl);
+                const codeData = await codeRes.json();
+                if (!codeRes.ok) {
+                    alert(codeData.message || "❌ ไม่พบรหัส PIN หรือข้อสอบสำหรับรหัสนี้");
+                    return;
+                }
+                roomId = codeData.roomId;
+            }
+
+            currentRoomId = roomId;
+
+            const settingsRes = await fetch(`/api/room-settings?roomId=${currentRoomId}`);
+            const settings = await settingsRes.json();
+            showScoreSetting = settings.showScore;
+
+            const res = await fetch(`/api/get-questions?roomId=${currentRoomId}`);
+            const data = await res.json();
+            if (!res.ok) { 
+                alert(data.message || "❌ ไม่พบข้อสอบในห้องนี้ หรือยังไม่เปิดเผยแพร่"); 
+                window.location.href = `student-portal.html?code=${encodeURIComponent(examCode || '')}`;
+                return; 
+            }
+
+            let questions = data;
+            let examTitle = '';
+            if (data.questions && Array.isArray(data.questions)) {
+                questions = data.questions;
+                examTitle = data.examTitle || '';
+            }
+
+            if (questions.length === 0) { 
+                alert("❌ ไม่พบข้อสอบในห้องรหัสนี้"); 
+                return; 
+            }
+
+            if (examTitle) {
+                const badge = document.getElementById('exam-title-display');
+                badge.textContent = '🏷️ ' + examTitle;
+                badge.classList.remove('hidden');
+            }
+
+            if (settings.randomize === 1) {
+                examQuestions = shuffleArray(questions);
+                shouldRandomizeChoices = true;
+            } else {
+                examQuestions = questions;
+                shouldRandomizeChoices = false;
+            }
+
+            fetch('/api/log-student-login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ studentId: currentStudentId, name: currentStudentName, class: currentStudentClass, roomId: currentRoomId })
+            }).catch(e => console.error(e));
+
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('exam-screen').classList.remove('hidden');
+
+            document.getElementById('student-identity-display').innerHTML = `ผู้ทำข้อสอบ: <strong class="text-slate-800">${escapeHtml(currentStudentName)}</strong> | รหัส: <strong class="text-slate-800">${escapeHtml(currentStudentId)}</strong> | ชั้นเรียน: <strong class="text-slate-800">${escapeHtml(currentStudentClass)}</strong>`;
+
+            initAntiCheatProtection();
+            initTabSwitchMonitoring();
+            startExamTimer(settings.duration);
+            startAnnouncementStream(settings.announcement);
+            startWarningStream();
+            startPublishStatusCheck();
+            renderExamQuestions();
         }
 
         function renderExamQuestions() {
