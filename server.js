@@ -1105,7 +1105,7 @@ app.post('/api/student/check-exam-access', (req, res) => {
         }
 
         // 2. ดึงข้อมูลนักศึกษาในระบบ
-        db.get('SELECT studentId, firstName, lastName, class FROM students WHERE studentId = ? OR REPLACE(studentId, "-", "") = ?',
+        db.get("SELECT studentId, firstName, lastName, class FROM students WHERE studentId = ? OR REPLACE(studentId, '-', '') = ?",
             [cleanStudentId, normStudentId], (err2, student) => {
             if (err2) return res.status(500).json({ success: false, message: err2.message });
             if (!student) {
@@ -1666,6 +1666,36 @@ app.post('/api/teacher/update-exam-title', (req, res) => {
         console.log(`🏷️ [ห้อง: ${roomId}] ตั้งชื่อการสอบเป็น: "${examTitle}"`);
         syncRoomToLibrary(roomId);
         res.json({ success: true });
+    });
+});
+
+// 🗑️ API สำหรับลบ/ปิดห้องสอบของอาจารย์
+app.delete('/api/teacher/room', (req, res) => {
+    const { username, roomId } = req.body;
+    if (!roomId) return res.status(400).json({ message: "กรุณาระบุรหัสห้องสอบ (roomId)" });
+
+    db.serialize(() => {
+        let deleteRoomSql = "DELETE FROM teacher_rooms WHERE roomId = ?";
+        let params = [roomId];
+
+        if (username && username !== 'admin') {
+            deleteRoomSql += " AND teacherUsername = ?";
+            params.push(username);
+        }
+
+        db.run(deleteRoomSql, params, function(err) {
+            if (err) return res.status(500).json({ message: err.message });
+
+            // ลบข้อมูลที่เกี่ยวข้องกับห้องสอบนี้ทั้งหมด
+            db.run('DELETE FROM questions WHERE roomId = ?', [roomId]);
+            db.run('DELETE FROM exam_results WHERE roomId = ?', [roomId]);
+            db.run('DELETE FROM cheat_logs WHERE roomId = ?', [roomId]);
+            db.run('DELETE FROM student_warnings WHERE roomId = ?', [roomId]);
+            db.run('DELETE FROM student_logins WHERE roomId = ?', [roomId]);
+
+            console.log(`🗑️ [ห้อง: ${roomId}] ลบห้องสอบสำเร็จ`);
+            res.json({ success: true, message: "ลบห้องสอบเรียบร้อยแล้ว" });
+        });
     });
 });
 
