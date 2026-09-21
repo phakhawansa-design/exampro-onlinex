@@ -647,19 +647,6 @@ app.post('/api/teacher/create-room', (req, res) => {
     });
 });
 
-// 🗑️ API ลบห้องสอบ
-app.delete('/api/teacher/room', (req, res) => {
-    const { username, roomId } = req.body;
-    if (!username || !roomId) return res.status(400).json({ message: "ข้อมูลไม่ครบถ้วน" });
-
-    db.run('DELETE FROM questions WHERE roomId = ?', [roomId], () => {
-        db.run('DELETE FROM teacher_rooms WHERE roomId = ? AND (teacherUsername = ? OR ? = "admin")', [roomId, username, username], function(err) {
-            if (err) return res.status(500).json({ message: err.message });
-            waitingStudentsTracker.delete(roomId);
-            res.json({ success: true, message: "ลบห้องสอบเรียบร้อยแล้ว" });
-        });
-    });
-});
 
 // 👥 ดึงรายชื่อและจำนวนนักศึกษาที่กำลังรอสอบอยู่ในห้อง (Real-time Waiting Counter)
 app.get('/api/teacher/waiting-students', (req, res) => {
@@ -1693,6 +1680,9 @@ app.delete('/api/teacher/room', (req, res) => {
             db.run('DELETE FROM student_warnings WHERE roomId = ?', [roomId]);
             db.run('DELETE FROM student_logins WHERE roomId = ?', [roomId]);
 
+            if (typeof waitingStudentsTracker !== 'undefined' && waitingStudentsTracker) {
+                waitingStudentsTracker.delete(roomId);
+            }
             console.log(`🗑️ [ห้อง: ${roomId}] ลบห้องสอบสำเร็จ`);
             res.json({ success: true, message: "ลบห้องสอบเรียบร้อยแล้ว" });
         });
