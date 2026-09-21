@@ -541,7 +541,7 @@ app.get('/api/teacher/rooms', (req, res) => {
     // หากเป็น admin ให้ดึงห้องของอาจารย์ทุกคน
     if (username === 'admin') {
         const sqlQuery = `
-            SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published, tr.duration, tr.courseId, tr.teacherUsername,
+            SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published, tr.duration, tr.courseId, tr.teacherUsername, tr.announcement,
                    c.courseCode, c.courseName,
                    (SELECT COUNT(*) FROM questions q WHERE q.roomId = tr.roomId) as questionCount
             FROM teacher_rooms tr
@@ -555,7 +555,7 @@ app.get('/api/teacher/rooms', (req, res) => {
     }
 
     const sqlQuery = `
-        SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published, tr.duration, tr.courseId,
+        SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published, tr.duration, tr.courseId, tr.announcement,
                c.courseCode, c.courseName,
                (SELECT COUNT(*) FROM questions q WHERE q.roomId = tr.roomId) as questionCount
         FROM teacher_rooms tr
@@ -2039,7 +2039,17 @@ app.get('/api/room-settings', (req, res) => {
     const roomId = req.query.roomId;
     if (!roomId) return res.status(400).json({ message: "กรุณาระบุ roomId" });
 
-    db.get('SELECT randomize, duration, announcement, show_score, show_leaderboard, exam_title, exam_code, roomName FROM teacher_rooms WHERE roomId = ?', [roomId], (err, row) => {
+    const sql = `
+        SELECT tr.randomize, tr.duration, tr.announcement, tr.show_score, tr.show_leaderboard,
+               tr.exam_title, tr.exam_code, tr.roomName, tr.is_published, tr.courseId,
+               c.courseCode, c.courseName,
+               (SELECT COUNT(*) FROM questions q WHERE q.roomId = tr.roomId) as questionCount
+        FROM teacher_rooms tr
+        LEFT JOIN courses c ON c.id = tr.courseId
+        WHERE tr.roomId = ?
+    `;
+
+    db.get(sql, [roomId], (err, row) => {
         if (err) return res.status(500).json({ message: err.message });
         res.json({
             randomize: row ? row.randomize : 1,
@@ -2048,15 +2058,20 @@ app.get('/api/room-settings', (req, res) => {
             showScore: row ? (row.show_score !== undefined ? row.show_score : 1) : 1,
             showLeaderboard: row ? (row.show_leaderboard !== undefined ? row.show_leaderboard : 1) : 1,
             examTitle: row ? (row.exam_title || '') : '',
-            examCode: row ? (row.exam_code || row.examCode || '') : '',
-            roomName: row ? (row.roomName || '') : ''
+            examCode: row ? (row.exam_code || '') : '',
+            roomName: row ? (row.roomName || '') : '',
+            is_published: row ? (row.is_published || 0) : 0,
+            courseId: row ? (row.courseId || 0) : 0,
+            courseCode: row ? (row.courseCode || '') : '',
+            courseName: row ? (row.courseName || '') : '',
+            questionCount: row ? (row.questionCount || 0) : 0
         });
     });
 });
 
 // อัปเดตการตั้งค่าห้องสอบ
 app.post('/api/teacher/update-room-settings', (req, res) => {
-    const { roomId, randomize, duration, announcement, showScore, showLeaderboard, examCode, examTitle, roomName } = req.body;
+    const { roomId, randomize, duration, announcement, showScore, showLeaderboard, examCode, examTitle, roomName, courseId } = req.body;
     if (!roomId) return res.status(400).json({ message: "กรุณาระบุ roomId" });
 
     db.run(
@@ -2068,17 +2083,20 @@ app.post('/api/teacher/update-room-settings', (req, res) => {
             show_leaderboard = ?, 
             exam_code = COALESCE(?, exam_code), 
             exam_title = COALESCE(?, exam_title), 
-            roomName = COALESCE(?, roomName) 
+            roomName = COALESCE(?, roomName),
+            courseId = CASE WHEN ? IS NOT NULL THEN ? ELSE courseId END
         WHERE roomId = ?`,
         [
             randomize !== undefined ? randomize : 1, 
             duration !== undefined ? duration : 0, 
-            announcement || '', 
+            announcement !== undefined ? announcement : '', 
             showScore !== undefined ? showScore : 1, 
             showLeaderboard !== undefined ? showLeaderboard : 1, 
             examCode !== undefined ? examCode : '',
             examTitle !== undefined ? examTitle : '',
             roomName !== undefined ? roomName : '',
+            courseId !== undefined ? courseId : null,
+            courseId !== undefined ? courseId : null,
             roomId
         ],
         function(err) {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kahoot! Creator Studio - Tab-Lock Exam</title>
+    <title>สร้างและจัดการข้อสอบ - Tab-Lock Exam</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -11,7 +11,7 @@
         * { box-sizing: border-box; }
         body {
             font-family: 'Kanit', 'Inter', sans-serif;
-            background: #f1f5f9;
+            background: #f8fafc;
             color: #1e293b;
             margin: 0;
             padding: 0;
@@ -21,743 +21,509 @@
             flex-direction: column;
         }
 
-        /* Kahoot Brand Colors */
-        .kahoot-red    { background-color: #e21b3c; color: white; }
-        .kahoot-blue   { background-color: #1368ce; color: white; }
-        .kahoot-yellow { background-color: #d89e00; color: white; }
-        .kahoot-green  { background-color: #26890c; color: white; }
-
-        .kahoot-border-red    { border-color: #e21b3c; }
-        .kahoot-border-blue   { border-color: #1368ce; }
-        .kahoot-border-yellow { border-color: #d89e00; }
-        .kahoot-border-green  { border-color: #26890c; }
-
-        /* Studio Canvas Background (Soft Playful Gradient like Kahoot) */
-        .studio-canvas {
-            background: radial-gradient(circle at 50% 20%, #818cf8 0%, #6366f1 35%, #4338ca 70%, #312e81 100%);
-            background-attachment: fixed;
-            position: relative;
-        }
-
-        /* Slide Card Active Glow */
-        .slide-card {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-        }
-        .slide-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-        }
-        .slide-card.active {
-            border-color: #3b82f6 !important;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4), 0 8px 20px rgba(0,0,0,0.15) !important;
-            background-color: #eff6ff !important;
-        }
-
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.5); border-radius: 9999px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.8); }
 
-        /* Checkbox circle for correct answers */
-        .answer-check-btn {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            border: 3px solid #cbd5e1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
+        /* Slide item card */
+        .slide-item {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
-            background: white;
-            flex-shrink: 0;
         }
-        .answer-check-btn:hover {
-            border-color: #64748b;
-            transform: scale(1.08);
+        .slide-item:hover {
+            transform: translateY(-1px);
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
-        .answer-check-btn.checked {
-            border-color: #10b981 !important;
-            background: #10b981 !important;
-            color: white !important;
-            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.3);
+        .slide-item.active {
+            border-color: #4f46e5 !important;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2), 0 4px 12px rgba(79, 70, 229, 0.1) !important;
+            background-color: #eef2ff !important;
         }
 
-        /* Right panel select styling */
-        .prop-select {
+        /* Choice Card Styling */
+        .choice-card {
+            transition: all 0.15s ease-in-out;
+            background-color: #ffffff;
+            border: 2px solid #e2e8f0;
+        }
+        .choice-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .choice-card.is-correct {
+            border-color: #10b981 !important;
+            background-color: #f0fdf4 !important;
+            box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2);
+        }
+        .choice-card.is-correct .choice-badge {
+            background-color: #10b981 !important;
+            color: #ffffff !important;
+        }
+
+        /* Correct answer toggle button */
+        .correct-toggle-btn {
+            padding: 6px 12px;
+            border-radius: 12px;
+            border: 1.5px solid #cbd5e1;
+            font-size: 12px;
+            font-weight: 800;
+            color: #64748b;
+            background: white;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            shrink: 0;
+            user-select: none;
+        }
+        .correct-toggle-btn:hover {
+            border-color: #10b981;
+            color: #059669;
+        }
+        .correct-toggle-btn.active {
+            border-color: #10b981 !important;
+            background-color: #10b981 !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Sidebar Select and Input styles */
+        .setting-input {
             width: 100%;
             padding: 8px 12px;
-            border-radius: 10px;
+            border-radius: 12px;
             border: 1.5px solid #e2e8f0;
             background-color: #ffffff;
             font-size: 13px;
             font-weight: 600;
             color: #1e293b;
             outline: none;
-            cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.15s;
         }
-        .prop-select:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        .setting-input:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
         }
     </style>
 </head>
 <body class="flex flex-col h-screen overflow-hidden select-none">
 
     <!-- ======================================================== -->
-    <!-- 1. TOP HEADER BAR (Kahoot! Go Style)                     -->
+    <!-- 1. TOP HEADER BAR                                        -->
+    <!-- TabLock Clean Professional Design                        -->
     <!-- ======================================================== -->
-    <header class="h-16 bg-white border-b border-slate-200 px-4 md:px-6 flex items-center justify-between shrink-0 shadow-sm z-30">
-        <!-- Left: Logo & Room selector -->
-        <div class="flex items-center gap-3 md:gap-4">
-            <a href="dashboard.html" class="flex items-center gap-2 group" title="กลับหน้าแดชบอร์ด">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 p-0.5 shadow-md group-hover:scale-105 transition">
+    <header class="h-16 bg-white border-b border-slate-200 px-4 md:px-6 flex items-center justify-between shrink-0 shadow-xs z-30">
+        <!-- Left: Brand Logo & Title -->
+        <div class="flex items-center gap-3">
+            <a href="dashboard.html" class="flex items-center gap-2.5 group" title="กลับหน้าหลักแดชบอร์ด">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-purple-600 p-0.5 shadow-sm group-hover:scale-105 transition">
                     <div class="w-full h-full bg-white rounded-[10px] flex items-center justify-center">
-                        <span class="font-black text-lg bg-gradient-to-r from-indigo-600 to-pink-600 bg-clip-text text-transparent">TL</span>
+                        <span class="font-black text-lg bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">TL</span>
                     </div>
-                </div>
-                <div class="hidden sm:block">
-                    <div class="font-black text-base text-slate-800 tracking-tight leading-none flex items-center gap-1.5">
-                        <span>TabLock</span>
-                        <span class="text-[10px] uppercase font-black px-1.5 py-0.5 bg-indigo-100 text-indigo-700 rounded-md">Creator</span>
-                    </div>
-                    <span class="text-[10px] text-slate-400 font-bold" id="header-teacher-name">อาจารย์ผู้สอน</span>
                 </div>
             </a>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="font-black text-lg sm:text-xl text-slate-900 tracking-tight leading-none">
+                        ระบบสร้างข้อสอบ
+                    </h1>
+                    <span class="text-[10px] uppercase font-black px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-md">Creator</span>
+                </div>
+                <span class="text-[11px] text-slate-400 font-semibold" id="header-teacher-name">อาจารย์ผู้สอน</span>
+            </div>
+        </div>
 
-            <div class="h-6 w-px bg-slate-200 hidden md:block"></div>
-
-            <!-- Room Selector Dropdown & Rename -->
-            <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
-                <span class="text-xs font-bold text-slate-500 pl-2 hidden lg:inline">ห้อง:</span>
-                <select id="room-selector" onchange="onRoomChange()" class="bg-transparent text-xs sm:text-sm font-extrabold text-slate-800 outline-none cursor-pointer pr-2">
-                    <option value="">กำลังโหลดห้องสอบ...</option>
+        <!-- Center: 1. เลือกรายวิชา & ชื่อชุดข้อสอบ -->
+        <div class="flex items-center gap-2 sm:gap-3 flex-1 max-w-2xl mx-4 justify-center">
+            <!-- 1. เลือกรายวิชาที่จะนำข้อสอบไปเก็บไว้ -->
+            <div class="flex items-center gap-1.5 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 transition">
+                <label for="top-course-selector" class="text-xs font-black text-slate-600 shrink-0 flex items-center gap-1">
+                    <span>📚</span> <span class="hidden md:inline">รายวิชา:</span>
+                </label>
+                <select id="top-course-selector" onchange="onCourseChanged(this.value)" class="bg-transparent text-xs sm:text-sm font-black text-slate-800 outline-none cursor-pointer max-w-[150px] sm:max-w-[220px] truncate">
+                    <option value="">กำลังโหลดรายวิชา...</option>
                 </select>
-                <button onclick="renameCurrentRoom()" title="แก้ไขชื่อห้อง" class="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-white rounded-lg transition text-xs">
-                    ✏️
-                </button>
-                <button onclick="openCreateRoomModal()" title="สร้างห้องสอบใหม่" class="px-2.5 py-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg text-xs font-black shadow-xs transition active:scale-95 flex items-center gap-1">
-                    <span>+</span><span class="hidden md:inline">ห้องใหม่</span>
-                </button>
+            </div>
+
+            <!-- ชื่อชุดข้อสอบ -->
+            <div class="relative flex-1 max-w-xs sm:max-w-sm hidden sm:block">
+                <input type="text" id="top-exam-title" 
+                    placeholder="กรอกชื่อชุดข้อสอบ (เช่น สอบปลายภาค)..." 
+                    class="w-full px-3.5 py-1.5 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 focus:border-indigo-500 rounded-xl text-xs sm:text-sm font-bold text-slate-800 outline-none transition shadow-inner">
             </div>
         </div>
 
-        <!-- Center: Quick Settings & Lounge Actions -->
-        <div class="hidden lg:flex items-center gap-2">
-            <!-- Exam Title Input -->
-            <div class="relative flex items-center">
-                <input type="text" id="top-exam-title" onchange="updateRoomExamTitle(this.value)" 
-                    placeholder="กรอกชื่อการสอบ / รหัสวิชา..." 
-                    class="w-56 xl:w-72 px-3 py-1.5 bg-slate-100 hover:bg-slate-50 focus:bg-white border border-slate-200 focus:border-indigo-400 rounded-xl text-xs font-bold text-slate-700 outline-none transition text-center shadow-inner">
-            </div>
-
-            <!-- Settings Button -->
-            <button onclick="openExamSettingsModal()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer active:scale-95">
-                <span>⚙️</span>
-                <span>การตั้งค่า</span>
-            </button>
-
-            <!-- Select From Library -->
-            <button onclick="openSelectFromLibraryModal()" class="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer active:scale-95">
-                <span>📚</span>
-                <span>คลังข้อสอบ</span>
-            </button>
-
-            <!-- Waiting Lounge PIN / QR Modal Button -->
-            <button onclick="openWaitingLoungeModal()" class="px-3.5 py-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-xl text-xs font-black transition shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95">
-                <span>📱</span>
-                <span>ห้องรอสอบ (PIN/QR)</span>
-            </button>
-        </div>
-
-        <!-- Right: Exit & Save Buttons -->
+        <!-- Right: 4. ปุ่มบันทึก & ออก (ไม่มี QR Code ใดๆ) -->
         <div class="flex items-center gap-2">
-            <a href="dashboard.html" class="px-3 py-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl text-xs sm:text-sm font-bold transition active:scale-95">
+            <a href="dashboard.html" class="px-3.5 py-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl text-xs sm:text-sm font-bold transition active:scale-95">
                 ออก
             </a>
-            <button onclick="saveKahootQuestions()" id="btn-save-all" class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs sm:text-sm font-black shadow-md shadow-emerald-600/25 transition active:scale-95 flex items-center gap-1.5 cursor-pointer">
+            <!-- ปุ่มกดบันทึกเข้าสู่วิชา -->
+            <button onclick="saveQuestionsToCourse()" id="btn-save-course" class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs sm:text-sm font-black shadow-md shadow-emerald-600/25 transition active:scale-95 flex items-center gap-1.5 cursor-pointer">
                 <span>💾</span>
-                <span>บันทึก</span>
+                <span>บันทึกข้อสอบ</span>
             </button>
         </div>
     </header>
 
     <!-- ======================================================== -->
-    <!-- 2. MAIN WORKSPACE: 3-COLUMN STUDIO LAYOUT                -->
+    <!-- 2. MAIN 3-PANEL LAYOUT (TabLock Style)                   -->
+    <!-- Left: Questions List | Center: Question Editor | Right: Settings -->
     <!-- ======================================================== -->
     <div class="flex-1 flex overflow-hidden relative">
 
         <!-- ---------------------------------------------------- -->
-        <!-- 2.1 LEFT SIDEBAR: QUESTION SLIDES NAVIGATOR          -->
+        <!-- 2.1 LEFT SIDEBAR: รายการข้อสอบ (Question Navigator)  -->
         <!-- ---------------------------------------------------- -->
-        <aside class="w-48 sm:w-56 lg:w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 z-20 shadow-xs">
-            <!-- Sidebar Header / Slide Count -->
-            <div class="p-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
-                <span class="text-xs font-extrabold text-slate-700 flex items-center gap-1.5">
-                    <span>📑</span> ข้อสอบทั้งหมด (<span id="total-slides-count">1</span>)
+        <aside class="w-52 sm:w-60 lg:w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 z-20 shadow-xs">
+            <!-- Header -->
+            <div class="p-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
+                <span class="text-xs font-black text-slate-700 flex items-center gap-1.5">
+                    <span>📑</span> ข้อสอบทั้งหมด (<span id="total-questions-count">1</span>)
                 </span>
-                <button onclick="openFastImportModal()" title="วางข้อความจาก Word หรือข้อสอบสำเร็จรูป" class="text-[11px] text-indigo-600 hover:text-indigo-800 font-extrabold flex items-center gap-1 cursor-pointer">
-                    <span>📋 วางด่วน</span>
-                </button>
+                <span id="course-tag-badge" class="text-[10px] font-black text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md truncate max-w-[100px]">
+                    วิชา...
+                </span>
             </div>
 
-            <!-- Scrollable Slide Thumbnails List -->
-            <div id="slides-list-container" class="flex-1 overflow-y-auto p-3 space-y-2.5">
-                <!-- Slide cards rendered dynamically -->
+            <!-- Scrollable Questions List -->
+            <div id="questions-list-container" class="flex-1 overflow-y-auto p-3 space-y-2">
+                <!-- Question cards dynamically rendered -->
             </div>
 
-            <!-- Bottom Add Question Button -->
+            <!-- Bottom Actions: + เพิ่มคำถาม & นำเข้า Excel (.xlsx) -->
             <div class="p-3 border-t border-slate-200 bg-white space-y-2">
-                <button onclick="addKahootQuestion()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md shadow-blue-600/20 transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+                <button onclick="addNewQuestion()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-sm shadow-indigo-600/20 transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
                     <span class="text-base leading-none">+</span>
-                    <span>เพิ่มคำถาม</span>
+                    <span>เพิ่มข้อสอบใหม่</span>
                 </button>
-                <button onclick="openSelectFromLibraryModal()" class="w-full py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl font-extrabold text-xs transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
-                    <span>✨</span>
-                    <span>ดึงจากคลังข้อสอบ</span>
+
+                <!-- นำเข้าเฉพาะไฟล์ Excel (.xlsx) ตามที่ผู้ใช้ระบุ -->
+                <button onclick="triggerExcelImport()" class="w-full py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl font-black text-xs transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer" title="นำเข้าไฟล์ข้อสอบ Excel (.xlsx)">
+                    <span>📊</span>
+                    <span>นำเข้าจาก Excel (.xlsx)</span>
                 </button>
+
+                <!-- ดาวน์โหลดไฟล์แม่แบบ Excel ตัวอย่าง -->
+                <div class="text-center pt-0.5">
+                    <button onclick="downloadSampleExcel()" class="text-[10px] text-slate-400 hover:text-indigo-600 font-bold transition hover:underline">
+                        📥 ดาวน์โหลดตัวอย่างไฟล์ .xlsx
+                    </button>
+                </div>
+
+                <!-- Hidden Excel File Input -->
+                <input type="file" id="excel-file-input" accept=".xlsx, .xls" onchange="handleExcelFileSelected(this)" class="hidden">
             </div>
         </aside>
 
         <!-- ---------------------------------------------------- -->
-        <!-- 2.2 CENTER STAGE: KAHOOT EDITING CANVAS              -->
+        <!-- 2.2 CENTER STAGE: กระดานสร้างข้อสอบ (TabLock Style)  -->
         <!-- ---------------------------------------------------- -->
-        <main class="flex-1 studio-canvas overflow-y-auto p-4 md:p-6 lg:p-8 flex flex-col justify-between items-center relative">
-
-            <!-- Mobile Bar for Quick Properties/Settings -->
-            <div class="w-full max-w-5xl flex lg:hidden items-center justify-between gap-2 pb-3">
-                <button onclick="openExamSettingsModal()" class="px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-lg text-xs font-bold text-slate-800 shadow-sm">
-                    ⚙️ ตั้งค่าห้อง
-                </button>
-                <button onclick="openWaitingLoungeModal()" class="px-3 py-1.5 bg-cyan-600 text-white rounded-lg text-xs font-black shadow-sm">
-                    📱 PIN / QR รอสอบ
-                </button>
-                <button onclick="togglePropertiesSidebar()" class="px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-lg text-xs font-bold text-slate-800 shadow-sm">
-                    ⚙️ คุณสมบัติข้อสอบ
+        <main class="flex-1 bg-slate-100 overflow-y-auto p-4 md:p-6 lg:p-8 flex flex-col justify-between items-center">
+            
+            <!-- Mobile Bar: สลับแท็บตั้งค่าบนจอเล็ก -->
+            <div class="w-full max-w-4xl flex lg:hidden items-center justify-between pb-3">
+                <span class="text-xs font-black text-slate-700">ข้อที่ <span id="mobile-q-index">1</span></span>
+                <button onclick="toggleSettingsSidebar()" class="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 shadow-xs">
+                    ⚡ การตั้งค่า
                 </button>
             </div>
 
-            <div class="w-full max-w-5xl space-y-4 my-auto">
+            <!-- Clean Centered Exam Card (TabLock White Card) -->
+            <div class="w-full max-w-4xl space-y-4 my-auto bg-white rounded-3xl p-5 sm:p-7 shadow-sm border border-slate-200/90">
+                
+                <!-- TOP: Question Header & Number -->
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                    <div class="flex items-center gap-2">
+                        <span class="px-3 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 font-black text-xs rounded-xl">
+                            ข้อที่ <span id="current-question-num">1</span>
+                        </span>
+                        <span id="current-question-type-badge" class="text-[11px] font-bold text-slate-500">
+                            ปรนัย 4 ตัวเลือก
+                        </span>
+                    </div>
 
-                <!-- TOP: BIG QUESTION TITLE INPUT (Centered White Card) -->
-                <div class="bg-white rounded-2xl md:rounded-3xl shadow-2xl p-4 md:p-6 border border-white/40 backdrop-blur-md">
-                    <input type="text" id="kahoot-question-input" 
-                        oninput="onCurrentQuestionTextChanged(this.value)"
-                        placeholder="เริ่มพิมพ์คำถามของคุณ..."
-                        class="w-full text-center font-black text-base sm:text-xl md:text-2xl text-slate-800 outline-none placeholder-slate-400 bg-transparent border-b-2 border-transparent focus:border-indigo-400 pb-1 transition">
+                    <div class="flex items-center gap-1.5 text-xs">
+                        <button onclick="toggleTrueFalseMode()" id="btn-toggle-tf" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition active:scale-95">
+                            🔄 สลับเป็น ถูก/ผิด
+                        </button>
+                    </div>
                 </div>
 
-                <!-- MIDDLE: MEDIA DRAG & DROP / UPLOAD BOX -->
-                <div class="flex justify-center">
-                    <div id="media-dropzone" class="w-full max-w-md min-h-[160px] md:min-h-[190px] rounded-2xl md:rounded-3xl bg-white/80 border-2 border-dashed border-indigo-200 hover:border-indigo-400 backdrop-blur-md p-4 flex flex-col items-center justify-center text-center shadow-lg transition relative overflow-hidden group">
-                        
-                        <!-- Empty Media State -->
-                        <div id="media-empty-state" class="space-y-2 cursor-pointer" onclick="triggerQuestionImageUpload()">
-                            <div class="w-14 h-14 mx-auto rounded-2xl bg-indigo-100/70 border border-indigo-200/80 flex items-center justify-center text-2xl shadow-inner group-hover:scale-110 transition">
-                                🖼️
-                            </div>
-                            <div>
-                                <div class="text-sm font-extrabold text-indigo-900 flex items-center justify-center gap-1">
-                                    <span class="text-base leading-none">+</span> ค้นหาและใส่สื่อ
-                                </div>
-                                <div class="text-[11px] text-slate-500 font-semibold mt-0.5">
-                                    อัปโหลดไฟล์ หรือลากมาที่นี่เพื่ออัปโหลด
-                                </div>
-                            </div>
+                <!-- QUESTION TITLE TEXTAREA -->
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-extrabold text-slate-500 uppercase tracking-wider">โจทย์คำถาม</label>
+                    <textarea id="question-text-input" rows="3"
+                        oninput="onQuestionTextChanged(this.value)"
+                        placeholder="พิมพ์โจทย์คำถามที่นี่..."
+                        class="w-full p-3.5 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 focus:border-indigo-500 rounded-2xl text-sm sm:text-base font-bold text-slate-800 outline-none transition leading-relaxed placeholder-slate-400"></textarea>
+                </div>
+
+                <!-- QUESTION IMAGE ATTACHMENT BOX -->
+                <div class="flex flex-col items-center">
+                    <div id="question-media-box" class="w-full rounded-2xl bg-slate-50 border-2 border-dashed border-slate-200 hover:border-indigo-400 p-4 flex flex-col items-center justify-center text-center transition relative overflow-hidden group">
+                        <!-- Empty State -->
+                        <div id="media-empty-state" class="cursor-pointer py-1" onclick="triggerQuestionImageUpload()">
+                            <div class="text-2xl mb-1">📷</div>
+                            <div class="text-xs font-bold text-indigo-700">แนบรูปภาพประกอบโจทย์ (ถ้ามี)</div>
+                            <div class="text-[10px] text-slate-400 font-semibold mt-0.5">คลิกเพื่ออัปโหลดไฟล์รูปภาพ (JPG, PNG, GIF)</div>
                         </div>
 
-                        <!-- Preview Media State -->
-                        <div id="media-preview-state" class="hidden w-full h-full flex flex-col items-center justify-center relative">
-                            <img id="media-preview-img" src="" alt="Question Media" class="max-h-40 md:max-h-48 object-contain rounded-xl shadow-md border border-slate-200 bg-white">
-                            <button onclick="removeQuestionImage()" class="mt-2 px-3 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl text-xs font-bold transition shadow-sm active:scale-95 flex items-center gap-1">
-                                🗑️ ลบรูปภาพ
+                        <!-- Preview State -->
+                        <div id="media-preview-state" class="hidden w-full flex flex-col items-center justify-center">
+                            <img id="media-preview-img" src="" alt="Question Image" class="max-h-48 object-contain rounded-xl border border-slate-200 bg-white p-1 shadow-xs">
+                            <button onclick="removeQuestionImage()" class="mt-2 px-3 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl text-xs font-bold transition shadow-xs active:scale-95 flex items-center gap-1">
+                                🗑️ ลบรูปภาพนี้
                             </button>
                         </div>
 
-                        <!-- Hidden File Input -->
                         <input type="file" id="question-image-file-input" accept="image/*" onchange="handleQuestionImageSelected(this)" class="hidden">
                     </div>
                 </div>
 
-                <!-- BOTTOM: 4 KAHOOT ANSWER TILES (2x2 Grid) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 pt-1">
+                <!-- CHOICES SECTION: ก. ข. ค. ง. (TabLock Professional Design) -->
+                <div class="space-y-2.5 pt-1">
+                    <label class="block text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center justify-between">
+                        <span>ตัวเลือกคำตอบและเฉลย</span>
+                        <span class="text-[10px] text-emerald-600 font-bold font-normal">คลิก "✓ เฉลย" ที่ตัวเลือกที่ถูกต้อง</span>
+                    </label>
 
-                    <!-- Tile 1: RED (Triangle ▲) -->
-                    <div class="bg-white rounded-2xl p-2.5 sm:p-3 shadow-xl border-2 border-transparent hover:border-rose-400 transition flex items-center gap-3">
-                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl kahoot-red flex items-center justify-center font-black text-xl shadow-md shrink-0">
-                            ▲
-                        </div>
-                        <input type="text" id="choice-input-0" 
-                            oninput="onCurrentChoiceTextChanged(0, this.value)"
-                            placeholder="เพิ่มคำตอบ 1" 
-                            class="flex-1 font-bold text-xs sm:text-sm md:text-base text-slate-800 outline-none placeholder-slate-400 bg-transparent">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="choices-grid-container">
                         
-                        <!-- Choice Image Upload & Preview -->
-                        <div class="shrink-0 flex items-center gap-1">
-                            <label class="p-1.5 sm:p-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs cursor-pointer transition select-none" title="แนบรูปตัวเลือก">
-                                🖼️
-                                <input type="file" accept="image/*" onchange="handleChoiceImageSelected(0, this)" class="hidden">
-                            </label>
-                            <img id="choice-preview-img-0" src="" class="hidden w-8 h-8 rounded-lg object-contain border border-slate-200">
+                        <!-- Choice ก. -->
+                        <div class="choice-card rounded-2xl p-3 flex items-center gap-2.5" id="choice-card-0">
+                            <div class="choice-badge w-9 h-9 rounded-xl bg-slate-100 text-slate-700 font-black text-sm flex items-center justify-center shrink-0">
+                                ก.
+                            </div>
+                            <input type="text" id="choice-text-0" 
+                                oninput="onChoiceTextChanged(0, this.value)"
+                                placeholder="พิมพ์ตัวเลือก ก..." 
+                                class="flex-1 font-bold text-xs sm:text-sm text-slate-800 outline-none bg-transparent placeholder-slate-400">
+                            
+                            <!-- Choice Image Attach -->
+                            <div class="shrink-0 flex items-center gap-1">
+                                <label class="p-1.5 hover:bg-slate-100 rounded-lg text-xs cursor-pointer transition" title="แนบรูปตัวเลือก">
+                                    📷
+                                    <input type="file" accept="image/*" onchange="handleChoiceImageSelected(0, this)" class="hidden">
+                                </label>
+                                <span id="choice-img-badge-0" class="hidden text-[10px] bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded font-bold">มีรูป</span>
+                            </div>
+
+                            <!-- Correct Answer Toggle -->
+                            <button type="button" id="choice-check-btn-0" onclick="setCorrectAnswer('a')" class="correct-toggle-btn">
+                                <span>✓ เฉลย</span>
+                            </button>
                         </div>
 
-                        <!-- Answer Check Toggle -->
-                        <button type="button" id="choice-check-btn-0" onclick="toggleCorrectAnswer('a')" class="answer-check-btn" title="เลือกเป็นข้อที่ถูกต้อง">
-                            <span class="text-sm font-black hidden">✓</span>
-                        </button>
+                        <!-- Choice ข. -->
+                        <div class="choice-card rounded-2xl p-3 flex items-center gap-2.5" id="choice-card-1">
+                            <div class="choice-badge w-9 h-9 rounded-xl bg-slate-100 text-slate-700 font-black text-sm flex items-center justify-center shrink-0">
+                                ข.
+                            </div>
+                            <input type="text" id="choice-text-1" 
+                                oninput="onChoiceTextChanged(1, this.value)"
+                                placeholder="พิมพ์ตัวเลือก ข..." 
+                                class="flex-1 font-bold text-xs sm:text-sm text-slate-800 outline-none bg-transparent placeholder-slate-400">
+                            
+                            <div class="shrink-0 flex items-center gap-1">
+                                <label class="p-1.5 hover:bg-slate-100 rounded-lg text-xs cursor-pointer transition" title="แนบรูปตัวเลือก">
+                                    📷
+                                    <input type="file" accept="image/*" onchange="handleChoiceImageSelected(1, this)" class="hidden">
+                                </label>
+                                <span id="choice-img-badge-1" class="hidden text-[10px] bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded font-bold">มีรูป</span>
+                            </div>
+
+                            <button type="button" id="choice-check-btn-1" onclick="setCorrectAnswer('b')" class="correct-toggle-btn">
+                                <span>✓ เฉลย</span>
+                            </button>
+                        </div>
+
+                        <!-- Choice ค. -->
+                        <div class="choice-card rounded-2xl p-3 flex items-center gap-2.5" id="choice-card-2">
+                            <div class="choice-badge w-9 h-9 rounded-xl bg-slate-100 text-slate-700 font-black text-sm flex items-center justify-center shrink-0">
+                                ค.
+                            </div>
+                            <input type="text" id="choice-text-2" 
+                                oninput="onChoiceTextChanged(2, this.value)"
+                                placeholder="พิมพ์ตัวเลือก ค..." 
+                                class="flex-1 font-bold text-xs sm:text-sm text-slate-800 outline-none bg-transparent placeholder-slate-400">
+                            
+                            <div class="shrink-0 flex items-center gap-1">
+                                <label class="p-1.5 hover:bg-slate-100 rounded-lg text-xs cursor-pointer transition" title="แนบรูปตัวเลือก">
+                                    📷
+                                    <input type="file" accept="image/*" onchange="handleChoiceImageSelected(2, this)" class="hidden">
+                                </label>
+                                <span id="choice-img-badge-2" class="hidden text-[10px] bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded font-bold">มีรูป</span>
+                            </div>
+
+                            <button type="button" id="choice-check-btn-2" onclick="setCorrectAnswer('c')" class="correct-toggle-btn">
+                                <span>✓ เฉลย</span>
+                            </button>
+                        </div>
+
+                        <!-- Choice ง. -->
+                        <div class="choice-card rounded-2xl p-3 flex items-center gap-2.5" id="choice-card-3">
+                            <div class="choice-badge w-9 h-9 rounded-xl bg-slate-100 text-slate-700 font-black text-sm flex items-center justify-center shrink-0">
+                                ง.
+                            </div>
+                            <input type="text" id="choice-text-3" 
+                                oninput="onChoiceTextChanged(3, this.value)"
+                                placeholder="พิมพ์ตัวเลือก ง..." 
+                                class="flex-1 font-bold text-xs sm:text-sm text-slate-800 outline-none bg-transparent placeholder-slate-400">
+                            
+                            <div class="shrink-0 flex items-center gap-1">
+                                <label class="p-1.5 hover:bg-slate-100 rounded-lg text-xs cursor-pointer transition" title="แนบรูปตัวเลือก">
+                                    📷
+                                    <input type="file" accept="image/*" onchange="handleChoiceImageSelected(3, this)" class="hidden">
+                                </label>
+                                <span id="choice-img-badge-3" class="hidden text-[10px] bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded font-bold">มีรูป</span>
+                            </div>
+
+                            <button type="button" id="choice-check-btn-3" onclick="setCorrectAnswer('d')" class="correct-toggle-btn">
+                                <span>✓ เฉลย</span>
+                            </button>
+                        </div>
+
                     </div>
-
-                    <!-- Tile 2: BLUE (Diamond ◆) -->
-                    <div class="bg-white rounded-2xl p-2.5 sm:p-3 shadow-xl border-2 border-transparent hover:border-blue-400 transition flex items-center gap-3">
-                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl kahoot-blue flex items-center justify-center font-black text-xl shadow-md shrink-0">
-                            ◆
-                        </div>
-                        <input type="text" id="choice-input-1" 
-                            oninput="onCurrentChoiceTextChanged(1, this.value)"
-                            placeholder="เพิ่มคำตอบ 2" 
-                            class="flex-1 font-bold text-xs sm:text-sm md:text-base text-slate-800 outline-none placeholder-slate-400 bg-transparent">
-                        
-                        <!-- Choice Image Upload & Preview -->
-                        <div class="shrink-0 flex items-center gap-1">
-                            <label class="p-1.5 sm:p-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs cursor-pointer transition select-none" title="แนบรูปตัวเลือก">
-                                🖼️
-                                <input type="file" accept="image/*" onchange="handleChoiceImageSelected(1, this)" class="hidden">
-                            </label>
-                            <img id="choice-preview-img-1" src="" class="hidden w-8 h-8 rounded-lg object-contain border border-slate-200">
-                        </div>
-
-                        <!-- Answer Check Toggle -->
-                        <button type="button" id="choice-check-btn-1" onclick="toggleCorrectAnswer('b')" class="answer-check-btn" title="เลือกเป็นข้อที่ถูกต้อง">
-                            <span class="text-sm font-black hidden">✓</span>
-                        </button>
-                    </div>
-
-                    <!-- Tile 3: YELLOW (Circle ●) -->
-                    <div class="bg-white rounded-2xl p-2.5 sm:p-3 shadow-xl border-2 border-transparent hover:border-amber-400 transition flex items-center gap-3">
-                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl kahoot-yellow flex items-center justify-center font-black text-xl shadow-md shrink-0">
-                            ●
-                        </div>
-                        <input type="text" id="choice-input-2" 
-                            oninput="onCurrentChoiceTextChanged(2, this.value)"
-                            placeholder="เพิ่มคำตอบ 3 (ไม่บังคับ)" 
-                            class="flex-1 font-bold text-xs sm:text-sm md:text-base text-slate-800 outline-none placeholder-slate-400 bg-transparent">
-                        
-                        <!-- Choice Image Upload & Preview -->
-                        <div class="shrink-0 flex items-center gap-1">
-                            <label class="p-1.5 sm:p-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs cursor-pointer transition select-none" title="แนบรูปตัวเลือก">
-                                🖼️
-                                <input type="file" accept="image/*" onchange="handleChoiceImageSelected(2, this)" class="hidden">
-                            </label>
-                            <img id="choice-preview-img-2" src="" class="hidden w-8 h-8 rounded-lg object-contain border border-slate-200">
-                        </div>
-
-                        <!-- Answer Check Toggle -->
-                        <button type="button" id="choice-check-btn-2" onclick="toggleCorrectAnswer('c')" class="answer-check-btn" title="เลือกเป็นข้อที่ถูกต้อง">
-                            <span class="text-sm font-black hidden">✓</span>
-                        </button>
-                    </div>
-
-                    <!-- Tile 4: GREEN (Square ■) -->
-                    <div class="bg-white rounded-2xl p-2.5 sm:p-3 shadow-xl border-2 border-transparent hover:border-emerald-400 transition flex items-center gap-3">
-                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl kahoot-green flex items-center justify-center font-black text-xl shadow-md shrink-0">
-                            ■
-                        </div>
-                        <input type="text" id="choice-input-3" 
-                            oninput="onCurrentChoiceTextChanged(3, this.value)"
-                            placeholder="เพิ่มคำตอบ 4 (ไม่บังคับ)" 
-                            class="flex-1 font-bold text-xs sm:text-sm md:text-base text-slate-800 outline-none placeholder-slate-400 bg-transparent">
-                        
-                        <!-- Choice Image Upload & Preview -->
-                        <div class="shrink-0 flex items-center gap-1">
-                            <label class="p-1.5 sm:p-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs cursor-pointer transition select-none" title="แนบรูปตัวเลือก">
-                                🖼️
-                                <input type="file" accept="image/*" onchange="handleChoiceImageSelected(3, this)" class="hidden">
-                            </label>
-                            <img id="choice-preview-img-3" src="" class="hidden w-8 h-8 rounded-lg object-contain border border-slate-200">
-                        </div>
-
-                        <!-- Answer Check Toggle -->
-                        <button type="button" id="choice-check-btn-3" onclick="toggleCorrectAnswer('d')" class="answer-check-btn" title="เลือกเป็นข้อที่ถูกต้อง">
-                            <span class="text-sm font-black hidden">✓</span>
-                        </button>
-                    </div>
-
                 </div>
 
-                <!-- STAGE FOOTER CONTROLS: Delete & Duplicate Current Question -->
-                <div class="flex items-center justify-between pt-2">
-                    <button onclick="toggleTrueFalseMode()" id="btn-toggle-tf" class="px-3.5 py-1.5 bg-white/90 hover:bg-white text-indigo-900 border border-white/60 rounded-xl text-xs font-extrabold shadow-sm transition active:scale-95">
-                        🔄 สลับเป็นคำถาม ถูก/ผิด
-                    </button>
-
+                <!-- CARD FOOTER ACTIONS: Delete & Duplicate -->
+                <div class="flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
+                    <div class="text-slate-400 font-semibold">
+                        ระบบบันทึกคำถามที่คุณพิมพ์อัตโนมัติขณะแก้ไข
+                    </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="deleteKahootQuestion(activeQuestionIndex)" class="px-3 py-1.5 bg-rose-500/90 hover:bg-rose-600 text-white rounded-xl text-xs font-bold shadow-md transition active:scale-95">
-                            🗑️ ลบข้อนี้
+                        <button onclick="duplicateCurrentQuestion()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition active:scale-95 flex items-center gap-1">
+                            <span>📋</span> <span>ทำสำเนาข้อนี้</span>
                         </button>
-                        <button onclick="duplicateKahootQuestion(activeQuestionIndex)" class="px-3.5 py-1.5 bg-white/90 hover:bg-white text-slate-800 border border-white/60 rounded-xl text-xs font-bold shadow-md transition active:scale-95">
-                            📋 ทำสำเนา
+                        <button onclick="deleteCurrentQuestion()" class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl font-bold transition active:scale-95 flex items-center gap-1">
+                            <span>🗑️</span> <span>ลบข้อนี้</span>
                         </button>
                     </div>
                 </div>
 
             </div>
-
         </main>
 
         <!-- ---------------------------------------------------- -->
-        <!-- 2.3 RIGHT SIDEBAR: QUESTION PROPERTIES PANEL         -->
+        <!-- 2.3 RIGHT SIDEBAR: แผงการตั้งค่าด้านข้าง              -->
+        <!-- Fits user requirement: "3. มีตั้งค่าอยู่ด้านข้าง"       -->
         <!-- ---------------------------------------------------- -->
-        <aside id="properties-sidebar" class="w-64 lg:w-72 bg-white border-l border-slate-200 flex flex-col shrink-0 z-20 shadow-xs">
-            <!-- Properties Header -->
+        <aside id="settings-sidebar" class="w-64 lg:w-72 bg-white border-l border-slate-200 flex flex-col shrink-0 z-20 shadow-xs">
+            <!-- Header -->
             <div class="p-4 border-b border-slate-100 flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <span class="text-indigo-600">⚡</span>
-                    <h3 class="font-extrabold text-sm text-slate-800">คุณสมบัติคำถาม</h3>
+                    <span class="text-indigo-600 font-black">⚡</span>
+                    <h2 class="font-black text-sm text-slate-800">การตั้งค่าข้อสอบ</h2>
                 </div>
-                <button onclick="togglePropertiesSidebar()" class="lg:hidden text-slate-400 hover:text-slate-700 font-black">✕</button>
+                <button onclick="toggleSettingsSidebar()" class="lg:hidden text-slate-400 hover:text-slate-700 font-black">✕</button>
             </div>
 
-            <!-- Properties Body -->
-            <div class="flex-1 overflow-y-auto p-4 space-y-5">
+            <!-- Settings Body -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-4">
                 
-                <!-- 1. Question Type -->
+                <!-- 1. รายวิชาที่จัดเก็บ -->
+                <div class="p-3 bg-indigo-50/70 border border-indigo-100 rounded-2xl space-y-1">
+                    <label class="block text-[11px] font-black text-indigo-900 uppercase tracking-wider">📚 รายวิชาที่จะจัดเก็บ:</label>
+                    <div id="side-course-name" class="text-xs font-black text-indigo-700">กำลังโหลด...</div>
+                    <div id="side-course-students" class="text-[10px] text-slate-500 font-bold">นักศึกษาในรายวิชา: 0 คน</div>
+                </div>
+
+                <!-- 2. ประเภทคำถาม -->
                 <div class="space-y-1.5">
-                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">🎯 ประเภทคำถาม</label>
-                    <select id="prop-question-type" onchange="onPropQuestionTypeChange(this.value)" class="prop-select">
-                        <option value="quiz">ควิซ (ปรนัย 4 ตัวเลือก)</option>
-                        <option value="true_false">จริง หรือ เท็จ (ถูก/ผิด)</option>
+                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">🎯 รูปแบบคำถาม</label>
+                    <select id="prop-question-type" onchange="onQuestionTypeChanged(this.value)" class="setting-input">
+                        <option value="quiz">ปรนัย (4 ตัวเลือก)</option>
+                        <option value="true_false">จริง หรือ เท็จ (ถูก / ผิด)</option>
                     </select>
                 </div>
 
-                <!-- 2. Time Limit -->
+                <!-- 3. เวลาทำข้อสอบต่อข้อ -->
                 <div class="space-y-1.5">
                     <div class="flex items-center justify-between">
-                        <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">⏱️ จำกัดเวลา</label>
+                        <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">⏱️ เวลาต่อข้อ (วินาที)</label>
                         <button onclick="applyTimeToAllQuestions()" class="text-[10px] text-indigo-600 hover:underline font-bold">ใช้กับทุกข้อ</button>
                     </div>
-                    <select id="prop-time-limit" onchange="onPropTimeLimitChange(this.value)" class="prop-select">
+                    <select id="prop-time-limit" onchange="onTimeLimitChanged(this.value)" class="setting-input">
                         <option value="0">ไม่จำกัดเวลาต่อข้อ (ใช้เวลารวม)</option>
-                        <option value="10">10 วินาที</option>
+                        <option value="15">15 วินาที</option>
                         <option value="20" selected>20 วินาที</option>
                         <option value="30">30 วินาที</option>
-                        <option value="60">1 นาที</option>
-                        <option value="120">2 นาที</option>
+                        <option value="60">1 นาที (60 วินาที)</option>
+                        <option value="120">2 นาที (120 วินาที)</option>
                         <option value="300">5 นาที</option>
                     </select>
                 </div>
 
-                <!-- 3. Points -->
+                <!-- 4. เวลาทำข้อสอบรวม -->
                 <div class="space-y-1.5">
-                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">⭐ คะแนน</label>
-                    <select id="prop-points" class="prop-select">
+                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">⏱️ เวลาทำข้อสอบรวม (นาที)</label>
+                    <input type="number" id="prop-total-duration" value="60" min="0" max="600" class="setting-input" placeholder="เช่น 60 (ใส่ 0 หากไม่จำกัด)">
+                </div>
+
+                <!-- 5. คะแนนต่อข้อ -->
+                <div class="space-y-1.5">
+                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">⭐ คะแนนต่อข้อ</label>
+                    <select id="prop-points" class="setting-input">
                         <option value="standard" selected>มาตรฐาน (1 คะแนน)</option>
                         <option value="double">คะแนนคูณสอง (2 คะแนน)</option>
-                        <option value="none">ไม่มีคะแนน (สำรวจความคิดเห็น)</option>
+                        <option value="none">ไม่มีคะแนน (แบบสำรวจ)</option>
                     </select>
                 </div>
 
-                <!-- 4. Answer Mode -->
+                <!-- 6. คำชี้แจง / ประกาศแจ้งเตือน -->
                 <div class="space-y-1.5">
-                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">🔘 ตัวเลือกคำตอบ</label>
-                    <select id="prop-answer-mode" class="prop-select">
-                        <option value="single" selected>เลือกข้อเดียว</option>
-                        <option value="multiple">เลือกได้หลายข้อ</option>
-                    </select>
+                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">📢 คำชี้แจง / ประกาศในห้องสอบ</label>
+                    <textarea id="prop-announcement" rows="2" class="setting-input leading-relaxed" placeholder="เช่น ห้ามสลับหน้าจอหรือเปิดแท็บอื่น"></textarea>
                 </div>
 
-                <!-- Quick Help / Summary Box -->
-                <div class="p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2 text-xs text-slate-600">
-                    <div class="font-bold text-slate-800 flex items-center gap-1.5">
-                        <span>💡</span> เคล็ดลับการสร้าง
-                    </div>
-                    <p class="text-[11px] leading-relaxed text-slate-500">
-                        คลิกวงกลมด้านขวาของช้อยส์เพื่อกำหนด <b class="text-emerald-700">เฉลยที่ถูกต้อง</b> โดยระบบจะบันทึกอัตโนมัติขณะที่คุณพิมพ์
-                    </p>
+                <!-- 7. ออปชันการสอบ (สุ่มข้อ & แสดงคะแนน) -->
+                <div class="space-y-2 pt-1 border-t border-slate-100 text-xs">
+                    <label class="flex items-center gap-2 p-2 hover:bg-slate-50 rounded-xl cursor-pointer">
+                        <input type="checkbox" id="prop-randomize" checked class="w-4 h-4 text-indigo-600 rounded">
+                        <span class="font-bold text-slate-700">🔀 สุ่มลำดับข้อสอบ</span>
+                    </label>
+                    <label class="flex items-center gap-2 p-2 hover:bg-slate-50 rounded-xl cursor-pointer">
+                        <input type="checkbox" id="prop-show-score" checked class="w-4 h-4 text-indigo-600 rounded">
+                        <span class="font-bold text-slate-700">👁️ แสดงผลคะแนนหลังส่ง</span>
+                    </label>
                 </div>
 
             </div>
 
-            <!-- Footer of Right Sidebar -->
-            <div class="p-4 border-t border-slate-100 bg-slate-50/50 flex items-center justify-between text-xs text-slate-400 font-semibold">
-                <span>TabLock Exam Creator</span>
-                <span>v2.5</span>
+            <!-- Footer of Right Sidebar: Quick Save Button -->
+            <div class="p-4 border-t border-slate-100 bg-slate-50/50 space-y-2">
+                <button onclick="saveQuestionsToCourse()" class="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl font-black text-xs shadow-sm transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+                    <span>💾</span>
+                    <span>บันทึกข้อสอบเข้าสู่วิชา</span>
+                </button>
             </div>
         </aside>
 
     </div>
 
     <!-- ======================================================== -->
-    <!-- 3. MODALS & POPUPS                                       -->
-    <!-- ======================================================== -->
-
-    <!-- ⚙️ 3.1 EXAM & ROOM SETTINGS MODAL -->
-    <div id="exam-settings-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="text-rose-500 text-lg">⚙️</span>
-                    <h3 class="text-base font-extrabold text-slate-800">การตั้งค่าห้องสอบและรายวิชา</h3>
-                </div>
-                <button onclick="closeExamSettingsModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold">✕</button>
-            </div>
-
-            <div class="p-6 overflow-y-auto space-y-4 text-slate-700 text-xs">
-                <!-- Select Course -->
-                <div class="space-y-1.5">
-                    <label class="block font-bold text-slate-600 uppercase tracking-wider">📚 ผูกกับรายวิชา (Student Gatekeeping)</label>
-                    <select id="modal-room-course-id" class="w-full p-2.5 rounded-xl border border-slate-200 font-semibold outline-none focus:border-indigo-500">
-                        <option value="0">-- ทั่วไป (ไม่จำกัดเฉพาะรายวิชา) --</option>
-                    </select>
-                    <p class="text-[10px] text-slate-400">หากผูกวิชา เฉพาะนักศึกษาที่มีรายชื่อในวิชานี้เท่านั้นจึงจะสามารถเข้าห้องรอสอบได้</p>
-                </div>
-
-                <!-- Room Name -->
-                <div class="space-y-1.5">
-                    <label class="block font-bold text-slate-600 uppercase tracking-wider">ชื่อห้องสอบ / รายวิชา</label>
-                    <input type="text" id="modal-room-name" class="w-full p-2.5 rounded-xl border border-slate-200 font-semibold outline-none focus:border-indigo-500" placeholder="เช่น วิทยาการคำนวณ ม.4">
-                </div>
-
-                <!-- Exam Title -->
-                <div class="space-y-1.5">
-                    <label class="block font-bold text-slate-600 uppercase tracking-wider">ประเภทการสอบ / ชื่อข้อสอบ</label>
-                    <input type="text" id="modal-exam-title" class="w-full p-2.5 rounded-xl border border-slate-200 font-semibold outline-none focus:border-indigo-500" placeholder="เช่น สอบกลางภาค ภาคเรียนที่ 1">
-                </div>
-
-                <!-- Duration -->
-                <div class="space-y-1.5">
-                    <label class="block font-bold text-slate-600 uppercase tracking-wider">⏱️ เวลาทำข้อสอบรวม (นาที)</label>
-                    <input type="number" id="modal-duration" min="0" max="600" class="w-full p-2.5 rounded-xl border border-slate-200 font-semibold outline-none focus:border-indigo-500" placeholder="ใส่ 0 หากไม่จำกัดเวลา">
-                </div>
-
-                <!-- Announcement -->
-                <div class="space-y-1.5">
-                    <label class="block font-bold text-slate-600 uppercase tracking-wider">📢 ประกาศแจ้งเตือนนักศึกษาในห้องสอบ</label>
-                    <input type="text" id="modal-announcement" class="w-full p-2.5 rounded-xl border border-slate-200 font-semibold outline-none focus:border-indigo-500" placeholder="เช่น ห้ามสลับแท็บเด็ดขาด">
-                </div>
-
-                <!-- Toggles -->
-                <div class="grid grid-cols-2 gap-3 pt-2">
-                    <label class="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer">
-                        <input type="checkbox" id="modal-randomize" class="w-4 h-4 text-indigo-600 rounded">
-                        <span class="font-bold text-slate-700">🔀 สุ่มลำดับข้อสอบ</span>
-                    </label>
-                    <label class="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer">
-                        <input type="checkbox" id="modal-show-score" class="w-4 h-4 text-indigo-600 rounded">
-                        <span class="font-bold text-slate-700">👁️ แสดงคะแนนหลังส่ง</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2">
-                <button onclick="closeExamSettingsModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs transition">ยกเลิก</button>
-                <button onclick="saveExamSettingsFromModal()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition">บันทึกการตั้งค่า</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 📱 3.2 WAITING LOUNGE MODAL (PIN / QR CODE & LIVE STUDENTS) -->
-    <div id="publish-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
-        <div id="publish-modal-card" class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden border border-slate-100 flex flex-col p-6 space-y-4">
-            
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <div class="flex items-center gap-2.5">
-                    <span id="pub-modal-icon" class="text-2xl">⏳</span>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <h3 id="pub-modal-title" class="font-black text-slate-800 text-base">ห้องรอสอบ (Waiting Lounge)</h3>
-                            <span id="pub-modal-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-700">⏳ รอกดเริ่มสอบ</span>
-                        </div>
-                        <p id="pub-modal-room-info" class="text-[11px] text-slate-400 font-semibold">ห้องสอบ...</p>
-                    </div>
-                </div>
-                <button onclick="closePublishModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold">✕</button>
-            </div>
-
-            <!-- PIN Code Box -->
-            <div class="bg-gradient-to-br from-slate-900 to-indigo-950 p-4 rounded-2xl text-center text-white space-y-1">
-                <div class="text-[10px] uppercase font-bold text-cyan-400 tracking-widest">รหัสเข้าห้องสอบ (PIN 6 หลัก)</div>
-                <div id="pub-modal-pin" onclick="copyPinOnly()" class="text-4xl font-black font-mono tracking-widest text-white py-1 cursor-pointer hover:text-cyan-300 transition" title="คลิกเพื่อคัดลอก PIN">
-                    ------
-                </div>
-                <p class="text-[10px] text-slate-300">ให้นักศึกษาเข้าหน้าเว็บ แล้วกรอกรหัส PIN นี้เพื่อเข้ามารอในห้องสอบ</p>
-            </div>
-
-            <!-- QR Code -->
-            <div class="flex flex-col items-center justify-center p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
-                <div class="w-40 h-40 bg-white p-2 rounded-xl border border-slate-200 shadow-xs flex items-center justify-center">
-                    <img id="pub-modal-qrcode" src="" alt="QR Code" class="w-full h-full object-contain">
-                </div>
-                <p class="text-[11px] font-bold text-slate-600">📷 สแกนด้วยกล้องมือถือ/แท็บเล็ตเพื่อเข้าห้องรอสอบทันที</p>
-            </div>
-
-            <!-- Real-time Waiting Students Count -->
-            <div class="p-3 bg-indigo-50/80 border border-indigo-200 rounded-2xl flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-xs font-bold text-slate-700">นักศึกษาที่เข้าห้องรอสอบ:</span>
-                    <span id="pub-waiting-count" class="text-lg font-black text-indigo-700">0</span>
-                    <span class="text-xs font-bold text-slate-500">คน</span>
-                </div>
-                <button onclick="toggleWaitingStudentsList()" class="text-xs text-indigo-600 hover:underline font-extrabold">ดูรายชื่อ</button>
-            </div>
-
-            <!-- Collapsible Waiting List -->
-            <div id="pub-waiting-list-container" class="hidden max-h-28 overflow-y-auto p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1">
-                <div id="pub-waiting-students-list">ยังไม่มีนักศึกษา...</div>
-            </div>
-
-            <!-- Master Action: Start Exam Now -->
-            <div class="space-y-2 pt-1">
-                <button id="btn-lounge-start-exam" onclick="startExamFromLounge()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm rounded-xl shadow-lg shadow-emerald-600/30 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-                    <span>🚀</span>
-                    <span>เริ่มการสอบทันที (เผยแพร่ให้นักศึกษาทำพร้อมกัน)</span>
-                </button>
-                <button id="btn-lounge-stop-exam" onclick="stopExamFromLounge()" class="hidden w-full py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-black text-xs rounded-xl shadow-md transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-                    <span>🛑</span>
-                    <span>ปิดห้องสอบ / สลับกลับเป็นแบบร่าง</span>
-                </button>
-            </div>
-
-            <!-- Link & Projector Controls -->
-            <div class="flex items-center gap-2 pt-1">
-                <button onclick="toggleProjectorMode()" class="flex-1 py-2 bg-slate-900 hover:bg-slate-800 text-white font-black text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5">
-                    <span>📺</span> ฉายจอโปรเจกเตอร์
-                </button>
-                <button onclick="copyPublishLink()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition active:scale-95">
-                    📋 คัดลอกลิงก์
-                </button>
-            </div>
-            <input type="hidden" id="pub-modal-link">
-        </div>
-    </div>
-
-    <!-- 📚 3.3 SELECT FROM LIBRARY MODAL -->
-    <div id="library-selector-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[85vh]">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="text-indigo-600 text-lg">📚</span>
-                    <h3 class="text-base font-extrabold text-slate-800">เลือกข้อสอบจากคลังของคุณ</h3>
-                </div>
-                <button onclick="closeSelectFromLibraryModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold">✕</button>
-            </div>
-            <div id="modal-library-list" class="p-6 overflow-y-auto space-y-3">
-                <!-- Library items rendered dynamically -->
-            </div>
-        </div>
-    </div>
-
-    <!-- ➕ 3.4 CREATE ROOM & WAITING LOUNGE WIZARD MODAL -->
-    <div id="create-room-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden border border-slate-100 flex flex-col">
-            <div class="px-6 py-4 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-slate-100 flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                    <span class="text-2xl">🚀</span>
-                    <div>
-                        <h3 class="text-base font-black text-slate-800">สร้างห้องสอบและเปิดห้องรอสอบ</h3>
-                        <p class="text-[11px] text-slate-500 font-medium">เลือกรายวิชาและชุดข้อสอบเพื่อเปิดห้องรอสอบ (Waiting Lounge) ให้นักศึกษาทันที</p>
-                    </div>
-                </div>
-                <button onclick="closeCreateRoomModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold">✕</button>
-            </div>
-            <div class="p-6 space-y-4 text-xs">
-                <!-- 1. Select Course -->
-                <div class="space-y-1.5">
-                    <label class="font-extrabold text-slate-700 flex items-center gap-1.5">
-                        <span>📚 1. เลือกรายวิชาที่จะจัดสอบ</span>
-                        <span class="text-[10px] text-rose-500 font-bold">*จำเป็น</span>
-                    </label>
-                    <select id="create-room-course-id" onchange="onCourseSelectedForNewRoom(this)" class="w-full p-2.5 rounded-xl border border-slate-200 font-semibold outline-none focus:border-indigo-500 bg-slate-50 focus:bg-white text-slate-800">
-                        <option value="">กำลังโหลดรายวิชา...</option>
-                    </select>
-                    <p class="text-[10px] text-slate-400">ระบบจะคัดกรองเฉพาะนักศึกษาในรายวิชานี้เท่านั้นที่มีสิทธิ์เข้าห้องสอบ</p>
-                </div>
-
-                <!-- 2. Select Exam Set from Library -->
-                <div class="space-y-1.5">
-                    <label class="font-extrabold text-slate-700 flex items-center gap-1.5">
-                        <span>📝 2. เลือกชุดข้อสอบที่จะใช้สอบ</span>
-                        <span class="text-[10px] text-indigo-600 font-bold">(จากคลังข้อสอบ)</span>
-                    </label>
-                    <select id="create-room-template-id" onchange="onTemplateSelectedForNewRoom(this)" class="w-full p-2.5 rounded-xl border border-slate-200 font-semibold outline-none focus:border-indigo-500 bg-slate-50 focus:bg-white text-slate-800">
-                        <option value="">กำลังโหลดคลังข้อสอบ...</option>
-                    </select>
-                    <p class="text-[10px] text-slate-400">ระบบจะดึงข้อสอบชุดที่เลือกมาบรรจุลงห้องนี้ให้อัตโนมัติใน 1 วินาที</p>
-                </div>
-
-                <!-- 3. Room Name -->
-                <div class="space-y-1.5">
-                    <label class="font-extrabold text-slate-700">ชื่อห้องเรียน / หัวข้อการสอบ</label>
-                    <input type="text" id="create-room-name" class="w-full p-2.5 rounded-xl border border-slate-200 font-semibold outline-none focus:border-indigo-500 bg-slate-50 focus:bg-white text-slate-800" placeholder="เช่น วิทยาการคำนวณ ม.5/1 (สอบกลางภาค)">
-                </div>
-
-                <!-- 4. Duration & Exam Type -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="space-y-1.5">
-                        <label class="font-extrabold text-slate-700">⏱️ เวลาทำข้อสอบ (นาที)</label>
-                        <input type="number" id="create-room-duration" value="60" min="0" max="600" class="w-full p-2.5 rounded-xl border border-slate-200 font-semibold outline-none focus:border-indigo-500 bg-slate-50 focus:bg-white text-slate-800" placeholder="เช่น 60 (0=ไม่จำกัด)">
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="font-extrabold text-slate-700">🏷️ ประเภทการสอบ</label>
-                        <input type="text" id="create-room-exam-title" class="w-full p-2.5 rounded-xl border border-slate-200 font-semibold outline-none focus:border-indigo-500 bg-slate-50 focus:bg-white text-slate-800" placeholder="เช่น สอบเก็บคะแนน, กลางภาค">
-                    </div>
-                </div>
-            </div>
-            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2">
-                <button onclick="closeCreateRoomModal()" class="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs transition">ยกเลิก</button>
-                <button onclick="handleCreateRoom()" id="btn-submit-create-room" class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-black rounded-xl text-xs sm:text-sm shadow-md shadow-emerald-600/25 transition active:scale-95 flex items-center gap-1.5 cursor-pointer">
-                    <span>🚀</span>
-                    <span>เปิดห้องรอสอบทันที (รับ PIN & QR Code)</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 📋 3.5 FAST PASTE / WORD IMPORT MODAL -->
-    <div id="fast-import-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[90vh]">
-            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="text-indigo-600 text-lg">📋</span>
-                    <h3 class="text-base font-extrabold text-slate-800">วางข้อความจาก Word หรือข้อสอบสำเร็จรูป</h3>
-                </div>
-                <button onclick="closeFastImportModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold">✕</button>
-            </div>
-            <div class="p-6 overflow-y-auto space-y-3 text-xs">
-                <p class="text-slate-500 font-medium">
-                    คัดลอกข้อสอบจาก Word หรือ Text File มาวางได้เลย ระบบจะแยกโจทย์และช้อยส์ ก ข ค ง หรือ A B C D ให้โดยอัตโนมัติ:
-                </p>
-                <textarea id="fast-import-text" rows="10" placeholder="1. เมืองหลวงของประเทศไทยคือเมืองใด?&#10;ก. เชียงใหม่&#10;ข. กรุงเทพมหานคร&#10;ค. ภูเก็ต&#10;ง. ขอนแก่น&#10;&#10;2. ข้อใดคือแม่สี?&#10;ก. สีแดง&#10;ข. สีม่วง&#10;ค. สีส้ม&#10;ง. สีเขียว" 
-                    class="w-full p-3 font-mono text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 leading-relaxed"></textarea>
-            </div>
-            <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2">
-                <button onclick="closeFastImportModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs transition">ยกเลิก</button>
-                <button onclick="parseAndAppendFastQuestions()" class="px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl text-xs transition">นำเข้าสู่สไลด์ทันที</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ======================================================== -->
-    <!-- 4. CORE JAVASCRIPT LOGIC (Kahoot Studio Engine)          -->
+    <!-- 3. CORE JAVASCRIPT LOGIC                                 -->
     <!-- ======================================================== -->
     <script>
         const username = localStorage.getItem('teacher_username') || 'admin';
         const teacherName = localStorage.getItem('teacher_name') || 'ไม่ระบุชื่ออาจารย์';
         document.getElementById('header-teacher-name').textContent = `อาจารย์: ${teacherName}`;
 
-        let rooms = [];
-        let currentRoomId = '';
-        let currentPublishedPin = '';
-        let waitingStudentsInterval = null;
+        let courses = [];
+        let activeCourseId = null;
+        let activeRoomId = '';
 
-        // Data array of all questions in the active exam
-        let manualQuestions = [];
+        // All questions data array
+        let questions = [];
         let activeQuestionIndex = 0;
 
-        const choiceKeys = ['a', 'b', 'c', 'd', 'e', 'f'];
+        const choiceKeys = ['a', 'b', 'c', 'd'];
+        const thaiKeys = ['ก', 'ข', 'ค', 'ง'];
 
         function createEmptyQuestion() {
             return {
@@ -775,231 +541,173 @@
         // INITIALIZATION
         // ==========================================
         window.addEventListener('DOMContentLoaded', async () => {
-            await loadTeacherRooms();
-            if (currentRoomId) {
-                await fetchRoomSettings();
-                await loadExistingQuestionsToStudio();
-            }
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const action = urlParams.get('action');
-            if (action === 'new-room') {
-                setTimeout(() => openCreateRoomModal(), 400);
-            } else if (action === 'waiting-lounge') {
-                setTimeout(() => openWaitingLoungeModal(), 400);
-            }
+            await loadTeacherCourses();
+            await loadExistingExamForCourse();
         });
 
-        // 1. โหลดห้องสอบของอาจารย์
-        async function loadTeacherRooms() {
+        // 1. โหลดรายวิชาของอาจารย์
+        async function loadTeacherCourses() {
+            const select = document.getElementById('top-course-selector');
             try {
-                const res = await fetch(`/api/teacher/rooms?username=${encodeURIComponent(username)}`);
-                if (!res.ok) return;
-                rooms = await res.json();
-
-                if (!Array.isArray(rooms) || rooms.length === 0) {
-                    // Auto create first room if none
-                    const cRes = await fetch('/api/teacher/create-rooms', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username })
-                    });
-                    if (cRes.ok) {
-                        const r2 = await fetch(`/api/teacher/rooms?username=${encodeURIComponent(username)}`);
-                        if (r2.ok) rooms = await r2.json();
-                    }
-                }
-
-                const select = document.getElementById('room-selector');
-                if (!rooms || rooms.length === 0) {
-                    select.innerHTML = '<option value="">ไม่มีห้องสอบ</option>';
-                    return;
-                }
-
-                select.innerHTML = rooms.map(r => `<option value="${r.roomId}">${r.roomName || r.roomId}</option>`).join('');
-
-                const savedRoom = localStorage.getItem('active_room_id');
-                if (savedRoom && rooms.some(r => r.roomId === savedRoom)) {
-                    select.value = savedRoom;
-                }
-                currentRoomId = select.value;
-                localStorage.setItem('active_room_id', currentRoomId);
-            } catch(e) {
-                console.error("loadTeacherRooms error:", e);
-            }
-        }
-
-        // 2. เมื่อเปลี่ยนห้องสอบ
-        async function onRoomChange() {
-            currentRoomId = document.getElementById('room-selector').value;
-            localStorage.setItem('active_room_id', currentRoomId);
-            await fetchRoomSettings();
-            await loadExistingQuestionsToStudio();
-        }
-
-        // 3. เปลี่ยนชื่อห้องสอบ
-        async function renameCurrentRoom() {
-            const currentRoom = rooms.find(r => r.roomId === currentRoomId);
-            if (!currentRoom) return;
-
-            const newName = prompt(`เปลี่ยนชื่อห้องสอบ (${currentRoomId}):`, currentRoom.roomName);
-            if (!newName || !newName.trim()) return;
-
-            try {
-                const res = await fetch('/api/teacher/update-room-name', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, roomId: currentRoomId, roomName: newName.trim() })
-                });
+                const res = await fetch(`/api/teacher/courses?username=${encodeURIComponent(username)}`);
                 if (res.ok) {
-                    await loadTeacherRooms();
-                }
-            } catch(e) {
-                alert("ไม่สามารถเปลี่ยนชื่อห้องได้");
-            }
-        }
+                    courses = await res.json();
+                    if (Array.isArray(courses) && courses.length > 0) {
+                        select.innerHTML = courses.map(c => `
+                            <option value="${c.id}">[${escapeHtml(c.courseCode || 'วิชา')}] ${escapeHtml(c.courseName)}</option>
+                        `).join('');
 
-        // 4. โหลดการตั้งค่าห้องสอบ
-        async function fetchRoomSettings() {
-            if (!currentRoomId) return;
-            try {
-                const res = await fetch(`/api/room-settings?roomId=${encodeURIComponent(currentRoomId)}`);
-                if (!res.ok) return;
-                const data = await res.json();
-
-                document.getElementById('top-exam-title').value = data.examTitle || data.roomName || '';
-                document.getElementById('modal-room-name').value = data.roomName || '';
-                document.getElementById('modal-exam-title').value = data.examTitle || '';
-                document.getElementById('modal-duration').value = data.duration || 0;
-                document.getElementById('modal-announcement').value = data.announcement || '';
-                document.getElementById('modal-randomize').checked = data.randomize === 1;
-                document.getElementById('modal-show-score').checked = data.showScore === 1;
-
-                // โหลดรายวิชาสำหรับ modal
-                try {
-                    const cRes = await fetch(`/api/teacher/courses?username=${encodeURIComponent(username)}`);
-                    if (cRes.ok) {
-                        const courses = await cRes.json();
-                        const cSelect = document.getElementById('modal-room-course-id');
-                        if (cSelect && Array.isArray(courses)) {
-                            cSelect.innerHTML = `<option value="0">-- ทั่วไป (ไม่จำกัดเฉพาะรายวิชา) --</option>` +
-                                courses.map(c => `<option value="${c.id}" ${c.id === (data.courseId || 0) ? 'selected' : ''}>[${c.courseCode || 'วิชา'}] ${c.courseName}</option>`).join('');
+                        // ใช้ courseId จาก query param หรือตัวแรก
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const queryCourseId = urlParams.get('courseId');
+                        if (queryCourseId && courses.some(c => String(c.id) === String(queryCourseId))) {
+                            select.value = queryCourseId;
                         }
+
+                        activeCourseId = select.value;
+                        updateCourseSideBadge();
+                    } else {
+                        select.innerHTML = '<option value="">-- ยังไม่มีรายวิชา (สร้างได้ที่หน้าแดชบอร์ด) --</option>';
                     }
-                } catch(e) {}
+                }
             } catch(e) {
-                console.error(e);
+                console.error("loadTeacherCourses error:", e);
+                select.innerHTML = '<option value="">-- ไม่สามารถโหลดรายวิชาได้ --</option>';
             }
         }
 
-        // 5. อัปเดตชื่อการสอบทันทีจากแถบด้านบน
-        async function updateRoomExamTitle(newTitle) {
-            if (!currentRoomId) return;
-            try {
-                await fetch('/api/teacher/update-room-settings', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ roomId: currentRoomId, examTitle: newTitle.trim() })
-                });
-            } catch(e) {}
+        function updateCourseSideBadge() {
+            const courseObj = courses.find(c => String(c.id) === String(activeCourseId));
+            const sideName = document.getElementById('side-course-name');
+            const sideStudents = document.getElementById('side-course-students');
+            const courseTag = document.getElementById('course-tag-badge');
+
+            if (courseObj) {
+                const nameStr = `[${courseObj.courseCode || 'วิชา'}] ${courseObj.courseName}`;
+                if (sideName) sideName.textContent = nameStr;
+                if (sideStudents) sideStudents.textContent = `นักศึกษาในรายวิชา: ${courseObj.studentCount || 0} คน`;
+                if (courseTag) courseTag.textContent = courseObj.courseName;
+
+                // Auto set default exam title if empty
+                const titleInput = document.getElementById('top-exam-title');
+                if (titleInput && !titleInput.value.trim()) {
+                    titleInput.value = `แบบทดสอบวิชา ${courseObj.courseName}`;
+                }
+            } else {
+                if (sideName) sideName.textContent = 'ไม่ระบุรายวิชา (ทั่วไป)';
+                if (sideStudents) sideStudents.textContent = 'นักศึกษา: 0 คน';
+                if (courseTag) courseTag.textContent = 'ทั่วไป';
+            }
         }
 
-        // 6. โหลดข้อสอบเข้าสู่ Kahoot Studio
-        async function loadExistingQuestionsToStudio() {
-            if (!currentRoomId) return;
+        // เมื่ออาจารย์เปลี่ยนรายวิชาจากดรอปดาวน์
+        async function onCourseChanged(courseId) {
+            activeCourseId = courseId;
+            updateCourseSideBadge();
+            await loadExistingExamForCourse();
+        }
+
+        // โหลดข้อสอบที่มีอยู่แล้วในรายวิชานี้ (ถ้ามี)
+        async function loadExistingExamForCourse() {
             try {
-                const res = await fetch(`/api/teacher/get-questions?roomId=${encodeURIComponent(currentRoomId)}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    if (Array.isArray(data) && data.length > 0) {
-                        manualQuestions = data.map(q => {
-                            const choices = [];
-                            const choices_img = [];
-                            choiceKeys.forEach(key => {
-                                choices.push(q[key] !== null && q[key] !== undefined ? String(q[key]) : '');
-                                choices_img.push(q[key + '_img'] || '');
-                            });
-                            // ตัดท้ายที่ว่างเกิน 4 ช้อยส์ออก
-                            let lastFilled = 3;
-                            for (let i = choices.length - 1; i >= 4; i--) {
-                                if (choices[i] || choices_img[i]) { lastFilled = i; break; }
+                // ค้นหาห้องสอบที่ผูกกับวิชานี้
+                const rRes = await fetch(`/api/teacher/rooms?username=${encodeURIComponent(username)}`);
+                if (rRes.ok) {
+                    const rooms = await rRes.json();
+                    let targetRoom = null;
+                    if (activeCourseId) {
+                        targetRoom = rooms.find(r => String(r.courseId) === String(activeCourseId));
+                    }
+                    if (!targetRoom && rooms.length > 0) {
+                        targetRoom = rooms[0];
+                    }
+
+                    if (targetRoom) {
+                        activeRoomId = targetRoom.roomId;
+                        document.getElementById('top-exam-title').value = targetRoom.exam_title || targetRoom.roomName || '';
+                        document.getElementById('prop-total-duration').value = targetRoom.duration || 60;
+                        document.getElementById('prop-announcement').value = targetRoom.announcement || '';
+
+                        // โหลดคำถาม
+                        const qRes = await fetch(`/api/teacher/get-questions?roomId=${encodeURIComponent(activeRoomId)}`);
+                        if (qRes.ok) {
+                            const qData = await qRes.json();
+                            if (Array.isArray(qData) && qData.length > 0) {
+                                questions = qData.map(q => {
+                                    const choices = [];
+                                    const choices_img = [];
+                                    choiceKeys.forEach(key => {
+                                        choices.push(q[key] !== null && q[key] !== undefined ? String(q[key]) : '');
+                                        choices_img.push(q[key + '_img'] || '');
+                                    });
+                                    return {
+                                        question: q.question || '',
+                                        question_img: q.question_img || '',
+                                        choices,
+                                        choices_img,
+                                        answer: (q.answer || 'a').toLowerCase(),
+                                        timeLimit: 20,
+                                        type: 'quiz'
+                                    };
+                                });
+                            } else {
+                                questions = [createEmptyQuestion()];
                             }
-                            return {
-                                question: q.question || '',
-                                question_img: q.question_img || '',
-                                choices: choices.slice(0, lastFilled + 1),
-                                choices_img: choices_img.slice(0, lastFilled + 1),
-                                answer: q.answer || 'a',
-                                timeLimit: 20,
-                                type: 'quiz'
-                            };
-                        });
+                        } else {
+                            questions = [createEmptyQuestion()];
+                        }
                     } else {
-                        manualQuestions = [createEmptyQuestion()];
+                        questions = [createEmptyQuestion()];
                     }
                 } else {
-                    manualQuestions = [createEmptyQuestion()];
+                    questions = [createEmptyQuestion()];
                 }
             } catch(e) {
                 console.error(e);
-                manualQuestions = [createEmptyQuestion()];
+                questions = [createEmptyQuestion()];
             }
 
             activeQuestionIndex = 0;
-            renderAllSlides();
-            renderCurrentQuestionStage();
+            renderAllQuestionsList();
+            renderActiveQuestionStage();
         }
 
         // ==========================================
-        // 🎨 RENDER SLIDE NAVIGATOR (LEFT SIDEBAR)
+        // 2. RENDERING UI
         // ==========================================
-        function renderAllSlides() {
-            const container = document.getElementById('slides-list-container');
-            document.getElementById('total-slides-count').textContent = manualQuestions.length;
+        function renderAllQuestionsList() {
+            const container = document.getElementById('questions-list-container');
+            const totalCount = document.getElementById('total-questions-count');
+            if (totalCount) totalCount.textContent = questions.length;
 
-            container.innerHTML = manualQuestions.map((q, idx) => {
+            container.innerHTML = questions.map((q, idx) => {
                 const isActive = idx === activeQuestionIndex;
-                const previewText = q.question.trim() ? escapeHtml(q.question.trim()) : 'ยังไม่ได้พิมพ์คำถาม...';
+                const snippet = q.question.trim() || '(คำถามว่าง...)';
+                const ansKey = (q.answer || 'a').toLowerCase();
+                const thaiAns = thaiKeys[choiceKeys.indexOf(ansKey)] || 'ก';
                 const hasImg = !!q.question_img;
-                const answerLetter = (q.answer || 'a').toUpperCase();
 
                 return `
-                    <div onclick="selectQuestionIndex(${idx})" class="slide-card ${isActive ? 'active' : ''} bg-white border border-slate-200 rounded-2xl p-2.5 shadow-xs relative group select-none">
-                        <!-- Top header of card: Question number & Actions -->
-                        <div class="flex items-center justify-between pb-1.5 border-b border-slate-100">
-                            <span class="text-[11px] font-black ${isActive ? 'text-blue-600' : 'text-slate-500'}">
-                                ${idx + 1} ควิซ
+                    <div class="slide-item p-3 rounded-2xl bg-white border border-slate-200 select-none ${isActive ? 'active' : ''}"
+                        onclick="selectQuestionIndex(${idx})">
+                        
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-[11px] font-black ${isActive ? 'text-indigo-700' : 'text-slate-500'}">ข้อที่ ${idx + 1}</span>
+                            <div class="flex items-center gap-1">
+                                <button onclick="event.stopPropagation(); duplicateQuestion(${idx})" title="ทำสำเนา" class="p-1 text-slate-400 hover:text-slate-700 rounded text-[11px]">📋</button>
+                                <button onclick="event.stopPropagation(); deleteQuestion(${idx})" title="ลบข้อนี้" class="p-1 text-slate-400 hover:text-rose-600 rounded text-[11px]">🗑️</button>
+                            </div>
+                        </div>
+
+                        <div class="text-xs font-bold text-slate-800 line-clamp-2 leading-snug">
+                            ${escapeHtml(snippet)}
+                        </div>
+
+                        <div class="flex items-center justify-between mt-2 pt-1 border-t border-slate-100">
+                            <span class="text-[10px] font-black px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                เฉลย: ${thaiAns}.
                             </span>
-                            <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100">
-                                <button onclick="event.stopPropagation(); duplicateKahootQuestion(${idx})" title="ทำสำเนาข้อนี้" class="p-1 text-slate-400 hover:text-blue-600 hover:bg-slate-100 rounded-lg text-[10px] transition">
-                                    📋
-                                </button>
-                                ${manualQuestions.length > 1 ? `
-                                    <button onclick="event.stopPropagation(); deleteKahootQuestion(${idx})" title="ลบข้อนี้" class="p-1 text-slate-400 hover:text-rose-600 hover:bg-slate-100 rounded-lg text-[10px] transition">
-                                        🗑️
-                                    </button>
-                                ` : ''}
-                            </div>
-                        </div>
-
-                        <!-- Mini Thumbnail Preview Area -->
-                        <div class="py-2 space-y-1">
-                            <div class="text-[10px] font-bold text-slate-700 line-clamp-2 leading-tight">
-                                ${previewText}
-                            </div>
-                            ${hasImg ? `
-                                <div class="flex items-center gap-1 text-[9px] font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded-md w-fit">
-                                    <span>🖼️ มีรูปภาพ</span>
-                                </div>
-                            ` : ''}
-                        </div>
-
-                        <!-- Mini Answer Indicators (4 geometric chips) -->
-                        <div class="grid grid-cols-4 gap-1 pt-1">
-                            <div class="h-1.5 rounded-full ${q.answer === 'a' ? 'kahoot-red ring-1 ring-rose-600' : 'bg-slate-200'}"></div>
-                            <div class="h-1.5 rounded-full ${q.answer === 'b' ? 'kahoot-blue ring-1 ring-blue-600' : 'bg-slate-200'}"></div>
-                            <div class="h-1.5 rounded-full ${q.answer === 'c' ? 'kahoot-yellow ring-1 ring-amber-600' : 'bg-slate-200'}"></div>
-                            <div class="h-1.5 rounded-full ${q.answer === 'd' ? 'kahoot-green ring-1 ring-emerald-600' : 'bg-slate-200'}"></div>
+                            ${hasImg ? '<span class="text-[11px]" title="มีรูปภาพประกอบ">📷</span>' : ''}
                         </div>
                     </div>
                 `;
@@ -1007,686 +715,344 @@
         }
 
         function selectQuestionIndex(idx) {
+            if (idx < 0 || idx >= questions.length) return;
             activeQuestionIndex = idx;
-            renderAllSlides();
-            renderCurrentQuestionStage();
+            renderAllQuestionsList();
+            renderActiveQuestionStage();
         }
 
-        // ==========================================
-        // 🎯 RENDER CENTER STAGE FOR ACTIVE QUESTION
-        // ==========================================
-        function renderCurrentQuestionStage() {
-            if (!manualQuestions[activeQuestionIndex]) {
+        function renderActiveQuestionStage() {
+            if (questions.length === 0) {
+                questions = [createEmptyQuestion()];
                 activeQuestionIndex = 0;
             }
-            const q = manualQuestions[activeQuestionIndex] || createEmptyQuestion();
 
-            // 1. Question Title
-            const qInput = document.getElementById('kahoot-question-input');
-            qInput.value = q.question || '';
+            const cur = questions[activeQuestionIndex];
 
-            // 2. Question Media Preview
-            const emptyState = document.getElementById('media-empty-state');
-            const previewState = document.getElementById('media-preview-state');
-            const previewImg = document.getElementById('media-preview-img');
+            // Header indicators
+            document.getElementById('current-question-num').textContent = activeQuestionIndex + 1;
+            const mobileIdx = document.getElementById('mobile-q-index');
+            if (mobileIdx) mobileIdx.textContent = activeQuestionIndex + 1;
 
-            if (q.question_img) {
-                emptyState.classList.add('hidden');
-                previewState.classList.remove('hidden');
-                previewImg.src = q.question_img;
-            } else {
-                emptyState.classList.remove('hidden');
-                previewState.classList.add('hidden');
-                previewImg.src = '';
+            const typeBadge = document.getElementById('current-question-type-badge');
+            if (typeBadge) {
+                typeBadge.textContent = cur.type === 'true_false' ? 'จริง หรือ เท็จ (ถูก / ผิด)' : 'ปรนัย 4 ตัวเลือก';
             }
 
-            // 3. Four Choice Inputs & Images & Answers
+            // Question Input
+            const qInput = document.getElementById('question-text-input');
+            if (qInput) qInput.value = cur.question || '';
+
+            // Question Media
+            const emptyMedia = document.getElementById('media-empty-state');
+            const prevMedia = document.getElementById('media-preview-state');
+            const prevImg = document.getElementById('media-preview-img');
+
+            if (cur.question_img) {
+                emptyMedia.classList.add('hidden');
+                prevMedia.classList.remove('hidden');
+                prevImg.src = cur.question_img;
+            } else {
+                emptyMedia.classList.remove('hidden');
+                prevMedia.classList.add('hidden');
+                prevImg.src = '';
+            }
+
+            // Choices ก ข ค ง
             for (let i = 0; i < 4; i++) {
-                const choiceInput = document.getElementById(`choice-input-0`.replace('0', i));
-                const previewImg = document.getElementById(`choice-preview-img-0`.replace('0', i));
-                const checkBtn = document.getElementById(`choice-check-btn-0`.replace('0', i));
+                const card = document.getElementById(`choice-card-${i}`);
+                const textInput = document.getElementById(`choice-text-${i}`);
+                const checkBtn = document.getElementById(`choice-check-btn-${i}`);
+                const badge = document.getElementById(`choice-img-badge-${i}`);
 
-                const val = (q.choices && q.choices[i]) || '';
-                const img = (q.choices_img && q.choices_img[i]) || '';
+                if (textInput) textInput.value = cur.choices[i] || '';
+
                 const key = choiceKeys[i];
-                const isCorrect = (q.answer || 'a').toLowerCase() === key;
+                const isCorrect = (cur.answer || 'a').toLowerCase() === key;
 
-                if (choiceInput) choiceInput.value = val;
-
-                if (previewImg) {
-                    if (img) {
-                        previewImg.src = img;
-                        previewImg.classList.remove('hidden');
+                if (card) {
+                    if (isCorrect) {
+                        card.classList.add('is-correct');
                     } else {
-                        previewImg.src = '';
-                        previewImg.classList.add('hidden');
+                        card.classList.remove('is-correct');
                     }
                 }
 
                 if (checkBtn) {
-                    checkBtn.classList.toggle('checked', isCorrect);
-                    const checkIcon = checkBtn.querySelector('span');
-                    if (checkIcon) checkIcon.classList.toggle('hidden', !isCorrect);
+                    if (isCorrect) {
+                        checkBtn.classList.add('active');
+                        checkBtn.innerHTML = '<span>✓ ถูกต้อง</span>';
+                    } else {
+                        checkBtn.classList.remove('active');
+                        checkBtn.innerHTML = '<span>✓ เฉลย</span>';
+                    }
+                }
+
+                if (badge) {
+                    if (cur.choices_img && cur.choices_img[i]) {
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
                 }
             }
 
-            // 4. Properties sync
-            const propType = document.getElementById('prop-question-type');
-            if (propType) propType.value = q.type || 'quiz';
+            // Right Sidebar Sync
+            const typeSelect = document.getElementById('prop-question-type');
+            if (typeSelect) typeSelect.value = cur.type || 'quiz';
 
-            const propTime = document.getElementById('prop-time-limit');
-            if (propTime) propTime.value = String(q.timeLimit || 20);
+            const timeSelect = document.getElementById('prop-time-limit');
+            if (timeSelect) timeSelect.value = cur.timeLimit !== undefined ? cur.timeLimit : 20;
         }
 
         // ==========================================
-        // ✍️ LIVE INPUT HANDLERS
+        // 3. EDITING HANDLERS
         // ==========================================
-        function onCurrentQuestionTextChanged(text) {
-            if (!manualQuestions[activeQuestionIndex]) return;
-            manualQuestions[activeQuestionIndex].question = text;
-            // Update preview in left thumbnail
-            renderAllSlides();
+        function onQuestionTextChanged(text) {
+            if (!questions[activeQuestionIndex]) return;
+            questions[activeQuestionIndex].question = text;
+            renderAllQuestionsList();
         }
 
-        function onCurrentChoiceTextChanged(choiceIdx, text) {
-            if (!manualQuestions[activeQuestionIndex]) return;
-            if (!manualQuestions[activeQuestionIndex].choices) {
-                manualQuestions[activeQuestionIndex].choices = ['', '', '', ''];
+        function onChoiceTextChanged(choiceIdx, text) {
+            if (!questions[activeQuestionIndex]) return;
+            while (questions[activeQuestionIndex].choices.length <= choiceIdx) {
+                questions[activeQuestionIndex].choices.push('');
             }
-            manualQuestions[activeQuestionIndex].choices[choiceIdx] = text;
+            questions[activeQuestionIndex].choices[choiceIdx] = text;
         }
 
-        function toggleCorrectAnswer(answerKey) {
-            if (!manualQuestions[activeQuestionIndex]) return;
-            manualQuestions[activeQuestionIndex].answer = answerKey;
-            renderCurrentQuestionStage();
-            renderAllSlides();
+        function setCorrectAnswer(key) {
+            if (!questions[activeQuestionIndex]) return;
+            questions[activeQuestionIndex].answer = key.toLowerCase();
+            renderAllQuestionsList();
+            renderActiveQuestionStage();
         }
 
-        // ==========================================
-        // 🖼️ IMAGE UPLOAD HANDLERS
-        // ==========================================
         function triggerQuestionImageUpload() {
             document.getElementById('question-image-file-input').click();
         }
 
         function handleQuestionImageSelected(input) {
-            const file = input.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                manualQuestions[activeQuestionIndex].question_img = e.target.result;
-                renderCurrentQuestionStage();
-                renderAllSlides();
-            };
-            reader.readAsDataURL(file);
-            input.value = '';
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    questions[activeQuestionIndex].question_img = e.target.result;
+                    renderAllQuestionsList();
+                    renderActiveQuestionStage();
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
         }
 
         function removeQuestionImage() {
-            if (!manualQuestions[activeQuestionIndex]) return;
-            manualQuestions[activeQuestionIndex].question_img = '';
-            renderCurrentQuestionStage();
-            renderAllSlides();
+            if (!questions[activeQuestionIndex]) return;
+            questions[activeQuestionIndex].question_img = '';
+            renderAllQuestionsList();
+            renderActiveQuestionStage();
         }
 
         function handleChoiceImageSelected(choiceIdx, input) {
-            const file = input.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                if (!manualQuestions[activeQuestionIndex].choices_img) {
-                    manualQuestions[activeQuestionIndex].choices_img = ['', '', '', ''];
-                }
-                manualQuestions[activeQuestionIndex].choices_img[choiceIdx] = e.target.result;
-                renderCurrentQuestionStage();
-            };
-            reader.readAsDataURL(file);
-            input.value = '';
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    while (questions[activeQuestionIndex].choices_img.length <= choiceIdx) {
+                        questions[activeQuestionIndex].choices_img.push('');
+                    }
+                    questions[activeQuestionIndex].choices_img[choiceIdx] = e.target.result;
+                    renderActiveQuestionStage();
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
         }
 
-        // ==========================================
-        // ➕ ADD / DUPLICATE / DELETE QUESTIONS
-        // ==========================================
-        function addKahootQuestion() {
-            const newQ = createEmptyQuestion();
-            manualQuestions.push(newQ);
-            activeQuestionIndex = manualQuestions.length - 1;
-            renderAllSlides();
-            renderCurrentQuestionStage();
+        function addNewQuestion() {
+            questions.push(createEmptyQuestion());
+            activeQuestionIndex = questions.length - 1;
+            renderAllQuestionsList();
+            renderActiveQuestionStage();
 
-            // Auto focus question input
-            setTimeout(() => {
-                const el = document.getElementById('kahoot-question-input');
-                if (el) el.focus();
-            }, 100);
+            const container = document.getElementById('questions-list-container');
+            if (container) container.scrollTop = container.scrollHeight;
         }
 
-        function duplicateKahootQuestion(idx) {
-            const original = manualQuestions[idx];
-            if (!original) return;
-            const copy = JSON.parse(JSON.stringify(original));
-            manualQuestions.splice(idx + 1, 0, copy);
+        function duplicateCurrentQuestion() {
+            duplicateQuestion(activeQuestionIndex);
+        }
+
+        function duplicateQuestion(idx) {
+            if (idx < 0 || idx >= questions.length) return;
+            const cloned = JSON.parse(JSON.stringify(questions[idx]));
+            questions.splice(idx + 1, 0, cloned);
             activeQuestionIndex = idx + 1;
-            renderAllSlides();
-            renderCurrentQuestionStage();
+            renderAllQuestionsList();
+            renderActiveQuestionStage();
         }
 
-        function deleteKahootQuestion(idx) {
-            if (manualQuestions.length <= 1) {
-                // If only 1 left, just reset it
-                manualQuestions = [createEmptyQuestion()];
-                activeQuestionIndex = 0;
-            } else {
-                manualQuestions.splice(idx, 1);
-                if (activeQuestionIndex >= manualQuestions.length) {
-                    activeQuestionIndex = manualQuestions.length - 1;
-                }
+        function deleteCurrentQuestion() {
+            deleteQuestion(activeQuestionIndex);
+        }
+
+        function deleteQuestion(idx) {
+            if (questions.length <= 1) {
+                alert("ต้องมีคำถามอย่างน้อย 1 ข้อในชุดข้อสอบครับ");
+                return;
             }
-            renderAllSlides();
-            renderCurrentQuestionStage();
+            if (!confirm(`ยืนยันลบข้อสอบข้อที่ ${idx + 1}?`)) return;
+
+            questions.splice(idx, 1);
+            if (activeQuestionIndex >= questions.length) {
+                activeQuestionIndex = questions.length - 1;
+            }
+            renderAllQuestionsList();
+            renderActiveQuestionStage();
         }
 
-        // Switch True/False Mode
         function toggleTrueFalseMode() {
-            const q = manualQuestions[activeQuestionIndex];
-            if (!q) return;
+            const cur = questions[activeQuestionIndex];
+            if (!cur) return;
 
-            if (q.type === 'true_false') {
-                q.type = 'quiz';
-                q.choices = ['', '', '', ''];
-                q.choices_img = ['', '', '', ''];
-                q.answer = 'a';
+            if (cur.type === 'true_false') {
+                cur.type = 'quiz';
+                cur.choices = ['', '', '', ''];
+                cur.answer = 'a';
             } else {
-                q.type = 'true_false';
-                q.choices = ['จริง / ถูกต้อง', 'เท็จ / ไม่ถูกต้อง', '', ''];
-                q.choices_img = ['', '', '', ''];
-                q.answer = 'a';
+                cur.type = 'true_false';
+                cur.choices = ['ถูก (จริง)', 'ผิด (เท็จ)', '', ''];
+                cur.answer = 'a';
             }
-            renderCurrentQuestionStage();
-            renderAllSlides();
+            renderAllQuestionsList();
+            renderActiveQuestionStage();
         }
 
-        function onPropQuestionTypeChange(type) {
-            const q = manualQuestions[activeQuestionIndex];
-            if (!q) return;
-            if (type === 'true_false' && q.type !== 'true_false') {
+        function onQuestionTypeChanged(type) {
+            if (!questions[activeQuestionIndex]) return;
+            questions[activeQuestionIndex].type = type;
+            if (type === 'true_false') {
                 toggleTrueFalseMode();
-            } else if (type === 'quiz' && q.type === 'true_false') {
-                toggleTrueFalseMode();
+            } else {
+                questions[activeQuestionIndex].type = 'quiz';
+                renderActiveQuestionStage();
             }
         }
 
-        function onPropTimeLimitChange(seconds) {
-            const q = manualQuestions[activeQuestionIndex];
-            if (q) q.timeLimit = parseInt(seconds, 10);
+        function onTimeLimitChanged(sec) {
+            if (!questions[activeQuestionIndex]) return;
+            questions[activeQuestionIndex].timeLimit = parseInt(sec, 10);
         }
 
         function applyTimeToAllQuestions() {
             const sec = parseInt(document.getElementById('prop-time-limit').value, 10);
-            manualQuestions.forEach(q => q.timeLimit = sec);
-            alert(`⏱️ ตั้งค่าเวลา ${sec > 0 ? sec + ' วินาที' : 'ไม่จำกัดเวลา'} ให้กับทุกข้อคำถามเรียบร้อยแล้ว`);
+            questions.forEach(q => q.timeLimit = sec);
+            alert(`⏱️ ตั้งเวลา ${sec === 0 ? 'ไม่จำกัด' : sec + ' วินาที'} ให้กับทุกข้อเรียบร้อยแล้ว`);
         }
 
-        function togglePropertiesSidebar() {
-            const sb = document.getElementById('properties-sidebar');
-            sb.classList.toggle('hidden');
+        function toggleSettingsSidebar() {
+            document.getElementById('settings-sidebar').classList.toggle('hidden');
         }
 
         // ==========================================
-        // 💾 SAVE QUESTIONS TO DATABASE
+        // 4. SAVE TO COURSE (มีแค่กดบันทึก นำไปเก็บในรายวิชา)
         // ==========================================
-        async function saveKahootQuestions() {
-            if (!currentRoomId) {
-                alert("กรุณาเลือกห้องสอบก่อนครับ");
+        async function saveQuestionsToCourse() {
+            if (!activeCourseId) {
+                alert("กรุณาเลือกรายวิชาที่จะนำข้อสอบไปจัดเก็บก่อนครับ");
                 return;
             }
 
-            if (manualQuestions.length === 0) {
-                alert("กรุณาเพิ่มข้อสอบอย่างน้อย 1 ข้อครับ");
-                return;
+            const courseObj = courses.find(c => String(c.id) === String(activeCourseId));
+            const courseName = courseObj ? courseObj.courseName : 'รายวิชาที่เลือก';
+
+            let examTitle = document.getElementById('top-exam-title').value.trim();
+            if (!examTitle) {
+                examTitle = `แบบทดสอบวิชา ${courseName}`;
+                document.getElementById('top-exam-title').value = examTitle;
             }
 
-            // Quick validation
-            for (let i = 0; i < manualQuestions.length; i++) {
-                const q = manualQuestions[i];
-                if (!q.question.trim() && !q.question_img) {
-                    selectQuestionIndex(i);
-                    alert(`⚠️ กรุณากรอกคำถามในข้อที่ ${i + 1} ให้เรียบร้อยครับ`);
-                    return;
-                }
-                const hasAnswers = q.choices.some(c => c && c.trim() !== '');
-                if (!hasAnswers) {
-                    selectQuestionIndex(i);
-                    alert(`⚠️ กรุณากรอกตัวเลือกคำตอบในข้อที่ ${i + 1} อย่างน้อย 1-2 ข้อครับ`);
-                    return;
-                }
-            }
+            const duration = parseInt(document.getElementById('prop-total-duration').value, 10) || 60;
+            const announcement = document.getElementById('prop-announcement').value.trim();
+            const randomize = document.getElementById('prop-randomize').checked ? 1 : 0;
+            const showScore = document.getElementById('prop-show-score').checked ? 1 : 0;
 
-            const btn = document.getElementById('btn-save-all');
-            const oldText = btn.innerHTML;
+            const btn = document.getElementById('btn-save-course');
+            const oldHtml = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '⏳ กำลังบันทึก...';
 
-            const questionsPayload = manualQuestions.map(q => {
-                const p = {
-                    question: q.question.trim(),
-                    question_img: q.question_img || '',
-                    answer: q.answer || 'a'
-                };
-                choiceKeys.forEach((k, idx) => {
-                    p[k] = (q.choices && q.choices[idx]) ? q.choices[idx].trim() : '';
-                    p[k + '_img'] = (q.choices_img && q.choices_img[idx]) || '';
-                });
-                return p;
-            });
-
             try {
-                const res = await fetch('/api/teacher/add-questions', {
+                // 1. ถ้ายังไม่มี roomId หรือต้องการสร้างห้องสำหรับวิชานี้
+                let targetRoomId = activeRoomId;
+                if (!targetRoomId) {
+                    const cRes = await fetch('/api/teacher/create-room', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            username,
+                            roomName: examTitle,
+                            examTitle,
+                            courseId: parseInt(activeCourseId, 10),
+                            duration,
+                            announcement,
+                            randomize,
+                            showScore
+                        })
+                    });
+                    const cData = await cRes.json();
+                    if (cRes.ok && cData.success) {
+                        targetRoomId = cData.roomId;
+                        activeRoomId = targetRoomId;
+                    }
+                } else {
+                    // อัปเดตการตั้งค่าห้องสอบ
+                    await fetch('/api/teacher/update-room-settings', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            roomId: targetRoomId,
+                            courseId: parseInt(activeCourseId, 10),
+                            roomName: examTitle,
+                            examTitle,
+                            duration,
+                            announcement,
+                            randomize,
+                            showScore
+                        })
+                    });
+                }
+
+                // 2. จัดรูปแบบคำถามเพื่อบันทึก
+                const formatted = questions.map(q => {
+                    const item = {
+                        question: q.question || '',
+                        question_img: q.question_img || '',
+                        answer: (q.answer || 'a').toLowerCase()
+                    };
+                    choiceKeys.forEach((key, idx) => {
+                        item[key] = (q.choices && q.choices[idx]) ? q.choices[idx] : '';
+                        item[key + '_img'] = (q.choices_img && q.choices_img[idx]) ? q.choices_img[idx] : '';
+                    });
+                    return item;
+                });
+
+                // 3. บันทึกคำถามลงฐานข้อมูล
+                const res = await fetch('/api/teacher/save-questions', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ roomId: currentRoomId, questions: questionsPayload })
+                    body: JSON.stringify({
+                        roomId: targetRoomId,
+                        questions: formatted
+                    })
                 });
                 const data = await res.json();
-                if (res.ok && data.success) {
-                    alert(`🎉 บันทึกข้อสอบทั้งหมดจำนวน ${manualQuestions.length} ข้อสำเร็จเรียบร้อยแล้ว!\nสามารถกดปุ่ม "📱 ห้องรอสอบ (PIN/QR)" เพื่อเปิดให้นักศึกษาเข้ามารอสอบได้เลยครับ`);
+
+                if (res.ok) {
+                    alert(`✅ บันทึกข้อสอบเข้าสู่รายวิชา "${courseName}" เรียบร้อยแล้ว!\n(รวมข้อสอบทั้งสิ้น ${formatted.length} ข้อ)`);
                 } else {
                     alert(`❌ บันทึกไม่สำเร็จ: ${data.message || 'เกิดข้อผิดพลาด'}`);
                 }
             } catch(e) {
-                console.error(e);
-                alert("ไม่สามารถติดต่อเซิร์ฟเวอร์ได้");
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = oldText;
-            }
-        }
-
-        // ==========================================
-        // 📱 WAITING LOUNGE (PIN & QR & LIVE STUDENTS)
-        // ==========================================
-        async function openWaitingLoungeModal(targetRoomId, pinCode, roomName, examTitle) {
-            const rId = targetRoomId || currentRoomId;
-            if (!rId) {
-                alert("กรุณาเลือกห้องสอบก่อน");
-                return;
-            }
-
-            try {
-                const statusRes = await fetch(`/api/teacher/get-publish-status?roomId=${encodeURIComponent(rId)}`);
-                const statusData = await statusRes.json();
-                const pin = pinCode || statusData.exam_code || currentPublishedPin || '------';
-                currentPublishedPin = pin;
-
-                const formattedPin = pin.length === 6 ? `${pin.slice(0,3)} ${pin.slice(3)}` : pin;
-                document.getElementById('pub-modal-pin').textContent = formattedPin;
-
-                const joinUrl = `${window.location.origin}/Student-login.html?room=${encodeURIComponent(rId)}&code=${encodeURIComponent(pin)}`;
-                document.getElementById('pub-modal-link').value = joinUrl;
-
-                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(joinUrl)}`;
-                document.getElementById('pub-modal-qrcode').src = qrUrl;
-
-                const displayTitle = examTitle || statusData.exam_title || '';
-                const displayRoomName = roomName || statusData.roomName || rId;
-                document.getElementById('pub-modal-room-info').textContent = `ห้อง: ${displayRoomName} (${rId}) ${displayTitle ? '• ' + displayTitle : ''}`;
-
-                // Update start/stop UI
-                const isPub = statusData.is_published === 1;
-                const icon = document.getElementById('pub-modal-icon');
-                const title = document.getElementById('pub-modal-title');
-                const badge = document.getElementById('pub-modal-badge');
-                const startBtn = document.getElementById('btn-lounge-start-exam');
-                const stopBtn = document.getElementById('btn-lounge-stop-exam');
-
-                if (isPub) {
-                    if (icon) icon.textContent = '🟢';
-                    if (title) title.textContent = 'การสอบกำลังดำเนินอยู่ (LIVE)';
-                    if (badge) {
-                        badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-700';
-                        badge.textContent = '🟢 กำลังสอบ (LIVE)';
-                    }
-                    if (startBtn) startBtn.classList.add('hidden');
-                    if (stopBtn) stopBtn.classList.remove('hidden');
-                } else {
-                    if (icon) icon.textContent = '⏳';
-                    if (title) title.textContent = 'ห้องรอสอบ (Waiting Lounge)';
-                    if (badge) {
-                        badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-700';
-                        badge.textContent = '⏳ รอกดเริ่มสอบ';
-                    }
-                    if (startBtn) startBtn.classList.remove('hidden');
-                    if (stopBtn) stopBtn.classList.add('hidden');
-                }
-
-                await pollWaitingStudents(rId);
-                if (waitingStudentsInterval) clearInterval(waitingStudentsInterval);
-                waitingStudentsInterval = setInterval(() => pollWaitingStudents(rId), 2000);
-
-                document.getElementById('publish-modal').classList.remove('hidden');
-            } catch(e) {
-                console.error(e);
-            }
-        }
-
-        function closePublishModal() {
-            if (waitingStudentsInterval) {
-                clearInterval(waitingStudentsInterval);
-                waitingStudentsInterval = null;
-            }
-            document.getElementById('publish-modal').classList.add('hidden');
-        }
-
-        async function pollWaitingStudents(rId) {
-            try {
-                const res = await fetch(`/api/teacher/waiting-students?roomId=${encodeURIComponent(rId)}`);
-                if (!res.ok) return;
-                const data = await res.json();
-                document.getElementById('pub-waiting-count').textContent = data.count || 0;
-                const list = document.getElementById('pub-waiting-students-list');
-                if (data.students && data.students.length > 0) {
-                    list.innerHTML = data.students.map(s => `
-                        <div class="flex items-center justify-between py-1 border-b border-slate-100 last:border-b-0">
-                            <span class="font-bold text-slate-800">${escapeHtml(s.name)}</span>
-                            <span class="font-mono text-slate-400 text-[11px]">${escapeHtml(s.studentId)}</span>
-                        </div>
-                    `).join('');
-                } else {
-                    list.innerHTML = '<p class="text-slate-400 text-center py-1">ยังไม่มีนักศึกษาเข้ามารอ...</p>';
-                }
-            } catch(e) {}
-        }
-
-        function toggleWaitingStudentsList() {
-            document.getElementById('pub-waiting-list-container').classList.toggle('hidden');
-        }
-
-        async function startExamFromLounge() {
-            if (!currentRoomId) return;
-            if (!confirm("🚀 ยืนยันเริ่มการสอบทันที?\nนักศึกษาทุกคนที่กำลังรออยู่ในห้องจะเริ่มทำข้อสอบพร้อมกันทันที")) return;
-
-            try {
-                const res = await fetch('/api/teacher/publish-exam', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ roomId: currentRoomId, publish: true })
-                });
-                const data = await res.json();
-                if (res.ok && data.success) {
-                    alert("🎉 เริ่มการสอบเรียบร้อยแล้ว! หน้าจอของนักศึกษาในห้องรอสอบจะเปลี่ยนเป็นหน้าทำข้อสอบพร้อมกัน");
-                    openWaitingLoungeModal();
-                } else {
-                    alert(`❌ ไม่สามารถเริ่มสอบได้: ${data.message}`);
-                }
-            } catch(e) {
-                alert("เกิดข้อผิดพลาดในการเชื่อมต่อ");
-            }
-        }
-
-        async function stopExamFromLounge() {
-            if (!currentRoomId) return;
-            if (!confirm("🛑 ยืนยันปิดห้องสอบ / สลับกลับเป็นแบบร่าง?\nนักศึกษาจะไม่สามารถทำหรือส่งข้อสอบต่อได้")) return;
-
-            try {
-                const res = await fetch('/api/teacher/publish-exam', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ roomId: currentRoomId, publish: false })
-                });
-                const data = await res.json();
-                if (res.ok && data.success) {
-                    alert("🛑 ปิดห้องสอบเรียบร้อยแล้ว");
-                    openWaitingLoungeModal();
-                }
-            } catch(e) {
-                alert("เกิดข้อผิดพลาด");
-            }
-        }
-
-        function copyPublishLink() {
-            const link = document.getElementById('pub-modal-link').value;
-            navigator.clipboard.writeText(link).then(() => {
-                alert("📋 คัดลอกลิงก์เรียบร้อยแล้ว!");
-            });
-        }
-
-        function copyPinOnly() {
-            if (!currentPublishedPin) return;
-            navigator.clipboard.writeText(currentPublishedPin).then(() => {
-                alert(`📋 คัดลอกรหัส PIN: ${currentPublishedPin} เรียบร้อยแล้ว`);
-            });
-        }
-
-        function toggleProjectorMode() {
-            const card = document.getElementById('publish-modal-card');
-            const modal = document.getElementById('publish-modal');
-            if (!document.fullscreenElement) {
-                modal.requestFullscreen().catch(() => {});
-                card.classList.remove('max-w-lg');
-                card.classList.add('max-w-3xl', 'p-10');
-            } else {
-                document.exitFullscreen().catch(() => {});
-                card.classList.remove('max-w-3xl', 'p-10');
-                card.classList.add('max-w-lg');
-            }
-        }
-
-        // ==========================================
-        // 📚 LIBRARY TEMPLATES SELECTOR
-        // ==========================================
-        function openSelectFromLibraryModal() {
-            document.getElementById('library-selector-modal').classList.remove('hidden');
-            loadLibraryTemplates();
-        }
-
-        function closeSelectFromLibraryModal() {
-            document.getElementById('library-selector-modal').classList.add('hidden');
-        }
-
-        async function loadLibraryTemplates() {
-            const list = document.getElementById('modal-library-list');
-            list.innerHTML = '<div class="text-center py-6 text-slate-400">กำลังโหลดชุดข้อสอบในคลัง...</div>';
-
-            try {
-                const res = await fetch(`/api/library/get-templates?username=${encodeURIComponent(username)}`);
-                const templates = await res.json();
-
-                if (!Array.isArray(templates) || templates.length === 0) {
-                    list.innerHTML = `
-                        <div class="text-center py-8 text-slate-400 border border-dashed border-slate-200 rounded-2xl bg-slate-50">
-                            ยังไม่มีข้อสอบในคลังข้อสอบของคุณ
-                        </div>`;
-                    return;
-                }
-
-                list.innerHTML = templates.map(t => `
-                    <div class="bg-white border-2 border-slate-200 hover:border-indigo-500 rounded-2xl p-4 flex items-center justify-between gap-4 transition shadow-xs">
-                        <div>
-                            <h4 class="font-black text-slate-900 text-base">${escapeHtml(t.templateName)}</h4>
-                            <div class="flex items-center gap-2 mt-1 text-xs text-slate-500">
-                                <span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-md font-bold">${t.questionCount} ข้อ</span>
-                                <span>🗓️ ${t.created_at || ''}</span>
-                            </div>
-                        </div>
-                        <button onclick="copyTemplateQuestions(${t.id})" class="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-black rounded-xl shadow-xs hover:opacity-90 active:scale-95 transition">
-                            📁 ดึงข้อสอบชุดนี้
-                        </button>
-                    </div>
-                `).join('');
-            } catch(e) {
-                list.innerHTML = '<div class="text-center py-6 text-rose-500 font-bold">เกิดข้อผิดพลาดในการโหลดคลังข้อสอบ</div>';
-            }
-        }
-
-        async function copyTemplateQuestions(templateId) {
-            if (!currentRoomId) return;
-            if (!confirm("⚠️ ยืนยันการดึงข้อสอบชุดนี้มาใช้ในห้องเรียนปัจจุบัน?\n(ข้อสอบเดิมในห้องนี้จะถูกแทนที่ด้วยข้อสอบจากคลัง)")) return;
-
-            try {
-                const res = await fetch('/api/library/load-template', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ roomId: currentRoomId, templateId })
-                });
-                const data = await res.json();
-                if (res.ok && data.success) {
-                    closeSelectFromLibraryModal();
-                    await loadExistingQuestionsToStudio();
-                    alert(`✅ ดึงข้อสอบเข้าสู่สตูดิโอสำเร็จแล้ว! (รวม ${data.count} ข้อ)`);
-                } else {
-                    alert(`❌ ดึงข้อสอบไม่สำเร็จ: ${data.message}`);
-                }
-            } catch(e) {
-                alert("เกิดข้อผิดพลาดในการกู้คืนข้อสอบ");
-            }
-        }
-
-        // ==========================================
-        // ➕ CREATE ROOM MODAL
-        // ==========================================
-        async function openCreateRoomModal() {
-            const cSelect = document.getElementById('create-room-course-id');
-            const tSelect = document.getElementById('create-room-template-id');
-
-            cSelect.innerHTML = '<option value="">กำลังโหลดรายวิชา...</option>';
-            tSelect.innerHTML = '<option value="">กำลังโหลดคลังข้อสอบ...</option>';
-
-            document.getElementById('create-room-name').value = '';
-            document.getElementById('create-room-exam-title').value = 'สอบเก็บคะแนน';
-            document.getElementById('create-room-duration').value = '60';
-
-            // 1. โหลดรายวิชา
-            try {
-                const res = await fetch(`/api/teacher/courses?username=${encodeURIComponent(username)}`);
-                if (res.ok) {
-                    const courses = await res.json();
-                    if (Array.isArray(courses) && courses.length > 0) {
-                        cSelect.innerHTML = '<option value="">-- ไม่ระบุรายวิชา (ทั่วไป) --</option>' +
-                            courses.map(c => `<option value="${c.id}" data-code="${escapeHtml(c.courseCode)}" data-name="${escapeHtml(c.courseName)}">[${c.courseCode || 'วิชา'}] ${c.courseName} (${c.studentCount || 0} คน)</option>`).join('');
-                    } else {
-                        cSelect.innerHTML = '<option value="">-- ยังไม่มีวิชาในระบบ (สร้างได้ที่ "จัดการรายวิชา") --</option>';
-                    }
-                }
-            } catch(e) {}
-
-            // 2. โหลดชุดข้อสอบจากคลัง
-            try {
-                const resT = await fetch(`/api/library/get-templates?username=${encodeURIComponent(username)}`);
-                if (resT.ok) {
-                    const templates = await resT.json();
-                    if (Array.isArray(templates) && templates.length > 0) {
-                        tSelect.innerHTML = '<option value="">-- เลือกชุดข้อสอบจากคลัง (ดึงข้อสอบลงห้องอัตโนมัติ) --</option>' +
-                            templates.map(t => `<option value="${t.id}" data-name="${escapeHtml(t.templateName)}">📁 ${t.templateName} (${t.questionCount} ข้อ)</option>`).join('') +
-                            '<option value="none">✍️ ยังไม่เลือก (จะพิมพ์ข้อสอบเองในห้อง)</option>';
-                    } else {
-                        tSelect.innerHTML = '<option value="none">📭 ยังไม่มีข้อสอบในคลัง (จะพิมพ์ข้อสอบเองในห้อง)</option>';
-                    }
-                }
-            } catch(e) {
-                tSelect.innerHTML = '<option value="none">✍️ จะพิมพ์ข้อสอบเองในห้อง</option>';
-            }
-
-            document.getElementById('create-room-modal').classList.remove('hidden');
-        }
-
-        function onCourseSelectedForNewRoom(select) {
-            const opt = select.options[select.selectedIndex];
-            if (opt && opt.value) {
-                const cName = opt.getAttribute('data-name');
-                const nameInput = document.getElementById('create-room-name');
-                if (!nameInput.value.trim() && cName) {
-                    nameInput.value = cName;
-                }
-            }
-        }
-
-        function onTemplateSelectedForNewRoom(select) {
-            const opt = select.options[select.selectedIndex];
-            if (opt && opt.value && opt.value !== 'none') {
-                const tName = opt.getAttribute('data-name');
-                const titleInput = document.getElementById('create-room-exam-title');
-                if (tName) {
-                    titleInput.value = tName;
-                }
-            }
-        }
-
-        function closeCreateRoomModal() {
-            document.getElementById('create-room-modal').classList.add('hidden');
-        }
-
-        async function handleCreateRoom() {
-            const courseId = document.getElementById('create-room-course-id').value;
-            const templateId = document.getElementById('create-room-template-id').value;
-            let roomName = document.getElementById('create-room-name').value.trim();
-            let examTitle = document.getElementById('create-room-exam-title').value.trim();
-            const duration = parseInt(document.getElementById('create-room-duration').value, 10) || 0;
-
-            if (!roomName) {
-                roomName = examTitle || 'ห้องสอบใหม่';
-            }
-            if (!examTitle) {
-                examTitle = roomName;
-            }
-
-            const btn = document.getElementById('btn-submit-create-room');
-            const oldHtml = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '⏳ กำลังสร้างห้องและเปิดห้องรอสอบ...';
-
-            try {
-                // 1. สร้างห้องสอบบนเซิร์ฟเวอร์
-                const res = await fetch('/api/teacher/create-room', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        username,
-                        roomName,
-                        examTitle,
-                        duration,
-                        courseId: courseId ? parseInt(courseId, 10) : null
-                    })
-                });
-                const data = await res.json();
-                if (!res.ok || !data.success) {
-                    alert(`❌ สร้างห้องไม่สำเร็จ: ${data.message || 'เกิดข้อผิดพลาด'}`);
-                    btn.disabled = false;
-                    btn.innerHTML = oldHtml;
-                    return;
-                }
-
-                const newRoomId = data.roomId;
-                const newPin = data.exam_code;
-
-                // 2. หากเลือกชุดข้อสอบจากคลัง ให้ดึงข้อสอบลงห้องทันทีใน 1 วินาที!
-                if (templateId && templateId !== 'none' && !isNaN(parseInt(templateId, 10))) {
-                    try {
-                        await fetch('/api/library/load-template', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                roomId: newRoomId,
-                                templateId: parseInt(templateId, 10)
-                            })
-                        });
-                    } catch(tErr) {
-                        console.error('Auto-load template error:', tErr);
-                    }
-                }
-
-                closeCreateRoomModal();
-
-                // 3. สลับห้องในสตูดิโอ
-                await loadTeacherRooms();
-                document.getElementById('room-selector').value = newRoomId;
-                await onRoomChange();
-
-                // 4. เปิดหน้าต่าง ห้องรอสอบ (Waiting Lounge) พร้อม PIN 6 หลัก และ QR Code ทันที!
-                openWaitingLoungeModal(newRoomId, newPin, roomName, examTitle);
-
-            } catch(e) {
-                console.error(e);
-                alert("เกิดข้อผิดพลาดในการสร้างห้องสอบ");
+                console.error("saveQuestionsToCourse error:", e);
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อกับระบบ");
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = oldHtml;
@@ -1694,141 +1060,121 @@
         }
 
         // ==========================================
-        // ⚙️ SETTINGS MODAL ACTIONS
+        // 5. EXCEL (.XLSX) IMPORT ONLY
         // ==========================================
-        function openExamSettingsModal() {
-            document.getElementById('exam-settings-modal').classList.remove('hidden');
+        function triggerExcelImport() {
+            document.getElementById('excel-file-input').click();
         }
 
-        function closeExamSettingsModal() {
-            document.getElementById('exam-settings-modal').classList.add('hidden');
-        }
+        function handleExcelFileSelected(input) {
+            const file = input.files && input.files[0];
+            if (!file) return;
 
-        async function saveExamSettingsFromModal() {
-            if (!currentRoomId) return;
-
-            const courseId = document.getElementById('modal-room-course-id').value;
-            const roomName = document.getElementById('modal-room-name').value.trim();
-            const examTitle = document.getElementById('modal-exam-title').value.trim();
-            const duration = parseInt(document.getElementById('modal-duration').value, 10) || 0;
-            const announcement = document.getElementById('modal-announcement').value.trim();
-            const randomize = document.getElementById('modal-randomize').checked ? 1 : 0;
-            const showScore = document.getElementById('modal-show-score').checked ? 1 : 0;
-
-            try {
-                const res = await fetch('/api/teacher/update-room-settings', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        roomId: currentRoomId,
-                        courseId: courseId ? parseInt(courseId, 10) : 0,
-                        roomName,
-                        examTitle,
-                        duration,
-                        announcement,
-                        randomize,
-                        showScore
-                    })
-                });
-                if (res.ok) {
-                    closeExamSettingsModal();
-                    document.getElementById('top-exam-title').value = examTitle || roomName;
-                    alert("✅ บันทึกการตั้งค่าห้องสอบเรียบร้อยแล้ว");
-                }
-            } catch(e) {
-                alert("เกิดข้อผิดพลาดในการบันทึกการตั้งค่า");
-            }
-        }
-
-        // ==========================================
-        // 📋 FAST PASTE / TEXT PARSER
-        // ==========================================
-        function openFastImportModal() {
-            document.getElementById('fast-import-modal').classList.remove('hidden');
-        }
-
-        function closeFastImportModal() {
-            document.getElementById('fast-import-modal').classList.add('hidden');
-        }
-
-        function parseAndAppendFastQuestions() {
-            const rawText = document.getElementById('fast-import-text').value;
-            if (!rawText.trim()) {
-                alert("กรุณาวางข้อความข้อสอบก่อนครับ");
+            if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
+                alert("❌ รองรับเฉพาะไฟล์ Excel (.xlsx) เท่านั้นครับ");
+                input.value = '';
                 return;
             }
 
-            const lines = rawText.split('\n').map(l => l.trim()).filter(Boolean);
-            const parsed = [];
-            let current = null;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[firstSheetName];
+                    const rows = XLSX.utils.sheet_to_json(sheet);
 
-            const isChoiceLine = (line) => {
-                return /^[ก-ฮA-Da-d1-4][\.\)\-\s]/.test(line);
-            };
+                    if (!Array.isArray(rows) || rows.length === 0) {
+                        alert("❌ ไม่พบข้อมูลข้อสอบในไฟล์ Excel");
+                        input.value = '';
+                        return;
+                    }
 
-            lines.forEach(line => {
-                // If it starts with a question number (e.g. 1. or 1) )
-                if (/^\d+[\.\)\-]\s*/.test(line)) {
-                    if (current) parsed.push(current);
-                    current = {
-                        question: line.replace(/^\d+[\.\)\-]\s*/, '').trim(),
-                        question_img: '',
-                        choices: [],
-                        choices_img: ['', '', '', ''],
-                        answer: 'a',
-                        timeLimit: 20,
-                        type: 'quiz'
-                    };
-                } else if (isChoiceLine(line)) {
-                    if (!current) {
-                        current = {
-                            question: 'คำถาม',
+                    const parsedQuestions = [];
+
+                    rows.forEach(row => {
+                        // Normalize keys
+                        const norm = {};
+                        for (let k in row) {
+                            if (row.hasOwnProperty(k)) {
+                                norm[k.trim().toLowerCase()] = String(row[k]).trim();
+                            }
+                        }
+
+                        const qText = norm['คำถาม'] || norm['โจทย์'] || norm['question'] || norm['ข้อ'] || '';
+                        if (!qText) return;
+
+                        const choiceA = norm['ก'] || norm['a'] || norm['ตัวเลือก ก'] || '';
+                        const choiceB = norm['ข'] || norm['b'] || norm['ตัวเลือก ข'] || '';
+                        const choiceC = norm['ค'] || norm['c'] || norm['ตัวเลือก ค'] || '';
+                        const choiceD = norm['ง'] || norm['d'] || norm['ตัวเลือก ง'] || '';
+
+                        let rawAns = norm['เฉลย'] || norm['answer'] || norm['คำตอบ'] || 'ก';
+                        rawAns = rawAns.toLowerCase();
+
+                        let ans = 'a';
+                        if (rawAns === 'ก' || rawAns === 'a' || rawAns === '1') ans = 'a';
+                        else if (rawAns === 'ข' || rawAns === 'b' || rawAns === '2') ans = 'b';
+                        else if (rawAns === 'ค' || rawAns === 'c' || rawAns === '3') ans = 'c';
+                        else if (rawAns === 'ง' || rawAns === 'd' || rawAns === '4') ans = 'd';
+
+                        parsedQuestions.push({
+                            question: qText,
                             question_img: '',
-                            choices: [],
+                            choices: [choiceA, choiceB, choiceC, choiceD],
                             choices_img: ['', '', '', ''],
-                            answer: 'a',
+                            answer: ans,
                             timeLimit: 20,
                             type: 'quiz'
-                        };
+                        });
+                    });
+
+                    if (parsedQuestions.length === 0) {
+                        alert("❌ ไม่สามารถดึงข้อสอบได้ กรุณาตรวจสอบหัวตาราง เช่น คำถาม, ก, ข, ค, ง, เฉลย");
+                        input.value = '';
+                        return;
                     }
-                    const cleanChoice = line.replace(/^[ก-ฮA-Da-d1-4][\.\)\-\s]*/, '').trim();
-                    if (current.choices.length < 4) {
-                        current.choices.push(cleanChoice);
+
+                    // ถ้ามีข้อสอบเดิมอยู่เพียง 1 ข้อที่ยังว่าง ให้แทนที่
+                    if (questions.length === 1 && !questions[0].question.trim()) {
+                        questions = parsedQuestions;
+                    } else {
+                        questions = questions.concat(parsedQuestions);
                     }
-                } else {
-                    if (current && current.choices.length === 0) {
-                        current.question += ' ' + line;
-                    }
+
+                    activeQuestionIndex = questions.length - parsedQuestions.length;
+                    renderAllQuestionsList();
+                    renderActiveQuestionStage();
+
+                    alert(`🎉 นำเข้าข้อสอบจากไฟล์ Excel (.xlsx) เรียบร้อยแล้วจำนวน ${parsedQuestions.length} ข้อ!`);
+                } catch(err) {
+                    console.error("Excel import error:", err);
+                    alert("❌ เกิดข้อผิดพลาดในการอ่านไฟล์ Excel");
+                } finally {
+                    input.value = '';
                 }
-            });
+            };
+            reader.readAsArrayBuffer(file);
+        }
 
-            if (current) parsed.push(current);
-
-            if (parsed.length === 0) {
-                alert("ไม่สามารถแยกข้อสอบได้ กรุณาตรวจสอบรูปแบบ เช่น 1. โจทย์... ตามด้วย ก. ข. ค. ง.");
-                return;
-            }
-
-            // Fill up missing choices to 4
-            parsed.forEach(q => {
-                while (q.choices.length < 4) q.choices.push('');
-            });
-
-            // If only had 1 empty question, replace it
-            if (manualQuestions.length === 1 && !manualQuestions[0].question.trim()) {
-                manualQuestions = parsed;
-            } else {
-                manualQuestions = manualQuestions.concat(parsed);
-            }
-
-            closeFastImportModal();
-            renderAllSlides();
-            renderCurrentQuestionStage();
-            alert(`🎉 นำเข้าข้อสอบเรียบร้อยแล้วจำนวน ${parsed.length} ข้อ!`);
+        // ดาวน์โหลดแม่แบบตัวอย่างไฟล์ .xlsx
+        function downloadSampleExcel() {
+            const ws_data = [
+                ["ข้อ", "คำถาม", "ก", "ข", "ค", "ง", "เฉลย"],
+                [1, "เมืองหลวงของประเทศไทยคือเมืองใด?", "เชียงใหม่", "กรุงเทพมหานคร", "ภูเก็ต", "ขอนแก่น", "ข"],
+                [2, "ข้อใดคือแม่สีหลักทางทัศนศิลป์?", "สีแดง", "สีม่วง", "สีส้ม", "สีเขียว", "ก"],
+                [3, "ระบบปฏิบัติการใดเป็นระบบ Open Source?", "Windows", "macOS", "Linux", "iOS", "ค"],
+                [4, "ภาษาใดใช้สำหรับการจัดโครงสร้างหน้าเว็บเป็นหลัก?", "HTML", "Python", "SQL", "C++", "ก"]
+            ];
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "ข้อสอบ");
+            XLSX.writeFile(wb, "ตัวอย่างไฟล์ข้อสอบ_TabLock.xlsx");
         }
 
         // ==========================================
-        // UTILITIES
+        // 6. UTILITIES
         // ==========================================
         function escapeHtml(str) {
             if (!str) return '';
