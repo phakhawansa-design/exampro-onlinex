@@ -1863,6 +1863,71 @@ app.post('/api/teacher/save-questions', async (req, res) => {
     });
 });
 
+// ==========================================
+// 📚 บันทึกชุดข้อสอบประจำวิชา (เฉพาะเข้าคลังข้อสอบวิชา ไม่สร้างห้องสอบใน teacher_rooms)
+// ==========================================
+app.post('/api/teacher/save-course-exam', (req, res) => {
+    const { username, courseId, examTitle, questions } = req.body;
+    if (!username || !courseId || !Array.isArray(questions)) {
+        return res.status(400).json({ message: "ข้อมูลไม่ครบถ้วน (username, courseId, questions)" });
+    }
+
+    const cleanTitle = (examTitle || 'แบบทดสอบประจำวิชา').trim();
+    const cleanCourseId = parseInt(courseId, 10);
+    const nowStr = new Date().toLocaleDateString('th-TH', { 
+        timeZone: 'Asia/Bangkok',
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+    });
+
+    db.get('SELECT id FROM exam_templates WHERE teacherUsername = ? AND courseId = ? AND templateName = ?', 
+    [username, cleanCourseId, cleanTitle], (err, row) => {
+        if (err) return res.status(500).json({ message: err.message });
+
+        let templateId = row ? row.id : null;
+
+        if (templateId) {
+            db.run('UPDATE exam_templates SET created_at = ? WHERE id = ?', [nowStr, templateId], (uErr) => {
+                if (uErr) console.error("update template err:", uErr);
+                saveQuestionsToTemplateHelper(templateId, questions, res);
+            });
+        } else {
+            db.run('INSERT INTO exam_templates (teacherUsername, templateName, courseId, created_at) VALUES (?, ?, ?, ?)',
+            [username, cleanTitle, cleanCourseId, nowStr], function(iErr) {
+                if (iErr) return res.status(500).json({ message: iErr.message });
+                templateId = this.lastID;
+                saveQuestionsToTemplateHelper(templateId, questions, res);
+            });
+        }
+    });
+});
+
+function saveQuestionsToTemplateHelper(templateId, questions, res) {
+    db.run('DELETE FROM template_questions WHERE templateId = ?', [templateId], (delErr) => {
+        if (delErr) return res.status(500).json({ message: delErr.message });
+
+        const stmt = db.prepare(`
+            INSERT INTO template_questions (
+                templateId, question, question_img,
+                a, b, c, d, e, f, g, h, i, j,
+                a_img, b_img, c_img, d_img, e_img, f_img, g_img, h_img, i_img, j_img,
+                answer
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `);
+
+        questions.forEach(q => {
+            stmt.run(
+                templateId, q.question || '', q.question_img || '',
+                q.a || '', q.b || '', q.c || '', q.d || '', q.e || '', q.f || '', q.g || '', q.h || '', q.i || '', q.j || '',
+                q.a_img || '', q.b_img || '', q.c_img || '', q.d_img || '', q.e_img || '', q.f_img || '', q.g_img || '', q.h_img || '', q.i_img || '', q.j_img || '',
+                q.answer || ''
+            );
+        });
+        stmt.finalize();
+        res.json({ success: true, templateId, count: questions.length });
+    });
+}
+
 // นักเรียนดึงข้อสอบไปทำ (ค้นหาจาก roomId และซ่อนเฉลย - ต้องกดยืนยันเผยแพร่ก่อน)
 app.get('/api/get-questions', (req, res) => {
     const roomId = req.query.roomId;

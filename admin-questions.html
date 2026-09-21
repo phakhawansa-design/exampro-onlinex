@@ -585,12 +585,13 @@
             await loadExistingExamForCourse();
         }
 
-        // โหลดข้อสอบที่มีอยู่แล้วในรายวิชานี้ (ถ้ามี)
+        // โหลดข้อสอบที่มีอยู่แล้วในรายวิชานี้จากคลังข้อสอบ (ถ้ามี)
         async function loadExistingExamForCourse() {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
                 const queryTemplateId = urlParams.get('templateId');
 
+                // 1. ถ้ามี templateId ส่งมาจาก query string
                 if (queryTemplateId) {
                     const tRes = await fetch(`/api/library/get-template-questions?templateId=${encodeURIComponent(queryTemplateId)}`);
                     if (tRes.ok) {
@@ -630,66 +631,53 @@
                     }
                 }
 
-                // ค้นหาห้องสอบที่ผูกกับวิชานี้เท่านั้น (ห้ามใช้ rooms[0] ข้ามวิชา)
-                const rRes = await fetch(`/api/teacher/rooms?username=${encodeURIComponent(username)}`);
-                if (rRes.ok) {
-                    const rooms = await rRes.json();
-                    let targetRoom = null;
-                    if (activeCourseId) {
-                        targetRoom = rooms.find(r => String(r.courseId) === String(activeCourseId));
-                    }
+                // 2. ถ้าไม่มี templateId ใน query string ให้ค้นหาชุดข้อสอบในคลังสำหรับวิชานี้ (courseId)
+                if (activeCourseId) {
+                    const tListRes = await fetch(`/api/library/get-templates?username=${encodeURIComponent(username)}&courseId=${encodeURIComponent(activeCourseId)}`);
+                    if (tListRes.ok) {
+                        const tList = await tListRes.json();
+                        if (Array.isArray(tList) && tList.length > 0) {
+                            const latestTpl = tList[0]; // ชุดล่าสุดสำหรับวิชานี้
+                            document.getElementById('top-exam-title').value = latestTpl.templateName || '';
 
-                    if (targetRoom) {
-                        activeRoomId = targetRoom.roomId;
-                        document.getElementById('top-exam-title').value = targetRoom.exam_title || targetRoom.roomName || '';
-                        if (document.getElementById('prop-total-duration')) {
-                            document.getElementById('prop-total-duration').value = targetRoom.duration || 60;
-                        }
-                        if (document.getElementById('prop-announcement')) {
-                            document.getElementById('prop-announcement').value = targetRoom.announcement || '';
-                        }
-
-                        // โหลดคำถาม
-                        const qRes = await fetch(`/api/teacher/get-questions?roomId=${encodeURIComponent(activeRoomId)}`);
-                        if (qRes.ok) {
-                            const qData = await qRes.json();
-                            if (Array.isArray(qData) && qData.length > 0) {
-                                questions = qData.map(q => {
-                                    const choices = [];
-                                    const choices_img = [];
-                                    choiceKeys.forEach(key => {
-                                        choices.push(q[key] !== null && q[key] !== undefined ? String(q[key]) : '');
-                                        choices_img.push(q[key + '_img'] || '');
+                            const tRes = await fetch(`/api/library/get-template-questions?templateId=${encodeURIComponent(latestTpl.id)}`);
+                            if (tRes.ok) {
+                                const tQuestions = await tRes.json();
+                                if (Array.isArray(tQuestions) && tQuestions.length > 0) {
+                                    questions = tQuestions.map(q => {
+                                        const choices = [];
+                                        const choices_img = [];
+                                        choiceKeys.forEach(key => {
+                                            choices.push(q[key] !== null && q[key] !== undefined ? String(q[key]) : '');
+                                            choices_img.push(q[key + '_img'] || '');
+                                        });
+                                        return {
+                                            question: q.question || '',
+                                            question_img: q.question_img || '',
+                                            choices,
+                                            choices_img,
+                                            answer: (q.answer || 'a').toLowerCase(),
+                                            timeLimit: 20,
+                                            type: 'quiz'
+                                        };
                                     });
-                                    return {
-                                        question: q.question || '',
-                                        question_img: q.question_img || '',
-                                        choices,
-                                        choices_img,
-                                        answer: (q.answer || 'a').toLowerCase(),
-                                        timeLimit: 20,
-                                        type: 'quiz'
-                                    };
-                                });
-                            } else {
-                                questions = [createEmptyQuestion()];
+                                    activeQuestionIndex = 0;
+                                    renderAllQuestionsList();
+                                    renderActiveQuestionStage();
+                                    return;
+                                }
                             }
-                        } else {
-                            questions = [createEmptyQuestion()];
                         }
-                    } else {
-                        // ไม่มีห้องเดิมในวิชานี้ รีเซ็ต activeRoomId เพื่อให้สร้างห้องใหม่เมื่อกดบันทึก
-                        activeRoomId = '';
-                        const courseObj = courses.find(c => String(c.id) === String(activeCourseId));
-                        document.getElementById('top-exam-title').value = courseObj ? `แบบทดสอบวิชา ${courseObj.courseName}` : '';
-                        questions = [createEmptyQuestion()];
                     }
-                } else {
-                    activeRoomId = '';
-                    questions = [createEmptyQuestion()];
                 }
+
+                // ถ้าไม่มีข้อสอบเดิมในคลังสำหรับวิชานี้ ให้ตั้งชื่อตั้งต้นและใช้คำถามว่าง 1 ข้อ
+                activeRoomId = '';
+                const courseObj = courses.find(c => String(c.id) === String(activeCourseId));
+                document.getElementById('top-exam-title').value = courseObj ? `แบบทดสอบวิชา ${courseObj.courseName}` : '';
+                questions = [createEmptyQuestion()];
             } catch(e) {
-                console.error(e);
+                console.error("loadExistingExamForCourse error:", e);
                 activeRoomId = '';
                 questions = [createEmptyQuestion()];
             }
@@ -979,7 +967,7 @@
         }
 
         // ==========================================
-        // 4. SAVE TO COURSE (มีแค่กดบันทึก นำไปเก็บในรายวิชา)
+        // 4. SAVE TO COURSE (บันทึกเข้าคลังข้อสอบประจำวิชา - ไม่สร้างห้องสอบใน teacher_rooms)
         // ==========================================
         async function saveQuestionsToCourse() {
             if (!activeCourseId) {
@@ -996,58 +984,13 @@
                 document.getElementById('top-exam-title').value = examTitle;
             }
 
-            const duration = document.getElementById('prop-total-duration') ? (parseInt(document.getElementById('prop-total-duration').value, 10) || 60) : 60;
-            const announcement = document.getElementById('prop-announcement') ? document.getElementById('prop-announcement').value.trim() : '';
-            const randomize = document.getElementById('prop-randomize') ? (document.getElementById('prop-randomize').checked ? 1 : 0) : 1;
-            const showScore = document.getElementById('prop-show-score') ? (document.getElementById('prop-show-score').checked ? 1 : 0) : 1;
-
             const btn = document.getElementById('btn-save-course');
             const oldHtml = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '⏳ กำลังบันทึก...';
 
             try {
-                // 1. ถ้ายังไม่มี roomId หรือต้องการสร้างห้องสำหรับวิชานี้
-                let targetRoomId = activeRoomId;
-                if (!targetRoomId) {
-                    const cRes = await fetch('/api/teacher/create-room', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            username,
-                            roomName: examTitle,
-                            examTitle,
-                            courseId: parseInt(activeCourseId, 10),
-                            duration,
-                            announcement,
-                            randomize,
-                            showScore
-                        })
-                    });
-                    const cData = await cRes.json();
-                    if (cRes.ok && cData.success) {
-                        targetRoomId = cData.roomId;
-                        activeRoomId = targetRoomId;
-                    }
-                } else {
-                    // อัปเดตการตั้งค่าห้องสอบ
-                    await fetch('/api/teacher/update-room-settings', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            roomId: targetRoomId,
-                            courseId: parseInt(activeCourseId, 10),
-                            roomName: examTitle,
-                            examTitle,
-                            duration,
-                            announcement,
-                            randomize,
-                            showScore
-                        })
-                    });
-                }
-
-                // 2. จัดรูปแบบคำถามเพื่อบันทึก
+                // จัดรูปแบบคำถามเพื่อบันทึก
                 const formatted = questions.map(q => {
                     const item = {
                         question: q.question || '',
@@ -1061,19 +1004,21 @@
                     return item;
                 });
 
-                // 3. บันทึกคำถามลงฐานข้อมูล
-                const res = await fetch('/api/teacher/save-questions', {
+                // บันทึกข้อสอบเข้าคลังประจำวิชา (ไม่สร้างห้องสอบ active ใน teacher_rooms)
+                const res = await fetch('/api/teacher/save-course-exam', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        roomId: targetRoomId,
+                        username,
+                        courseId: parseInt(activeCourseId, 10),
+                        examTitle,
                         questions: formatted
                     })
                 });
                 const data = await res.json();
 
-                if (res.ok) {
-                    alert(`✅ บันทึกข้อสอบเข้าสู่รายวิชา "${courseName}" เรียบร้อยแล้ว!\n(รวมข้อสอบทั้งสิ้น ${formatted.length} ข้อ)`);
+                if (res.ok && data.success) {
+                    alert(`✅ บันทึกชุดข้อสอบเข้าสู่วิชา "${courseName}" เรียบร้อยแล้ว!\n(รวมข้อสอบทั้งสิ้น ${formatted.length} ข้อ)\n\n📌 เมื่อต้องการเริ่มสอบจริง ให้ไปที่เมนู "ห้องสอบ" แล้วกด "+ สร้างห้องสอบ"`);
                 } else {
                     alert(`❌ บันทึกไม่สำเร็จ: ${data.message || 'เกิดข้อผิดพลาด'}`);
                 }
