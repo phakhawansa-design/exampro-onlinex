@@ -274,24 +274,32 @@
                     </h1>
                 </div>
 
-                <!-- 🏠 Room Selector, Name Editor & Wayground Settings Trigger Frame -->
-                <div class="header-card flex items-center gap-3 w-full sm:w-auto shrink-0 justify-end flex-wrap">
+                <!-- 🏠 Room Selector, Create Room & Waiting Lounge Trigger Frame -->
+                <div class="header-card flex items-center gap-2 sm:gap-2.5 w-full sm:w-auto shrink-0 justify-end flex-wrap">
+                    <button onclick="openCreateRoomModal()" 
+                        class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold px-3 py-2 rounded-xl text-xs sm:text-sm transition duration-300 shadow-md active:scale-95 flex items-center gap-1.5 shrink-0 cursor-pointer">
+                        <span>➕ สร้างห้องสอบใหม่</span>
+                    </button>
                     <span class="text-sm font-bold text-slate-700">ห้องสอบ:</span>
                     <select id="room-selector" onchange="onRoomChange()" 
                         class="dark-select max-w-[170px] text-sm">
                         <!-- รายการห้องจะโหลดมาตรงนี้ -->
                     </select>
                     <button onclick="renameCurrentRoom()" title="แก้ไขชื่อเล่นห้องสอบ"
-                        class="bg-slate-100 hover:bg-slate-200 border border-slate-300 p-2.5 rounded-xl transition text-sm flex items-center justify-center text-slate-700 active:scale-95 shadow-sm font-bold">
+                        class="bg-slate-100 hover:bg-slate-200 border border-slate-300 p-2 rounded-xl transition text-sm flex items-center justify-center text-slate-700 active:scale-95 shadow-sm font-bold">
                         ✏️
                     </button>
+                    <button onclick="openWaitingLoungeModal()" title="ดูรหัส PIN และ QR สำหรับห้องรอสอบ"
+                        class="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-extrabold px-3 py-2 rounded-xl text-xs sm:text-sm transition duration-300 shadow-md active:scale-95 flex items-center gap-1.5 shrink-0 cursor-pointer">
+                        <span>📱 PIN / QR รอสอบ</span>
+                    </button>
                     <button onclick="openExamSettingsModal()" 
-                        class="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-extrabold px-4 py-2.5 rounded-xl text-sm transition duration-300 shadow-md active:scale-95 flex items-center gap-1.5 shrink-0 cursor-pointer">
-                        <span>⚙️ ตั้งค่าแบบทดสอบ</span>
+                        class="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-extrabold px-3 py-2 rounded-xl text-xs sm:text-sm transition duration-300 shadow-md active:scale-95 flex items-center gap-1.5 shrink-0 cursor-pointer">
+                        <span>⚙️ ตั้งค่า</span>
                     </button>
                     <button onclick="window.TabLockGuide.open('questions')" 
-                        class="bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white font-extrabold px-3.5 py-2.5 rounded-xl text-sm transition duration-300 shadow-md active:scale-95 flex items-center gap-1.5 shrink-0 cursor-pointer">
-                        <span>💡 คู่มือหน้านี้</span>
+                        class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-extrabold px-3 py-2 rounded-xl text-xs sm:text-sm transition duration-300 shadow-md active:scale-95 flex items-center gap-1.5 shrink-0 cursor-pointer">
+                        <span>💡 คู่มือ</span>
                     </button>
                 </div>
             </div>
@@ -693,58 +701,183 @@
             </div>
         </div>
 
-        <!-- 📱 Modal แสดงรหัส PIN 6 หลัก และ QR Code เมื่อเผยแพร่ข้อสอบ -->
+        <!-- ➕ Modal สร้างห้องสอบใหม่ -->
+        <div id="create-room-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 select-none">
+            <div class="w-full max-w-lg bg-white border border-slate-200 p-6 sm:p-8 rounded-3xl shadow-2xl text-slate-800 space-y-4 transition-all max-h-[90vh] overflow-y-auto">
+                <!-- Header -->
+                <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                    <div class="flex items-center gap-2.5">
+                        <span class="text-2xl">🏫</span>
+                        <div>
+                            <h3 class="text-lg sm:text-xl font-black text-slate-900">สร้างห้องสอบใหม่</h3>
+                            <p class="text-xs text-slate-500 font-medium">สร้างห้องพร้อมรับรหัส PIN 6 หลัก และ QR Code ให้ นศ. มารอสอบทันที</p>
+                        </div>
+                    </div>
+                    <button onclick="closeCreateRoomModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-lg transition">&times;</button>
+                </div>
+
+                <!-- Form -->
+                <div class="space-y-3.5 text-xs font-bold text-slate-700">
+                    <!-- Course selector -->
+                    <div>
+                        <label class="block mb-1 text-slate-600">วิชาที่สอบ (จากระบบจัดการรายวิชา):</label>
+                        <select id="create-room-course-id" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                            <option value="">-- ไม่ระบุรายวิชา (ทั่วไป) --</option>
+                        </select>
+                        <p class="text-[10px] text-slate-400 mt-1 font-normal">* หากเลือกวิชา ระบบจะตรวจทานรหัสนักศึกษา/ชื่อนักศึกษากับรายชื่อที่นำเข้าในวิชานั้น</p>
+                    </div>
+
+                    <!-- Room Name -->
+                    <div>
+                        <label class="block mb-1 text-slate-600">ชื่อห้องสอบ / กลุ่มเรียน <span class="text-rose-500">*</span>:</label>
+                        <input type="text" id="create-room-name" placeholder="เช่น ห้องสอบที่ 1 (ม.4/1), กลุ่ม A" 
+                            class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                    </div>
+
+                    <!-- Exam Title -->
+                    <div>
+                        <label class="block mb-1 text-slate-600">หัวข้อข้อสอบ / ชื่อการสอบ <span class="text-rose-500">*</span>:</label>
+                        <input type="text" id="create-room-title" placeholder="เช่น สอบกลางภาคเรียนที่ 1/2567, Quiz บทที่ 1-2" 
+                            class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                    </div>
+
+                    <!-- Duration & Settings -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block mb-1 text-slate-600">เวลาสอบ (นาที):</label>
+                            <input type="number" id="create-room-duration" value="60" min="1" max="300" 
+                                class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-cyan-500">
+                        </div>
+                        <div>
+                            <label class="block mb-1 text-slate-600">ตัวเลือกเพิ่มเติม:</label>
+                            <div class="space-y-1.5 pt-0.5">
+                                <label class="flex items-center gap-2 cursor-pointer text-[11px] font-normal text-slate-600">
+                                    <input type="checkbox" id="create-room-randomize" checked class="rounded text-cyan-600 focus:ring-cyan-500">
+                                    <span>สลับข้อสอบอัตโนมัติ</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer text-[11px] font-normal text-slate-600">
+                                    <input type="checkbox" id="create-room-show-score" checked class="rounded text-cyan-600 focus:ring-cyan-500">
+                                    <span>แสดงคะแนนหลังส่ง</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Announcement -->
+                    <div>
+                        <label class="block mb-1 text-slate-600">ข้อความประกาศในห้องรอสอบ (แสดงให้นักเรียนเห็น):</label>
+                        <textarea id="create-room-announcement" rows="2" placeholder="เช่น กรุณานั่งประจำที่ เตรียมบัตรนักศึกษา และห้ามสลับหน้าจอระหว่างสอบ..." 
+                            class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-normal focus:outline-none focus:ring-2 focus:ring-cyan-500"></textarea>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-3 pt-2">
+                    <button onclick="closeCreateRoomModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition">
+                        ยกเลิก
+                    </button>
+                    <button onclick="submitCreateRoom()" id="btn-submit-create-room" class="flex-1 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black rounded-xl text-xs transition shadow-md active:scale-95 flex items-center justify-center gap-1.5">
+                        <span>🚀 สร้างห้องสอบทันที</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📱 Modal ห้องรอสอบ (Exam Waiting Lounge) & รหัส PIN / QR Code -->
         <div id="publish-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center hidden p-4 select-none">
-            <div id="publish-modal-card" class="w-full max-w-lg bg-white border border-slate-200 p-6 sm:p-8 rounded-3xl shadow-2xl text-slate-800 space-y-5 transition-all duration-300">
+            <div id="publish-modal-card" class="w-full max-w-lg bg-white border border-slate-200 p-6 sm:p-7 rounded-3xl shadow-2xl text-slate-800 space-y-4 transition-all duration-300 max-h-[92vh] overflow-y-auto">
                 <!-- Header -->
                 <div class="flex justify-between items-start">
                     <div class="space-y-1">
                         <div class="flex items-center gap-2">
-                            <span class="text-2xl">🎉</span>
-                            <h3 class="text-lg sm:text-xl font-black text-slate-900">เผยแพร่ข้อสอบสำเร็จ!</h3>
+                            <span class="text-2xl" id="pub-modal-icon">⏳</span>
+                            <h3 class="text-lg sm:text-xl font-black text-slate-900" id="pub-modal-title">ห้องรอสอบ (Waiting Lounge)</h3>
+                            <span id="pub-modal-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-700">⏳ รอกดเริ่มสอบ</span>
                         </div>
-                        <p class="text-xs text-slate-500" id="pub-modal-room-info">ห้องสอบพร้อมให้นักเรียนเข้าทำข้อสอบแล้ว</p>
+                        <p class="text-xs text-slate-500" id="pub-modal-room-info">ห้อง: -</p>
                     </div>
                     <button onclick="closePublishModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-lg transition">&times;</button>
                 </div>
 
                 <!-- Big PIN Code Card -->
-                <div class="bg-gradient-to-br from-slate-900 to-indigo-950 p-5 rounded-2xl text-center text-white space-y-2 relative overflow-hidden shadow-lg shadow-indigo-950/20">
-                    <div class="text-[10px] uppercase font-bold text-cyan-400 tracking-widest">รหัสเข้าสอบ (Exam PIN)</div>
-                    <div id="pub-modal-pin" onclick="copyPinOnly()" class="text-3xl sm:text-4xl font-black font-mono tracking-widest text-white py-1 cursor-pointer select-all hover:text-cyan-300 transition" title="คลิกเพื่อคัดลอก PIN">
+                <div class="bg-gradient-to-br from-slate-900 to-indigo-950 p-4 sm:p-5 rounded-2xl text-center text-white space-y-1 relative overflow-hidden shadow-lg shadow-indigo-950/20">
+                    <div class="text-[10px] uppercase font-bold text-cyan-400 tracking-widest">รหัสเข้าห้องสอบ (Exam PIN 6 หลัก)</div>
+                    <div id="pub-modal-pin" onclick="copyPinOnly()" class="text-3xl sm:text-4xl font-black font-mono tracking-widest text-white py-0.5 cursor-pointer select-all hover:text-cyan-300 transition" title="คลิกเพื่อคัดลอก PIN">
                         ------
                     </div>
-                    <p class="text-[10px] text-slate-400">ให้นักเรียนกรอกรหัส PIN 6 หลักนี้ หรือสแกน QR Code ด้านล่าง</p>
+                    <p class="text-[10px] text-slate-300">ให้นักศึกษาเข้าสู่ระบบ แล้วกรอกรหัส PIN นี้ หรือสแกน QR เพื่อมารอในห้องสอบ</p>
                 </div>
 
                 <!-- QR Code Display -->
-                <div class="flex flex-col items-center justify-center p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
-                    <div class="w-52 h-52 bg-white p-2 rounded-xl border border-slate-200 shadow-sm flex items-center justify-center">
+                <div class="flex flex-col items-center justify-center p-3 sm:p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+                    <div class="w-44 h-44 bg-white p-2 rounded-xl border border-slate-200 shadow-sm flex items-center justify-center">
                         <img id="pub-modal-qrcode" src="" alt="Exam QR Code" class="w-full h-full object-contain rounded-lg" />
                     </div>
                     <p class="text-[11px] font-bold text-slate-600 flex items-center gap-1.5">
-                        <span>📷</span> ยกมือถือ/แท็บเล็ตสแกน เพื่อเข้าทำข้อสอบได้ทันที
+                        <span>📷</span> สแกนด้วยกล้องมือถือ/แท็บเล็ต เพื่อเข้าห้องรอสอบทันที
                     </p>
                 </div>
 
+                <!-- 👥 Real-Time Waiting Students Section -->
+                <div class="p-3.5 bg-indigo-50/80 border border-indigo-200/90 rounded-2xl space-y-2">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="relative flex h-3 w-3">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                            </span>
+                            <span class="text-xs font-bold text-slate-700">นักศึกษาที่เข้าห้องรอสอบ:</span>
+                            <span id="pub-waiting-count" class="text-lg font-black text-indigo-700">0</span>
+                            <span class="text-xs font-bold text-slate-500">คน</span>
+                        </div>
+                        <button type="button" onclick="toggleWaitingStudentsList()" id="btn-toggle-waiting-list" class="text-[11px] text-indigo-600 hover:text-indigo-800 font-extrabold underline cursor-pointer">
+                            ดูรายชื่อ
+                        </button>
+                    </div>
+
+                    <!-- Collapsible student list -->
+                    <div id="pub-waiting-list-container" class="hidden pt-2 border-t border-indigo-200/50">
+                        <div id="pub-waiting-students-list" class="max-h-32 overflow-y-auto space-y-1.5 pr-1 text-xs">
+                            <p class="text-slate-400 text-center text-[11px] py-2">ยังไม่มีนักศึกษาเข้าห้องรอสอบ...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🚀 Master Action: Start Exam / Stop Exam -->
+                <div id="pub-master-action-container" class="space-y-2 pt-1">
+                    <!-- ปุ่มเริ่มสอบ (เมื่อยังไม่เผยแพร่) -->
+                    <button id="btn-lounge-start-exam" onclick="startExamFromLounge()" 
+                        class="w-full py-3.5 px-4 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm sm:text-base rounded-2xl shadow-lg shadow-emerald-600/30 transition duration-300 active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                        <span>🚀</span>
+                        <span>เริ่มการสอบทันที (เผยแพร่ให้นักศึกษาทำพร้อมกัน)</span>
+                    </button>
+
+                    <!-- ปุ่มยกเลิก/ปิดห้องสอบ (เมื่อเผยแพร่อยู่) -->
+                    <button id="btn-lounge-stop-exam" onclick="stopExamFromLounge()" 
+                        class="w-full py-3 px-4 bg-rose-600 hover:bg-rose-500 text-white font-black text-xs sm:text-sm rounded-2xl shadow-md transition duration-300 active:scale-95 flex items-center justify-center gap-2 cursor-pointer hidden">
+                        <span>🛑</span>
+                        <span>ปิดห้องสอบ / ยกเลิกการเผยแพร่ (กลับเป็นแบบร่าง)</span>
+                    </button>
+                </div>
+
                 <!-- Direct Link Box -->
-                <div class="space-y-1.5">
+                <div class="space-y-1">
                     <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">ลิงก์ตรงเข้าสู่ห้องสอบ</label>
                     <div class="flex gap-2">
-                        <input type="text" id="pub-modal-link" readonly class="flex-1 px-3.5 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs font-mono text-slate-700 select-all" />
-                        <button onclick="copyPublishLink()" id="btn-copy-link" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-1 shrink-0 active:scale-95">
+                        <input type="text" id="pub-modal-link" readonly class="flex-1 px-3 py-1.5 bg-slate-100 border border-slate-200 rounded-xl text-xs font-mono text-slate-700 select-all" />
+                        <button onclick="copyPublishLink()" id="btn-copy-link" class="px-3.5 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded-xl transition flex items-center gap-1 shrink-0 active:scale-95">
                             📋 คัดลอก
                         </button>
                     </div>
                 </div>
 
-                <!-- Action Buttons -->
-                <div class="grid grid-cols-2 gap-3 pt-1">
-                    <button onclick="toggleProjectorMode()" id="btn-projector" class="py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white font-black text-xs rounded-xl transition flex items-center justify-center gap-2 active:scale-95">
+                <!-- Projector & Close Buttons -->
+                <div class="grid grid-cols-2 gap-2.5 pt-1">
+                    <button onclick="toggleProjectorMode()" id="btn-projector" class="py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white font-black text-xs rounded-xl transition flex items-center justify-center gap-1.5 active:scale-95">
                         <span>📺</span> ฉายจอโปรเจกเตอร์
                     </button>
-                    <button onclick="closePublishModal()" class="py-3 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl transition flex items-center justify-center gap-1 active:scale-95">
-                        <span>✅</span> เรียบร้อย
+                    <button onclick="closePublishModal()" class="py-2.5 px-4 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1 active:scale-95">
+                        <span>✕</span> ปิดหน้าต่างนี้
                     </button>
                 </div>
             </div>
@@ -784,6 +917,13 @@
             const urlParams = new URLSearchParams(window.location.search);
             const initialTab = urlParams.get('tab') || 'manual';
             switchTab(initialTab);
+
+            const action = urlParams.get('action');
+            if (action === 'new-room') {
+                setTimeout(() => openCreateRoomModal(), 300);
+            } else if (action === 'waiting-lounge') {
+                setTimeout(() => openWaitingLoungeModal(), 300);
+            }
         });
 
         // ดึงข้อมูลห้องสอบของอาจารย์
@@ -2190,35 +2330,337 @@
             }
         }
 
-        // 📱 เปิด Modal แสดงรหัส PIN และ QR Code
-        function openPublishModal(pinCode) {
-            const pin = pinCode || currentPublishedPin;
-            if (!pin) {
-                alert("ห้องสอบนี้ยังไม่ได้เผยแพร่ หรือยังไม่มีรหัส PIN");
+        let waitingStudentsInterval = null;
+
+        // ➕ เปิด Modal สร้างห้องสอบใหม่
+        async function openCreateRoomModal() {
+            const courseSelect = document.getElementById('create-room-course-id');
+            courseSelect.innerHTML = '<option value="">กำลังโหลดรายวิชา...</option>';
+            try {
+                const res = await fetch(`/api/teacher/courses?username=${encodeURIComponent(username)}`);
+                if (res.ok) {
+                    const courses = await res.json();
+                    if (Array.isArray(courses) && courses.length > 0) {
+                        courseSelect.innerHTML = '<option value="">-- ไม่ระบุรายวิชา (ทั่วไป) --</option>' +
+                            courses.map(c => `<option value="${c.id}">[${c.courseCode || 'วิชา'}] ${c.courseName} (${c.studentCount || 0} คน)</option>`).join('');
+                    } else {
+                        courseSelect.innerHTML = '<option value="">-- ยังไม่มีวิชาในระบบ (สร้างได้ที่เมนู "จัดการรายวิชา") --</option>';
+                    }
+                } else {
+                    courseSelect.innerHTML = '<option value="">-- ไม่ระบุรายวิชา (ทั่วไป) --</option>';
+                }
+            } catch(e) {
+                console.error(e);
+                courseSelect.innerHTML = '<option value="">-- ไม่ระบุรายวิชา (ทั่วไป) --</option>';
+            }
+
+            // รีเซ็ตฟอร์ม
+            const currentRoom = rooms.find(r => r.roomId === currentRoomId);
+            const defaultIndex = rooms.length + 1;
+            document.getElementById('create-room-name').value = `ห้องสอบที่ ${defaultIndex}`;
+            document.getElementById('create-room-title').value = currentRoom && currentRoom.exam_title ? currentRoom.exam_title : `การสอบครั้งที่ ${defaultIndex}`;
+            document.getElementById('create-room-duration').value = 60;
+            document.getElementById('create-room-announcement').value = 'กรุณานั่งประจำที่และเตรียมความพร้อม ห้ามสลับหน้าจอระหว่างการสอบ';
+            document.getElementById('create-room-randomize').checked = true;
+            document.getElementById('create-room-show-score').checked = true;
+
+            document.getElementById('create-room-modal').classList.remove('hidden');
+        }
+
+        function closeCreateRoomModal() {
+            document.getElementById('create-room-modal').classList.add('hidden');
+        }
+
+        // 🚀 ส่งคำขอสร้างห้องสอบใหม่
+        async function submitCreateRoom() {
+            const courseId = document.getElementById('create-room-course-id').value;
+            const roomName = document.getElementById('create-room-name').value.trim();
+            const examTitle = document.getElementById('create-room-title').value.trim();
+            const duration = parseInt(document.getElementById('create-room-duration').value, 10) || 60;
+            const announcement = document.getElementById('create-room-announcement').value.trim();
+            const randomize = document.getElementById('create-room-randomize').checked ? 1 : 0;
+            const showScore = document.getElementById('create-room-show-score').checked ? 1 : 0;
+            const btn = document.getElementById('btn-submit-create-room');
+
+            if (!roomName) {
+                alert("⚠️ กรุณาระบุชื่อห้องสอบหรือกลุ่มเรียน");
+                document.getElementById('create-room-name').focus();
                 return;
             }
-            currentPublishedPin = pin;
+            if (!examTitle) {
+                alert("⚠️ กรุณาระบุหัวข้อข้อสอบหรือชื่อการสอบ");
+                document.getElementById('create-room-title').focus();
+                return;
+            }
 
-            const formattedPin = pin.length === 6 ? `${pin.slice(0,3)} ${pin.slice(3)}` : pin;
-            document.getElementById('pub-modal-pin').textContent = formattedPin;
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳ กำลังสร้างห้องสอบ...</span>';
 
-            const joinUrl = `${window.location.origin}/Student-login.html?room=${encodeURIComponent(currentRoomId)}&code=${encodeURIComponent(pin)}`;
-            document.getElementById('pub-modal-link').value = joinUrl;
+            try {
+                const res = await fetch('/api/teacher/create-room', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username,
+                        roomName,
+                        examTitle,
+                        courseId: courseId ? parseInt(courseId, 10) : null,
+                        duration,
+                        announcement,
+                        showScore,
+                        randomize
+                    })
+                });
 
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(joinUrl)}`;
-            document.getElementById('pub-modal-qrcode').src = qrUrl;
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    closeCreateRoomModal();
+                    // โหลดห้องใหม่
+                    await loadTeacherRooms();
+                    // สลับไปยังห้องใหม่
+                    const select = document.getElementById('room-selector');
+                    if (select) {
+                        select.value = data.roomId;
+                        await onRoomChange();
+                    }
+                    // เปิดห้องรอสอบทันทีพร้อม PIN และ QR Code
+                    openWaitingLoungeModal(data.roomId, data.exam_code, data.roomName, data.examTitle);
+                } else {
+                    alert(`❌ สร้างห้องไม่สำเร็จ: ${data.message}`);
+                }
+            } catch (err) {
+                console.error(err);
+                alert("❌ เกิดข้อผิดพลาด ไม่สามารถสร้างห้องสอบได้");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>🚀 สร้างห้องสอบทันที</span>';
+            }
+        }
 
-            const roomPreset = document.getElementById('modal-exam-title-preset');
-            const roomTitle = roomPreset ? roomPreset.value : '';
-            document.getElementById('pub-modal-room-info').textContent = `ห้อง: ${currentRoomId} ${roomTitle ? '• ' + roomTitle : ''}`;
+        // 📱 เปิด Modal ห้องรอสอบ (Waiting Lounge & Projector)
+        async function openWaitingLoungeModal(targetRoomId, pinCode, roomName, examTitle) {
+            const rId = targetRoomId || currentRoomId;
+            if (!rId) {
+                alert("กรุณาเลือกห้องสอบก่อน");
+                return;
+            }
 
-            document.getElementById('publish-modal').classList.remove('hidden');
+            try {
+                const statusRes = await fetch(`/api/teacher/get-publish-status?roomId=${encodeURIComponent(rId)}`);
+                const statusData = await statusRes.json();
+                const pin = pinCode || statusData.exam_code || currentPublishedPin || '------';
+                currentPublishedPin = pin;
+
+                const formattedPin = pin.length === 6 ? `${pin.slice(0,3)} ${pin.slice(3)}` : pin;
+                document.getElementById('pub-modal-pin').textContent = formattedPin;
+
+                const joinUrl = `${window.location.origin}/Student-login.html?room=${encodeURIComponent(rId)}&code=${encodeURIComponent(pin)}`;
+                document.getElementById('pub-modal-link').value = joinUrl;
+
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(joinUrl)}`;
+                document.getElementById('pub-modal-qrcode').src = qrUrl;
+
+                const displayTitle = examTitle || statusData.exam_title || '';
+                const displayRoomName = roomName || statusData.roomName || rId;
+                document.getElementById('pub-modal-room-info').textContent = `ห้อง: ${displayRoomName} (${rId}) ${displayTitle ? '• ' + displayTitle : ''}`;
+
+                // ปรับ UI สถานะและปุ่มกด
+                const isPub = statusData.is_published === 1;
+                const icon = document.getElementById('pub-modal-icon');
+                const title = document.getElementById('pub-modal-title');
+                const badge = document.getElementById('pub-modal-badge');
+                const startBtn = document.getElementById('btn-lounge-start-exam');
+                const stopBtn = document.getElementById('btn-lounge-stop-exam');
+
+                if (isPub) {
+                    if (icon) icon.textContent = '🟢';
+                    if (title) title.textContent = 'การสอบกำลังดำเนินอยู่ (LIVE)';
+                    if (badge) {
+                        badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-700';
+                        badge.textContent = '🟢 กำลังสอบ (LIVE)';
+                    }
+                    if (startBtn) startBtn.classList.add('hidden');
+                    if (stopBtn) stopBtn.classList.remove('hidden');
+                } else {
+                    if (icon) icon.textContent = '⏳';
+                    if (title) title.textContent = 'ห้องรอสอบ (Waiting Lounge)';
+                    if (badge) {
+                        badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-700';
+                        badge.textContent = '⏳ รอกดเริ่มสอบ';
+                    }
+                    if (startBtn) startBtn.classList.remove('hidden');
+                    if (stopBtn) stopBtn.classList.add('hidden');
+                }
+
+                // เริ่มดึงรายชื่อและจำนวนนักศึกษาที่รอสอบทันที
+                await pollWaitingStudents(rId);
+                if (waitingStudentsInterval) clearInterval(waitingStudentsInterval);
+                waitingStudentsInterval = setInterval(() => pollWaitingStudents(rId), 2000);
+
+                document.getElementById('publish-modal').classList.remove('hidden');
+            } catch (err) {
+                console.error('openWaitingLoungeModal error:', err);
+                alert("ไม่สามารถโหลดข้อมูลห้องรอสอบได้");
+            }
+        }
+
+        // Backward compatibility
+        function openPublishModal(pinCode) {
+            openWaitingLoungeModal(currentRoomId, pinCode);
         }
 
         function closePublishModal() {
+            if (waitingStudentsInterval) {
+                clearInterval(waitingStudentsInterval);
+                waitingStudentsInterval = null;
+            }
             document.getElementById('publish-modal').classList.add('hidden');
             if (document.fullscreenElement) {
                 document.exitFullscreen().catch(() => {});
+            }
+        }
+
+        // สลับแสดง/ซ่อนรายชื่อ นศ. ในห้องรอสอบ
+        function toggleWaitingStudentsList() {
+            const list = document.getElementById('pub-waiting-list-container');
+            const btn = document.getElementById('btn-toggle-waiting-list');
+            if (list.classList.contains('hidden')) {
+                list.classList.remove('hidden');
+                btn.textContent = 'ซ่อนรายชื่อ';
+            } else {
+                list.classList.add('hidden');
+                btn.textContent = 'ดูรายชื่อ';
+            }
+        }
+
+        // ดึงรายชื่อ นศ. ที่รอสอบแบบ Real-time
+        async function pollWaitingStudents(rId) {
+            const targetRoom = rId || currentRoomId;
+            if (!targetRoom) return;
+
+            try {
+                const res = await fetch(`/api/teacher/waiting-students?roomId=${encodeURIComponent(targetRoom)}`);
+                if (!res.ok) return;
+                const data = await res.json();
+
+                const countEl = document.getElementById('pub-waiting-count');
+                const listEl = document.getElementById('pub-waiting-students-list');
+
+                if (countEl) countEl.textContent = data.count || 0;
+
+                if (listEl) {
+                    if (!data.students || data.students.length === 0) {
+                        listEl.innerHTML = '<p class="text-slate-400 text-center text-[11px] py-2">ยังไม่มีนักศึกษาเข้าห้องรอสอบ...</p>';
+                    } else {
+                        listEl.innerHTML = data.students.map((s, idx) => `
+                            <div class="flex items-center justify-between p-1.5 px-2 bg-white rounded-lg border border-slate-200 text-[11px] shadow-xs">
+                                <div class="flex items-center gap-2 truncate">
+                                    <span class="w-5 h-5 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-[10px] shrink-0">${idx + 1}</span>
+                                    <div class="truncate">
+                                        <span class="font-bold text-slate-800">${escapeHtml(s.studentName || s.studentId)}</span>
+                                        <span class="text-slate-400 text-[10px] font-mono ml-1">(${escapeHtml(s.studentId)})</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5 shrink-0 text-[10px]">
+                                    ${s.studentClass ? `<span class="px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded font-medium">${escapeHtml(s.studentClass)}</span>` : ''}
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="ออนไลน์"></span>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                }
+            } catch(e) {
+                // silent poll error
+            }
+        }
+
+        // 🚀 เริ่มสอบพร้อมกันทันทีจาก Waiting Lounge
+        async function startExamFromLounge() {
+            if (!currentRoomId) return;
+
+            const count = parseInt(document.getElementById('pub-waiting-count').textContent, 10) || 0;
+            const confirmMsg = `🚀 ยืนยันเริ่มการสอบทันที?\n\nขณะนี้มีนักศึกษารออยู่ในห้องสอบ ${count} คน\nเมื่อกดยืนยัน ข้อสอบจะเปิดให้นักศึกษาเริ่มทำพร้อมกันทันที`;
+            if (!confirm(confirmMsg)) return;
+
+            const btn = document.getElementById('btn-lounge-start-exam');
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳ กำลังเปิดข้อสอบ...</span>';
+
+            try {
+                const res = await fetch('/api/teacher/publish-exam', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomId: currentRoomId, publish: true, resetResults: false })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    await updatePublishBanner();
+                    // อัปเดตสถานะใน Lounge
+                    const icon = document.getElementById('pub-modal-icon');
+                    const title = document.getElementById('pub-modal-title');
+                    const badge = document.getElementById('pub-modal-badge');
+                    const startBtn = document.getElementById('btn-lounge-start-exam');
+                    const stopBtn = document.getElementById('btn-lounge-stop-exam');
+
+                    if (icon) icon.textContent = '🟢';
+                    if (title) title.textContent = 'การสอบกำลังดำเนินอยู่ (LIVE)';
+                    if (badge) {
+                        badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-700';
+                        badge.textContent = '🟢 กำลังสอบ (LIVE)';
+                    }
+                    if (startBtn) startBtn.classList.add('hidden');
+                    if (stopBtn) stopBtn.classList.remove('hidden');
+
+                    alert("🎉 เริ่มการสอบเรียบร้อยแล้ว! นักศึกษาในห้องรอสอบกำลังเข้าสู่หน้าทำข้อสอบพร้อมกัน");
+                } else {
+                    alert(`❌ เริ่มสอบไม่สำเร็จ: ${data.message}`);
+                }
+            } catch (err) {
+                console.error(err);
+                alert("ไม่สามารถติดต่อเซิร์ฟเวอร์ได้");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>🚀 เริ่มการสอบทันที (เผยแพร่ให้นักศึกษาทำพร้อมกัน)</span>';
+            }
+        }
+
+        // 🛑 ปิดห้องสอบ / สลับกลับเป็นแบบร่าง
+        async function stopExamFromLounge() {
+            if (!currentRoomId) return;
+
+            if (!confirm("🛑 ยืนยันปิดห้องสอบ / สลับกลับเป็นแบบร่าง?\nนักศึกษาจะไม่สามารถส่งหรือทำข้อสอบต่อได้")) return;
+
+            try {
+                const res = await fetch('/api/teacher/publish-exam', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomId: currentRoomId, publish: false })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    await updatePublishBanner();
+                    const icon = document.getElementById('pub-modal-icon');
+                    const title = document.getElementById('pub-modal-title');
+                    const badge = document.getElementById('pub-modal-badge');
+                    const startBtn = document.getElementById('btn-lounge-start-exam');
+                    const stopBtn = document.getElementById('btn-lounge-stop-exam');
+
+                    if (icon) icon.textContent = '⏳';
+                    if (title) title.textContent = 'ห้องรอสอบ (Waiting Lounge)';
+                    if (badge) {
+                        badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-700';
+                        badge.textContent = '⏳ รอกดเริ่มสอบ';
+                    }
+                    if (startBtn) startBtn.classList.remove('hidden');
+                    if (stopBtn) stopBtn.classList.add('hidden');
+
+                    alert("🛑 ปิดห้องสอบเรียบร้อยแล้ว");
+                } else {
+                    alert(`❌ ปิดห้องสอบไม่สำเร็จ: ${data.message}`);
+                }
+            } catch(e) {
+                console.error(e);
+                alert("ไม่สามารถติดต่อเซิร์ฟเวอร์ได้");
             }
         }
 

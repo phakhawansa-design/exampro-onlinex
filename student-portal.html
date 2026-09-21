@@ -471,8 +471,10 @@
             // Start polling every 2 seconds to check if teacher published
             if (waitingRoomInterval) clearInterval(waitingRoomInterval);
             waitingRoomInterval = setInterval(async () => {
-                try {
-                    const res = await fetch(`/api/teacher/get-publish-status?roomId=${encodeURIComponent(data.roomId)}`);
+                    const sId = encodeURIComponent(currentStudent.studentId);
+                    const sName = encodeURIComponent(data.student.name || '');
+                    const sCls = encodeURIComponent(data.student.class || '');
+                    const res = await fetch(`/api/teacher/get-publish-status?roomId=${encodeURIComponent(data.roomId)}&studentId=${sId}&studentName=${sName}&studentClass=${sCls}`);
                     if (!res.ok) return;
                     const status = await res.json();
 

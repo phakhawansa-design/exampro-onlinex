@@ -501,17 +501,51 @@ app.post('/api/teacher/login', (req, res) => {
     });
 });
 
-// 🏠 API สำหรับดึงห้องสอบ 10 ห้องของอาจารย์คนนั้นๆ (หรือดึงทุกห้องในระบบหากเป็น admin)
+// ⏳ ระบบจัดการนักศึกษาที่อยู่ในห้องรอสอบ (Waiting Room Live Tracker)
+const waitingStudentsTracker = new Map(); // roomId -> Map(studentId -> { studentId, name, class, lastSeen })
+
+function recordWaitingStudent(roomId, studentId, name, studentClass) {
+    if (!roomId || !studentId) return;
+    if (!waitingStudentsTracker.has(roomId)) {
+        waitingStudentsTracker.set(roomId, new Map());
+    }
+    const roomMap = waitingStudentsTracker.get(roomId);
+    roomMap.set(studentId, {
+        studentId,
+        name: name || 'นักศึกษา',
+        class: studentClass || '',
+        lastSeen: Date.now()
+    });
+}
+
+function getWaitingStudents(roomId) {
+    if (!waitingStudentsTracker.has(roomId)) return [];
+    const roomMap = waitingStudentsTracker.get(roomId);
+    const now = Date.now();
+    const active = [];
+    for (const [sId, data] of roomMap.entries()) {
+        if (now - data.lastSeen < 12000) { // ออนไลน์ถ้า heartbeat ภายใน 12 วินาที
+            active.push(data);
+        } else {
+            roomMap.delete(sId);
+        }
+    }
+    return active;
+}
+
+// 🏠 API สำหรับดึงห้องสอบของอาจารย์ (หรือดึงทุกห้องในระบบหากเป็น admin)
 app.get('/api/teacher/rooms', (req, res) => {
     const username = req.query.username;
     if (!username || username === 'undefined') return res.status(400).json({ message: "กรุณาระบุ username ของอาจารย์" });
 
-    // หากเป็น admin ให้ดึงห้องของอาจารย์ทุกคน เพื่อให้ผู้ดูแลระบบสามารถมอนิเตอร์ได้ทุกห้องสอบ
+    // หากเป็น admin ให้ดึงห้องของอาจารย์ทุกคน
     if (username === 'admin') {
         const sqlQuery = `
-            SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published, tr.teacherUsername,
-            (SELECT COUNT(*) FROM questions q WHERE q.roomId = tr.roomId) as questionCount
+            SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published, tr.duration, tr.courseId, tr.teacherUsername,
+                   c.courseCode, c.courseName,
+                   (SELECT COUNT(*) FROM questions q WHERE q.roomId = tr.roomId) as questionCount
             FROM teacher_rooms tr
+            LEFT JOIN courses c ON c.id = tr.courseId
             ORDER BY tr.is_published DESC, tr.id ASC
         `;
         return db.all(sqlQuery, [], (err, rows) => {
@@ -521,9 +555,11 @@ app.get('/api/teacher/rooms', (req, res) => {
     }
 
     const sqlQuery = `
-        SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published,
-        (SELECT COUNT(*) FROM questions q WHERE q.roomId = tr.roomId) as questionCount
+        SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published, tr.duration, tr.courseId,
+               c.courseCode, c.courseName,
+               (SELECT COUNT(*) FROM questions q WHERE q.roomId = tr.roomId) as questionCount
         FROM teacher_rooms tr
+        LEFT JOIN courses c ON c.id = tr.courseId
         WHERE tr.teacherUsername = ?
         ORDER BY tr.id ASC
     `;
@@ -545,6 +581,99 @@ app.get('/api/teacher/rooms', (req, res) => {
         } else {
             res.json(rows);
         }
+    });
+});
+
+// ➕ API สร้างห้องสอบใหม่ พร้อมรหัส PIN 6 หลักและเปิดห้องรอสอบทันที
+app.post('/api/teacher/create-room', (req, res) => {
+    const { username, roomName, examTitle, courseId, duration, announcement, showScore, randomize } = req.body;
+    if (!username) return res.status(400).json({ message: "กรุณาระบุ username ของอาจารย์" });
+
+    const cleanRoomName = (roomName || 'ห้องสอบใหม่').trim();
+    const cleanExamTitle = (examTitle || cleanRoomName).trim();
+    const cleanDuration = parseInt(duration, 10) || 0;
+    const cleanCourseId = courseId ? parseInt(courseId, 10) : null;
+    const cleanShowScore = showScore !== undefined ? parseInt(showScore, 10) : 1;
+    const cleanRandomize = randomize !== undefined ? parseInt(randomize, 10) : 1;
+    const cleanAnnouncement = (announcement || '').trim();
+
+    // สร้าง roomId เฉพาะตัว เช่น phakhawan_room_m1a2b3
+    const roomId = `${username}_room_${Date.now().toString(36)}`;
+    // สุ่ม PIN 6 หลัก
+    const examPin = Math.floor(100000 + Math.random() * 900000).toString();
+
+    const insertSql = `
+        INSERT INTO teacher_rooms (
+            teacherUsername, roomId, roomName, exam_title, exam_code,
+            is_published, duration, announcement, show_score, randomize, courseId
+        ) VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?)
+    `;
+
+    db.run(insertSql, [
+        username, roomId, cleanRoomName, cleanExamTitle, examPin,
+        cleanDuration, cleanAnnouncement, cleanShowScore, cleanRandomize, cleanCourseId
+    ], function(err) {
+        if (err) return res.status(500).json({ message: "ไม่สามารถสร้างห้องสอบได้: " + err.message });
+
+        console.log(`🎉 [ห้องสอบใหม่] อาจารย์ ${username} สร้างห้อง "${cleanRoomName}" (ID: ${roomId}, PIN: ${examPin})`);
+
+        res.json({
+            success: true,
+            message: "สร้างห้องสอบใหม่เรียบร้อยแล้ว",
+            roomId,
+            exam_code: examPin,
+            roomName: cleanRoomName,
+            examTitle: cleanExamTitle,
+            room: {
+                id: this.lastID,
+                roomId,
+                roomName: cleanRoomName,
+                exam_title: cleanExamTitle,
+                exam_code: examPin,
+                is_published: 0,
+                duration: cleanDuration,
+                announcement: cleanAnnouncement,
+                show_score: cleanShowScore,
+                randomize: cleanRandomize,
+                courseId: cleanCourseId
+            }
+        });
+    });
+});
+
+// 🗑️ API ลบห้องสอบ
+app.delete('/api/teacher/room', (req, res) => {
+    const { username, roomId } = req.body;
+    if (!username || !roomId) return res.status(400).json({ message: "ข้อมูลไม่ครบถ้วน" });
+
+    db.run('DELETE FROM questions WHERE roomId = ?', [roomId], () => {
+        db.run('DELETE FROM teacher_rooms WHERE roomId = ? AND (teacherUsername = ? OR ? = "admin")', [roomId, username, username], function(err) {
+            if (err) return res.status(500).json({ message: err.message });
+            waitingStudentsTracker.delete(roomId);
+            res.json({ success: true, message: "ลบห้องสอบเรียบร้อยแล้ว" });
+        });
+    });
+});
+
+// 👥 ดึงรายชื่อและจำนวนนักศึกษาที่กำลังรอสอบอยู่ในห้อง (Real-time Waiting Counter)
+app.get('/api/teacher/waiting-students', (req, res) => {
+    const roomId = req.query.roomId;
+    if (!roomId) return res.status(400).json({ message: "กรุณาระบุ roomId" });
+
+    db.get('SELECT is_published, exam_code, exam_title, roomName, duration FROM teacher_rooms WHERE roomId = ?', [roomId], (err, room) => {
+        if (err || !room) return res.status(404).json({ message: "ไม่พบห้องสอบนี้" });
+
+        const students = getWaitingStudents(roomId);
+        res.json({
+            success: true,
+            roomId,
+            is_published: room.is_published === 1,
+            examCode: room.exam_code,
+            examTitle: room.exam_title || room.roomName,
+            duration: room.duration || 0,
+            count: students.length,
+            students
+        });
     });
 });
 
@@ -2434,21 +2563,33 @@ app.post('/api/mark-warning-read', (req, res) => {
     });
 });
 
-// 🟢 ดึงสถานะการเผยแพร่ห้องสอบ พร้อมจำนวนประวัติผลสอบเดิม และรหัส PIN
+// 🟢 ดึงสถานะการเผยแพร่ห้องสอบ พร้อมจำนวนประวัติผลสอบเดิม รหัส PIN และนับนักศึกษาในห้องรอสอบ
 app.get('/api/teacher/get-publish-status', (req, res) => {
     const roomId = req.query.roomId;
+    const studentId = req.query.studentId;
+    const studentName = req.query.studentName;
+    const studentClass = req.query.studentClass;
+
     if (!roomId) return res.status(400).json({ message: "กรุณาระบุ roomId" });
 
-    db.get('SELECT is_published, exam_code, roomName, exam_title FROM teacher_rooms WHERE roomId = ?', [roomId], (err, row) => {
+    // หากนักศึกษาส่งข้อมูลมาขณะกำลังรอสอบ ให้บันทึกสถานะกำลังรอ (Heartbeat)
+    if (studentId) {
+        recordWaitingStudent(roomId, studentId, studentName, studentClass);
+    }
+
+    db.get('SELECT is_published, exam_code, roomName, exam_title, duration FROM teacher_rooms WHERE roomId = ?', [roomId], (err, row) => {
         if (err) return res.status(500).json({ message: err.message });
         
         db.get('SELECT COUNT(*) as resultCount FROM exam_results WHERE roomId = ?', [roomId], (err2, rRow) => {
+            const waitingList = getWaitingStudents(roomId);
             res.json({ 
                 is_published: row ? (row.is_published || 0) : 0,
                 exam_code: row ? (row.exam_code || '') : '',
                 roomName: row ? (row.roomName || '') : '',
                 exam_title: row ? (row.exam_title || '') : '',
-                resultCount: rRow ? (rRow.resultCount || 0) : 0
+                duration: row ? (row.duration || 0) : 0,
+                resultCount: rRow ? (rRow.resultCount || 0) : 0,
+                waitingCount: waitingList.length
             });
         });
     });

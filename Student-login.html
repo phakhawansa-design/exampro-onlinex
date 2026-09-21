@@ -90,23 +90,10 @@
                     <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">รหัสผ่าน *</label>
                     <input type="password" id="student-password" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="กรอกรหัสผ่านของคุณ">
                 </div>
-                <div class="space-y-1.5">
-                    <div class="flex items-center justify-between">
-                        <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">รหัส PIN เข้าสอบ 6 หลัก (Exam PIN)</label>
-                        <span class="text-[9px] text-slate-400 font-medium">(ไม่บังคับ หากต้องการเข้าหน้าหลัก)</span>
-                    </div>
-                    <input type="text" id="exam-code-input" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm font-mono font-bold text-cyan-600 transition-all tracking-wider" placeholder="เช่น 849 201">
-                    <p class="text-[9px] text-slate-400">กรอกรหัส PIN ที่อาจารย์ฉายหน้าห้อง หรือสแกน QR Code</p>
-                </div>
-
-                <div class="space-y-2 pt-1">
-                    <button onclick="handleLoginAndEnter(false)" id="btn-login-submit" class="btn-primary w-full text-white py-3.5 rounded-xl sm:rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-[0.98]">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        เข้าสู่ระบบและเริ่มทำข้อสอบ
-                    </button>
-
-                    <button onclick="handleLoginAndEnter(true)" type="button" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-[0.98]">
-                        <span>🎓</span> เข้าสู่หน้าหลักนักศึกษา (Student Portal / ดูประวัติ / ห้องรอสอบ)
+                <div class="pt-2">
+                    <button onclick="handleLoginAndEnter()" id="btn-login-submit" class="btn-primary w-full text-white py-3.5 rounded-xl sm:rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-[0.98] cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
+                        เข้าสู่ระบบ
                     </button>
                 </div>
 
@@ -433,10 +420,9 @@
             }
         }
 
-        async function handleLoginAndEnter(goToPortalOnly = false) {
+        async function handleLoginAndEnter() {
             const studentId = document.getElementById('student-id').value.trim();
             const password = document.getElementById('student-password').value;
-            const examCode = document.getElementById('exam-code-input').value.trim();
             const loginBtn = document.getElementById('btn-login-submit');
 
             if (!studentId || !password) {
@@ -459,60 +445,32 @@
                 if (!loginRes.ok || !loginData.success) {
                     alert(loginData.message || "❌ เข้าสู่ระบบไม่สำเร็จ กรุณาตรวจสอบรหัสนักศึกษาหรือรหัสผ่าน");
                     loginBtn.disabled = false;
-                    loginBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> เข้าสู่ระบบและเริ่มทำข้อสอบ`;
+                    loginBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg> เข้าสู่ระบบ`;
                     return;
                 }
 
-                // บันทึก Session นักศึกษาลง LocalStorage เพื่อให้ student-portal และระบบสอบใช้งานร่วมกันได้
+                // บันทึก Session นักศึกษาลง LocalStorage เพื่อให้ student-portal ใช้งานได้
                 localStorage.setItem('currentStudent', JSON.stringify(loginData.student));
 
-                currentStudentId = loginData.student.studentId;
-                currentStudentName = loginData.student.name;
-                currentStudentClass = loginData.student.class || '';
-
-                // หากกดเข้าสู่ Portal หรือไม่ได้กรอก PIN ให้พาไปที่หน้า Student Portal
-                if (goToPortalOnly || !examCode) {
+                // นำเข้าสู่หน้าระบบนักศึกษา (Student Portal) ทันที (หากสแกน QR Code มา ให้ส่งรหัส PIN ต่อไปด้วย)
+                const urlParams = new URLSearchParams(window.location.search);
+                const codeParam = urlParams.get('code') || urlParams.get('pin');
+                if (codeParam) {
+                    window.location.href = `student-portal.html?code=${encodeURIComponent(codeParam)}`;
+                } else {
                     window.location.href = 'student-portal.html';
-                    return;
                 }
-
-                // 2. หากกรอก PIN: ตรวจสอบสิทธิ์กับรายวิชาและข้อมูลชื่อ-นามสกุล (Gatekeeper Verification)
-                loginBtn.innerHTML = "⏳ กำลังตรวจสอบสิทธิ์รายวิชา...";
-                const accessRes = await fetch('/api/student/check-exam-access', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ studentId: currentStudentId, examCode: examCode })
-                });
-                const accessData = await accessRes.json();
-
-                if (!accessRes.ok || !accessData.success) {
-                    alert(`❌ ปฏิเสธการเข้าสอบ:\n\n${accessData.message || 'ไม่สามารถเข้าห้องสอบนี้ได้'}`);
-                    loginBtn.disabled = false;
-                    loginBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> เข้าสู่ระบบและเริ่มทำข้อสอบ`;
-                    return;
-                }
-
-                // ถ้ายังไม่เผยแพร่ ให้พาไปที่ห้องรอสอบ (Waiting Room) ใน Portal ทันที
-                if (!accessData.is_published) {
-                    alert("⏳ ข้อสอบในห้องนี้ยังไม่เริ่มสอบ (รออาจารย์กดเผยแพร่)\nระบบจะนำท่านเข้าสู่ 'ห้องรอสอบ'");
-                    window.location.href = `student-portal.html?code=${encodeURIComponent(examCode)}`;
-                    return;
-                }
-
-                // ถ้าเผยแพร่แล้ว ให้เปิดข้อสอบทันที
-                await launchExamDirectly(examCode, accessData.roomId);
-
             } catch(e) {
                 console.error(e);
                 alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
                 loginBtn.disabled = false;
-                loginBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> เข้าสู่ระบบและเริ่มทำข้อสอบ`;
+                loginBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg> เข้าสู่ระบบ`;
             }
         }
 
         // สำหรับปุ่มเดิม
         function startExam() {
-            handleLoginAndEnter(false);
+            handleLoginAndEnter();
         }
 
         async function launchExamDirectly(examCode, explicitRoomId) {
