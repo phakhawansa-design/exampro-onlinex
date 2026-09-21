@@ -3,114 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tab-Lock — Online Proctoring System (ส่งกระดาษคำตอบเรียบร้อยแล้ว)</title>
+    <title>Tab-Lock — ส่งกระดาษคำตอบเรียบร้อยแล้ว</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
     <style>
-        html { font-size: 100%; -webkit-text-size-adjust: 100%; }
         body {
             font-family: 'Kanit', 'Inter', sans-serif;
+            background: linear-gradient(135deg, #fdf2f8 0%, #f0f9ff 50%, #faf5ff 100%);
         }
-        .bg-grid {
-            background-image: linear-gradient(to right, rgba(99, 102, 241, 0.03) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(244, 114, 182, 0.25);
+            box-shadow: 0 25px 60px -15px rgba(236, 72, 153, 0.15), 0 12px 30px -5px rgba(56, 189, 248, 0.1);
         }
-        .animate-bounce-slow {
-            animation: bounce 2s infinite;
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
         }
-    @keyframes bounce {
-        0%, 100% {
-            transform: translateY(-5%);
-            animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(3deg); }
         }
-        50% {
-            transform: translateY(0);
-            animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+        .pulse-glow {
+            animation: pulseGlow 2.5s ease-in-out infinite alternate;
         }
-    }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 15px rgba(244, 114, 182, 0.15); }
+            100% { box-shadow: 0 0 25px rgba(56, 189, 248, 0.35); }
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-700 min-h-screen flex flex-col justify-center items-center py-8 sm:py-12 px-3 sm:px-6 bg-grid relative overflow-x-hidden overflow-y-auto" style="background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #faf5ff 100%);">
+<body class="text-slate-700 min-h-screen flex flex-col justify-center items-center p-4 sm:p-6 relative overflow-x-hidden">
     
-    <!-- Decorative Radial Glow Backgrounds -->
-    <div class="fixed w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-cyan-500/5 blur-[100px] rounded-full -top-10 -left-10 pointer-events-none"></div>
-    <div class="fixed w-[320px] sm:w-[550px] h-[320px] sm:h-[550px] bg-pink-500/5 blur-[100px] rounded-full -bottom-10 -right-10 pointer-events-none"></div>
+    <!-- Dynamic Glowing Backdrop Lights -->
+    <div class="fixed w-[400px] h-[400px] bg-pink-400/20 blur-[120px] rounded-full -top-20 -left-20 pointer-events-none"></div>
+    <div class="fixed w-[450px] h-[450px] bg-sky-400/20 blur-[130px] rounded-full -bottom-20 -right-20 pointer-events-none"></div>
+    <div class="fixed w-[350px] h-[350px] bg-purple-400/15 blur-[100px] rounded-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
 
-    <div class="w-full max-w-md bg-white/90 border border-slate-200 backdrop-blur-xl shadow-2xl p-5 sm:p-8 rounded-2xl sm:rounded-3xl text-center space-y-5 sm:space-y-6 z-10 relative">
+    <!-- Main Finish Card -->
+    <div class="w-full max-w-md glass-card p-6 sm:p-9 rounded-3xl text-center space-y-6 z-10 relative">
         
-        <!-- Animated Mascot Icon -->
-        <div class="inline-flex items-center justify-center w-20 h-20 bg-white border border-slate-200 text-slate-800 rounded-full text-4xl select-none animate-bounce-slow shadow-sm" id="mascot-emoji">
-            🎉
+        <!-- Header Mascot Icon -->
+        <div class="relative inline-block">
+            <div class="absolute inset-0 bg-gradient-to-tr from-pink-400 to-sky-400 rounded-full blur-md opacity-40 animate-pulse"></div>
+            <div class="relative w-24 h-24 bg-white border-2 border-pink-100 rounded-full flex items-center justify-center text-5xl shadow-lg select-none animate-float mx-auto" id="mascot-emoji">
+                🎉
+            </div>
         </div>
 
-        <div class="space-y-2">
-            <h1 class="text-2xl font-semibold tracking-tight bg-gradient-to-r from-cyan-600 to-indigo-600 bg-clip-text text-transparent">
+        <div class="space-y-1.5">
+            <h1 class="text-2xl sm:text-3xl font-black tracking-tight bg-gradient-to-r from-pink-600 via-purple-600 to-sky-600 bg-clip-text text-transparent">
                 ส่งข้อสอบสำเร็จเรียบร้อย!
             </h1>
-            <p class="text-xs text-slate-500 font-medium">ระบบได้บันทึกคำตอบของคุณเข้าสู่คลังฐานข้อมูลแล้ว</p>
+            <p class="text-xs sm:text-sm text-slate-500 font-medium">ระบบได้บันทึกคำตอบของคุณเข้าสู่คลังฐานข้อมูลแล้ว</p>
         </div>
 
-        <!-- Student Data Display Box -->
-        <div class="bg-slate-100 border border-slate-205 p-4 rounded-2xl text-left text-xs text-slate-600 space-y-2 shadow-inner">
-            <div class="flex justify-between">
-                <span>ผู้เข้าสอบ:</span>
-                <strong class="text-slate-800" id="display-name">กำลังดึงข้อมูล...</strong>
+        <!-- Student Information Card -->
+        <div class="bg-gradient-to-br from-white/90 to-slate-50/80 border border-slate-200/80 p-4.5 rounded-2xl text-left text-xs space-y-2.5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-slate-400 font-medium flex items-center gap-1.5">
+                    <span class="text-pink-500">👤</span> ผู้เข้าสอบ:
+                </span>
+                <strong class="text-slate-800 font-bold" id="display-name">กำลังดึงข้อมูล...</strong>
             </div>
-            <div class="flex justify-between">
-                <span>รหัสนักศึกษา:</span>
-                <strong class="text-slate-800 font-mono" id="display-id">-</strong>
+            <div class="flex items-center justify-between">
+                <span class="text-slate-400 font-medium flex items-center gap-1.5">
+                    <span class="text-sky-500">🆔</span> รหัสนักศึกษา:
+                </span>
+                <strong class="text-slate-800 font-mono font-bold" id="display-id">-</strong>
             </div>
-            <div class="flex justify-between">
-                <span>ห้องสอบที่เข้าสอบ:</span>
-                <strong class="text-cyan-600 font-mono" id="display-room">-</strong>
+            <div class="flex items-center justify-between">
+                <span class="text-slate-400 font-medium flex items-center gap-1.5">
+                    <span class="text-purple-500">🚪</span> ห้องสอบ:
+                </span>
+                <strong class="text-sky-600 font-mono font-bold bg-sky-50 px-2.5 py-0.5 rounded-lg border border-sky-100" id="display-room">-</strong>
             </div>
         </div>
 
-        <!-- Dynamic Cheeky Score Teasing Container -->
-        <div class="border-t border-slate-205 pt-5 space-y-4">
+        <!-- Score & Teasing Container -->
+        <div class="border-t border-pink-100/80 pt-5 space-y-4">
             
+            <!-- Score Section (Toggleable) -->
             <div id="score-section" class="hidden space-y-3">
-                <div class="text-xs font-bold text-slate-500 uppercase tracking-widest">คะแนนสอบที่ได้ของคุณ</div>
-                <div class="inline-block px-5 py-2.5 bg-cyan-50 border border-cyan-200 rounded-2xl text-2xl font-semibold text-cyan-600 font-mono shadow-sm" id="score-text">
-                    0 / 0 คะแนน
+                <div class="text-[11px] font-black text-slate-400 uppercase tracking-widest">คะแนนสอบที่คุณทำได้</div>
+                
+                <div class="inline-flex items-baseline justify-center gap-1.5 px-6 py-3 bg-gradient-to-r from-pink-50 via-purple-50 to-sky-50 border border-pink-200/60 rounded-2xl shadow-inner pulse-glow">
+                    <span class="text-3xl font-black text-pink-600 font-mono" id="score-num">0</span>
+                    <span class="text-lg font-bold text-slate-400">/</span>
+                    <span class="text-xl font-bold text-slate-600 font-mono" id="max-score-num">0</span>
+                    <span class="text-xs font-bold text-slate-500 ml-1">คะแนน</span>
                 </div>
                 
                 <!-- Score Bar Fill -->
-                <div class="w-full bg-slate-100 border border-slate-205 h-2.5 rounded-full overflow-hidden shadow-inner">
-                    <div id="score-bar-fill" class="bg-gradient-to-r from-cyan-500 to-indigo-500 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                <div class="w-full bg-slate-100 border border-slate-200 h-3 rounded-full overflow-hidden p-0.5 shadow-inner">
+                    <div id="score-bar-fill" class="bg-gradient-to-r from-pink-500 via-purple-500 to-sky-500 h-full rounded-full transition-all duration-1000 shadow-sm" style="width: 0%"></div>
                 </div>
             </div>
 
             <!-- Funny Teasing Quote Banner -->
-            <div class="p-4 bg-slate-100 border border-slate-205 rounded-2xl">
+            <div class="p-4 bg-gradient-to-r from-pink-50/70 via-purple-50/50 to-sky-50/70 border border-pink-100 rounded-2xl shadow-xs">
                 <p id="teasing-quote" class="text-xs text-slate-600 leading-relaxed font-semibold">
                     กำลังประมวลผลคำตอบ... 🧐
                 </p>
             </div>
 
-            <!-- Leaderboard / Hall of Fame Box -->
-            <div id="leaderboard-section" class="hidden p-4 bg-slate-100 border border-slate-205 rounded-2xl text-left space-y-3 shadow-inner">
-                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-                    <span class="text-xs font-bold text-amber-600 flex items-center gap-1">
-                        🏆 Hall of Fame - บอร์ดคนเก่ง Top 5
-                    </span>
-                    <span class="text-[9px] text-slate-500 font-mono" id="leaderboard-room-label"></span>
-                </div>
-                <div class="space-y-2" id="leaderboard-list">
-                    <!-- Top 5 rows will go here dynamically -->
-                </div>
-            </div>
         </div>
 
-        <!-- Lobby Action Button -->
-        <div class="pt-2 flex flex-col gap-2.5">
+        <!-- Lobby Action Buttons -->
+        <div class="pt-2 flex flex-col gap-3">
             <a href="student-portal.html" 
-                class="block w-full text-center py-3.5 bg-gradient-to-r from-cyan-500 to-indigo-500 hover:from-cyan-600 hover:to-indigo-600 text-white rounded-2xl font-bold text-xs transition duration-300 shadow-md hover:shadow-lg active:scale-[0.98]">
+                class="block w-full text-center py-3.5 bg-gradient-to-r from-pink-500 via-purple-500 to-sky-500 hover:from-pink-600 hover:to-sky-600 text-white rounded-2xl font-bold text-sm transition-all duration-300 shadow-lg shadow-pink-500/25 active:scale-[0.98]">
                 🎓 กลับสู่หน้าหลักนักศึกษา (Student Portal)
             </a>
             <a href="Student-login.html" 
-                class="block w-full text-center py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-2xl font-bold text-xs transition duration-300">
+                class="block w-full text-center py-2.5 bg-white/80 hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-2xl font-bold text-xs transition duration-200 active:scale-[0.98]">
                 ออกจากระบบ / เข้าสู่ระบบใหม่
             </a>
         </div>
@@ -118,7 +125,6 @@
     </div>
 
     <script>
-        // ฟังก์ชันลึงพารามิเตอร์ URL
         function getUrlParams() {
             const params = {};
             const search = window.location.search.substring(1);
@@ -135,7 +141,6 @@
         window.addEventListener('DOMContentLoaded', () => {
             const params = getUrlParams();
             
-            // ตรวจสอบว่าแอบเปิดเข้ามาโดยตรงหรือไม่
             if (!params.roomId) {
                 document.getElementById('display-name').textContent = "คนแอบแฝง";
                 document.getElementById('display-id').textContent = "999999";
@@ -145,7 +150,6 @@
                 return;
             }
 
-            // แสดงข้อมูลผู้สอบ
             document.getElementById('display-name').textContent = params.studentName || 'ไม่ระบุชื่อ';
             document.getElementById('display-id').textContent = params.studentId || '-';
             document.getElementById('display-room').textContent = params.roomId || '-';
@@ -158,16 +162,15 @@
             const emojiEl = document.getElementById('mascot-emoji');
 
             if (showScore) {
-                // แสดงคะแนน
                 document.getElementById('score-section').classList.remove('hidden');
-                document.getElementById('score-text').textContent = `${score} / ${maxScore} คะแนน`;
+                document.getElementById('score-num').textContent = score;
+                document.getElementById('max-score-num').textContent = maxScore;
                 
-                const percent = (score / maxScore) * 100;
+                const percent = Math.min(100, Math.max(0, (score / maxScore) * 100));
                 setTimeout(() => {
                     document.getElementById('score-bar-fill').style.width = `${percent}%`;
                 }, 300);
 
-                // กรองคำกวนๆ ตามช่วงคะแนน
                 if (percent === 100) {
                     emojiEl.textContent = "👑";
                     teaseEl.textContent = "กราบแทบตักคุณพี่ศิษย์เอก! หัวดีเกินมนุษย์ขนาดนี้ ลอกเพื่อนนั่งข้างๆ มาป่ะเนี่ย หรือจารย์เฉลยข้อสอบรั่ว? 🧐";
@@ -181,12 +184,7 @@
                     emojiEl.textContent = "💀";
                     teaseEl.textContent = "สอบตกจ้า! นี่คะแนนสอบหรือคะแนนความน่าจะเป็นของอุณหภูมิห้องห้องปรับอากาศ? ต่ำเตี้ยเรี่ยราดปวดใจจี๊ดเลยเพื่อน! 🐶💨";
                 }
-                
-                // โหลดบอร์ดคนเก่ง Top 5 ประจำห้อง
-                loadLeaderboard(params.roomId);
-
             } else {
-                // ปิดการแสดงคะแนน
                 emojiEl.textContent = "🤫";
                 
                 const hiddenQuotes = [
@@ -194,69 +192,10 @@
                     "ทำข้อสอบเสร็จแล้วก็รีบปิดคอมพ์ไปวิ่งเล่นข้างนอกซะ! คะแนนของคุณปลอดภัยในระบบดี... (มั้งนะ 🫣)",
                     "บันทึกผลสอบเข้าระบบเรียบร้อย! ส่วนคะแนนนั้น... ลอยอยู่ในหลุมดำ รออาจารย์ปล่อยคิวเฉลยรอบหน้าทีเดียวนะจ๊ะ 🌌"
                 ];
-                // สุ่มโควตกวนๆ
                 const randomQuoteIndex = (score + maxScore) % hiddenQuotes.length;
                 teaseEl.textContent = hiddenQuotes[randomQuoteIndex];
             }
         });
-
-        async function loadLeaderboard(roomId) {
-            if (!roomId) return;
-            const labelEl = document.getElementById('leaderboard-room-label');
-            const sectionEl = document.getElementById('leaderboard-section');
-            const listEl = document.getElementById('leaderboard-list');
-
-            labelEl.textContent = `ห้อง: ${roomId}`;
-
-            try {
-                const res = await fetch(`/api/exam-results?roomId=${roomId}`);
-                if (!res.ok) return;
-                const data = await res.json();
-
-                if (data.length === 0) {
-                    sectionEl.classList.add('hidden');
-                    return;
-                }
-
-                // กรองสถิติสูงสุด: จัดเรียงตามคะแนน desc จากนั้นจัดเรียงตามลำดับส่ง (id) asc
-                data.sort((a, b) => {
-                    if (b.score !== a.score) {
-                        return b.score - a.score;
-                    }
-                    return a.id - b.id;
-                });
-
-                // ดึงเฉพาะ Top 5
-                const top5 = data.slice(0, 5);
-
-                const medals = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"];
-                const goldStyles = ["text-amber-400 font-bold", "text-slate-300 font-semibold", "text-amber-600 font-semibold", "text-slate-400", "text-slate-400"];
-
-                listEl.innerHTML = top5.map((student, index) => {
-                    const medal = medals[index] || "⭐️";
-                    const styleClass = goldStyles[index] || "text-slate-650";
-                    return `
-                        <div class="flex items-center justify-between p-2 rounded-xl bg-slate-950/60 border border-slate-800/80">
-                            <div class="flex items-center gap-2">
-                                <span class="text-sm select-none">${medal}</span>
-                                <span class="text-xs ${styleClass}">${escapeHtml(student.name)} <span class="text-[9px] text-slate-400 font-normal">(${student.class || '-'})</span></span>
-                            </div>
-                            <span class="text-xs font-mono font-bold text-cyan-400">${student.score}/${student.maxScore} คะแนน</span>
-                        </div>
-                    `;
-                }).join('');
-
-                sectionEl.classList.remove('hidden');
-            } catch(e) {
-                console.error("โหลด Leaderboard ล้มเหลว:", e);
-                sectionEl.classList.add('hidden');
-            }
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-        }
     </script>
 </body>
 </html>

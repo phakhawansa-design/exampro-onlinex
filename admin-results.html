@@ -486,6 +486,9 @@
                 if (savedCourseId && courses.some(c => String(c.id) === String(savedCourseId))) {
                     select.value = savedCourseId;
                     await onCourseChange();
+                } else if (courses.length > 0) {
+                    select.value = courses[0].id;
+                    await onCourseChange();
                 }
             } catch(e) {
                 console.error("Load courses error:", e);
@@ -564,7 +567,7 @@
                 if (score > max) max = score;
                 if (score < min) min = score;
                 sum += score;
-                maxTotalScore = student.maxScore;
+                if (student.maxScore) maxTotalScore = student.maxScore;
             });
 
             const avg = sum / count;

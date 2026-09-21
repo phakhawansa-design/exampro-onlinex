@@ -2142,50 +2142,66 @@ app.post('/api/submit-exam', (req, res) => {
     if (!roomId || !studentId || !name || !answers) return res.status(400).json({ message: "ข้อมูลไม่ครบถ้วน" });
 
     // 1. ค้นหา courseId จากห้องสอบ
-    db.get('SELECT courseId FROM teacher_rooms WHERE roomId = ?', [roomId], (roomErr, roomRow) => {
-        const courseId = roomRow ? roomRow.courseId : null;
+    db.get('SELECT courseId, teacherUsername FROM teacher_rooms WHERE roomId = ?', [roomId], (roomErr, roomRow) => {
+        let courseId = roomRow ? roomRow.courseId : null;
+        let teacherUsername = roomRow ? roomRow.teacherUsername : null;
 
-        // 2. ดึงข้อสอบและเฉลยเพื่อตรวจคำตอบ
-        db.all('SELECT id, answer FROM questions WHERE roomId = ?', [roomId], (err, questions) => {
-            if (err) return res.status(500).json({ message: err.message });
-            if (!questions || questions.length === 0) return res.status(400).json({ message: "ไม่พบข้อสอบในห้องนี้" });
+        const processSubmission = (finalCourseId) => {
+            // 2. ดึงข้อสอบและเฉลยเพื่อตรวจคำตอบ
+            db.all('SELECT id, answer FROM questions WHERE roomId = ?', [roomId], (err, questions) => {
+                if (err) return res.status(500).json({ message: err.message });
+                if (!questions || questions.length === 0) return res.status(400).json({ message: "ไม่พบข้อสอบในห้องนี้" });
 
-            let score = 0;
-            questions.forEach((q, index) => {
-                const studentAns = (answers[q.id] !== undefined ? answers[q.id] : answers[index] || "").trim().toLowerCase();
-                const correctAns = (q.answer || "").trim().toLowerCase();
-                if (studentAns === correctAns && correctAns !== "") score++;
+                let score = 0;
+                questions.forEach((q, index) => {
+                    const studentAns = (answers[q.id] !== undefined ? answers[q.id] : answers[index] || "").trim().toLowerCase();
+                    const correctAns = (q.answer || "").trim().toLowerCase();
+                    if (studentAns === correctAns && correctAns !== "") score++;
+                });
+
+                const thaiDateOptions = { timeZone: 'Asia/Bangkok', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                const date = new Date().toLocaleDateString('th-TH', thaiDateOptions);
+                const time = new Date().toLocaleTimeString('th-TH', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const answersJson = JSON.stringify(answers);
+
+                // 3. บันทึก/อัปเดตผลสอบลงใน exam_results ทันที
+                db.get('SELECT id FROM exam_results WHERE roomId = ? AND studentId = ?', [roomId, studentId], (existErr, existRow) => {
+                    if (existRow) {
+                        db.run(`
+                            UPDATE exam_results 
+                            SET score = ?, maxScore = ?, time = ?, date = ?, answers_json = ?, class = ?, courseId = ?
+                            WHERE id = ?
+                        `, [score, questions.length, time, date, answersJson, studentClass || '', finalCourseId, existRow.id], (upErr) => {
+                            if (upErr) return res.status(500).json({ message: upErr.message });
+                            console.log(`✅ [ผลสอบอัปเดต] นักศึกษา ${studentId} (${name}) ได้ ${score}/${questions.length} ในห้อง ${roomId}`);
+                            res.json({ success: true, score, maxScore: questions.length, updated: true });
+                        });
+                    } else {
+                        db.run(`
+                            INSERT INTO exam_results (roomId, studentId, name, class, score, maxScore, time, date, answers_json, courseId)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        `, [roomId, studentId, name, studentClass || '', score, questions.length, time, date, answersJson, finalCourseId], (insErr) => {
+                            if (insErr) return res.status(500).json({ message: insErr.message });
+                            console.log(`✅ [ผลสอบบันทึกสำเร็จ] นักศึกษา ${studentId} (${name}) ได้ ${score}/${questions.length} ในห้อง ${roomId}`);
+                            res.json({ success: true, score, maxScore: questions.length });
+                        });
+                    }
+                });
             });
+        };
 
-            const thaiDateOptions = { timeZone: 'Asia/Bangkok', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const date = new Date().toLocaleDateString('th-TH', thaiDateOptions);
-            const time = new Date().toLocaleTimeString('th-TH', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            const answersJson = JSON.stringify(answers);
-
-            // 3. บันทึก/อัปเดตผลสอบลงใน exam_results ทันที
-            db.get('SELECT id FROM exam_results WHERE roomId = ? AND studentId = ?', [roomId, studentId], (existErr, existRow) => {
-                if (existRow) {
-                    db.run(`
-                        UPDATE exam_results 
-                        SET score = ?, maxScore = ?, time = ?, date = ?, answers_json = ?, class = ?, courseId = ?
-                        WHERE id = ?
-                    `, [score, questions.length, time, date, answersJson, studentClass || '', courseId, existRow.id], (upErr) => {
-                        if (upErr) return res.status(500).json({ message: upErr.message });
-                        console.log(`✅ [ผลสอบอัปเดต] นักศึกษา ${studentId} (${name}) ได้ ${score}/${questions.length} ในห้อง ${roomId}`);
-                        res.json({ success: true, score, maxScore: questions.length, updated: true });
-                    });
-                } else {
-                    db.run(`
-                        INSERT INTO exam_results (roomId, studentId, name, class, score, maxScore, time, date, answers_json, courseId)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    `, [roomId, studentId, name, studentClass || '', score, questions.length, time, date, answersJson, courseId], (insErr) => {
-                        if (insErr) return res.status(500).json({ message: insErr.message });
-                        console.log(`✅ [ผลสอบบันทึกสำเร็จ] นักศึกษา ${studentId} (${name}) ได้ ${score}/${questions.length} ในห้อง ${roomId}`);
-                        res.json({ success: true, score, maxScore: questions.length });
-                    });
+        if ((!courseId || courseId === 0) && teacherUsername) {
+            // ค้นหาคอร์สแรกของอาจารย์เพื่อผูกห้องสอบและผลสอบอัตโนมัติหากไม่ได้ระบุไว้ก่อน
+            db.get('SELECT id FROM courses WHERE teacherUsername = ? ORDER BY id ASC LIMIT 1', [teacherUsername], (cErr, cRow) => {
+                if (!cErr && cRow && cRow.id) {
+                    courseId = cRow.id;
+                    db.run('UPDATE teacher_rooms SET courseId = ? WHERE roomId = ?', [courseId, roomId]);
                 }
+                processSubmission(courseId);
             });
-        });
+        } else {
+            processSubmission(courseId);
+        }
     });
 });
 
@@ -2194,14 +2210,31 @@ app.get('/api/exam-results', (req, res) => {
     const { roomId, courseId, username } = req.query;
 
     if (courseId) {
-        const cId = parseInt(courseId, 10);
         db.all(`
             SELECT er.id, er.studentId, er.name, er.class, er.score, er.maxScore, er.time, er.date, er.roomId, er.answers_json, er.courseId
             FROM exam_results er
+            LEFT JOIN teacher_rooms tr ON er.roomId = tr.roomId
             WHERE er.courseId = ? 
-               OR er.roomId IN (SELECT tr.roomId FROM teacher_rooms tr WHERE tr.courseId = ?)
+               OR CAST(er.courseId AS TEXT) = ?
+               OR er.courseId IN (SELECT id FROM courses WHERE id = ? OR CAST(id AS TEXT) = ? OR courseCode = ?)
+               OR tr.courseId = ? 
+               OR CAST(tr.courseId AS TEXT) = ?
+               OR tr.courseId IN (SELECT id FROM courses WHERE id = ? OR CAST(id AS TEXT) = ? OR courseCode = ?)
+               OR (
+                   ? IS NOT NULL 
+                   AND tr.teacherUsername = ? 
+                   AND (er.courseId IS NULL OR er.courseId = 0) 
+                   AND (tr.courseId IS NULL OR tr.courseId = 0)
+               )
+            GROUP BY er.id
             ORDER BY er.id DESC
-        `, [cId, cId], (err, rows) => {
+        `, [
+            courseId, String(courseId),
+            courseId, String(courseId), String(courseId),
+            courseId, String(courseId),
+            courseId, String(courseId), String(courseId),
+            username || null, username || null
+        ], (err, rows) => {
             if (err) return res.status(500).json({ message: err.message });
             res.json(rows || []);
         });
