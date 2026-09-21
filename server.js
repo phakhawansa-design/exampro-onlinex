@@ -3031,7 +3031,7 @@ app.get('/api/library/get-template-questions', (req, res) => {
     const { templateId } = req.query;
     if (!templateId) return res.status(400).json({ message: "กรุณาระบุ templateId" });
 
-    db.all('SELECT * FROM template_questions WHERE templateId = ?', [templateId], (err, rows) => {
+    db.all('SELECT * FROM template_questions WHERE templateId = ? ORDER BY id ASC', [templateId], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
         res.json(rows);
     });

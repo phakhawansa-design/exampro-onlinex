@@ -679,13 +679,13 @@
             await loadExistingExamForCourse();
         }
 
-        // โหลดข้อสอบที่มีอยู่แล้วในรายวิชานี้จากคลังข้อสอบ (ถ้ามี)
+        // เริ่มต้นสร้างข้อสอบใหม่ในรูปแบบกระดาษเปล่าสำหรับวิชาที่เลือก
         async function loadExistingExamForCourse() {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
                 const queryTemplateId = urlParams.get('templateId');
 
-                // 1. ถ้ามี templateId ส่งมาจาก query string
+                // 1. ถ้ามี templateId ส่งมาจาก query string (เช่น ตั้งใจคลิกแก้ไขจากคลังข้อสอบ)
                 if (queryTemplateId) {
                     const tRes = await fetch(`/api/library/get-template-questions?templateId=${encodeURIComponent(queryTemplateId)}`);
                     if (tRes.ok) {
@@ -725,47 +725,7 @@
                     }
                 }
 
-                // 2. ถ้าไม่มี templateId ใน query string ให้ค้นหาชุดข้อสอบในคลังสำหรับวิชานี้ (courseId)
-                if (activeCourseId) {
-                    const tListRes = await fetch(`/api/library/get-templates?username=${encodeURIComponent(username)}&courseId=${encodeURIComponent(activeCourseId)}`);
-                    if (tListRes.ok) {
-                        const tList = await tListRes.json();
-                        if (Array.isArray(tList) && tList.length > 0) {
-                            const latestTpl = tList[0]; // ชุดล่าสุดสำหรับวิชานี้
-                            document.getElementById('top-exam-title').value = latestTpl.templateName || '';
-
-                            const tRes = await fetch(`/api/library/get-template-questions?templateId=${encodeURIComponent(latestTpl.id)}`);
-                            if (tRes.ok) {
-                                const tQuestions = await tRes.json();
-                                if (Array.isArray(tQuestions) && tQuestions.length > 0) {
-                                    questions = tQuestions.map(q => {
-                                        const choices = [];
-                                        const choices_img = [];
-                                        choiceKeys.forEach(key => {
-                                            choices.push(q[key] !== null && q[key] !== undefined ? String(q[key]) : '');
-                                            choices_img.push(q[key + '_img'] || '');
-                                        });
-                                        return {
-                                            question: q.question || '',
-                                            question_img: q.question_img || '',
-                                            choices,
-                                            choices_img,
-                                            answer: (q.answer || 'a').toLowerCase(),
-                                            timeLimit: 20,
-                                            type: 'quiz'
-                                        };
-                                    });
-                                    activeQuestionIndex = 0;
-                                    renderAllQuestionsList();
-                                    renderActiveQuestionStage();
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // ถ้าไม่มีข้อสอบเดิมในคลังสำหรับวิชานี้ ให้ตั้งชื่อตั้งต้นและใช้คำถามว่าง 1 ข้อ
+                // 2. เมื่อกดเลือกวิชา -> ให้เริ่มต้นเป็นกระดาษเปล่าพร้อมสร้างข้อสอบใหม่เสมอ
                 activeRoomId = '';
                 const courseObj = courses.find(c => String(c.id) === String(activeCourseId));
                 document.getElementById('top-exam-title').value = courseObj ? `แบบทดสอบวิชา ${courseObj.courseName}` : '';
