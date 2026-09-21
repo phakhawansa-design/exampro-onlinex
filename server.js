@@ -1124,11 +1124,11 @@ app.post('/api/student/check-exam-access', (req, res) => {
 
             // 3. 🔒 คัดกรองความปลอดภัย: ถ้ารายวิชานี้มีการผูกไว้ และมีรายชื่อนักศึกษาใน course_students
             if (room.courseId && room.courseId > 0) {
-                db.all('SELECT * FROM course_students WHERE courseId = ?', [room.courseId], (err3, enrolledList) => {
+                db.all('SELECT * FROM course_students WHERE courseId = ? OR CAST(courseId AS TEXT) = ?', [room.courseId, String(room.courseId)], (err3, enrolledList) => {
                     if (err3) return res.status(500).json({ success: false, message: err3.message });
 
                     if (enrolledList && enrolledList.length > 0) {
-                        // ค้นหานักศึกษาในบัญชีรายชื่อของวิชานี้
+                        // ค้นหานักศึกษาในบัญชีรายชื่อของวิชานี้ด้วย studentId
                         const found = enrolledList.find(s => {
                             const enrolledNorm = (s.studentId || '').replace(/[^0-9a-zA-Z]/g, '');
                             return s.studentId === cleanStudentId || enrolledNorm === normStudentId;
@@ -1138,26 +1138,7 @@ app.post('/api/student/check-exam-access', (req, res) => {
                             return res.status(403).json({
                                 success: false,
                                 accessDenied: true,
-                                message: `❌ ขออภัย รหัสนักศึกษา (${cleanStudentId}) ไม่มีรายชื่ออยู่ในบัญชีผู้มีสิทธิ์สอบรายวิชา "${room.courseName || room.courseCode || 'วิชานี้'}" กรุณาติดต่ออาจารย์ผู้สอน`
-                            });
-                        }
-
-                        // ตรวจสอบชื่อ-นามสกุลภาษาไทย ว่าตรงกันหรือไม่
-                        const cleanThai = (str) => (str || '')
-                            .replace(/^(นาย|นางสาว|นาง|ด\.ช\.|ด\.ญ\.)/g, '')
-                            .replace(/\s+/g, '')
-                            .trim();
-
-                        const studentCombined = cleanThai(`${student.firstName}${student.lastName}`);
-                        const enrolledCombined = cleanThai(`${found.firstName}${found.lastName}`);
-                        const firstMatch = cleanThai(student.firstName) === cleanThai(found.firstName);
-                        const fullMatch = studentCombined === enrolledCombined;
-
-                        if (!firstMatch && !fullMatch) {
-                            return res.status(403).json({
-                                success: false,
-                                accessDenied: true,
-                                message: `❌ ข้อมูลชื่อ-นามสกุลของคุณ (${student.firstName} ${student.lastName}) ไม่ตรงกับบัญชีรายชื่อของรายวิชา "${found.firstName} ${found.lastName}" (ต้องเป็นภาษาไทยตรงกัน)`
+                                message: `❌ ขออภัย รหัสนักศึกษา (${cleanStudentId}) ไม่มีรายชื่ออยู่ในบัญชีผู้มีสิทธิ์สอบรายวิชา "${room.courseName || room.courseCode || 'วิชานี้'}" จึงไม่สามารถเข้ามาร่วมสอบได้`
                             });
                         }
                     }
@@ -1169,6 +1150,127 @@ app.post('/api/student/check-exam-access', (req, res) => {
                 // หากห้องสอบนี้ไม่ได้ล็อกเฉพาะวิชา อนุญาตให้เข้าได้ตามปกติ
                 sendApprovedResponse();
             }
+        });
+    });
+});
+
+// 📊 เปรียบเทียบรายชื่อนักศึกษาในรายวิชา (course_students) กับคนที่เข้ามาสอบจริงในห้องนี้
+app.get('/api/teacher/room-roster-attendance', (req, res) => {
+    const { roomId } = req.query;
+    if (!roomId) return res.status(400).json({ message: "กรุณาระบุ roomId" });
+
+    db.get('SELECT r.*, c.courseCode, c.courseName FROM teacher_rooms r LEFT JOIN courses c ON c.id = r.courseId WHERE r.roomId = ?', [roomId], (err, room) => {
+        if (err || !room) return res.status(404).json({ message: "ไม่พบห้องสอบนี้" });
+
+        const courseId = room.courseId;
+
+        // 1. ดึงรายชื่อจาก course_students
+        const sqlEnrolled = 'SELECT * FROM course_students WHERE courseId = ? OR CAST(courseId AS TEXT) = ? ORDER BY studentId ASC';
+        db.all(sqlEnrolled, [courseId, String(courseId)], (err1, enrolledRows) => {
+            const enrolledList = enrolledRows || [];
+
+            // 2. ดึงผลสอบที่ส่งแล้ว
+            db.all('SELECT * FROM exam_results WHERE roomId = ?', [roomId], (err2, resultRows) => {
+                const results = resultRows || [];
+                const submittedMap = new Map();
+                results.forEach(r => submittedMap.set(String(r.studentId), r));
+
+                // 3. ดึงคนที่กำลังอยู่ห้องรอ/กำลังสอบในหน่วยความจำ
+                const waitingMap = waitingStudentsTracker.get(roomId) || new Map();
+
+                // 4. ดึงคนที่สร้าง session การสอบ
+                db.all('SELECT studentId, studentName, class FROM exam_sessions WHERE roomId = ?', [roomId], (err3, sessionRows) => {
+                    const activeSessions = sessionRows || [];
+                    const activeMap = new Map();
+                    activeSessions.forEach(s => activeMap.set(String(s.studentId), s));
+                    waitingMap.forEach((v, k) => activeMap.set(String(k), v));
+
+                    const studentStatusList = [];
+                    const enrolledSet = new Set();
+
+                    // ประมวลผลรายชื่อในวิชาทั้งหมด
+                    enrolledList.forEach(e => {
+                        const sIdStr = String(e.studentId);
+                        enrolledSet.add(sIdStr);
+
+                        const isSubmitted = submittedMap.get(sIdStr);
+                        const isActive = activeMap.get(sIdStr);
+
+                        let status = 'not_joined';
+                        let statusText = '🔴 ยังไม่เข้าสอบ';
+                        let statusBg = 'bg-rose-50 text-rose-700 border-rose-200';
+                        let score = null;
+                        let maxScore = null;
+
+                        if (isSubmitted) {
+                            status = 'submitted';
+                            statusText = '✅ ส่งข้อสอบแล้ว';
+                            statusBg = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                            score = isSubmitted.score;
+                            maxScore = isSubmitted.maxScore;
+                        } else if (isActive) {
+                            status = 'joined';
+                            statusText = '🟢 เข้าสอบแล้ว (กำลังทำ)';
+                            statusBg = 'bg-indigo-50 text-indigo-700 border-indigo-200';
+                        }
+
+                        const fullName = `${e.prefix || ''}${e.firstName || ''} ${e.lastName || ''}`.trim() || 'นักศึกษา';
+
+                        studentStatusList.push({
+                            studentId: e.studentId,
+                            name: fullName,
+                            class: e.class || '-',
+                            status,
+                            statusText,
+                            statusBg,
+                            score,
+                            maxScore
+                        });
+                    });
+
+                    // ถ้ามีคนที่เข้าสอบที่ไม่อยู่ใน course_students (เช่น ห้องสอบทั่วไปไม่ได้ล็อกรายวิชา)
+                    const extraJoined = new Map([...submittedMap, ...activeMap]);
+                    extraJoined.forEach((val, sIdStr) => {
+                        if (!enrolledSet.has(sIdStr)) {
+                            const isSubmitted = submittedMap.get(sIdStr);
+                            const name = isSubmitted ? isSubmitted.name : (val.name || val.studentName || 'นักศึกษา');
+                            const cls = isSubmitted ? (isSubmitted.class || '-') : (val.class || '-');
+
+                            studentStatusList.push({
+                                studentId: sIdStr,
+                                name,
+                                class: cls,
+                                status: isSubmitted ? 'submitted' : 'joined',
+                                statusText: isSubmitted ? '✅ ส่งข้อสอบแล้ว (นอกรายชื่อ)' : '🟢 เข้าสอบแล้ว (นอกรายชื่อ)',
+                                statusBg: isSubmitted ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-cyan-50 text-cyan-700 border-cyan-200',
+                                score: isSubmitted ? isSubmitted.score : null,
+                                maxScore: isSubmitted ? isSubmitted.maxScore : null
+                            });
+                        }
+                    });
+
+                    const totalEnrolled = enrolledList.length;
+                    const totalSubmitted = studentStatusList.filter(s => s.status === 'submitted').length;
+                    const totalActive = studentStatusList.filter(s => s.status === 'joined').length;
+                    const totalJoined = totalSubmitted + totalActive;
+                    const totalNotJoined = Math.max(0, totalEnrolled - totalJoined);
+
+                    res.json({
+                        success: true,
+                        roomId,
+                        courseId,
+                        courseCode: room.courseCode || '',
+                        courseName: room.courseName || '',
+                        examTitle: room.exam_title || room.roomName,
+                        totalEnrolled,
+                        totalJoined,
+                        totalSubmitted,
+                        totalActive,
+                        totalNotJoined,
+                        students: studentStatusList
+                    });
+                });
+            });
         });
     });
 });
@@ -3015,8 +3117,8 @@ app.get('/api/library/get-templates', (req, res) => {
         params.push(username);
     }
     if (courseId) {
-        sql += " AND et.courseId = ?";
-        params.push(parseInt(courseId, 10));
+        sql += " AND (et.courseId = ? OR CAST(et.courseId AS TEXT) = ?)";
+        params.push(courseId, String(courseId));
     }
     sql += " ORDER BY et.id DESC";
 
