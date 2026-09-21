@@ -265,7 +265,7 @@
                     </div>
 
                     <!-- Empty State (Shown when no active rooms) -->
-                    <div id="rooms-empty-state" class="flex flex-col items-center justify-center p-8 sm:p-12 bg-white/90 rounded-3xl border-2 border-dashed border-pink-200 text-center space-y-5 max-w-2xl mx-auto my-6 shadow-sm relative overflow-hidden group">
+                    <div id="rooms-empty-state" class="flex flex-col items-center justify-center p-8 sm:p-12 bg-white/90 rounded-3xl border-2 border-dashed border-pink-200 text-center space-y-3 max-w-2xl mx-auto my-6 shadow-sm relative overflow-hidden group">
                         <div class="w-16 h-16 rounded-2xl bg-pink-50 border border-pink-200 flex items-center justify-center text-3xl shadow-xs">
                             🏫
                         </div>
@@ -275,10 +275,6 @@
                                 กดปุ่ม <strong>"+ สร้างและเปิดห้องสอบใหม่ทันที"</strong> ด้านบนเพื่อเลือกรายวิชา ชุดข้อสอบ และรับ PIN 6 หลักให้ผู้สอบ
                             </p>
                         </div>
-                        <button onclick="openCreateRoomModal()" class="px-6 py-3 bg-gradient-to-r from-pink-500 via-rose-400 to-sky-400 hover:from-pink-600 hover:to-sky-500 text-white rounded-xl text-xs sm:text-sm font-bold shadow-md shadow-pink-500/20 transition active:scale-95 flex items-center gap-2 cursor-pointer">
-                            <span>➕</span>
-                            <span>สร้างห้องสอบใหม่</span>
-                        </button>
                     </div>
                 </div>
 
@@ -375,7 +371,7 @@
                         <!-- คำชี้แจง / ประกาศ -->
                         <div class="space-y-1.5 md:col-span-3">
                             <label class="font-bold text-slate-800 text-xs sm:text-sm">📢 คำชี้แจง / ประกาศในห้องสอบ:</label>
-                            <input type="text" id="modal-input-announcement" value="กรุณานั่งประจำที่และเตรียมความพร้อม ห้ามสลับหน้าระหว่างสอบ" class="w-full p-3.5 rounded-2xl border-2 border-slate-200 font-bold outline-none focus:border-indigo-600 bg-slate-50 focus:bg-white text-slate-900 text-sm shadow-xs transition">
+                            <input type="text" id="modal-input-announcement" value="อย่าแอบใช้ AI นะจ้ะ" class="w-full p-3.5 rounded-2xl border-2 border-slate-200 font-bold outline-none focus:border-indigo-600 bg-slate-50 focus:bg-white text-slate-900 text-sm shadow-xs transition">
                         </div>
                     </div>
 
@@ -750,7 +746,7 @@
                 const examPin = room.exam_code || '------';
                 const duration = room.duration || 60;
                 const qCount = room.questionCount || 0;
-                const announcement = room.announcement || 'กรุณานั่งประจำที่และเตรียมความพร้อม ห้ามสลับหน้าระหว่างสอบ';
+                const announcement = room.announcement || 'อย่าแอบใช้ AI นะจ้ะ';
 
                 html += `
                     <div class="bg-white rounded-3xl p-6 shadow-md hover:shadow-xl border-2 ${isPub ? 'border-emerald-400' : 'border-slate-200'} transition flex flex-col justify-between space-y-4 relative">
@@ -881,14 +877,20 @@
 
         // 4. เปิดโมดอล "+ สร้างห้องสอบ" (ขั้นตอนที่ 1, 2, 3)
         async function openCreateRoomModal() {
+            if (!courses || courses.length === 0) {
+                await loadTeacherCourses();
+            } else {
+                populateCourseSelectDropdown();
+            }
+
             document.getElementById('create-room-modal').classList.remove('hidden');
             const selectCourse = document.getElementById('modal-select-course');
             
-            if (courses.length > 0 && !selectCourse.value) {
-                selectCourse.value = courses[0].id;
-                onModalCourseChanged(courses[0].id);
+            if (courses && courses.length > 0) {
+                const targetId = selectCourse.value || courses[0].id;
+                selectCourse.value = targetId;
+                onModalCourseChanged(targetId);
             }
-            await loadExamTemplatesForModal();
         }
 
         function closeCreateRoomModal() {
