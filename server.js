@@ -261,6 +261,7 @@ db.serialize(() => {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         teacherUsername TEXT,
         templateName TEXT,
+        courseId INTEGER DEFAULT 0,
         created_at TEXT
     )`);
 
@@ -322,6 +323,11 @@ db.serialize(() => {
     // ผูกห้องสอบกับรายวิชา (courseId)
     db.run("ALTER TABLE teacher_rooms ADD COLUMN courseId INTEGER DEFAULT 0", (err) => {
         if (!err) console.log("✔ Added column 'courseId' to teacher_rooms table");
+    });
+    
+    // ผูกชุดข้อสอบในคลังกับรายวิชา (courseId)
+    db.run("ALTER TABLE exam_templates ADD COLUMN courseId INTEGER DEFAULT 0", (err) => {
+        if (!err) console.log("✔ Added column 'courseId' to exam_templates table");
     });
     
     // อัปเกรดตารางผลสอบ (exam_results)
@@ -1189,12 +1195,31 @@ app.get('/api/teacher/courses', (req, res) => {
     const sql = `
         SELECT c.*,
             (SELECT COUNT(*) FROM course_students cs WHERE cs.courseId = c.id) as studentCount,
-            (SELECT COUNT(*) FROM teacher_rooms tr WHERE tr.courseId = c.id) as roomCount
+            (SELECT COUNT(*) FROM teacher_rooms tr WHERE tr.courseId = c.id) as roomCount,
+            (SELECT COUNT(*) FROM exam_templates et WHERE et.courseId = c.id) as examCount
         FROM courses c
         WHERE c.teacherUsername = ? OR ? = 'admin'
         ORDER BY c.id DESC
     `;
     db.all(sql, [username, username], (err, rows) => {
+        if (err) return res.status(500).json({ message: err.message });
+        res.json(rows || []);
+    });
+});
+
+// 📝 ดึงรายการชุดข้อสอบทั้งหมดที่อยู่ในรายวิชานี้
+app.get('/api/courses/:courseId/exams', (req, res) => {
+    const courseId = parseInt(req.params.courseId, 10);
+    if (!courseId) return res.status(400).json({ message: "กรุณาระบุ courseId" });
+
+    const sql = `
+        SELECT et.id, et.templateName, et.courseId, et.created_at,
+               (SELECT COUNT(*) FROM template_questions tq WHERE tq.templateId = et.id) as questionCount
+        FROM exam_templates et
+        WHERE et.courseId = ?
+        ORDER BY et.id DESC
+    `;
+    db.all(sql, [courseId], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
         res.json(rows || []);
     });
@@ -1762,6 +1787,57 @@ app.post('/api/teacher/add-questions', async (req, res) => {
         console.error("Error adding questions:", insertErr);
         return res.status(500).json({ message: "เกิดข้อผิดพลาดในการบันทึกข้อสอบลงฐานข้อมูล: " + insertErr.message });
     }
+});
+
+// ==========================================
+// 📝 บันทึกข้อสอบทั้งชุดจากหน้าสร้างข้อสอบ (Replace all + sync ไปคลัง)
+// ==========================================
+app.post('/api/teacher/save-questions', async (req, res) => {
+    const { roomId, questions } = req.body;
+    if (!roomId || !Array.isArray(questions)) {
+        return res.status(400).json({ message: "ข้อมูลห้องสอบหรือข้อสอบไม่ถูกต้อง" });
+    }
+
+    // ลบข้อสอบเดิมในห้องสอบแล้ว insert ใหม่ทั้งชุด (replace strategy)
+    db.run('DELETE FROM questions WHERE roomId = ?', [roomId], async (delErr) => {
+        if (delErr) return res.status(500).json({ message: delErr.message });
+
+        if (questions.length === 0) {
+            syncRoomToLibrary(roomId);
+            return res.json({ success: true, count: 0 });
+        }
+
+        try {
+            for (const rawQ of questions) {
+                await new Promise((resolve, reject) => {
+                    db.run(`
+                        INSERT INTO questions (
+                            roomId, question, question_img,
+                            a, b, c, d, e, f, g, h, i, j,
+                            a_img, b_img, c_img, d_img, e_img, f_img, g_img, h_img, i_img, j_img,
+                            answer
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    `, [
+                        roomId,
+                        rawQ.question || '',
+                        rawQ.question_img || '',
+                        rawQ.a || '', rawQ.b || '', rawQ.c || '', rawQ.d || '',
+                        rawQ.e || '', rawQ.f || '', rawQ.g || '', rawQ.h || '', rawQ.i || '', rawQ.j || '',
+                        rawQ.a_img || '', rawQ.b_img || '', rawQ.c_img || '', rawQ.d_img || '',
+                        rawQ.e_img || '', rawQ.f_img || '', rawQ.g_img || '', rawQ.h_img || '', rawQ.i_img || '', rawQ.j_img || '',
+                        rawQ.answer || ''
+                    ], (insErr) => { if (insErr) reject(insErr); else resolve(); });
+                });
+            }
+
+            console.log(`💾 [ห้อง: ${roomId}] บันทึกข้อสอบสำเร็จ: ${questions.length} ข้อ (sync ไปคลังอัตโนมัติ)`);
+            syncRoomToLibrary(roomId);
+            return res.json({ success: true, count: questions.length });
+        } catch (insertErr) {
+            console.error("save-questions insert error:", insertErr);
+            return res.status(500).json({ message: "บันทึกข้อสอบล้มเหลว: " + insertErr.message });
+        }
+    });
 });
 
 // นักเรียนดึงข้อสอบไปทำ (ค้นหาจาก roomId และซ่อนเฉลย - ต้องกดยืนยันเผยแพร่ก่อน)
@@ -2728,12 +2804,20 @@ app.post('/api/teacher/publish-exam', (req, res) => {
 // ==========================================
 
 function syncRoomToLibrary(roomId) {
-    db.get('SELECT teacherUsername, exam_title, roomName FROM teacher_rooms WHERE roomId = ?', [roomId], (err, room) => {
+    db.get('SELECT teacherUsername, exam_title, roomName, courseId FROM teacher_rooms WHERE roomId = ?', [roomId], (err, room) => {
         if (err || !room) return;
         const teacherUsername = room.teacherUsername;
         const templateName = room.exam_title || room.roomName || 'ข้อสอบไม่มีชื่อ';
+        const courseId = room.courseId ? parseInt(room.courseId, 10) : 0;
 
-        db.get('SELECT id FROM exam_templates WHERE teacherUsername = ? AND templateName = ?', [teacherUsername, templateName], (err, tpl) => {
+        // ค้นหา template ด้วย teacherUsername + templateName + courseId
+        // เพื่อให้ข้อสอบชื่อเดียวกันในต่างวิชาไม่ปนกัน
+        const findSql = courseId > 0
+            ? 'SELECT id FROM exam_templates WHERE teacherUsername = ? AND templateName = ? AND courseId = ?'
+            : 'SELECT id FROM exam_templates WHERE teacherUsername = ? AND templateName = ? AND (courseId IS NULL OR courseId = 0)';
+        const findParams = courseId > 0 ? [teacherUsername, templateName, courseId] : [teacherUsername, templateName];
+
+        db.get(findSql, findParams, (err, tpl) => {
             if (err) return;
             const nowStr = new Date().toLocaleDateString('th-TH', { 
                 timeZone: 'Asia/Bangkok',
@@ -2747,10 +2831,10 @@ function syncRoomToLibrary(roomId) {
                     if (delErr) return;
                     copyRoomQuestionsToTemplate(roomId, templateId);
                 });
-                db.run('UPDATE exam_templates SET created_at = ? WHERE id = ?', [nowStr, templateId]);
+                db.run('UPDATE exam_templates SET created_at = ?, courseId = ? WHERE id = ?', [nowStr, courseId, templateId]);
             } else {
-                db.run('INSERT INTO exam_templates (teacherUsername, templateName, created_at) VALUES (?, ?, ?)',
-                    [teacherUsername, templateName, nowStr],
+                db.run('INSERT INTO exam_templates (teacherUsername, templateName, courseId, created_at) VALUES (?, ?, ?, ?)',
+                    [teacherUsername, templateName, courseId, nowStr],
                     function(insErr) {
                         if (insErr) return;
                         const templateId = this.lastID;
@@ -2787,26 +2871,34 @@ function copyRoomQuestionsToTemplate(roomId, templateId) {
     });
 }
 
-// 1. ดึงรายการชุดข้อสอบสะสมในคลังทั้งหมด
+// 1. ดึงรายการชุดข้อสอบสะสมในคลังทั้งหมด (รองรับกรองตาม courseId เพื่อแยกข้อสอบแต่ละวิชา)
 app.get('/api/library/get-templates', (req, res) => {
-    const { username } = req.query;
+    const { username, courseId } = req.query;
     if (!username) return res.status(400).json({ message: "กรุณาระบุ username" });
 
     let sql = `
         SELECT et.*, 
+            c.courseCode, c.courseName,
             (SELECT COUNT(*) FROM template_questions tq WHERE tq.templateId = et.id) as questionCount
         FROM exam_templates et
+        LEFT JOIN courses c ON c.id = et.courseId
+        WHERE 1=1
     `;
     const params = [];
     if (username !== 'admin') {
-        sql += " WHERE et.teacherUsername = ?";
+        sql += " AND et.teacherUsername = ?";
         params.push(username);
+    }
+    if (courseId) {
+        sql += " AND et.courseId = ?";
+        params.push(parseInt(courseId, 10));
     }
     sql += " ORDER BY et.id DESC";
 
     db.all(sql, params, (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
-        res.json(rows);
+        res.json(rows || []);
+    });
     });
 });
 
