@@ -126,7 +126,7 @@
         #sidebar.collapsed .logo-shield { margin: 0 auto; }
         #sidebar-toggle {
             position: absolute;
-            right: 12px; top: 24px;
+            right: 12px; top: 22px;
             width: 26px; height: 26px;
             border-radius: 50%;
             background: #ffffff;
@@ -136,12 +136,12 @@
             font-size: 11px;
             cursor: pointer;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: all 0.2s;
+            transition: all 0.3s ease;
             z-index: 100;
         }
-        #sidebar-toggle:hover { color: #0f172a; background: #f8fafc; scale: 1.05; }
+        #sidebar-toggle:hover { color: #0f172a; background: #f8fafc; transform: scale(1.08); }
         #sidebar.collapsed #sidebar-toggle {
-            right: 0; left: 0; margin: 0 auto; top: 60px;
+            right: 10px; left: auto; top: 22px; margin: 0; transform: rotate(180deg);
         }
 
         #main-area {
