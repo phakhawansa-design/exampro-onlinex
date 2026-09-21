@@ -404,6 +404,18 @@
 
                 if (res.ok && data.success) {
                     alert(`🎉 ${data.message}`);
+                    if (data.student) {
+                        localStorage.setItem('currentStudent', JSON.stringify(data.student));
+                        sessionStorage.setItem('currentStudent', JSON.stringify(data.student));
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const codeParam = urlParams.get('code') || urlParams.get('pin');
+                        if (codeParam) {
+                            window.location.href = `student-portal.html?code=${encodeURIComponent(codeParam)}`;
+                        } else {
+                            window.location.href = 'student-portal.html';
+                        }
+                        return;
+                    }
                     switchAuthTab('login');
                     document.getElementById('student-id').value = studentId;
                     document.getElementById('student-password').value = '';
@@ -449,8 +461,9 @@
                     return;
                 }
 
-                // บันทึก Session นักศึกษาลง LocalStorage เพื่อให้ student-portal ใช้งานได้
+                // บันทึก Session นักศึกษาลง LocalStorage และ SessionStorage เพื่อให้ student-portal ใช้งานได้
                 localStorage.setItem('currentStudent', JSON.stringify(loginData.student));
+                sessionStorage.setItem('currentStudent', JSON.stringify(loginData.student));
 
                 // นำเข้าสู่หน้าระบบนักศึกษา (Student Portal) ทันที (หากสแกน QR Code มา ให้ส่งรหัส PIN ต่อไปด้วย)
                 const urlParams = new URLSearchParams(window.location.search);

@@ -343,22 +343,36 @@
         let activeWaitingRoomId = null;
         let activeWaitingPin = null;
 
+        // ดึงข้อมูลนักศึกษาอย่างปลอดภัยจาก Storage
+        function getStoredStudent() {
+            try {
+                const raw = localStorage.getItem('currentStudent') || sessionStorage.getItem('currentStudent');
+                if (!raw || raw === 'null' || raw === 'undefined') return null;
+                const parsed = JSON.parse(raw);
+                if (parsed && (parsed.studentId || parsed.id)) {
+                    return {
+                        studentId: String(parsed.studentId || parsed.id).trim(),
+                        firstName: parsed.firstName || '',
+                        lastName: parsed.lastName || '',
+                        name: parsed.name || `${parsed.firstName || ''} ${parsed.lastName || ''}`.trim() || String(parsed.studentId || parsed.id),
+                        class: parsed.class || ''
+                    };
+                }
+            } catch (e) {
+                console.warn('Error reading currentStudent:', e);
+            }
+            return null;
+        }
+
         window.addEventListener('DOMContentLoaded', async () => {
-            // ดึงข้อมูลนักศึกษาจาก Session / LocalStorage
-            const raw = localStorage.getItem('currentStudent');
-            if (!raw) {
-                alert("⚠️ กรุณาเข้าสู่ระบบก่อนครับ");
+            currentStudent = getStoredStudent();
+            if (!currentStudent) {
+                alert("⚠️ กรุณาเข้าสู่ระบบก่อนเข้าใช้งานหน้ารวมนักศึกษาครับ");
                 window.location.href = 'Student-login.html';
                 return;
             }
 
-            try {
-                currentStudent = JSON.parse(raw);
-                renderStudentInfo();
-            } catch(e) {
-                window.location.href = 'Student-login.html';
-                return;
-            }
+            renderStudentInfo();
 
             // ตรวจสอบ query parameters กรณีมี ?code= หรือ ?pin= หรือ ?room= ติดมา
             const params = new URLSearchParams(window.location.search);
@@ -375,17 +389,26 @@
             if (!currentStudent) return;
             const fullName = `${currentStudent.firstName || ''} ${currentStudent.lastName || ''}`.trim() || currentStudent.name || 'นักศึกษา';
             
-            document.getElementById('header-student-name').textContent = fullName;
-            document.getElementById('header-student-id').textContent = `รหัส: ${currentStudent.studentId}`;
-            document.getElementById('banner-student-name').textContent = `สวัสดีคุณ ${fullName}`;
-            document.getElementById('banner-student-id').textContent = currentStudent.studentId;
-            document.getElementById('banner-student-class').textContent = currentStudent.class || 'ไม่ได้ระบุ';
+            const headerName = document.getElementById('header-student-name');
+            if (headerName) headerName.textContent = fullName;
+            const headerId = document.getElementById('header-student-id');
+            if (headerId) headerId.textContent = `รหัส: ${currentStudent.studentId}`;
+            const bannerName = document.getElementById('banner-student-name');
+            if (bannerName) bannerName.textContent = `สวัสดีคุณ ${fullName}`;
+            const bannerId = document.getElementById('banner-student-id');
+            if (bannerId) bannerId.textContent = currentStudent.studentId;
+            const bannerClass = document.getElementById('banner-student-class');
+            if (bannerClass) bannerClass.textContent = currentStudent.class || 'ไม่ได้ระบุ';
 
             // Profile Form
-            document.getElementById('prof-student-id').value = currentStudent.studentId;
-            document.getElementById('prof-firstname').value = currentStudent.firstName || '';
-            document.getElementById('prof-lastname').value = currentStudent.lastName || '';
-            document.getElementById('prof-class').value = currentStudent.class || '';
+            const profId = document.getElementById('prof-student-id');
+            if (profId) profId.value = currentStudent.studentId;
+            const profFirst = document.getElementById('prof-firstname');
+            if (profFirst) profFirst.value = currentStudent.firstName || '';
+            const profLast = document.getElementById('prof-lastname');
+            if (profLast) profLast.value = currentStudent.lastName || '';
+            const profCls = document.getElementById('prof-class');
+            if (profCls) profCls.value = currentStudent.class || '';
         }
 
         function switchTab(tab) {
@@ -410,7 +433,16 @@
         // 🚪 ตรวจสอบสิทธิ์และเข้าห้องสอบ / ห้องรอสอบ
         // ==========================================
         async function checkAndJoinExam() {
-            const pinInput = document.getElementById('join-exam-pin').value.trim();
+            currentStudent = getStoredStudent();
+            if (!currentStudent || !currentStudent.studentId) {
+                alert("⚠️ กรุณาเข้าสู่ระบบก่อนครับ");
+                window.location.href = 'Student-login.html';
+                return;
+            }
+
+            const rawPin = document.getElementById('join-exam-pin').value;
+            // ตัดช่องว่างทุกรูปแบบออก เช่น "360 173" -> "360173"
+            const pinInput = (rawPin || '').replace(/\s+/g, '').trim();
             const btn = document.getElementById('btn-join-exam');
 
             if (!pinInput) {
@@ -449,7 +481,7 @@
 
             } catch(e) {
                 console.error(e);
-                alert("❌ ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้");
+                alert("❌ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = "🚀 ตรวจสอบสิทธิ์ & เข้าสู่ห้องสอบ";
@@ -466,14 +498,21 @@
             document.getElementById('wait-course-title').textContent = data.courseName ? `รายวิชา: [${data.courseCode}] ${data.courseName}` : 'รายวิชาทั่วไป';
             document.getElementById('wait-teacher-name').textContent = data.teacherName || 'อาจารย์ผู้สอน';
             document.getElementById('wait-duration').textContent = data.duration > 0 ? `${data.duration} นาที` : 'ไม่จำกัดเวลา';
-            document.getElementById('wait-student-identity').innerHTML = `<span>✔</span> <span>${escapeHtml(data.student.name)} (${escapeHtml(data.student.studentId)}) • ${escapeHtml(data.student.class)}</span>`;
+            
+            const studentObj = data.student || currentStudent || {};
+            const stName = studentObj.name || `${studentObj.firstName || ''} ${studentObj.lastName || ''}`.trim() || studentObj.studentId || '';
+            const stId = studentObj.studentId || '';
+            const stCls = studentObj.class || '';
+
+            document.getElementById('wait-student-identity').innerHTML = `<span>✔</span> <span>${escapeHtml(stName)} (${escapeHtml(stId)}) • ${escapeHtml(stCls)}</span>`;
 
             // Start polling every 2 seconds to check if teacher published
             if (waitingRoomInterval) clearInterval(waitingRoomInterval);
             waitingRoomInterval = setInterval(async () => {
-                    const sId = encodeURIComponent(currentStudent.studentId);
-                    const sName = encodeURIComponent(data.student.name || '');
-                    const sCls = encodeURIComponent(data.student.class || '');
+                try {
+                    const sId = encodeURIComponent(currentStudent ? currentStudent.studentId : stId);
+                    const sName = encodeURIComponent(stName);
+                    const sCls = encodeURIComponent(stCls);
                     const res = await fetch(`/api/teacher/get-publish-status?roomId=${encodeURIComponent(data.roomId)}&studentId=${sId}&studentName=${sName}&studentClass=${sCls}`);
                     if (!res.ok) return;
                     const status = await res.json();
@@ -486,7 +525,9 @@
                         alert("🎉 อาจารย์ได้เริ่มการสอบแล้ว!\nระบบจะนำคุณเข้าสู่หน้าทำข้อสอบทันที");
                         window.location.href = `Student-login.html?room=${encodeURIComponent(data.roomId)}&code=${encodeURIComponent(pin)}&autostart=1`;
                     }
-                } catch(e) {}
+                } catch(e) {
+                    console.error('Polling publish status error:', e);
+                }
             }, 2000);
         }
 

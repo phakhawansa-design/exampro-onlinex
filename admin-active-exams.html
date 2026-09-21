@@ -130,14 +130,20 @@
                     <p class="text-sm text-slate-500 font-medium mt-1">รายการห้องสอบและชุดข้อสอบที่กำลังเปิดให้นักเรียนทำข้อสอบอยู่ในขณะนี้</p>
                 </div>
             </div>
-            <div class="header-card flex items-center gap-3">
-                <span class="text-sm font-bold text-slate-700">สถานะคุมสอบ:</span>
-                <span id="active-count-badge" class="px-4 py-1.5 bg-emerald-500 text-white rounded-xl text-xs md:text-sm font-black shadow-sm">
-                    กำลังโหลด...
-                </span>
-                <button onclick="window.TabLockGuide.open('active-exams')" class="bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white font-extrabold px-3 py-1.5 rounded-xl text-xs md:text-sm transition duration-300 shadow-sm active:scale-95 flex items-center gap-1.5 cursor-pointer">
-                    <span>💡 คู่มือหน้านี้</span>
-                </button>
+            <div class="flex items-center gap-2.5">
+                <a href="admin-questions.html?action=new-room" class="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-black px-4 py-2 rounded-xl text-xs md:text-sm transition duration-300 shadow-md shadow-emerald-600/25 active:scale-95 flex items-center gap-1.5 cursor-pointer">
+                    <span>🚀</span>
+                    <span>เปิดห้องรอสอบใหม่</span>
+                </a>
+                <div class="header-card flex items-center gap-3">
+                    <span class="text-sm font-bold text-slate-700">สถานะคุมสอบ:</span>
+                    <span id="active-count-badge" class="px-4 py-1.5 bg-emerald-500 text-white rounded-xl text-xs md:text-sm font-black shadow-sm">
+                        กำลังโหลด...
+                    </span>
+                    <button onclick="window.TabLockGuide.open('active-exams')" class="bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white font-extrabold px-3 py-1.5 rounded-xl text-xs md:text-sm transition duration-300 shadow-sm active:scale-95 flex items-center gap-1.5 cursor-pointer">
+                        <span>💡 คู่มือหน้านี้</span>
+                    </button>
+                </div>
             </div>
         </header>
 

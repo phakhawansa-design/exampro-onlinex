@@ -885,13 +885,57 @@ app.post('/api/student/register', (req, res) => {
     const now = new Date().toISOString();
 
     // ตรวจสอบว่ามีรหัสนักศึกษานี้อยู่แล้วหรือไม่
-    db.get('SELECT id, status FROM students WHERE studentId = ?', [cleanStudentId], (err, existing) => {
+    db.get('SELECT id, status, approved_by, password_hash, class, firstName, lastName FROM students WHERE studentId = ?', [cleanStudentId], (err, existing) => {
         if (err) return res.status(500).json({ success: false, message: err.message });
+        
+        // หากมีรหัสนี้ในระบบอยู่แล้ว ตรวจสอบว่าเป็นบัญชีที่อาจารย์นำเข้าไว้ล่วงหน้าหรือไม่ (ยังไม่เคยลงทะเบียนเอง)
         if (existing) {
-            return res.status(400).json({ 
-                success: false, 
-                message: "รหัสนักศึกษานี้มีอยู่ในระบบแล้ว กรุณาเข้าสู่ระบบได้เลยครับ"
-            });
+            const isImportedOrPending = existing.approved_by === 'teacher_import' || 
+                                       existing.approved_by === 'teacher_manual' || 
+                                       existing.approved_by === 'admin_import' ||
+                                       !existing.approved_by || 
+                                       existing.approved_by === '' ||
+                                       (existing.approved_by !== 'registered' && existing.approved_by !== 'system_auto');
+
+            if (isImportedOrPending) {
+                // อัปเดตข้อมูลและตั้งรหัสผ่านจริงตามที่นักศึกษาสมัคร
+                db.run(
+                    `UPDATE students 
+                     SET firstName = ?, lastName = ?, class = COALESCE(NULLIF(?, ''), class), 
+                         password_hash = ?, status = 'approved', approved_by = 'registered', approved_at = ?
+                     WHERE studentId = ?`,
+                    [cleanFirstName, cleanLastName, cleanClass, passwordHash, now, cleanStudentId],
+                    function(updateErr) {
+                        if (updateErr) return res.status(500).json({ success: false, message: updateErr.message });
+
+                        // ซิงค์ชื่อและห้องเรียนไปยัง course_students ด้วย
+                        db.run(
+                            `UPDATE course_students 
+                             SET firstName = ?, lastName = ?, class = COALESCE(NULLIF(?, ''), class)
+                             WHERE studentId = ?`,
+                            [cleanFirstName, cleanLastName, cleanClass, cleanStudentId]
+                        );
+
+                        return res.json({
+                            success: true,
+                            message: "🎉 ยืนยันการลงทะเบียนสำเร็จ! บัญชีของคุณเปิดใช้งานเรียบร้อย สามารถเข้าสู่ระบบได้ทันทีครับ",
+                            student: {
+                                studentId: cleanStudentId,
+                                firstName: cleanFirstName,
+                                lastName: cleanLastName,
+                                name: `${cleanFirstName} ${cleanLastName}`.trim(),
+                                class: cleanClass || existing.class || ''
+                            }
+                        });
+                    }
+                );
+                return;
+            } else {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: "รหัสนักศึกษานี้เคยลงทะเบียนแล้ว กรุณาเข้าสู่ระบบด้วยรหัสผ่านของคุณ (หากลืมรหัสผ่าน กรุณาแจ้งอาจารย์ผู้สอน)"
+                });
+            }
         }
 
         db.run(
@@ -900,10 +944,16 @@ app.post('/api/student/register', (req, res) => {
             [cleanStudentId, cleanFirstName, cleanLastName, cleanClass, passwordHash, now, now],
             function(insertErr) {
                 if (insertErr) return res.status(500).json({ success: false, message: insertErr.message });
-                console.log(`👨‍🎓 ลงทะเบียนนักศึกษาใหม่ (เปิดใช้งานทันที): ${cleanStudentId} (${cleanFirstName} ${cleanLastName})`);
                 res.json({
                     success: true,
-                    message: "🎉 สมัครสมาชิกสำเร็จ! บัญชีของคุณเปิดใช้งานเรียบร้อย สามารถเข้าสู่ระบบได้ทันทีครับ"
+                    message: "🎉 สมัครสมาชิกสำเร็จ! บัญชีของคุณเปิดใช้งานเรียบร้อย สามารถเข้าสู่ระบบได้ทันทีครับ",
+                    student: {
+                        studentId: cleanStudentId,
+                        firstName: cleanFirstName,
+                        lastName: cleanLastName,
+                        name: `${cleanFirstName} ${cleanLastName}`.trim(),
+                        class: cleanClass
+                    }
                 });
             }
         );
