@@ -114,37 +114,37 @@
 
     <!-- ======================================================== -->
     <!-- 1. TOP HEADER BAR                                        -->
-    <!-- TabLock Clean Professional Design                        -->
+    <!-- TabLock Clean Professional High-Contrast Design          -->
     <!-- ======================================================== -->
-    <header class="h-16 bg-white border-b border-slate-200 px-4 md:px-6 flex items-center justify-between shrink-0 shadow-xs z-30">
+    <header class="h-16 bg-white border-b-2 border-slate-200 px-4 md:px-6 flex items-center justify-between shrink-0 shadow-sm z-30">
         <!-- Left: Brand Logo & Title -->
         <div class="flex items-center gap-3">
             <a href="dashboard.html" class="flex items-center gap-2.5 group" title="กลับหน้าหลักแดชบอร์ด">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-purple-600 p-0.5 shadow-sm group-hover:scale-105 transition">
                     <div class="w-full h-full bg-white rounded-[10px] flex items-center justify-center">
-                        <span class="font-black text-lg bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">TL</span>
+                        <span class="font-black text-xl bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">TL</span>
                     </div>
                 </div>
             </a>
             <div>
                 <div class="flex items-center gap-2">
-                    <h1 class="font-black text-lg sm:text-xl text-slate-900 tracking-tight leading-none">
+                    <h1 class="font-black text-xl sm:text-2xl text-slate-900 tracking-tight leading-none">
                         ระบบสร้างข้อสอบ
                     </h1>
-                    <span class="text-[10px] uppercase font-black px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-md">Creator</span>
+                    <span class="text-xs uppercase font-black px-2.5 py-0.5 bg-indigo-100 text-indigo-800 border border-indigo-300 rounded-lg">Creator</span>
                 </div>
-                <span class="text-[11px] text-slate-400 font-semibold" id="header-teacher-name">อาจารย์ผู้สอน</span>
+                <span class="text-xs text-slate-600 font-bold" id="header-teacher-name">อาจารย์ผู้สอน</span>
             </div>
         </div>
 
         <!-- Center: 1. เลือกรายวิชา & ชื่อชุดข้อสอบ -->
         <div class="flex items-center gap-2 sm:gap-3 flex-1 max-w-2xl mx-4 justify-center">
             <!-- 1. เลือกรายวิชาที่จะนำข้อสอบไปเก็บไว้ -->
-            <div class="flex items-center gap-1.5 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 transition">
-                <label for="top-course-selector" class="text-xs font-black text-slate-600 shrink-0 flex items-center gap-1">
+            <div class="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200/80 px-3.5 py-1.5 rounded-2xl border-2 border-slate-300 transition">
+                <label for="top-course-selector" class="text-xs sm:text-sm font-black text-slate-900 shrink-0 flex items-center gap-1">
                     <span>📚</span> <span class="hidden md:inline">รายวิชา:</span>
                 </label>
-                <select id="top-course-selector" onchange="onCourseChanged(this.value)" class="bg-transparent text-xs sm:text-sm font-black text-slate-800 outline-none cursor-pointer max-w-[150px] sm:max-w-[220px] truncate">
+                <select id="top-course-selector" onchange="onCourseChanged(this.value)" class="bg-transparent text-xs sm:text-sm font-black text-slate-900 outline-none cursor-pointer max-w-[160px] sm:max-w-[240px] truncate">
                     <option value="">กำลังโหลดรายวิชา...</option>
                 </select>
             </div>
@@ -153,18 +153,18 @@
             <div class="relative flex-1 max-w-xs sm:max-w-sm hidden sm:block">
                 <input type="text" id="top-exam-title" 
                     placeholder="กรอกชื่อชุดข้อสอบ (เช่น สอบปลายภาค)..." 
-                    class="w-full px-3.5 py-1.5 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 focus:border-indigo-500 rounded-xl text-xs sm:text-sm font-bold text-slate-800 outline-none transition shadow-inner">
+                    class="w-full px-4 py-2 bg-slate-50 hover:bg-white focus:bg-white border-2 border-slate-300 focus:border-indigo-600 rounded-2xl text-xs sm:text-sm font-black text-slate-900 outline-none transition shadow-inner">
             </div>
         </div>
 
-        <!-- Right: 4. ปุ่มบันทึก & ออก (ไม่มี QR Code ใดๆ) -->
+        <!-- Right: ปุ่มบันทึก & ออก -->
         <div class="flex items-center gap-2">
-            <a href="dashboard.html" class="px-3.5 py-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl text-xs sm:text-sm font-bold transition active:scale-95">
+            <a href="dashboard.html" class="px-4 py-2 text-slate-700 hover:text-slate-950 hover:bg-slate-100 rounded-xl text-xs sm:text-sm font-black transition active:scale-95">
                 ออก
             </a>
             <!-- ปุ่มกดบันทึกเข้าสู่วิชา -->
-            <button onclick="saveQuestionsToCourse()" id="btn-save-course" class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs sm:text-sm font-black shadow-md shadow-emerald-600/25 transition active:scale-95 flex items-center gap-1.5 cursor-pointer">
-                <span>💾</span>
+            <button onclick="saveQuestionsToCourse()" id="btn-save-course" class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-2xl text-xs sm:text-sm font-black shadow-md shadow-emerald-600/25 transition active:scale-95 flex items-center gap-2 cursor-pointer">
+                <span class="text-base">💾</span>
                 <span>บันทึกข้อสอบ</span>
             </button>
         </div>
@@ -172,20 +172,20 @@
 
     <!-- ======================================================== -->
     <!-- 2. MAIN 3-PANEL LAYOUT (TabLock Style)                   -->
-    <!-- Left: Questions List | Center: Question Editor | Right: Settings -->
+    <!-- Left: Questions List | Center: Question Editor | Right: Tools Panel -->
     <!-- ======================================================== -->
     <div class="flex-1 flex overflow-hidden relative">
 
         <!-- ---------------------------------------------------- -->
         <!-- 2.1 LEFT SIDEBAR: รายการข้อสอบ (Question Navigator)  -->
         <!-- ---------------------------------------------------- -->
-        <aside class="w-52 sm:w-60 lg:w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 z-20 shadow-xs">
+        <aside class="w-56 sm:w-64 lg:w-70 bg-white border-r-2 border-slate-200 flex flex-col shrink-0 z-20 shadow-xs">
             <!-- Header -->
-            <div class="p-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
-                <span class="text-xs font-black text-slate-700 flex items-center gap-1.5">
-                    <span>📑</span> ข้อสอบทั้งหมด (<span id="total-questions-count">1</span>)
+            <div class="p-4 border-b-2 border-slate-100 flex items-center justify-between bg-slate-50/90">
+                <span class="text-sm font-black text-slate-900 flex items-center gap-1.5">
+                    <span>📑</span> ข้อสอบทั้งหมด (<span id="total-questions-count" class="text-indigo-600">1</span>)
                 </span>
-                <span id="course-tag-badge" class="text-[10px] font-black text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md truncate max-w-[100px]">
+                <span id="course-tag-badge" class="text-xs font-black text-indigo-800 bg-indigo-100 px-2.5 py-1 rounded-lg truncate max-w-[110px]">
                     วิชา...
                 </span>
             </div>
@@ -195,25 +195,12 @@
                 <!-- Question cards dynamically rendered -->
             </div>
 
-            <!-- Bottom Actions: + เพิ่มคำถาม & นำเข้า Excel (.xlsx) -->
-            <div class="p-3 border-t border-slate-200 bg-white space-y-2">
-                <button onclick="addNewQuestion()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-sm shadow-indigo-600/20 transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
-                    <span class="text-base leading-none">+</span>
+            <!-- Bottom Actions: + เพิ่มข้อสอบใหม่ -->
+            <div class="p-3 border-t-2 border-slate-200 bg-white space-y-2">
+                <button onclick="addNewQuestion()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-sm sm:text-base shadow-md shadow-indigo-600/25 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                    <span class="text-lg leading-none font-black">+</span>
                     <span>เพิ่มข้อสอบใหม่</span>
                 </button>
-
-                <!-- นำเข้าเฉพาะไฟล์ Excel (.xlsx) ตามที่ผู้ใช้ระบุ -->
-                <button onclick="triggerExcelImport()" class="w-full py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl font-black text-xs transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer" title="นำเข้าไฟล์ข้อสอบ Excel (.xlsx)">
-                    <span>📊</span>
-                    <span>นำเข้าจาก Excel (.xlsx)</span>
-                </button>
-
-                <!-- ดาวน์โหลดไฟล์แม่แบบ Excel ตัวอย่าง -->
-                <div class="text-center pt-0.5">
-                    <button onclick="downloadSampleExcel()" class="text-[10px] text-slate-400 hover:text-indigo-600 font-bold transition hover:underline">
-                        📥 ดาวน์โหลดตัวอย่างไฟล์ .xlsx
-                    </button>
-                </div>
 
                 <!-- Hidden Excel File Input -->
                 <input type="file" id="excel-file-input" accept=".xlsx, .xls" onchange="handleExcelFileSelected(this)" class="hidden">
@@ -225,58 +212,58 @@
         <!-- ---------------------------------------------------- -->
         <main class="flex-1 bg-slate-100 overflow-y-auto p-4 md:p-6 lg:p-8 flex flex-col justify-between items-center">
             
-            <!-- Mobile Bar: สลับแท็บตั้งค่าบนจอเล็ก -->
+            <!-- Mobile Bar: สลับแถบเครื่องมือบนจอเล็ก -->
             <div class="w-full max-w-4xl flex lg:hidden items-center justify-between pb-3">
-                <span class="text-xs font-black text-slate-700">ข้อที่ <span id="mobile-q-index">1</span></span>
-                <button onclick="toggleSettingsSidebar()" class="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 shadow-xs">
-                    ⚡ การตั้งค่า
+                <span class="text-sm font-black text-slate-900">ข้อที่ <span id="mobile-q-index" class="text-indigo-600">1</span></span>
+                <button onclick="toggleSettingsSidebar()" class="px-3.5 py-2 bg-white border-2 border-slate-300 rounded-xl text-xs font-black text-slate-900 shadow-xs flex items-center gap-1.5">
+                    <span>🛠️</span> เครื่องมือสร้างข้อสอบ
                 </button>
             </div>
 
             <!-- Clean Centered Exam Card (TabLock White Card) -->
-            <div class="w-full max-w-4xl space-y-4 my-auto bg-white rounded-3xl p-5 sm:p-7 shadow-sm border border-slate-200/90">
+            <div class="w-full max-w-4xl space-y-5 my-auto bg-white rounded-3xl p-5 sm:p-8 shadow-md border-2 border-slate-200/90">
                 
                 <!-- TOP: Question Header & Number -->
-                <div class="flex items-center justify-between pb-2 border-b border-slate-100">
-                    <div class="flex items-center gap-2">
-                        <span class="px-3 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 font-black text-xs rounded-xl">
+                <div class="flex items-center justify-between pb-3 border-b-2 border-slate-100">
+                    <div class="flex items-center gap-2.5">
+                        <span class="px-3.5 py-1.5 bg-indigo-100 border border-indigo-300 text-indigo-900 font-black text-sm sm:text-base rounded-2xl">
                             ข้อที่ <span id="current-question-num">1</span>
                         </span>
-                        <span id="current-question-type-badge" class="text-[11px] font-bold text-slate-500">
+                        <span id="current-question-type-badge" class="text-xs sm:text-sm font-black text-slate-600 bg-slate-100 px-3 py-1 rounded-xl">
                             ปรนัย 4 ตัวเลือก
                         </span>
                     </div>
 
-                    <div class="flex items-center gap-1.5 text-xs">
-                        <button onclick="toggleTrueFalseMode()" id="btn-toggle-tf" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition active:scale-95">
+                    <div class="flex items-center gap-1.5 text-xs sm:text-sm">
+                        <button onclick="toggleTrueFalseMode()" id="btn-toggle-tf" class="px-3.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-900 rounded-xl font-black transition active:scale-95 cursor-pointer">
                             🔄 สลับเป็น ถูก/ผิด
                         </button>
                     </div>
                 </div>
 
                 <!-- QUESTION TITLE TEXTAREA -->
-                <div class="space-y-1.5">
-                    <label class="block text-xs font-extrabold text-slate-500 uppercase tracking-wider">โจทย์คำถาม</label>
+                <div class="space-y-2">
+                    <label class="block text-sm font-black text-slate-800 uppercase tracking-wider">โจทย์คำถาม</label>
                     <textarea id="question-text-input" rows="3"
                         oninput="onQuestionTextChanged(this.value)"
                         placeholder="พิมพ์โจทย์คำถามที่นี่..."
-                        class="w-full p-3.5 bg-slate-50 hover:bg-white focus:bg-white border border-slate-200 focus:border-indigo-500 rounded-2xl text-sm sm:text-base font-bold text-slate-800 outline-none transition leading-relaxed placeholder-slate-400"></textarea>
+                        class="w-full p-4 bg-slate-50 hover:bg-white focus:bg-white border-2 border-slate-300 focus:border-indigo-600 rounded-2xl text-base sm:text-lg font-bold text-slate-900 outline-none transition leading-relaxed placeholder:font-normal placeholder-slate-400 shadow-inner"></textarea>
                 </div>
 
                 <!-- QUESTION IMAGE ATTACHMENT BOX -->
                 <div class="flex flex-col items-center">
-                    <div id="question-media-box" class="w-full rounded-2xl bg-slate-50 border-2 border-dashed border-slate-200 hover:border-indigo-400 p-4 flex flex-col items-center justify-center text-center transition relative overflow-hidden group">
+                    <div id="question-media-box" class="w-full rounded-2xl bg-slate-50 border-2 border-dashed border-slate-300 hover:border-indigo-500 p-4 flex flex-col items-center justify-center text-center transition relative overflow-hidden group">
                         <!-- Empty State -->
                         <div id="media-empty-state" class="cursor-pointer py-1" onclick="triggerQuestionImageUpload()">
-                            <div class="text-2xl mb-1">📷</div>
-                            <div class="text-xs font-bold text-indigo-700">แนบรูปภาพประกอบโจทย์ (ถ้ามี)</div>
-                            <div class="text-[10px] text-slate-400 font-semibold mt-0.5">คลิกเพื่ออัปโหลดไฟล์รูปภาพ (JPG, PNG, GIF)</div>
+                            <div class="text-3xl mb-1">📷</div>
+                            <div class="text-sm font-black text-indigo-800">แนบรูปภาพประกอบโจทย์ (ถ้ามี)</div>
+                            <div class="text-xs font-bold text-slate-500 mt-0.5">คลิกเพื่ออัปโหลดไฟล์รูปภาพ (JPG, PNG, GIF)</div>
                         </div>
 
                         <!-- Preview State -->
                         <div id="media-preview-state" class="hidden w-full flex flex-col items-center justify-center">
-                            <img id="media-preview-img" src="" alt="Question Image" class="max-h-48 object-contain rounded-xl border border-slate-200 bg-white p-1 shadow-xs">
-                            <button onclick="removeQuestionImage()" class="mt-2 px-3 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl text-xs font-bold transition shadow-xs active:scale-95 flex items-center gap-1">
+                            <img id="media-preview-img" src="" alt="Question Image" class="max-h-52 object-contain rounded-xl border border-slate-300 bg-white p-1 shadow-sm">
+                            <button onclick="removeQuestionImage()" class="mt-2.5 px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-xl text-xs sm:text-sm font-black transition shadow-xs active:scale-95 flex items-center gap-1.5 cursor-pointer">
                                 🗑️ ลบรูปภาพนี้
                             </button>
                         </div>
@@ -286,31 +273,31 @@
                 </div>
 
                 <!-- CHOICES SECTION: ก. ข. ค. ง. (TabLock Professional Design) -->
-                <div class="space-y-2.5 pt-1">
-                    <label class="block text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center justify-between">
+                <div class="space-y-3 pt-1">
+                    <label class="block text-sm font-black text-slate-800 uppercase tracking-wider flex items-center justify-between">
                         <span>ตัวเลือกคำตอบและเฉลย</span>
-                        <span class="text-[10px] text-emerald-600 font-bold font-normal">คลิก "✓ เฉลย" ที่ตัวเลือกที่ถูกต้อง</span>
+                        <span class="text-xs text-emerald-700 font-extrabold bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-lg">คลิก "✓ เฉลย" ที่ตัวเลือกที่ถูกต้อง</span>
                     </label>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="choices-grid-container">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5" id="choices-grid-container">
                         
                         <!-- Choice ก. -->
-                        <div class="choice-card rounded-2xl p-3 flex items-center gap-2.5" id="choice-card-0">
-                            <div class="choice-badge w-9 h-9 rounded-xl bg-slate-100 text-slate-700 font-black text-sm flex items-center justify-center shrink-0">
+                        <div class="choice-card rounded-2xl p-3.5 flex items-center gap-3" id="choice-card-0">
+                            <div class="choice-badge w-10 h-10 rounded-xl bg-slate-200 text-slate-900 font-black text-base sm:text-lg flex items-center justify-center shrink-0 border border-slate-300">
                                 ก.
                             </div>
                             <input type="text" id="choice-text-0" 
                                 oninput="onChoiceTextChanged(0, this.value)"
                                 placeholder="พิมพ์ตัวเลือก ก..." 
-                                class="flex-1 font-bold text-xs sm:text-sm text-slate-800 outline-none bg-transparent placeholder-slate-400">
+                                class="flex-1 font-extrabold text-sm sm:text-base text-slate-900 outline-none bg-transparent placeholder:font-normal placeholder-slate-400">
                             
                             <!-- Choice Image Attach -->
                             <div class="shrink-0 flex items-center gap-1">
-                                <label class="p-1.5 hover:bg-slate-100 rounded-lg text-xs cursor-pointer transition" title="แนบรูปตัวเลือก">
+                                <label class="p-1.5 hover:bg-slate-200 rounded-xl text-sm cursor-pointer transition" title="แนบรูปตัวเลือก">
                                     📷
                                     <input type="file" accept="image/*" onchange="handleChoiceImageSelected(0, this)" class="hidden">
                                 </label>
-                                <span id="choice-img-badge-0" class="hidden text-[10px] bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded font-bold">มีรูป</span>
+                                <span id="choice-img-badge-0" class="hidden text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-md font-black border border-indigo-200">มีรูป</span>
                             </div>
 
                             <!-- Correct Answer Toggle -->
@@ -320,21 +307,21 @@
                         </div>
 
                         <!-- Choice ข. -->
-                        <div class="choice-card rounded-2xl p-3 flex items-center gap-2.5" id="choice-card-1">
-                            <div class="choice-badge w-9 h-9 rounded-xl bg-slate-100 text-slate-700 font-black text-sm flex items-center justify-center shrink-0">
+                        <div class="choice-card rounded-2xl p-3.5 flex items-center gap-3" id="choice-card-1">
+                            <div class="choice-badge w-10 h-10 rounded-xl bg-slate-200 text-slate-900 font-black text-base sm:text-lg flex items-center justify-center shrink-0 border border-slate-300">
                                 ข.
                             </div>
                             <input type="text" id="choice-text-1" 
                                 oninput="onChoiceTextChanged(1, this.value)"
                                 placeholder="พิมพ์ตัวเลือก ข..." 
-                                class="flex-1 font-bold text-xs sm:text-sm text-slate-800 outline-none bg-transparent placeholder-slate-400">
+                                class="flex-1 font-extrabold text-sm sm:text-base text-slate-900 outline-none bg-transparent placeholder:font-normal placeholder-slate-400">
                             
                             <div class="shrink-0 flex items-center gap-1">
-                                <label class="p-1.5 hover:bg-slate-100 rounded-lg text-xs cursor-pointer transition" title="แนบรูปตัวเลือก">
+                                <label class="p-1.5 hover:bg-slate-200 rounded-xl text-sm cursor-pointer transition" title="แนบรูปตัวเลือก">
                                     📷
                                     <input type="file" accept="image/*" onchange="handleChoiceImageSelected(1, this)" class="hidden">
                                 </label>
-                                <span id="choice-img-badge-1" class="hidden text-[10px] bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded font-bold">มีรูป</span>
+                                <span id="choice-img-badge-1" class="hidden text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-md font-black border border-indigo-200">มีรูป</span>
                             </div>
 
                             <button type="button" id="choice-check-btn-1" onclick="setCorrectAnswer('b')" class="correct-toggle-btn">
@@ -343,21 +330,21 @@
                         </div>
 
                         <!-- Choice ค. -->
-                        <div class="choice-card rounded-2xl p-3 flex items-center gap-2.5" id="choice-card-2">
-                            <div class="choice-badge w-9 h-9 rounded-xl bg-slate-100 text-slate-700 font-black text-sm flex items-center justify-center shrink-0">
+                        <div class="choice-card rounded-2xl p-3.5 flex items-center gap-3" id="choice-card-2">
+                            <div class="choice-badge w-10 h-10 rounded-xl bg-slate-200 text-slate-900 font-black text-base sm:text-lg flex items-center justify-center shrink-0 border border-slate-300">
                                 ค.
                             </div>
                             <input type="text" id="choice-text-2" 
                                 oninput="onChoiceTextChanged(2, this.value)"
                                 placeholder="พิมพ์ตัวเลือก ค..." 
-                                class="flex-1 font-bold text-xs sm:text-sm text-slate-800 outline-none bg-transparent placeholder-slate-400">
+                                class="flex-1 font-extrabold text-sm sm:text-base text-slate-900 outline-none bg-transparent placeholder:font-normal placeholder-slate-400">
                             
                             <div class="shrink-0 flex items-center gap-1">
-                                <label class="p-1.5 hover:bg-slate-100 rounded-lg text-xs cursor-pointer transition" title="แนบรูปตัวเลือก">
+                                <label class="p-1.5 hover:bg-slate-200 rounded-xl text-sm cursor-pointer transition" title="แนบรูปตัวเลือก">
                                     📷
                                     <input type="file" accept="image/*" onchange="handleChoiceImageSelected(2, this)" class="hidden">
                                 </label>
-                                <span id="choice-img-badge-2" class="hidden text-[10px] bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded font-bold">มีรูป</span>
+                                <span id="choice-img-badge-2" class="hidden text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-md font-black border border-indigo-200">มีรูป</span>
                             </div>
 
                             <button type="button" id="choice-check-btn-2" onclick="setCorrectAnswer('c')" class="correct-toggle-btn">
@@ -366,21 +353,21 @@
                         </div>
 
                         <!-- Choice ง. -->
-                        <div class="choice-card rounded-2xl p-3 flex items-center gap-2.5" id="choice-card-3">
-                            <div class="choice-badge w-9 h-9 rounded-xl bg-slate-100 text-slate-700 font-black text-sm flex items-center justify-center shrink-0">
+                        <div class="choice-card rounded-2xl p-3.5 flex items-center gap-3" id="choice-card-3">
+                            <div class="choice-badge w-10 h-10 rounded-xl bg-slate-200 text-slate-900 font-black text-base sm:text-lg flex items-center justify-center shrink-0 border border-slate-300">
                                 ง.
                             </div>
                             <input type="text" id="choice-text-3" 
                                 oninput="onChoiceTextChanged(3, this.value)"
                                 placeholder="พิมพ์ตัวเลือก ง..." 
-                                class="flex-1 font-bold text-xs sm:text-sm text-slate-800 outline-none bg-transparent placeholder-slate-400">
+                                class="flex-1 font-extrabold text-sm sm:text-base text-slate-900 outline-none bg-transparent placeholder:font-normal placeholder-slate-400">
                             
                             <div class="shrink-0 flex items-center gap-1">
-                                <label class="p-1.5 hover:bg-slate-100 rounded-lg text-xs cursor-pointer transition" title="แนบรูปตัวเลือก">
+                                <label class="p-1.5 hover:bg-slate-200 rounded-xl text-sm cursor-pointer transition" title="แนบรูปตัวเลือก">
                                     📷
                                     <input type="file" accept="image/*" onchange="handleChoiceImageSelected(3, this)" class="hidden">
                                 </label>
-                                <span id="choice-img-badge-3" class="hidden text-[10px] bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded font-bold">มีรูป</span>
+                                <span id="choice-img-badge-3" class="hidden text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-md font-black border border-indigo-200">มีรูป</span>
                             </div>
 
                             <button type="button" id="choice-check-btn-3" onclick="setCorrectAnswer('d')" class="correct-toggle-btn">
@@ -392,15 +379,15 @@
                 </div>
 
                 <!-- CARD FOOTER ACTIONS: Delete & Duplicate -->
-                <div class="flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
-                    <div class="text-slate-400 font-semibold">
-                        ระบบบันทึกคำถามที่คุณพิมพ์อัตโนมัติขณะแก้ไข
+                <div class="flex items-center justify-between pt-4 border-t-2 border-slate-100 text-xs sm:text-sm">
+                    <div class="text-slate-500 font-bold hidden sm:block">
+                        💡 ระบบบันทึกคำถามอัตโนมัติขณะที่คุณพิมพ์แก้ไข
                     </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="duplicateCurrentQuestion()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition active:scale-95 flex items-center gap-1">
+                    <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+                        <button onclick="duplicateCurrentQuestion()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 rounded-xl font-black transition active:scale-95 flex items-center gap-1.5 cursor-pointer">
                             <span>📋</span> <span>ทำสำเนาข้อนี้</span>
                         </button>
-                        <button onclick="deleteCurrentQuestion()" class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl font-bold transition active:scale-95 flex items-center gap-1">
+                        <button onclick="deleteCurrentQuestion()" class="px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-xl font-black transition active:scale-95 flex items-center gap-1.5 cursor-pointer">
                             <span>🗑️</span> <span>ลบข้อนี้</span>
                         </button>
                     </div>
@@ -410,88 +397,86 @@
         </main>
 
         <!-- ---------------------------------------------------- -->
-        <!-- 2.3 RIGHT SIDEBAR: แผงการตั้งค่าด้านข้าง              -->
-        <!-- Fits user requirement: "3. มีตั้งค่าอยู่ด้านข้าง"       -->
+        <!-- 2.3 RIGHT SIDEBAR: เมนูเครื่องมือสร้างข้อสอบ (3 เครื่องมือ) -->
+        <!-- เรียงตามลำดับ: 1. Excel -> 2. AI -> 3. คลังข้อสอบ         -->
         <!-- ---------------------------------------------------- -->
-        <aside id="settings-sidebar" class="w-64 lg:w-72 bg-white border-l border-slate-200 flex flex-col shrink-0 z-20 shadow-xs">
+        <aside id="settings-sidebar" class="w-72 sm:w-80 lg:w-84 bg-white border-l-2 border-slate-200 flex flex-col shrink-0 z-20 shadow-xs">
             <!-- Header -->
-            <div class="p-4 border-b border-slate-100 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="text-indigo-600 font-black">⚡</span>
-                    <h2 class="font-black text-sm text-slate-800">การตั้งค่าข้อสอบ</h2>
+            <div class="p-4 border-b-2 border-slate-200 bg-slate-50 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">🛠️</span>
+                    <div>
+                        <h2 class="font-black text-base text-slate-900 leading-tight">เครื่องมือช่วยสร้างข้อสอบ</h2>
+                        <p class="text-xs font-bold text-slate-500">เลือกวิธีนำเข้าข้อสอบตามต้องการ</p>
+                    </div>
                 </div>
-                <button onclick="toggleSettingsSidebar()" class="lg:hidden text-slate-400 hover:text-slate-700 font-black">✕</button>
+                <button onclick="toggleSettingsSidebar()" class="lg:hidden text-slate-400 hover:text-slate-700 font-black text-xl p-1">✕</button>
             </div>
 
-            <!-- Settings Body -->
+            <!-- Tools Body (Exact Top to Bottom Order as requested) -->
             <div class="flex-1 overflow-y-auto p-4 space-y-4">
                 
-                <!-- 1. รายวิชาที่จัดเก็บ -->
-                <div class="p-3 bg-indigo-50/70 border border-indigo-100 rounded-2xl space-y-1">
-                    <label class="block text-[11px] font-black text-indigo-900 uppercase tracking-wider">📚 รายวิชาที่จะจัดเก็บ:</label>
-                    <div id="side-course-name" class="text-xs font-black text-indigo-700">กำลังโหลด...</div>
-                    <div id="side-course-students" class="text-[10px] text-slate-500 font-bold">นักศึกษาในรายวิชา: 0 คน</div>
-                </div>
-
-                <!-- 2. ประเภทคำถาม -->
-                <div class="space-y-1.5">
-                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">🎯 รูปแบบคำถาม</label>
-                    <select id="prop-question-type" onchange="onQuestionTypeChanged(this.value)" class="setting-input">
-                        <option value="quiz">ปรนัย (4 ตัวเลือก)</option>
-                        <option value="true_false">จริง หรือ เท็จ (ถูก / ผิด)</option>
-                    </select>
-                </div>
-
-                <!-- 3. เวลาทำข้อสอบต่อข้อ -->
-                <div class="space-y-1.5">
-                    <div class="flex items-center justify-between">
-                        <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">⏱️ เวลาต่อข้อ (วินาที)</label>
-                        <button onclick="applyTimeToAllQuestions()" class="text-[10px] text-indigo-600 hover:underline font-bold">ใช้กับทุกข้อ</button>
+                <!-- 1. นำเข้าไฟล์ xlsx -->
+                <div class="p-4 bg-emerald-50/90 border-2 border-emerald-300 rounded-2xl shadow-xs space-y-3 transition hover:border-emerald-400">
+                    <div class="flex items-center gap-2.5">
+                        <span class="p-2 bg-emerald-600 text-white rounded-xl font-black text-lg shadow-xs shrink-0">📊</span>
+                        <div>
+                            <h3 class="font-black text-sm sm:text-base text-emerald-950">1. นำเข้าไฟล์ xlsx</h3>
+                            <p class="text-xs font-bold text-emerald-800 leading-tight">นำเข้าโจทย์จากตาราง Excel (.xlsx)</p>
+                        </div>
                     </div>
-                    <select id="prop-time-limit" onchange="onTimeLimitChanged(this.value)" class="setting-input">
-                        <option value="0">ไม่จำกัดเวลาต่อข้อ (ใช้เวลารวม)</option>
-                        <option value="15">15 วินาที</option>
-                        <option value="20" selected>20 วินาที</option>
-                        <option value="30">30 วินาที</option>
-                        <option value="60">1 นาที (60 วินาที)</option>
-                        <option value="120">2 นาที (120 วินาที)</option>
-                        <option value="300">5 นาที</option>
-                    </select>
+                    
+                    <button onclick="triggerExcelImport()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md shadow-emerald-600/25 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                        <span class="text-base">📁</span>
+                        <span>เลือกไฟล์ Excel (.xlsx)</span>
+                    </button>
+
+                    <div class="text-center pt-0.5">
+                        <button onclick="downloadSampleExcel()" class="text-xs text-emerald-800 hover:text-emerald-950 font-black transition hover:underline inline-flex items-center gap-1 cursor-pointer">
+                            <span>📥</span>
+                            <span>ดาวน์โหลดตัวอย่างไฟล์ .xlsx</span>
+                        </button>
+                    </div>
                 </div>
 
-                <!-- 4. คะแนนต่อข้อ -->
-                <div class="space-y-1.5">
-                    <label class="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">⭐ คะแนนต่อข้อ</label>
-                    <select id="prop-points" class="setting-input">
-                        <option value="standard" selected>มาตรฐาน (1 คะแนน)</option>
-                        <option value="double">คะแนนคูณสอง (2 คะแนน)</option>
-                        <option value="none">ไม่มีคะแนน (แบบสำรวจ)</option>
-                    </select>
+                <!-- 2. แปลงข้อสอบจาก AI -->
+                <div class="p-4 bg-purple-50/90 border-2 border-purple-300 rounded-2xl shadow-xs space-y-3 transition hover:border-purple-400">
+                    <div class="flex items-center gap-2.5">
+                        <span class="p-2 bg-purple-600 text-white rounded-xl font-black text-lg shadow-xs shrink-0">🤖</span>
+                        <div>
+                            <h3 class="font-black text-sm sm:text-base text-purple-950">2. แปลงข้อสอบจาก AI</h3>
+                            <p class="text-xs font-bold text-purple-800 leading-tight">แปลงข้อความจาก ChatGPT / Claude</p>
+                        </div>
+                    </div>
+
+                    <button onclick="openAiModal()" class="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md shadow-purple-600/25 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                        <span class="text-base">✨</span>
+                        <span>เปิดตัวแปลงข้อสอบ AI</span>
+                    </button>
                 </div>
 
-                <!-- 5. กล่องแจ้งเตือน: การตั้งค่าห้องสอบย้ายไปที่เมนู 'ห้องสอบ' -->
-                <div class="p-4 bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200/80 rounded-2xl space-y-2">
-                    <div class="flex items-center gap-2 text-xs font-black text-indigo-950">
-                        <span>⚙️</span>
-                        <span>การตั้งค่าห้องสอบ & เผยแพร่</span>
+                <!-- 3. นำเข้าจากคลังข้อสอบ -->
+                <div class="p-4 bg-sky-50/90 border-2 border-sky-300 rounded-2xl shadow-xs space-y-3 transition hover:border-sky-400">
+                    <div class="flex items-center gap-2.5">
+                        <span class="p-2 bg-sky-600 text-white rounded-xl font-black text-lg shadow-xs shrink-0">📚</span>
+                        <div>
+                            <h3 class="font-black text-sm sm:text-base text-sky-950">3. นำเข้าจากคลังข้อสอบ</h3>
+                            <p class="text-xs font-bold text-sky-800 leading-tight">ดึงข้อสอบสำเร็จรูปจากคลังระบบ</p>
+                        </div>
                     </div>
-                    <p class="text-[11px] text-slate-600 leading-relaxed font-semibold">
-                        การตั้งค่าเวลาทำข้อสอบรวม, คำชี้แจง, การสลับข้อ, การแสดงผลคะแนน และระบบคุมสอบ ได้ย้ายไปกำหนดตอนเปิดห้องสอบในเมนู <a href="admin-rooms.html" class="underline font-black text-indigo-600 hover:text-indigo-800">"ห้องสอบ"</a> เมื่อเลือกข้อสอบที่จะทำการเผยแพร่
-                    </p>
-                    <div class="pt-1">
-                        <a href="admin-rooms.html" class="inline-flex items-center gap-1.5 text-[11px] font-black text-indigo-700 hover:text-indigo-900 bg-white px-3 py-1.5 rounded-xl border border-indigo-200 shadow-xs hover:shadow transition">
-                            <span>🏫 ไปที่เมนูห้องสอบ</span>
-                            <span>→</span>
-                        </a>
-                    </div>
+
+                    <button onclick="openLibraryModal()" class="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md shadow-sky-600/25 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                        <span class="text-base">📖</span>
+                        <span>เปิดคลังข้อสอบ</span>
+                    </button>
                 </div>
 
             </div>
 
             <!-- Footer of Right Sidebar: Quick Save Button -->
-            <div class="p-4 border-t border-slate-100 bg-slate-50/50 space-y-2">
-                <button onclick="saveQuestionsToCourse()" class="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl font-black text-xs shadow-sm transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
-                    <span>💾</span>
+            <div class="p-4 border-t-2 border-slate-200 bg-slate-50 space-y-2">
+                <button onclick="saveQuestionsToCourse()" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-2xl font-black text-sm sm:text-base shadow-lg shadow-emerald-600/25 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                    <span class="text-lg">💾</span>
                     <span>บันทึกข้อสอบเข้าสู่วิชา</span>
                 </button>
             </div>
@@ -1216,7 +1201,288 @@
         }
 
         // ==========================================
-        // 6. UTILITIES
+        // 6. AI EXAM CONVERTER & QUESTION BANK MODALS
+        // ==========================================
+        function openAiModal() {
+            document.getElementById('ai-exam-modal').classList.remove('hidden');
+        }
+
+        function closeAiModal() {
+            document.getElementById('ai-exam-modal').classList.add('hidden');
+        }
+
+        function parseAiTextToQuestions() {
+            const rawText = document.getElementById('ai-text-input').value.trim();
+            if (!rawText) {
+                alert("กรุณาวางข้อความโจทย์ข้อสอบที่ได้จาก AI ก่อนครับ");
+                return;
+            }
+
+            // Split into question blocks (by empty lines or numbered questions)
+            const blocks = rawText.split(/\n\s*\n/).filter(b => b.trim().length > 0);
+            const newQuestions = [];
+
+            blocks.forEach(block => {
+                const lines = block.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                if (lines.length === 0) return;
+
+                let qText = '';
+                let choices = ['', '', '', ''];
+                let answer = 'a';
+
+                lines.forEach(line => {
+                    // Answer pattern
+                    if (/^(เฉลย|คำตอบ|answer|ans)[\s:]+/i.test(line)) {
+                        const ansStr = line.replace(/^(เฉลย|คำตอบ|answer|ans)[\s:]+/i, '').trim().toLowerCase();
+                        if (ansStr.includes('ก') || ansStr.includes('a') || ansStr === '1') answer = 'a';
+                        else if (ansStr.includes('ข') || ansStr.includes('b') || ansStr === '2') answer = 'b';
+                        else if (ansStr.includes('ค') || ansStr.includes('c') || ansStr === '3') answer = 'c';
+                        else if (ansStr.includes('ง') || ansStr.includes('d') || ansStr === '4') answer = 'd';
+                    }
+                    // Choice ก / A / 1
+                    else if (/^[กa1][\.\)\s]/i.test(line)) {
+                        choices[0] = line.replace(/^[กa1][\.\)\s]+/i, '').trim();
+                    }
+                    // Choice ข / B / 2
+                    else if (/^[ขb2][\.\)\s]/i.test(line)) {
+                        choices[1] = line.replace(/^[ขb2][\.\)\s]+/i, '').trim();
+                    }
+                    // Choice ค / C / 3
+                    else if (/^[คc3][\.\)\s]/i.test(line)) {
+                        choices[2] = line.replace(/^[คc3][\.\)\s]+/i, '').trim();
+                    }
+                    // Choice ง / D / 4
+                    else if (/^[งd4][\.\)\s]/i.test(line)) {
+                        choices[3] = line.replace(/^[งd4][\.\)\s]+/i, '').trim();
+                    }
+                    // Question text line
+                    else {
+                        const cleanLine = line.replace(/^ข้อ\s*\d+[\.\:\s]*/i, '').replace(/^\d+[\.\:\s]*/, '').trim();
+                        if (cleanLine) {
+                            qText += (qText ? ' ' : '') + cleanLine;
+                        }
+                    }
+                });
+
+                if (qText) {
+                    newQuestions.push({
+                        question: qText,
+                        question_img: '',
+                        choices,
+                        choices_img: ['', '', '', ''],
+                        answer,
+                        timeLimit: 20,
+                        type: 'quiz'
+                    });
+                }
+            });
+
+            if (newQuestions.length === 0) {
+                alert("❌ ไม่สามารถแปลงข้อความได้ กรุณาตรวจสอบรูปแบบข้อความให้มี ก. ข. ค. ง. และ เฉลย:");
+                return;
+            }
+
+            if (questions.length === 1 && !questions[0].question.trim()) {
+                questions = newQuestions;
+            } else {
+                questions = questions.concat(newQuestions);
+            }
+
+            activeQuestionIndex = questions.length - newQuestions.length;
+            renderAllQuestionsList();
+            renderActiveQuestionStage();
+            closeAiModal();
+
+            alert(`🎉 แปลงและนำเข้าข้อสอบจาก AI สำเร็จเรียบร้อยแล้วจำนวน ${newQuestions.length} ข้อ!`);
+        }
+
+        // Question Bank Modal
+        async function openLibraryModal() {
+            document.getElementById('library-modal').classList.remove('hidden');
+            const listContainer = document.getElementById('library-templates-list');
+            listContainer.innerHTML = '<div class="text-center py-6 text-slate-500 font-bold text-sm">⏳ กำลังโหลดคลังข้อสอบในระบบ...</div>';
+
+            try {
+                const res = await fetch(`/api/library/get-templates?username=${encodeURIComponent(username)}`);
+                let sysTemplates = [];
+                if (res.ok) {
+                    sysTemplates = await res.json();
+                }
+
+                let html = `
+                    <div class="space-y-4">
+                        <h4 class="font-black text-sm text-slate-900 border-b pb-2">📚 ชุดข้อสอบสำเร็จรูปประจำวิชา (พร้อมใช้งาน)</h4>
+                        
+                        <!-- Pre-set Banks -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div onclick="importPresetBank('tech')" class="p-4 rounded-2xl bg-indigo-50 hover:bg-indigo-100 border-2 border-indigo-200 cursor-pointer transition hover:scale-[1.01] space-y-1.5">
+                                <div class="font-black text-sm text-indigo-950 flex items-center justify-between">
+                                    <span>💻 คอมพิวเตอร์และเทคโนโลยี</span>
+                                    <span class="text-xs bg-indigo-200 text-indigo-900 px-2 py-0.5 rounded-md">5 ข้อ</span>
+                                </div>
+                                <p class="text-xs font-bold text-slate-600">พื้นฐานฮาร์ดแวร์ ซอฟต์แวร์ อินเทอร์เน็ต และความปลอดภัยไซเบอร์</p>
+                            </div>
+
+                            <div onclick="importPresetBank('general')" class="p-4 rounded-2xl bg-emerald-50 hover:bg-emerald-100 border-2 border-emerald-200 cursor-pointer transition hover:scale-[1.01] space-y-1.5">
+                                <div class="font-black text-sm text-emerald-950 flex items-center justify-between">
+                                    <span>🇹🇭 ความรู้ทั่วไปและสังคม</span>
+                                    <span class="text-xs bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded-md">5 ข้อ</span>
+                                </div>
+                                <p class="text-xs font-bold text-slate-600">ความรู้รอบตัว ภูมิศาสตร์ และประวัติศาสตร์ไทยเบื้องต้น</p>
+                            </div>
+
+                            <div onclick="importPresetBank('english')" class="p-4 rounded-2xl bg-purple-50 hover:bg-purple-100 border-2 border-purple-200 cursor-pointer transition hover:scale-[1.01] space-y-1.5">
+                                <div class="font-black text-sm text-purple-950 flex items-center justify-between">
+                                    <span>🇬🇧 ภาษาอังกฤษเพื่อการสื่อสาร</span>
+                                    <span class="text-xs bg-purple-200 text-purple-900 px-2 py-0.5 rounded-md">5 ข้อ</span>
+                                </div>
+                                <p class="text-xs font-bold text-slate-600">Basic Grammar, Conversation and Vocabulary in English</p>
+                            </div>
+
+                            <div onclick="importPresetBank('math')" class="p-4 rounded-2xl bg-amber-50 hover:bg-amber-100 border-2 border-amber-200 cursor-pointer transition hover:scale-[1.01] space-y-1.5">
+                                <div class="font-black text-sm text-amber-950 flex items-center justify-between">
+                                    <span>📊 คณิตศาสตร์และตรรกศาสตร์</span>
+                                    <span class="text-xs bg-amber-200 text-amber-900 px-2 py-0.5 rounded-md">5 ข้อ</span>
+                                </div>
+                                <p class="text-xs font-bold text-slate-600">โจทย์คำนวณเบื้องต้น ลำดับตัวเลข และตรรกะเหตุผล</p>
+                            </div>
+                        </div>
+                `;
+
+                if (Array.isArray(sysTemplates) && sysTemplates.length > 0) {
+                    html += `
+                        <h4 class="font-black text-sm text-slate-900 border-b pb-2 pt-4">📁 คลังข้อสอบที่คุณเคยสร้างไว้ในระบบ</h4>
+                        <div class="space-y-2">
+                            ${sysTemplates.map(t => `
+                                <div onclick="importTemplateById('${t.id}')" class="p-3.5 bg-slate-50 hover:bg-white border-2 border-slate-200 hover:border-sky-500 rounded-xl cursor-pointer transition flex items-center justify-between">
+                                    <div>
+                                        <div class="font-black text-sm text-slate-900">${escapeHtml(t.templateName || 'ชุดข้อสอบ')}</div>
+                                        <div class="text-xs font-bold text-slate-500">สร้างเมื่อ: ${t.createdAt ? new Date(t.createdAt).toLocaleDateString('th-TH') : '-'}</div>
+                                    </div>
+                                    <span class="px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-black text-xs">ดึงข้อสอบนี้</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+
+                html += '</div>';
+                listContainer.innerHTML = html;
+            } catch(e) {
+                console.error(e);
+                listContainer.innerHTML = '<div class="text-center py-4 text-rose-600 font-bold text-sm">❌ ไม่สามารถดึงข้อมูลคลังข้อสอบได้</div>';
+            }
+        }
+
+        function closeLibraryModal() {
+            document.getElementById('library-modal').classList.add('hidden');
+        }
+
+        const presetBanks = {
+            tech: [
+                { question: "อุปกรณ์ใดทำหน้าที่เป็นสมองหลักในการประมวลผลของคอมพิวเตอร์?", choices: ["RAM", "CPU", "Hard Disk", "Power Supply"], answer: "b" },
+                { question: "ระบบปฏิบัติการ (OS) ข้อใดเป็น ซอฟต์แวร์โอเพนซอร์ส (Open Source)?", choices: ["Windows 11", "macOS", "Linux", "iOS"], answer: "c" },
+                { question: "โปรโตคอลความปลอดภัยที่ใช้ในการเข้ารหัสเว็บไซต์ที่มีความปลอดภัยสูงคืออะไร?", choices: ["HTTP", "HTTPS", "FTP", "SMTP"], answer: "b" },
+                { question: "หน่วยความจำชนิดใดที่ข้อมูลจะหายไปทันทีเมื่อปิดเครื่องคอมพิวเตอร์?", choices: ["RAM", "ROM", "SSD", "Flash Drive"], answer: "a" },
+                { question: "ภัยคุกคามทางไซเบอร์แบบ Phishing หมายถึงอะไร?", choices: ["การส่งไวรัสทำลายเครื่อง", "การหลอกลวงเพื่อขโมยข้อมูลรหัสผ่าน", "การโจมตีให้ระบบล่ม", "การแฮกเข้า Wi-Fi"], answer: "b" }
+            ],
+            general: [
+                { question: "เมืองหลวงของประเทศไทยคือเมืองใด?", choices: ["เชียงใหม่", "กรุงเทพมหานคร", "ภูเก็ต", "ชลบุรี"], answer: "b" },
+                { question: "แม่น้ำสายที่ยาวที่สุดในโลกคือแม่น้ำสายใด?", choices: ["แม่น้ำเจ้าพระยา", "แม่น้ำแอมะซอน", "แม่น้ำไนล์", "แม่น้ำโขง"], answer: "c" },
+                { question: "วันสำคัญทางศาสนาพุทธข้อใด ตรงกับวันที่พระสงฆ์ครบ 1,250 รูปมาประชุมกันโดยมิได้นัดหมาย?", choices: ["วันมาฆบูชา", "วันวิสาขบูชา", "วันอาสาฬหบูชา", "วันเข้าพรรษา"], answer: "a" },
+                { question: "ธงชาติไทย (ธงไตรรงค์) มีกี่สี?", choices: ["2 สี", "3 สี", "4 สี", "5 สี"], answer: "b" },
+                { question: "ข้อใดคือแม่สีหลักทางทัศนศิลป์?", choices: ["สีแดง", "สีม่วง", "สีเขียว", "สีส้ม"], answer: "a" }
+            ],
+            english: [
+                { question: "Which of the following is a noun?", choices: ["Quickly", "Happiness", "Beautiful", "Run"], answer: "b" },
+                { question: "What is the past tense of 'Go'?", choices: ["Goed", "Gone", "Went", "Going"], answer: "c" },
+                { question: "Complete the sentence: 'She ___ to school every morning.'", choices: ["go", "goes", "went", "going"], answer: "b" },
+                { question: "What is the opposite of 'Difficult'?", choices: ["Hard", "Complex", "Easy", "Short"], answer: "c" },
+                { question: "Choose the correct question format:", choices: ["Where you are going?", "Where are you going?", "Going where you are?", "Where going you are?"], answer: "b" }
+            ],
+            math: [
+                { question: "ผลลัพธ์ของ 15 + (8 × 4) มีค่าเท่ากับเท่าใด?", choices: ["47", "92", "62", "37"], answer: "a" },
+                { question: "ค่า π (พาย) โดยประมาณในทางคณิตศาสตร์มีค่าเท่ากับเท่าใด?", choices: ["2.14", "3.14", "4.14", "5.14"], answer: "b" },
+                { question: "ถ้ารูปสามเหลี่ยมมีฐานยาว 10 ซม. สูง 6 ซม. พื้นที่ของรูปสามเหลี่ยมนี้คือเท่าใด?", choices: ["60 ตร.ซม.", "30 ตร.ซม.", "15 ตร.ซม.", "40 ตร.ซม."], answer: "b" },
+                { question: "ลำดับตัวเลข 2, 4, 8, 16, ... ตัวถัดไปคือตัวเลขใด?", choices: ["20", "24", "32", "64"], answer: "c" },
+                { question: "ร้อยละ 20 ของ 500 มีค่าเท่ากับเท่าใด?", choices: ["50", "100", "150", "200"], answer: "b" }
+            ]
+        };
+
+        function importPresetBank(key) {
+            const list = presetBanks[key];
+            if (!list) return;
+
+            const formatted = list.map(item => ({
+                question: item.question,
+                question_img: '',
+                choices: item.choices,
+                choices_img: ['', '', '', ''],
+                answer: item.answer,
+                timeLimit: 20,
+                type: 'quiz'
+            }));
+
+            if (questions.length === 1 && !questions[0].question.trim()) {
+                questions = formatted;
+            } else {
+                questions = questions.concat(formatted);
+            }
+
+            activeQuestionIndex = questions.length - formatted.length;
+            renderAllQuestionsList();
+            renderActiveQuestionStage();
+            closeLibraryModal();
+
+            alert(`🎉 นำเข้าชุดข้อสอบสำเร็จรูปจำนวน ${formatted.length} ข้อเรียบร้อยแล้ว!`);
+        }
+
+        async function importTemplateById(templateId) {
+            try {
+                const res = await fetch(`/api/library/get-template-questions?templateId=${encodeURIComponent(templateId)}`);
+                if (res.ok) {
+                    const tQuestions = await res.json();
+                    if (Array.isArray(tQuestions) && tQuestions.length > 0) {
+                        const formatted = tQuestions.map(q => {
+                            const choices = [];
+                            const choices_img = [];
+                            choiceKeys.forEach(key => {
+                                choices.push(q[key] !== null && q[key] !== undefined ? String(q[key]) : '');
+                                choices_img.push(q[key + '_img'] || '');
+                            });
+                            return {
+                                question: q.question || '',
+                                question_img: q.question_img || '',
+                                choices,
+                                choices_img,
+                                answer: (q.answer || 'a').toLowerCase(),
+                                timeLimit: 20,
+                                type: 'quiz'
+                            };
+                        });
+
+                        if (questions.length === 1 && !questions[0].question.trim()) {
+                            questions = formatted;
+                        } else {
+                            questions = questions.concat(formatted);
+                        }
+
+                        activeQuestionIndex = questions.length - formatted.length;
+                        renderAllQuestionsList();
+                        renderActiveQuestionStage();
+                        closeLibraryModal();
+
+                        alert(`🎉 ดึงข้อสอบจากคลังสำเร็จจำนวน ${formatted.length} ข้อ!`);
+                    }
+                }
+            } catch(e) {
+                console.error(e);
+                alert("❌ เกิดข้อผิดพลาดในการดึงข้อสอบจากคลัง");
+            }
+        }
+
+        // ==========================================
+        // 7. UTILITIES
         // ==========================================
         function escapeHtml(str) {
             if (!str) return '';
@@ -1228,5 +1494,77 @@
                 .replace(/'/g, "&#039;");
         }
     </script>
+
+    <!-- ======================================================== -->
+    <!-- MODALS FOR AI EXAM & QUESTION LIBRARY                    -->
+    <!-- ======================================================== -->
+    
+    <!-- 1. AI Exam Converter Modal -->
+    <div id="ai-exam-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-2xl rounded-3xl p-6 shadow-2xl border-2 border-purple-200 space-y-4 max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between border-b pb-3 border-slate-100">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🤖</span>
+                    <div>
+                        <h3 class="font-black text-lg text-slate-900">ตัวแปลงข้อสอบจาก AI</h3>
+                        <p class="text-xs font-bold text-purple-700">วางข้อความโจทย์ข้อสอบจาก ChatGPT / Gemini / Claude ได้ทันที</p>
+                    </div>
+                </div>
+                <button onclick="closeAiModal()" class="text-slate-400 hover:text-slate-700 font-black text-xl">✕</button>
+            </div>
+
+            <div class="space-y-2 flex-1 flex flex-col overflow-hidden">
+                <label class="block text-xs font-bold text-slate-600">
+                    วางข้อความโจทย์ตามรูปแบบทั่วไป (เช่น 1. โจทย์... ก. ... ข. ... เฉลย: ข):
+                </label>
+                <textarea id="ai-text-input" rows="8" placeholder="1. เมืองหลวงของประเทศไทยคือเมืองใด?
+ก. เชียงใหม่
+ข. กรุงเทพมหานคร
+ค. ภูเก็ต
+ง. ขอนแก่น
+เฉลย: ข
+
+2. ข้อใดคือตัวอย่างของระบบปฏิบัติการ?
+ก. Python
+ข. Windows
+ค. HTML
+ง. Chrome
+เฉลย: ข" class="w-full p-4 bg-slate-50 border-2 border-slate-200 focus:border-purple-600 rounded-2xl text-sm font-bold text-slate-900 outline-none leading-relaxed flex-1 font-mono"></textarea>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-2 border-t border-slate-100">
+                <button onclick="closeAiModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs sm:text-sm font-black transition">ยกเลิก</button>
+                <button onclick="parseAiTextToQuestions()" class="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl text-xs sm:text-sm font-black shadow-md shadow-purple-600/25 transition active:scale-95 flex items-center gap-1.5 cursor-pointer">
+                    <span>✨</span>
+                    <span>แปลงและนำเข้าข้อสอบ</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Question Library Modal -->
+    <div id="library-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-3xl rounded-3xl p-6 shadow-2xl border-2 border-sky-200 space-y-4 max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between border-b pb-3 border-slate-100">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">📚</span>
+                    <div>
+                        <h3 class="font-black text-lg text-slate-900">คลังข้อสอบสำเร็จรูป & แม่แบบ</h3>
+                        <p class="text-xs font-bold text-sky-700">เลือกดึงข้อสอบจากแม่แบบประจำวิชาเข้าสู่แบบทดสอบนี้</p>
+                    </div>
+                </div>
+                <button onclick="closeLibraryModal()" class="text-slate-400 hover:text-slate-700 font-black text-xl">✕</button>
+            </div>
+
+            <div id="library-templates-list" class="flex-1 overflow-y-auto pr-1">
+                <!-- Loaded dynamically -->
+            </div>
+
+            <div class="flex items-center justify-end pt-2 border-t border-slate-100">
+                <button onclick="closeLibraryModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs sm:text-sm font-black transition">ปิดหน้าต่าง</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
