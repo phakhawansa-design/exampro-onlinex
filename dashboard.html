@@ -6,7 +6,7 @@
     <title>แผงควบคุมหลัก - Tab-Lock Online Proctoring System</title>
     <meta name="description" content="แผงควบคุมหลักระบบสอบออนไลน์ Tab-Lock สำหรับอาจารย์ผู้ดูแลห้องสอบ">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet">
     <style>
         html { font-size: 100%; -webkit-text-size-adjust: 100%; }
 
@@ -23,7 +23,8 @@
         }
 
         * { box-sizing: border-box; }
-                /* ===== SIDEBAR (STANDARDIZED UX/UI FOR 25-60 Y.O. TEACHERS) ===== */
+        
+        /* ===== SIDEBAR (STANDARDIZED UX/UI FOR TEACHERS) ===== */
         #sidebar {
             background: #ffffff;
             width: 280px;
@@ -76,7 +77,7 @@
         }
         .nav-section-title {
             font-size: 13px;
-            font-weight: 800;
+            font-weight: 600;
             letter-spacing: 0.04em;
             color: #475569;
             text-transform: uppercase;
@@ -85,7 +86,7 @@
         .nav-link {
             display: flex; align-items: center; gap: 12px;
             padding: 12px 16px; border-radius: 16px;
-            font-size: 16px; font-weight: 800;
+            font-size: 16px; font-weight: 500;
             color: #1e293b; text-decoration: none;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1.5px solid transparent;
@@ -104,7 +105,7 @@
         }
         .nav-link.active {
             background: linear-gradient(135deg, #06b6d4 0%, #4f46e5 50%, #8b5cf6 100%);
-            color: #ffffff !important; font-weight: 800 !important;
+            color: #ffffff !important; font-weight: 600 !important;
             box-shadow: 0 8px 24px rgba(79, 70, 229, 0.35);
             border-color: transparent;
         }
@@ -139,72 +140,104 @@
             right: 0; left: 0; margin: 0 auto; top: 60px;
         }
 
-        /* ===== MAIN ===== */
+        /* ===== MAIN WORKSPACE ===== */
         #main-area {
-            flex: 1; background: #f8fafc;
-            background-image:
-                linear-gradient(to right, rgba(99,102,241,0.01) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(99,102,241,0.01) 1px, transparent 1px);
-            background-size: 32px 32px;
+            flex: 1; background: #090d16;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.15) 0%, transparent 60%),
+                radial-gradient(circle at 90% 40%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
+                linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
             display: flex; flex-direction: column; overflow-x: hidden;
+            font-family: 'Kanit', sans-serif;
+            color: #f1f5f9;
         }
         #top-header {
-            background: rgba(255,255,255,0.85);
+            background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(226,232,240,0.8);
-            padding: 16px 28px;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+            padding: 18px 32px;
             display: flex; align-items: center; justify-content: space-between;
         }
-        .glass-card {
-            background: rgba(255,255,255,0.85);
-            backdrop-filter: blur(20px);
-            border: 1.5px solid #cbd5e1;
-            border-radius: 20px;
+        
+        /* High-tech Cyber Cards */
+        .cyber-glass-card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.85) 100%);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .hero-banner {
-            background: linear-gradient(135deg, #e0f2fe 0%, #f5f3ff 50%, #eff6ff 100%);
-            border: 1px solid rgba(226,232,240,0.8);
+        .cyber-glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.4), transparent);
+            pointer-events: none;
         }
-        .orb {
+        .cyber-glass-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(6, 182, 212, 0.4);
+            box-shadow: 0 20px 40px -15px rgba(6, 182, 212, 0.2);
+        }
+
+        /* Cyber Hero Banner */
+        .cyber-hero-banner {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(23, 37, 84, 0.9) 50%, rgba(30, 27, 75, 0.95) 100%);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            box-shadow: 0 20px 50px -10px rgba(14, 165, 233, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        .cyber-hero-banner::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 80% 20%, rgba(56, 189, 248, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .cyber-orb {
             position: absolute; border-radius: 50%;
-            filter: blur(40px); opacity: 0.35;
-            animation: orbFloat 6s ease-in-out infinite;
+            filter: blur(50px); opacity: 0.4;
+            animation: orbFloat 7s ease-in-out infinite;
             pointer-events: none;
         }
         @keyframes orbFloat {
             0%, 100% { transform: translateY(0px) scale(1); }
-            50% { transform: translateY(-15px) scale(1.05); }
+            50% { transform: translateY(-18px) scale(1.08); }
         }
-        .action-card { transition: all 0.3s ease; cursor: pointer; text-decoration: none; }
-        .action-card:hover { transform: translateY(-4px); border-color: rgba(6, 182, 212, 0.25) !important; }
-        .stat-tile { transition: all 0.2s ease; }
-        .stat-tile:hover { transform: translateY(-2px); }
-        @keyframes onlinePulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
-            50% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
-        }
-        .online-dot { animation: onlinePulse 2s ease-in-out infinite; }
-        @keyframes sidebarDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-        .sidebar-online-dot { animation: sidebarDot 2s ease-in-out infinite; }
 
-        /* Modal */
+        /* Pulse Dot Animation */
+        @keyframes cyberPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+            50% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+        }
+        .cyber-pulse-dot { animation: cyberPulse 2s ease-in-out infinite; }
+
+        @keyframes shieldGlow {
+            0%, 100% { filter: drop-shadow(0 0 8px rgba(6, 182, 212, 0.5)); }
+            50% { filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.8)); }
+        }
+        .shield-glow-anim { animation: shieldGlow 3s ease-in-out infinite; }
+
+        /* Modal styling */
         #gemini-modal {
             display: none;
             position: fixed; inset: 0; z-index: 9999;
-            background: rgba(15,23,42,0.5);
-            backdrop-filter: blur(8px);
+            background: rgba(9, 13, 22, 0.8);
+            backdrop-filter: blur(12px);
             align-items: center; justify-content: center;
         }
         #gemini-modal.open { display: flex; }
 
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(6,182,212,0.25); border-radius: 4px; }
-
-        /* Storage widget */
-        .my-storage-bar-bg { height: 8px; border-radius: 9999px; background: #e2e8f0; overflow: hidden; }
-        .my-storage-bar-fill { height: 100%; border-radius: 9999px; transition: width 1s cubic-bezier(.4,0,.2,1); }
-        .my-stat-chip { display:inline-flex; align-items:center; gap:4px; background:rgba(15,23,42,0.04); border:1px solid rgba(226,232,240,0.8); border-radius:20px; padding:3px 10px; font-size:11px; font-weight:600; color:#475569; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #090d16; }
+        ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.6); }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
@@ -220,8 +253,8 @@
                 <img src="logo.png" alt="Tab-Lock Logo" class="w-8 h-8 object-cover rounded-lg" />
             </div>
             <div class="logo-text leading-tight">
-                <div class="font-black text-lg tracking-tight text-slate-900">Tab-<span class="logo-gradient">Lock</span></div>
-                <div class="text-[10px] text-slate-500 uppercase tracking-widest font-extrabold">Online Proctoring</div>
+                <div class="font-bold text-lg tracking-tight text-slate-900">Tab-<span class="logo-gradient">Lock</span></div>
+                <div class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Online Proctoring</div>
             </div>
         </div>
 
@@ -294,17 +327,17 @@
     <div class="sidebar-inner p-4 border-t border-slate-200 bg-slate-50/60 space-y-3">
         <div class="flex items-center gap-3">
             <div class="relative flex-shrink-0">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 via-indigo-600 to-purple-600 flex items-center justify-center text-sm font-black text-white shadow-sm">อ</div>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 via-indigo-600 to-purple-600 flex items-center justify-center text-sm font-bold text-white shadow-sm">อ</div>
                 <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white sidebar-online-dot online-dot"></span>
             </div>
             <div class="flex-1 min-w-0">
-                <div class="text-sm font-black text-slate-900 truncate" id="sidebar-teacher-name">อาจารย์ผู้ดูแล</div>
-                <div class="text-xs text-slate-500 font-extrabold flex items-center gap-1">
+                <div class="text-sm font-bold text-slate-900 truncate" id="sidebar-teacher-name">อาจารย์ผู้ดูแล</div>
+                <div class="text-xs text-slate-500 font-semibold flex items-center gap-1">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> ออนไลน์ • ผู้ดูแลระบบ
                 </div>
             </div>
         </div>
-        <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-black flex items-center justify-center gap-2 border border-red-200 transition-colors">
+        <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-red-200 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H2.25" /></svg>
             <span class="logout-btn-text">ออกจากระบบ</span>
         </a>
@@ -316,205 +349,392 @@
     <!-- Header -->
     <header id="top-header">
         <div class="flex items-center gap-3">
-            <button id="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')" class="md:hidden p-2 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 transition">
+            <button id="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')" class="md:hidden p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
             </button>
             <div>
-                <h1 class="text-xl md:text-2xl font-black text-slate-800" id="welcome-text">ยินดีต้อนรับกลับมา 👋</h1>
-                <p class="text-sm font-medium text-slate-500 mt-1">Tab-Lock Online Proctoring System &middot; Teacher Dashboard</p>
+                <h1 class="text-xl md:text-2xl font-semibold text-white tracking-tight" id="welcome-text">ยินดีต้อนรับกลับมา 👋</h1>
+                <p class="text-xs md:text-sm font-medium text-slate-400 mt-0.5 flex items-center gap-2">
+                    <span class="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                    Tab-Lock Online Proctoring System &middot; Cyber Security Center
+                </p>
             </div>
         </div>
         <div class="flex items-center gap-3">
-            <button onclick="window.TabLockGuide.open('dashboard')" class="flex items-center gap-1.5 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white px-3.5 py-2 rounded-full text-xs font-extrabold transition shadow-sm active:scale-95 cursor-pointer">
+            <button onclick="window.TabLockGuide.open('dashboard')" class="flex items-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-4 py-2 rounded-full text-xs font-semibold transition shadow-lg shadow-cyan-500/20 active:scale-95 cursor-pointer border border-cyan-400/30">
                 <span>💡</span>
                 <span class="hidden sm:inline">คู่มือแนะนำ</span>
             </button>
-            <div class="flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3.5 py-2 rounded-full">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 online-dot"></span>
-                <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">System Online</span>
+            <div class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-1.5 rounded-full">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 cyber-pulse-dot"></span>
+                <span class="text-xs font-semibold text-emerald-400 tracking-wider uppercase">AI SECURITY MATRIX ONLINE</span>
             </div>
-            <div class="hidden sm:flex items-center gap-2 bg-slate-100 border border-slate-200 px-3.5 py-2 rounded-full">
-                <span class="text-xs text-slate-600 font-medium" id="date-display"></span>
+            <div class="hidden sm:flex items-center gap-2 bg-slate-800/80 border border-slate-700 px-3.5 py-1.5 rounded-full">
+                <span class="text-xs text-slate-300 font-medium" id="date-display"></span>
             </div>
         </div>
     </header>
 
     <!-- Main workspace -->
-    <main class="flex-1 p-6 md:p-8 space-y-8 overflow-y-auto max-w-[1400px] w-full mx-auto">
+    <main class="flex-1 p-6 md:p-10 space-y-8 overflow-y-auto max-w-[1450px] w-full mx-auto">
 
-        <!-- ===== HERO BANNER ===== -->
-        <div class="hero-banner rounded-2xl p-8 relative overflow-hidden">
-            <div class="orb w-64 h-64 bg-indigo-600/30" style="top:-50px;right:-30px;animation-delay:0s;"></div>
-            <div class="orb w-40 h-40 bg-violet-600/20" style="bottom:-20px;left:100px;animation-delay:3s;"></div>
-            <div class="orb w-24 h-24 bg-purple-400/20" style="top:20px;left:40%;animation-delay:1.5s;"></div>
+        <!-- ===== HIGH-TECH CYBER SECURITY HERO BANNER ===== -->
+        <div class="cyber-hero-banner rounded-3xl p-8 md:p-10 relative overflow-hidden">
+            <div class="cyber-orb w-96 h-96 bg-cyan-500/20" style="top:-100px;right:-50px;animation-delay:0s;"></div>
+            <div class="cyber-orb w-72 h-72 bg-indigo-500/20" style="bottom:-80px;left:80px;animation-delay:3.5s;"></div>
+            <div class="cyber-orb w-48 h-48 bg-purple-500/15" style="top:40px;left:45%;animation-delay:1.8s;"></div>
+
             <div class="relative z-10">
-                <div class="flex flex-wrap items-start gap-4">
-                    <div class="flex-1 min-w-0 space-y-3">
-                        <div class="inline-flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-full">
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-                            <span class="text-xs font-extrabold text-amber-700 uppercase tracking-wider">Enterprise AI Platform</span>
+                <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+                    
+                    <div class="space-y-4 max-w-3xl">
+                        <div class="inline-flex items-center gap-2.5 bg-slate-900/80 border border-cyan-500/40 px-4 py-1.5 rounded-full shadow-lg shadow-cyan-500/10">
+                            <span class="w-2 h-2 rounded-full bg-cyan-400 cyber-pulse-dot"></span>
+                            <span class="text-xs font-semibold text-cyan-300 tracking-wider uppercase">NEXT-GEN AI PROCTORING & DEFENSE PLATFORM</span>
                         </div>
-                        <h1 class="text-2xl md:text-3xl font-black text-slate-800 leading-tight">
-                            ระบบประมวลผลสอบอัจฉริยะยุคใหม่<br>
-                            <span class="text-indigo-600">และวิเคราะห์ผลลัพธ์ห้องเรียน</span>
+                        
+                        <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight tracking-tight">
+                            ระบบป้องกันการทุจริตขั้นสูง<br>
+                            <span class="bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-300 bg-clip-text text-transparent">
+                                และประมวลผลสอบอัจฉริยะยุคใหม่
+                            </span>
                         </h1>
-                        <p class="text-slate-600 text-sm md:text-base max-w-lg font-medium">ศูนย์รวมข้อสอบออนไลน์ ตรวจจับพฤติกรรมทุจริต วิเคราะห์คุณภาพข้อสอบ และสรุปผลการเรียนรู้แบบอัตโนมัติ</p>
+                        
+                        <p class="text-slate-300 text-sm md:text-base leading-relaxed font-normal">
+                            ศูนย์กลางการควบคุมห้องสอบดิจิทัล ป้องกันการสลับหน้าจอ ถอดรหัสพฤติกรรมสุ่มเสี่ยง ด้วยปัญญาประดิษฐ์เรียลไทม์ พร้อมวิเคราะห์คุณภาพข้อสอบและรายงานผลสัมฤทธิ์ทางการเรียนรู้อัตโนมัติ
+                        </p>
+
+                        <div class="flex flex-wrap items-center gap-4 pt-2">
+                            <a href="admin-questions.html" class="inline-flex items-center gap-2.5 bg-gradient-to-r from-cyan-500 via-teal-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-semibold px-7 py-3.5 rounded-2xl text-sm transition-all duration-200 shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 active:scale-[0.98] border border-cyan-300/30">
+                                <span>📝</span>
+                                <span>จัดการข้อสอบ & คลังโจทย์</span>
+                            </a>
+                            <a href="admin-monitoring.html" class="inline-flex items-center gap-2.5 bg-slate-800/90 hover:bg-slate-700/90 text-slate-200 hover:text-white font-semibold px-6 py-3.5 rounded-2xl text-sm transition-all duration-200 border border-slate-700 hover:border-slate-600 active:scale-[0.98]">
+                                <span>🚨</span>
+                                <span>ศูนย์เฝ้าระวังพฤติกรรม</span>
+                            </a>
+                        </div>
                     </div>
-                    <div class="shrink-0 self-end flex items-center gap-2.5 flex-wrap">
-                        <a href="admin-portal.html" class="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-black px-6 py-3.5 rounded-2xl text-sm transition-all duration-200 shadow-lg shadow-pink-500/25 active:scale-[0.98]">
-                            <span>📝</span> จัดการข้อสอบ
-                        </a>
+
+                    <!-- Cyber Shield Status Visual Accent -->
+                    <div class="shrink-0 w-full lg:w-auto flex justify-center lg:justify-end">
+                        <div class="p-6 rounded-3xl bg-slate-900/90 border border-cyan-500/30 shadow-2xl backdrop-filter backdrop-blur-xl flex flex-col items-center justify-center text-center space-y-3 min-w-[240px] shield-glow-anim">
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-indigo-600/20 border border-cyan-400/40 flex items-center justify-center text-3xl text-cyan-300">
+                                🛡️
+                            </div>
+                            <div>
+                                <div class="text-xs font-semibold text-cyan-400 uppercase tracking-widest">PROCTOR SHIELD V3.5</div>
+                                <div class="text-lg font-bold text-white mt-0.5">สถานะระบบ: ปลอดภัย</div>
+                            </div>
+                            <div class="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-xl text-xs font-medium text-emerald-400">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 cyber-pulse-dot"></span>
+                                🔒 ล็อกเบราว์เซอร์ 100%
+                            </div>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>
 
-        <!-- ===== QUICK STATS ===== -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            <!-- Gemini AI Card -->
-            <div onclick="openGeminiModal()" class="glass-card p-5 flex items-center gap-4 cursor-pointer border border-slate-200/80 bg-white/90 hover:bg-white hover:border-purple-300 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 rounded-2xl group active:scale-[0.99]">
-                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-xl shrink-0 shadow-md shadow-purple-500/20 group-hover:scale-110 transition-transform duration-300">✨</div>
-                <div class="min-w-0">
-                    <div class="text-base md:text-lg font-extrabold text-slate-800 leading-snug group-hover:text-purple-700 transition-colors">Gemini AI Generator</div>
-                    <div class="text-xs md:text-sm text-slate-500 font-medium mt-0.5 truncate">สร้างและแปลงข้อสอบด้วย AI Gem 🚀</div>
+        <!-- ===== HIGH-TECH FEATURES GRID (3 TOP CARDS) ===== -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <!-- Gemini AI Generator -->
+            <div onclick="openGeminiModal()" class="cyber-glass-card p-6 cursor-pointer group hover:border-purple-500/50 hover:shadow-purple-500/20 transition-all duration-300">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600/30 to-indigo-600/30 border border-purple-500/40 flex items-center justify-center text-2xl text-purple-300 shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-purple-500/10">
+                        ✨
+                    </div>
+                    <span class="text-[11px] font-semibold text-purple-400 bg-purple-500/10 border border-purple-500/20 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                        AI GENERATOR
+                    </span>
+                </div>
+                <div class="mt-4">
+                    <h3 class="text-lg font-semibold text-white group-hover:text-purple-300 transition-colors">Gemini AI Generator</h3>
+                    <p class="text-xs md:text-sm text-slate-400 font-normal mt-1 leading-relaxed">
+                        ระบบสร้างโจทย์และแปลงข้อสอบอัตโนมัติด้วย AI Gem ปรับระดับความยากง่ายทันใจ 🚀
+                    </p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-purple-400 font-medium">
+                    <span>เปิดเครื่องมือ AI</span>
+                    <span class="group-hover:translate-x-1 transition-transform">→</span>
                 </div>
             </div>
 
-            <!-- Real-time Card -->
-            <a href="admin-results.html" class="glass-card p-5 flex items-center gap-4 cursor-pointer border border-slate-200/80 bg-white/90 hover:bg-white hover:border-emerald-300 hover:shadow-lg hover:shadow-emerald-500/10 transition-all duration-300 rounded-2xl group active:scale-[0.99]">
-                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-xl shrink-0 shadow-md shadow-emerald-500/20 group-hover:scale-110 transition-transform duration-300">📊</div>
-                <div class="min-w-0">
-                    <div class="text-base md:text-lg font-extrabold text-slate-800 leading-snug group-hover:text-teal-700 transition-colors">Real-Time Data</div>
-                    <div class="text-xs md:text-sm text-slate-500 font-medium mt-0.5 truncate">ประมวลผลและดึงข้อมูลสดทันที</div>
+            <!-- Real-Time Data & Analytics -->
+            <a href="admin-results.html" class="cyber-glass-card p-6 group hover:border-teal-500/50 hover:shadow-teal-500/20 transition-all duration-300">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-500/30 to-emerald-600/30 border border-teal-500/40 flex items-center justify-center text-2xl text-teal-300 shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-teal-500/10">
+                        📊
+                    </div>
+                    <span class="text-[11px] font-semibold text-teal-400 bg-teal-500/10 border border-teal-500/20 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                        REAL-TIME FEED
+                    </span>
+                </div>
+                <div class="mt-4">
+                    <h3 class="text-lg font-semibold text-white group-hover:text-teal-300 transition-colors">Real-Time Data Engine</h3>
+                    <p class="text-xs md:text-sm text-slate-400 font-normal mt-1 leading-relaxed">
+                        ประมวลผลคะแนน Z-Score, T-Score และคำนวณสถิติวิเคราะห์ทันทีที่มีการส่งข้อสอบ
+                    </p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-teal-400 font-medium">
+                    <span>ดูผลสอบเรียลไทม์</span>
+                    <span class="group-hover:translate-x-1 transition-transform">→</span>
                 </div>
             </a>
 
-            <!-- AI Guard Card -->
-            <a href="admin-monitoring.html" class="glass-card p-5 flex items-center gap-4 cursor-pointer border border-slate-200/80 bg-white/90 hover:bg-white hover:border-rose-300 hover:shadow-lg hover:shadow-rose-500/10 transition-all duration-300 rounded-2xl group active:scale-[0.99]">
-                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-500 to-red-600 flex items-center justify-center text-xl shrink-0 shadow-md shadow-rose-500/20 group-hover:scale-110 transition-transform duration-300">🛡️</div>
-                <div class="min-w-0">
-                    <div class="text-base md:text-lg font-extrabold text-slate-800 leading-snug group-hover:text-rose-700 transition-colors">AI Anti-Cheat Guard</div>
-                    <div class="text-xs md:text-sm text-slate-500 font-medium mt-0.5 truncate">ตรวจจับสลับหน้าจออัตโนมัติ</div>
+            <!-- AI Anti-Cheat Guard -->
+            <a href="admin-monitoring.html" class="cyber-glass-card p-6 group hover:border-rose-500/50 hover:shadow-rose-500/20 transition-all duration-300">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-500/30 to-red-600/30 border border-rose-500/40 flex items-center justify-center text-2xl text-rose-300 shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-lg shadow-rose-500/10">
+                        🛡️
+                    </div>
+                    <span class="text-[11px] font-semibold text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                        AI ANTI-CHEAT
+                    </span>
+                </div>
+                <div class="mt-4">
+                    <h3 class="text-lg font-semibold text-white group-hover:text-rose-300 transition-colors">AI Anti-Cheat Guard</h3>
+                    <p class="text-xs md:text-sm text-slate-400 font-normal mt-1 leading-relaxed">
+                        ตรวจจับการสลับแท็บ หน้าจอ และวิเคราะห์พฤติกรรมผิดปกติตลอดการสอบ
+                    </p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-rose-400 font-medium">
+                    <span>เปิดระบบเฝ้าระวัง</span>
+                    <span class="group-hover:translate-x-1 transition-transform">→</span>
                 </div>
             </a>
         </div>
 
-        <!-- ===== 4 ACTION CARDS ===== -->
-        <div>
-            <h2 class="text-sm md:text-base font-extrabold text-slate-700 uppercase tracking-wider mb-5 flex items-center gap-2">
-                <span class="w-4 h-px bg-indigo-400/50 rounded inline-block"></span>
-                เมนูหลัก
-                <span class="w-4 h-px bg-indigo-400/50 rounded inline-block"></span>
-            </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <!-- Questions -->
-                <a href="admin-questions.html" class="action-card glass-card p-6 space-y-4 block hover:shadow-lg hover:shadow-indigo-500/10">
+        <!-- ===== SYSTEM METRICS COUNTER (4 HIGH-TECH WIDGETS) ===== -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
+            <div class="cyber-glass-card p-5 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-xl font-bold shrink-0">
+                    ⚡
+                </div>
+                <div>
+                    <div class="text-xs text-slate-400 font-medium uppercase tracking-wider">ความเร็วการตรวจจับ</div>
+                    <div class="text-lg font-bold text-cyan-300 mt-0.5">&lt; 0.2 วินาที</div>
+                    <div class="text-[11px] text-emerald-400 font-normal">Real-Time Sync</div>
+                </div>
+            </div>
+
+            <div class="cyber-glass-card p-5 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-xl font-bold shrink-0">
+                    🔒
+                </div>
+                <div>
+                    <div class="text-xs text-slate-400 font-medium uppercase tracking-wider">โหมดเบราว์เซอร์</div>
+                    <div class="text-lg font-bold text-indigo-300 mt-0.5">Strict Lockdown</div>
+                    <div class="text-[11px] text-indigo-400 font-normal">ป้องกัน คัดลอก/วาง</div>
+                </div>
+            </div>
+
+            <div class="cyber-glass-card p-5 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 text-xl font-bold shrink-0">
+                    📚
+                </div>
+                <div>
+                    <div class="text-xs text-slate-400 font-medium uppercase tracking-wider">คลังข้อสอบ</div>
+                    <div class="text-lg font-bold text-purple-300 mt-0.5">AI & Excel Ready</div>
+                    <div class="text-[11px] text-purple-400 font-normal">นำเข้าข้อสอบอัตโนมัติ</div>
+                </div>
+            </div>
+
+            <div class="cyber-glass-card p-5 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xl font-bold shrink-0">
+                    👥
+                </div>
+                <div>
+                    <div class="text-xs text-slate-400 font-medium uppercase tracking-wider">คัดกรองสิทธิ์ผู้สอบ</div>
+                    <div class="text-lg font-bold text-emerald-300 mt-0.5">Roster Guard Active</div>
+                    <div class="text-[11px] text-emerald-400 font-normal">ตรวจสอบรหัสนักศึกษา</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== MAIN MODULES & ACTION CARDS ===== -->
+        <div class="space-y-5">
+            <div class="flex items-center justify-between">
+                <h2 class="text-base md:text-lg font-semibold text-white tracking-tight flex items-center gap-2.5">
+                    <span class="w-2.5 h-6 bg-gradient-to-b from-cyan-400 to-indigo-500 rounded-full inline-block"></span>
+                    ระบบงานหลักประจำศูนย์สอบ
+                </h2>
+                <span class="text-xs text-slate-400 font-medium">เลือกหัวข้อการทำงานที่ต้องการ</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 1. คลังและจัดการข้อสอบ -->
+                <a href="admin-questions.html" class="cyber-glass-card p-7 space-y-5 block group hover:border-cyan-500/50">
                     <div class="flex items-center justify-between">
-                        <div class="w-12 h-12 rounded-2xl bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center text-2xl">📚</div>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-slate-400"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                        <div class="w-14 h-14 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                            📚
+                        </div>
+                        <span class="p-2.5 rounded-full bg-slate-800 text-slate-400 group-hover:text-cyan-400 group-hover:bg-slate-700 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                        </span>
                     </div>
                     <div>
-                        <h3 class="text-base md:text-lg font-black text-slate-800">ระบบจัดการคลังข้อสอบ</h3>
-                        <p class="text-sm text-slate-600 mt-1.5 leading-relaxed font-medium">เพิ่ม แก้ไข ลบ และเผยแพร่ข้อสอบ รองรับ Excel, AI Generator และรูปภาพ</p>
+                        <h3 class="text-lg md:text-xl font-bold text-white group-hover:text-cyan-300 transition-colors">1. ระบบจัดการคลังข้อสอบ (Question Vault)</h3>
+                        <p class="text-sm text-slate-400 mt-2 leading-relaxed font-normal">
+                            เพิ่ม แก้ไข ลบ และจัดหมวดหมู่ข้อสอบตามรายวิชา รองรับการอัปโหลดไฟล์ Excel, รูปภาพประกอบข้อสอบ และการสร้างข้อสอบด้วย AI
+                        </p>
                     </div>
-                    <div class="flex items-center gap-1.5">
-                        <div class="h-2 flex-1 bg-indigo-500/30 rounded-full overflow-hidden"><div class="h-full bg-indigo-500 rounded-full" style="width:65%"></div></div>
-                        <span class="text-xs text-indigo-600 font-extrabold">จัดการข้อสอบ</span>
+                    <div class="space-y-2 pt-2">
+                        <div class="flex items-center justify-between text-xs text-slate-400 font-medium">
+                            <span>สถานะระบบจัดการคลังข้อสอบ</span>
+                            <span class="text-cyan-400 font-semibold">พร้อมใช้งาน (Active)</span>
+                        </div>
+                        <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
+                            <div class="h-full bg-gradient-to-r from-cyan-500 to-indigo-500 rounded-full" style="width: 100%"></div>
+                        </div>
                     </div>
                 </a>
-                <!-- Results -->
-                <a href="admin-results.html" class="action-card glass-card p-6 space-y-4 block hover:shadow-lg hover:shadow-emerald-500/10">
+
+                <!-- 2. ตรวจสอบคะแนนสอบ -->
+                <a href="admin-results.html" class="cyber-glass-card p-7 space-y-5 block group hover:border-emerald-500/50">
                     <div class="flex items-center justify-between">
-                        <div class="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-2xl">📈</div>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-slate-400"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                            📈
+                        </div>
+                        <span class="p-2.5 rounded-full bg-slate-800 text-slate-400 group-hover:text-emerald-400 group-hover:bg-slate-700 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                        </span>
                     </div>
                     <div>
-                        <h3 class="text-base md:text-lg font-black text-slate-800">ตรวจสอบคะแนนสอบ</h3>
-                        <p class="text-sm text-slate-600 mt-1.5 leading-relaxed font-medium">ดูผลการสอบ Z-Score, T-Score, Item Analysis และส่งออกรายงาน Excel</p>
+                        <h3 class="text-lg md:text-xl font-bold text-white group-hover:text-emerald-300 transition-colors">2. ตรวจสอบคะแนนสอบ & วิเคราะห์ผลสัมฤทธิ์</h3>
+                        <p class="text-sm text-slate-400 mt-2 leading-relaxed font-normal">
+                            ตรวจสอบคะแนนรายบุคคล คำนวณค่าสถิติ Z-Score, T-Score, Item Analysis (ค่าความยาก p และค่าอำนาจจำแนก r) และส่งออกรายงาน Excel
+                        </p>
                     </div>
-                    <div class="flex items-center gap-1.5">
-                        <div class="h-2 flex-1 bg-emerald-100 rounded-full overflow-hidden"><div class="h-full bg-emerald-500 rounded-full" style="width:82%"></div></div>
-                        <span class="text-xs text-emerald-600 font-extrabold">วิเคราะห์ผล</span>
+                    <div class="space-y-2 pt-2">
+                        <div class="flex items-center justify-between text-xs text-slate-400 font-medium">
+                            <span>ระบบคำนวณ Z-Score / T-Score</span>
+                            <span class="text-emerald-400 font-semibold">เรียลไทม์ (Auto Analytics)</span>
+                        </div>
+                        <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
+                            <div class="h-full bg-gradient-to-r from-teal-500 to-emerald-400 rounded-full" style="width: 100%"></div>
+                        </div>
                     </div>
                 </a>
-                <!-- Monitoring -->
-                <a href="admin-monitoring.html" class="action-card glass-card p-6 space-y-4 block hover:shadow-lg hover:shadow-rose-500/10">
+
+                <!-- 3. ตรวจสอบพฤติกรรมน่าสงสัย -->
+                <a href="admin-monitoring.html" class="cyber-glass-card p-7 space-y-5 block group hover:border-rose-500/50">
                     <div class="flex items-center justify-between">
-                        <div class="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-2xl">🚨</div>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-slate-400"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                        <div class="w-14 h-14 rounded-2xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                            🚨
+                        </div>
+                        <span class="p-2.5 rounded-full bg-slate-800 text-slate-400 group-hover:text-rose-400 group-hover:bg-slate-700 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                        </span>
                     </div>
                     <div>
-                        <h3 class="text-base md:text-lg font-black text-slate-800">ตรวจสอบพฤติกรรมน่าสงสัย</h3>
-                        <p class="text-sm text-slate-600 mt-1.5 leading-relaxed font-medium">ติดตามการสลับหน้าจอ ตรวจจับกลุ่มเสี่ยงสูง และส่งสัญญาณเตือนแบบเรียลไทม์</p>
+                        <h3 class="text-lg md:text-xl font-bold text-white group-hover:text-rose-300 transition-colors">3. ระบบเฝ้าระวังพฤติกรรมน่าสงสัย (Live Threat Center)</h3>
+                        <p class="text-sm text-slate-400 mt-2 leading-relaxed font-normal">
+                            ติดตามการเข้าสอบสด รายงานสถิติการสลับหน้าจอ (Tab Switches) ตรวจจับกลุ่มเสี่ยง และส่งสัญญาณเตือนให้อาจารย์ระงับสิทธิ์การสอบทันที
+                        </p>
                     </div>
-                    <div class="flex items-center gap-1.5">
-                        <div class="h-2 flex-1 bg-rose-100 rounded-full overflow-hidden"><div class="h-full bg-rose-500 rounded-full animate-pulse" style="width:100%"></div></div>
-                        <span class="text-xs text-rose-600 font-extrabold">Live Monitor</span>
+                    <div class="space-y-2 pt-2">
+                        <div class="flex items-center justify-between text-xs text-slate-400 font-medium">
+                            <span>สถานะตรวจจับพฤติกรรม</span>
+                            <span class="text-rose-400 font-semibold flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                                Live Defense Monitor
+                            </span>
+                        </div>
+                        <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
+                            <div class="h-full bg-gradient-to-r from-rose-500 to-red-500 rounded-full animate-pulse" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 4. จัดการรายวิชาและนักศึกษา -->
+                <a href="admin-courses.html" class="cyber-glass-card p-7 space-y-5 block group hover:border-indigo-500/50">
+                    <div class="flex items-center justify-between">
+                        <div class="w-14 h-14 rounded-2xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                            🏫
+                        </div>
+                        <span class="p-2.5 rounded-full bg-slate-800 text-slate-400 group-hover:text-indigo-400 group-hover:bg-slate-700 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                        </span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg md:text-xl font-bold text-white group-hover:text-indigo-300 transition-colors">4. จัดการรายวิชาและรายชื่อนักศึกษา (Roster Guard)</h3>
+                        <p class="text-sm text-slate-400 mt-2 leading-relaxed font-normal">
+                            บริหารจัดการวิชาที่สอน จัดกลุ่มห้องเรียน นำเข้ารายชื่อนักศึกษาเพื่อคัดกรองสิทธิ์เข้าสอบ และกำหนดช่วงเวลาการเปิดห้องสอบ
+                        </p>
+                    </div>
+                    <div class="space-y-2 pt-2">
+                        <div class="flex items-center justify-between text-xs text-slate-400 font-medium">
+                            <span>ระบบคัดกรองสิทธิ์เข้าสอบ</span>
+                            <span class="text-indigo-400 font-semibold">พร้อมคัดกรอง (Roster Guard)</span>
+                        </div>
+                        <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden p-0.5 border border-slate-700">
+                            <div class="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full" style="width: 100%"></div>
+                        </div>
                     </div>
                 </a>
             </div>
         </div>
-
-        <!-- ===== MY STORAGE WIDGET REMOVED ===== -->
 
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-slate-100 py-4 px-8 text-center">
-        <p class="text-[10px] text-slate-500">&copy; 2026 Tab-Lock Online Proctoring System &middot; Enterprise Edition &middot; สงวนลิขสิทธิ์</p>
+    <footer class="border-t border-slate-800/80 bg-slate-950/80 py-4 px-8 text-center">
+        <p class="text-xs text-slate-400 font-normal">&copy; 2026 Tab-Lock Online Proctoring System &middot; Next-Gen AI Security Edition &middot; สงวนลิขสิทธิ์</p>
     </footer>
 </div>
 
 <!-- ===== GEMINI AI MODAL ===== -->
 <div id="gemini-modal">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
         <!-- Modal Header -->
-        <div class="bg-gradient-to-r from-cyan-500 via-violet-500 to-indigo-600 p-6">
+        <div class="bg-gradient-to-r from-cyan-600 via-indigo-600 to-purple-700 p-6">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center text-2xl">✨</div>
+                    <div class="w-11 h-11 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-2xl">✨</div>
                     <div>
-                        <h2 class="text-white font-black text-base">สร้างข้อสอบด้วย Gemini AI</h2>
-                        <p class="text-white/70 text-xs mt-0.5">ระบบช่วยสร้างข้อสอบโดย AI อัจฉริยะ</p>
+                        <h2 class="text-white font-bold text-lg">สร้างข้อสอบด้วย Gemini AI</h2>
+                        <p class="text-cyan-100 text-xs mt-0.5">ระบบช่วยสร้างข้อสอบโดย AI อัจฉริยะ</p>
                     </div>
                 </div>
-                <button onclick="closeGeminiModal()" class="text-white/70 hover:text-white transition text-xl font-bold leading-none">✕</button>
+                <button onclick="closeGeminiModal()" class="text-white/70 hover:text-white transition text-xl font-bold leading-none p-1">✕</button>
             </div>
         </div>
         <!-- Modal Body -->
         <div class="p-6 space-y-4">
-            <p class="text-slate-600 text-sm leading-relaxed">
-                Tab-Lock รองรับการสร้างข้อสอบด้วย AI Gemini ผ่าน 2 วิธี:
+            <p class="text-slate-300 text-sm leading-relaxed">
+                Tab-Lock รองรับการสร้างข้อสอบด้วย AI Gemini ผ่าน 2 วิธีสะดวก:
             </p>
             <div class="space-y-3">
                 <!-- Option 1 -->
-                <a href="admin-portal.html" onclick="closeGeminiModal()" class="flex items-start gap-4 p-4 rounded-2xl border border-violet-100 bg-violet-50 hover:bg-violet-100 transition cursor-pointer group block">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-lg flex-shrink-0 shadow-sm">🤖</div>
+                <a href="admin-questions.html" onclick="closeGeminiModal()" class="flex items-start gap-4 p-4 rounded-2xl border border-indigo-500/30 bg-indigo-950/50 hover:bg-indigo-900/50 transition cursor-pointer group block">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-lg flex-shrink-0 shadow-md">🤖</div>
                     <div>
-                        <div class="text-sm font-extrabold text-slate-800">AI Generator ในระบบ</div>
-                        <div class="text-xs text-slate-500 mt-0.5 leading-relaxed">ไปที่ "จัดการข้อสอบ" แล้วกดปุ่ม <strong>AI Generator</strong> เพื่อให้ระบบสร้างข้อสอบตามหัวข้อที่กำหนดได้เลย</div>
+                        <div class="text-sm font-semibold text-white group-hover:text-indigo-300 transition-colors">1. AI Generator ในระบบ Tab-Lock</div>
+                        <div class="text-xs text-slate-400 mt-1 leading-relaxed">ไปที่หน้า "จัดการข้อสอบ" แล้วกดปุ่ม <strong>AI Generator</strong> เพื่อให้ระบบสร้างข้อสอบตามหัวข้อที่ต้องการได้ทันที</div>
                     </div>
                 </a>
                 <!-- Option 2 -->
-                <a href="https://gemini.google.com" target="_blank" rel="noopener" class="flex items-start gap-4 p-4 rounded-2xl border border-cyan-100 bg-cyan-50 hover:bg-cyan-100 transition cursor-pointer group block">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-lg flex-shrink-0 shadow-sm">🌐</div>
+                <a href="https://gemini.google.com" target="_blank" rel="noopener" class="flex items-start gap-4 p-4 rounded-2xl border border-cyan-500/30 bg-cyan-950/50 hover:bg-cyan-900/50 transition cursor-pointer group block">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-lg flex-shrink-0 shadow-md">🌐</div>
                     <div>
-                        <div class="text-sm font-extrabold text-slate-800">Gemini.google.com (Gem)</div>
-                        <div class="text-xs text-slate-500 mt-0.5 leading-relaxed">ใช้ Gemini Gem โดยตรง แล้วนำข้อสอบที่ได้มาวางผ่านระบบ Excel Import ของ Tab-Lock</div>
-                        <div class="text-[10px] text-cyan-600 font-bold mt-1">↗ เปิดในแท็บใหม่</div>
+                        <div class="text-sm font-semibold text-white group-hover:text-cyan-300 transition-colors">2. Gemini.google.com (Gem)</div>
+                        <div class="text-xs text-slate-400 mt-1 leading-relaxed">ใช้ Gemini Gem โดยตรง แล้วนำข้อสอบที่ได้มาวางผ่านระบบ Excel Import ของ Tab-Lock</div>
+                        <div class="text-[11px] text-cyan-400 font-semibold mt-1">↗ เปิดเว็บไซต์ Gemini ในแท็บใหม่</div>
                     </div>
                 </a>
             </div>
-            <div class="bg-amber-50 border border-amber-100 rounded-xl p-3">
-                <p class="text-xs text-amber-700 font-medium">
-                    💡 <strong>เคล็ดลับ:</strong> แนะนำให้ใช้ AI Generator ในระบบ เพราะรองรับรูปแบบข้อสอบและการเผยแพร่ได้ทันที
+            <div class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4">
+                <p class="text-xs text-amber-300 font-medium leading-relaxed">
+                    💡 <strong>คำแนะนำ:</strong> แนะนำให้ใช้ AI Generator ในระบบ เพราะระบบจะนำเข้าข้อสอบเข้าคลังรายวิชาให้อัตโนมัติทันที
                 </p>
             </div>
         </div>
         <!-- Modal Footer -->
         <div class="px-6 pb-6">
-            <button onclick="closeGeminiModal()" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-sm font-bold transition">
-                ปิด
+            <button onclick="closeGeminiModal()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-semibold transition border border-slate-700">
+                ปิดหน้าต่าง
             </button>
         </div>
     </div>
@@ -526,8 +746,6 @@
     const teacherUsername = localStorage.getItem('teacher_username') || '';
     document.getElementById('welcome-text').textContent = `ยินดีต้อนรับกลับมา, อาจารย์ ${teacherName} 👋`;
     document.getElementById('sidebar-teacher-name').textContent = `อาจารย์: ${teacherName}`;
-
-
 
     // Date display
     const now = new Date();

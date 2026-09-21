@@ -24,7 +24,7 @@
         }
         * { box-sizing: border-box; }
         body { font-family: 'Kanit', 'Inter', sans-serif; background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #faf5ff 100%); background-attachment: fixed; color: #334155; }
-        /* ===== SIDEBAR (STANDARDIZED UX/UI FOR 25-60 Y.O. TEACHERS) ===== */
+        /* ===== SIDEBAR (STANDARDIZED UX/UI FOR TEACHERS - REGULAR WEIGHT) ===== */
         #sidebar {
             background: #ffffff;
             width: 280px;
@@ -77,7 +77,7 @@
         }
         .nav-section-title {
             font-size: 13px;
-            font-weight: 800;
+            font-weight: 600;
             letter-spacing: 0.04em;
             color: #475569;
             text-transform: uppercase;
@@ -86,7 +86,7 @@
         .nav-link {
             display: flex; align-items: center; gap: 12px;
             padding: 12px 16px; border-radius: 16px;
-            font-size: 16px; font-weight: 800;
+            font-size: 16px; font-weight: 500;
             color: #1e293b; text-decoration: none;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1.5px solid transparent;
@@ -105,7 +105,7 @@
         }
         .nav-link.active {
             background: linear-gradient(135deg, #06b6d4 0%, #4f46e5 50%, #8b5cf6 100%);
-            color: #ffffff !important; font-weight: 800 !important;
+            color: #ffffff !important; font-weight: 600 !important;
             box-shadow: 0 8px 24px rgba(79, 70, 229, 0.35);
             border-color: transparent;
         }
@@ -163,8 +163,8 @@
                 <img src="logo.png" alt="Tab-Lock Logo" class="w-8 h-8 object-cover rounded-lg" />
             </div>
             <div class="logo-text leading-tight">
-                <div class="font-black text-lg tracking-tight text-slate-900">Tab-<span class="logo-gradient">Lock</span></div>
-                <div class="text-[10px] text-slate-500 uppercase tracking-widest font-extrabold">Online Proctoring</div>
+                <div class="font-bold text-lg tracking-tight text-slate-900">Tab-<span class="logo-gradient">Lock</span></div>
+                <div class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Online Proctoring</div>
             </div>
         </div>
 
@@ -237,17 +237,17 @@
     <div class="sidebar-inner p-4 border-t border-slate-200 bg-slate-50/60 space-y-3">
         <div class="flex items-center gap-3">
             <div class="relative flex-shrink-0">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 via-indigo-600 to-purple-600 flex items-center justify-center text-sm font-black text-white shadow-sm">อ</div>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 via-indigo-600 to-purple-600 flex items-center justify-center text-sm font-bold text-white shadow-sm">อ</div>
                 <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white sidebar-online-dot online-dot"></span>
             </div>
             <div class="flex-1 min-w-0">
-                <div class="text-sm font-black text-slate-900 truncate" id="sidebar-teacher-name">อาจารย์ผู้ดูแล</div>
-                <div class="text-xs text-slate-500 font-extrabold flex items-center gap-1">
+                <div class="text-sm font-bold text-slate-900 truncate" id="sidebar-teacher-name">อาจารย์ผู้ดูแล</div>
+                <div class="text-xs text-slate-500 font-semibold flex items-center gap-1">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> ออนไลน์ • ผู้ดูแลระบบ
                 </div>
             </div>
         </div>
-        <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-black flex items-center justify-center gap-2 border border-red-200 transition-colors">
+        <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-red-200 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H2.25" /></svg>
             <span class="logout-btn-text">ออกจากระบบ</span>
         </a>
@@ -260,13 +260,13 @@
         <div class="flex items-center gap-3.5">
             <span class="text-3xl md:text-4xl">📚</span>
             <div>
-                <h1 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">จัดการรายวิชาและรายชื่อนักศึกษา</h1>
+                <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">จัดการรายวิชาและรายชื่อนักศึกษา</h1>
                 <p class="text-sm md:text-base text-slate-500 font-semibold mt-0.5">สร้างรายวิชาและนำเข้ารายชื่อนักศึกษาเพื่อคัดกรองสิทธิ์ก่อนเข้าสอบ</p>
             </div>
         </div>
         <div class="flex items-center gap-3">
             <button onclick="openCourseModal()"
-                class="flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white text-sm md:text-base font-black rounded-2xl transition shadow-lg shadow-cyan-500/25 active:scale-95 cursor-pointer">
+                class="flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white text-sm md:text-base font-bold rounded-2xl transition shadow-lg shadow-cyan-500/25 active:scale-95 cursor-pointer">
                 <span>➕</span>
                 <span>สร้างรายวิชาใหม่</span>
             </button>
@@ -277,9 +277,9 @@
         <!-- Courses Grid -->
         <div>
             <div class="flex items-center justify-between mb-5">
-                <h2 class="text-xl md:text-2xl font-black text-slate-900 flex items-center gap-3">
+                <h2 class="text-xl md:text-2xl font-bold text-slate-900 flex items-center gap-3">
                     <span>📖 รายการวิชาที่สอน</span>
-                    <span id="course-count-badge" class="text-sm md:text-base bg-indigo-100 text-indigo-800 font-black px-4 py-1 rounded-full border border-indigo-200">0 วิชา</span>
+                    <span id="course-count-badge" class="text-sm md:text-base bg-indigo-100 text-indigo-800 font-bold px-4 py-1 rounded-full border border-indigo-200">0 วิชา</span>
                 </h2>
             </div>
             
@@ -296,33 +296,33 @@
 <div id="course-modal" class="modal-overlay hidden">
     <div class="bg-white rounded-3xl p-7 sm:p-8 max-w-xl w-full shadow-2xl space-y-5 relative border-2 border-slate-200/80">
         <div class="flex justify-between items-center border-b border-slate-200 pb-4">
-            <h3 class="text-xl sm:text-2xl font-black text-slate-900" id="course-modal-title">➕ สร้างรายวิชาใหม่</h3>
+            <h3 class="text-xl sm:text-2xl font-bold text-slate-900" id="course-modal-title">➕ สร้างรายวิชาใหม่</h3>
             <button onclick="closeCourseModal()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xl transition">&times;</button>
         </div>
         <input type="hidden" id="modal-course-id">
         <div class="space-y-4 text-sm">
             <div>
-                <label class="block font-extrabold text-slate-800 mb-1.5 text-sm sm:text-base">รหัสวิชา *</label>
+                <label class="block font-semibold text-slate-800 mb-1.5 text-sm sm:text-base">รหัสวิชา *</label>
                 <input type="text" id="modal-course-code" placeholder="เช่น 04-06-101 หรือ CS101" class="w-full px-4 py-3 border-2 border-slate-300 rounded-2xl text-base font-bold text-slate-900 focus:border-cyan-500 focus:outline-none shadow-xs">
             </div>
             <div>
-                <label class="block font-extrabold text-slate-800 mb-1.5 text-sm sm:text-base">ชื่อรายวิชา *</label>
+                <label class="block font-semibold text-slate-800 mb-1.5 text-sm sm:text-base">ชื่อรายวิชา *</label>
                 <input type="text" id="modal-course-name" placeholder="เช่น การเขียนโปรแกรมคอมพิวเตอร์เบื้องต้น" class="w-full px-4 py-3 border-2 border-slate-300 rounded-2xl text-base font-bold text-slate-900 focus:border-cyan-500 focus:outline-none shadow-xs">
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block font-extrabold text-slate-800 mb-1.5 text-sm sm:text-base">ภาคเรียน / ปีการศึกษา</label>
+                    <label class="block font-semibold text-slate-800 mb-1.5 text-sm sm:text-base">ภาคเรียน / ปีการศึกษา</label>
                     <input type="text" id="modal-course-semester" placeholder="เช่น 1/2567" class="w-full px-4 py-3 border-2 border-slate-300 rounded-2xl text-base font-bold text-slate-900 focus:border-cyan-500 focus:outline-none shadow-xs">
                 </div>
                 <div>
-                    <label class="block font-extrabold text-slate-800 mb-1.5 text-sm sm:text-base">กลุ่มเรียนเป้าหมาย (เช่น TEC3N)</label>
+                    <label class="block font-semibold text-slate-800 mb-1.5 text-sm sm:text-base">กลุ่มเรียนเป้าหมาย (เช่น TEC3N)</label>
                     <input type="text" id="modal-course-desc" placeholder="เช่น TEC3N, DTE1" class="w-full px-4 py-3 border-2 border-slate-300 rounded-2xl text-base font-bold text-slate-900 focus:border-cyan-500 focus:outline-none shadow-xs">
                 </div>
             </div>
         </div>
         <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
-            <button onclick="closeCourseModal()" class="px-5 py-3 text-slate-600 hover:bg-slate-100 rounded-2xl text-sm font-extrabold transition">ยกเลิก</button>
-            <button onclick="saveCourse()" id="btn-save-course" class="px-7 py-3 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white rounded-2xl text-sm sm:text-base font-black shadow-lg shadow-cyan-500/25 active:scale-95 transition cursor-pointer">
+            <button onclick="closeCourseModal()" class="px-5 py-3 text-slate-600 hover:bg-slate-100 rounded-2xl text-sm font-semibold transition">ยกเลิก</button>
+            <button onclick="saveCourse()" id="btn-save-course" class="px-7 py-3 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white rounded-2xl text-sm sm:text-base font-bold shadow-lg shadow-cyan-500/25 active:scale-95 transition cursor-pointer">
                 💾 บันทึกรายวิชา
             </button>
         </div>
@@ -337,7 +337,7 @@
             <div>
                 <div class="flex items-center gap-3">
                     <span class="text-3xl">👥</span>
-                    <h3 class="text-xl sm:text-2xl font-black text-slate-900" id="roster-modal-course-title">รายชื่อนักศึกษาประจำวิชา</h3>
+                    <h3 class="text-xl sm:text-2xl font-bold text-slate-900" id="roster-modal-course-title">รายชื่อนักศึกษาประจำวิชา</h3>
                 </div>
                 <p class="text-sm text-slate-500 font-semibold mt-1" id="roster-modal-course-subtitle">รายชื่อผู้มีสิทธิ์เข้าสอบในรายวิชานี้</p>
             </div>
@@ -349,28 +349,28 @@
             <div class="flex items-center gap-3">
                 <input type="text" id="roster-search-input" placeholder="🔍 ค้นหารหัส / ชื่อ..." onkeyup="filterRoster()"
                     class="w-64 sm:w-72 px-4 py-2.5 border-2 border-slate-300 rounded-2xl text-sm font-bold text-slate-900 focus:outline-none focus:border-cyan-500">
-                <span id="roster-count-label" class="text-sm font-black text-slate-700 bg-slate-100 px-3 py-1 rounded-xl">0 คน</span>
+                <span id="roster-count-label" class="text-sm font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-xl">0 คน</span>
             </div>
             <div class="flex items-center gap-2.5 flex-wrap">
                 <!-- Import Excel/CSV Button -->
                 <input type="file" id="roster-file-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleRosterFileUpload(event)">
                 <button onclick="document.getElementById('roster-file-input').click()"
-                    class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs sm:text-sm font-black transition flex items-center gap-2 shadow-md shadow-emerald-500/20 active:scale-95 cursor-pointer">
+                    class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs sm:text-sm font-bold transition flex items-center gap-2 shadow-md shadow-emerald-500/20 active:scale-95 cursor-pointer">
                     📥 นำเข้า Excel / CSV
                 </button>
                 <!-- Download Template -->
                 <button onclick="downloadRosterTemplate()"
-                    class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-2xl text-xs sm:text-sm font-extrabold transition flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                    class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-2xl text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 active:scale-95 cursor-pointer">
                     📄 โหลดตัวอย่าง CSV
                 </button>
                 <!-- Add Single Student -->
                 <button onclick="openAddStudentToCourseModal()"
-                    class="px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-2xl text-xs sm:text-sm font-black transition flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                    class="px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-2xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 active:scale-95 cursor-pointer">
                     ➕ เพิ่มรายคน
                 </button>
                 <!-- Clear All -->
                 <button onclick="clearAllRosterStudents()"
-                    class="px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border-2 border-rose-200 rounded-2xl text-xs sm:text-sm font-extrabold transition active:scale-95 cursor-pointer">
+                    class="px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border-2 border-rose-200 rounded-2xl text-xs sm:text-sm font-semibold transition active:scale-95 cursor-pointer">
                     🗑️ ล้างทั้งหมด
                 </button>
             </div>
@@ -389,12 +389,12 @@
             <table class="w-full text-sm">
                 <thead class="sticky top-0 bg-slate-100 border-b-2 border-slate-200 z-10">
                     <tr>
-                        <th class="text-left px-5 py-3.5 font-black text-slate-700 uppercase text-xs">ลำดับ</th>
-                        <th class="text-left px-5 py-3.5 font-black text-slate-700 uppercase text-xs">รหัสนักศึกษา</th>
-                        <th class="text-left px-5 py-3.5 font-black text-slate-700 uppercase text-xs">ชื่อ-นามสกุล (ภาษาไทย)</th>
-                        <th class="text-left px-5 py-3.5 font-black text-slate-700 uppercase text-xs">Full Name (EN)</th>
-                        <th class="text-left px-5 py-3.5 font-black text-slate-700 uppercase text-xs">กลุ่มเรียน / ชั้น</th>
-                        <th class="text-center px-5 py-3.5 font-black text-slate-700 uppercase text-xs">จัดการ</th>
+                        <th class="text-left px-5 py-3.5 font-bold text-slate-700 uppercase text-xs">ลำดับ</th>
+                        <th class="text-left px-5 py-3.5 font-bold text-slate-700 uppercase text-xs">รหัสนักศึกษา</th>
+                        <th class="text-left px-5 py-3.5 font-bold text-slate-700 uppercase text-xs">ชื่อ-นามสกุล (ภาษาไทย)</th>
+                        <th class="text-left px-5 py-3.5 font-bold text-slate-700 uppercase text-xs">Full Name (EN)</th>
+                        <th class="text-left px-5 py-3.5 font-bold text-slate-700 uppercase text-xs">กลุ่มเรียน / ชั้น</th>
+                        <th class="text-center px-5 py-3.5 font-bold text-slate-700 uppercase text-xs">จัดการ</th>
                     </tr>
                 </thead>
                 <tbody id="roster-table-body">
@@ -409,40 +409,40 @@
 <div id="add-student-modal" class="modal-overlay hidden" style="z-index: 60;">
     <div class="bg-white rounded-3xl p-7 max-w-lg w-full shadow-2xl space-y-5 border-2 border-slate-200">
         <div class="flex justify-between items-center border-b border-slate-200 pb-3">
-            <h3 class="text-lg sm:text-xl font-black text-slate-900">➕ เพิ่มนักศึกษาในวิชา</h3>
+            <h3 class="text-lg sm:text-xl font-bold text-slate-900">➕ เพิ่มนักศึกษาในวิชา</h3>
             <button onclick="closeAddStudentToCourseModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-lg transition">&times;</button>
         </div>
         <div class="space-y-4 text-sm">
             <div>
-                <label class="block font-extrabold text-slate-800 mb-1.5">รหัสนักศึกษา *</label>
+                <label class="block font-semibold text-slate-800 mb-1.5">รหัสนักศึกษา *</label>
                 <input type="text" id="add-s-id" placeholder="เช่น 69325110007-0" class="w-full px-4 py-3 border-2 border-slate-300 rounded-2xl text-base font-mono font-bold focus:outline-none focus:border-cyan-500">
             </div>
             <div class="grid grid-cols-3 gap-2.5">
                 <div>
-                    <label class="block font-extrabold text-slate-800 mb-1.5 text-xs sm:text-sm">คำนำหน้า</label>
+                    <label class="block font-semibold text-slate-800 mb-1.5 text-xs sm:text-sm">คำนำหน้า</label>
                     <input type="text" id="add-s-prefix" placeholder="นาย / น.ส." class="w-full px-3 py-2.5 border-2 border-slate-300 rounded-xl text-sm font-bold focus:outline-none focus:border-cyan-500">
                 </div>
                 <div>
-                    <label class="block font-extrabold text-slate-800 mb-1.5 text-xs sm:text-sm">ชื่อจริง (ไทย) *</label>
+                    <label class="block font-semibold text-slate-800 mb-1.5 text-xs sm:text-sm">ชื่อจริง (ไทย) *</label>
                     <input type="text" id="add-s-first" placeholder="ชื่อจริง" class="w-full px-3 py-2.5 border-2 border-slate-300 rounded-xl text-sm font-bold focus:outline-none focus:border-cyan-500">
                 </div>
                 <div>
-                    <label class="block font-extrabold text-slate-800 mb-1.5 text-xs sm:text-sm">นามสกุล (ไทย)</label>
+                    <label class="block font-semibold text-slate-800 mb-1.5 text-xs sm:text-sm">นามสกุล (ไทย)</label>
                     <input type="text" id="add-s-last" placeholder="นามสกุล" class="w-full px-3 py-2.5 border-2 border-slate-300 rounded-xl text-sm font-bold focus:outline-none focus:border-cyan-500">
                 </div>
             </div>
             <div>
-                <label class="block font-extrabold text-slate-800 mb-1.5">ชื่อ-นามสกุล ภาษาอังกฤษ (ถ้ามี)</label>
+                <label class="block font-semibold text-slate-800 mb-1.5">ชื่อ-นามสกุล ภาษาอังกฤษ (ถ้ามี)</label>
                 <input type="text" id="add-s-en" placeholder="Mr. THANANAN MUKHATHRAKOSA" class="w-full px-4 py-3 border-2 border-slate-300 rounded-2xl text-sm font-bold focus:outline-none focus:border-cyan-500">
             </div>
             <div>
-                <label class="block font-extrabold text-slate-800 mb-1.5">กลุ่มเรียน / ชั้น</label>
+                <label class="block font-semibold text-slate-800 mb-1.5">กลุ่มเรียน / ชั้น</label>
                 <input type="text" id="add-s-class" placeholder="เช่น TEC3N" class="w-full px-4 py-3 border-2 border-slate-300 rounded-2xl text-sm font-bold focus:outline-none focus:border-cyan-500">
             </div>
         </div>
         <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
-            <button onclick="closeAddStudentToCourseModal()" class="px-5 py-2.5 text-slate-600 hover:bg-slate-100 rounded-2xl text-sm font-extrabold transition">ยกเลิก</button>
-            <button onclick="saveStudentToCourse()" class="px-6 py-2.5 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white rounded-2xl text-sm font-black shadow-md active:scale-95 transition cursor-pointer">บันทึก</button>
+            <button onclick="closeAddStudentToCourseModal()" class="px-5 py-2.5 text-slate-600 hover:bg-slate-100 rounded-2xl text-sm font-semibold transition">ยกเลิก</button>
+            <button onclick="saveStudentToCourse()" class="px-6 py-2.5 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white rounded-2xl text-sm font-bold shadow-md active:scale-95 transition cursor-pointer">บันทึก</button>
         </div>
     </div>
 </div>
@@ -456,7 +456,7 @@
                     📝
                 </div>
                 <div>
-                    <h3 class="text-xl sm:text-2xl font-black text-slate-900" id="exams-modal-title">ข้อสอบในรายวิชา</h3>
+                    <h3 class="text-xl sm:text-2xl font-bold text-slate-900" id="exams-modal-title">ข้อสอบในรายวิชา</h3>
                     <p class="text-xs sm:text-sm text-slate-500 font-bold mt-0.5" id="exams-modal-subtitle">รายวิชา...</p>
                 </div>
             </div>
@@ -468,10 +468,10 @@
         </div>
 
         <div class="flex items-center justify-between pt-4 border-t border-slate-200 shrink-0">
-            <button onclick="closeCourseExamsModal()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl text-sm font-extrabold transition cursor-pointer">
+            <button onclick="closeCourseExamsModal()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl text-sm font-semibold transition cursor-pointer">
                 ปิด
             </button>
-            <a id="btn-create-exam-for-course" href="admin-questions.html" class="px-6 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-2xl text-sm sm:text-base font-black shadow-lg shadow-indigo-600/25 transition active:scale-95 flex items-center gap-2 cursor-pointer">
+            <a id="btn-create-exam-for-course" href="admin-questions.html" class="px-6 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-2xl text-sm sm:text-base font-bold shadow-lg shadow-indigo-600/25 transition active:scale-95 flex items-center gap-2 cursor-pointer">
                 <span>➕</span>
                 <span>สร้างข้อสอบใหม่ในวิชานี้</span>
             </a>
@@ -521,7 +521,7 @@
             <div class="glass-card p-6 sm:p-7 rounded-3xl flex flex-col justify-between hover:border-indigo-400/50 transition shadow-md hover:shadow-xl border-2 border-slate-200/80">
                 <div class="space-y-4">
                     <div class="flex items-start justify-between gap-2.5">
-                        <span class="px-3.5 py-1.5 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white rounded-2xl text-xs sm:text-sm font-mono font-black shadow-sm">
+                        <span class="px-3.5 py-1.5 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white rounded-2xl text-xs sm:text-sm font-mono font-bold shadow-sm">
                             ${escapeHtml(c.courseCode)}
                         </span>
                         <span class="text-xs sm:text-sm font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-xl">
@@ -529,17 +529,17 @@
                         </span>
                     </div>
                     <div>
-                        <h3 class="text-lg sm:text-xl font-black text-slate-900 leading-snug line-clamp-1">${escapeHtml(c.courseName)}</h3>
+                        <h3 class="text-lg sm:text-xl font-bold text-slate-900 leading-snug line-clamp-1">${escapeHtml(c.courseName)}</h3>
                         <p class="text-xs sm:text-sm text-slate-500 font-semibold mt-1 line-clamp-2 leading-relaxed">${escapeHtml(c.description || 'ไม่มีคำอธิบายเพิ่มเติม')}</p>
                     </div>
                     <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-200 text-xs sm:text-sm">
-                        <div class="flex items-center gap-1.5 text-slate-700 font-extrabold">
+                        <div class="flex items-center gap-1.5 text-slate-700 font-semibold">
                             <span>👥 นักศึกษา:</span>
-                            <span class="text-cyan-600 font-black text-sm sm:text-base">${c.studentCount || 0} คน</span>
+                            <span class="text-cyan-600 font-bold text-sm sm:text-base">${c.studentCount || 0} คน</span>
                         </div>
-                        <div class="flex items-center gap-1.5 text-slate-700 font-extrabold">
+                        <div class="flex items-center gap-1.5 text-slate-700 font-semibold">
                             <span>📝 ชุดข้อสอบ:</span>
-                            <span class="text-indigo-600 font-black text-sm sm:text-base">${c.examCount || 0} ชุด</span>
+                            <span class="text-indigo-600 font-bold text-sm sm:text-base">${c.examCount || 0} ชุด</span>
                         </div>
                     </div>
                 </div>
@@ -547,14 +547,14 @@
                 <div class="pt-4 mt-4 border-t border-slate-200 space-y-2.5">
                     <!-- ปุ่มกดดูข้อสอบที่มีในวิชา -->
                     <button onclick="openCourseExamsModal(${c.id})"
-                        class="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-sm sm:text-base font-black rounded-2xl transition shadow-md shadow-indigo-600/20 active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                        class="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-sm sm:text-base font-bold rounded-2xl transition shadow-md shadow-indigo-600/20 active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
                         <span>📝</span>
                         <span>ดูข้อสอบในวิชานี้ (${c.examCount || 0})</span>
                     </button>
 
                     <div class="flex items-center justify-between gap-2.5">
                         <button onclick="openRosterModal(${c.id})"
-                            class="flex-1 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs sm:text-sm font-black rounded-2xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer border border-slate-200">
+                            class="flex-1 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs sm:text-sm font-bold rounded-2xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer border border-slate-200">
                             👥 นักศึกษา (${c.studentCount || 0})
                         </button>
                         <button onclick="openEditCourseModal(${c.id})" title="แก้ไข"
@@ -618,11 +618,11 @@
                 listContainer.innerHTML = `
                     <div class="p-8 sm:p-10 text-center bg-slate-50 border-2 border-slate-200 rounded-3xl space-y-4">
                         <span class="text-4xl">📝</span>
-                        <div class="font-black text-slate-800 text-base sm:text-lg">ยังไม่มีชุดข้อสอบในวิชานี้</div>
+                        <div class="font-bold text-slate-800 text-base sm:text-lg">ยังไม่มีชุดข้อสอบในวิชานี้</div>
                         <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto font-medium leading-relaxed">
                             ข้อสอบแต่ละวิชาจะถูกจัดเก็บแยกกันอย่างเป็นระเบียบ คุณสามารถสร้างข้อสอบใหม่สำหรับวิชานี้ได้ทันที
                         </p>
-                        <a href="admin-questions.html?courseId=${c.id}" class="inline-flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-xs sm:text-sm font-black shadow-md transition active:scale-95">
+                        <a href="admin-questions.html?courseId=${c.id}" class="inline-flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-xs sm:text-sm font-bold shadow-md transition active:scale-95">
                             <span>➕ สร้างข้อสอบชุดแรกสำหรับวิชานี้</span>
                         </a>
                     </div>
@@ -635,20 +635,20 @@
                     <div class="space-y-1.5">
                         <div class="flex items-center gap-2.5">
                             <span class="text-2xl">📄</span>
-                            <h4 class="text-base sm:text-lg font-black text-slate-900">${escapeHtml(ex.templateName)}</h4>
+                            <h4 class="text-base sm:text-lg font-bold text-slate-900">${escapeHtml(ex.templateName)}</h4>
                         </div>
                         <div class="text-xs sm:text-sm text-slate-500 font-bold flex flex-wrap items-center gap-2 sm:gap-3">
-                            <span>จำนวนข้อสอบ: <b class="text-indigo-600 font-black text-sm sm:text-base">${ex.questionCount || 0} ข้อ</b></span>
+                            <span>จำนวนข้อสอบ: <b class="text-indigo-600 font-bold text-sm sm:text-base">${ex.questionCount || 0} ข้อ</b></span>
                             <span>•</span>
                             <span>สร้างเมื่อ: ${escapeHtml(ex.created_at || '-')}</span>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-2.5 shrink-0">
-                        <a href="admin-rooms.html?courseId=${c.id}&templateId=${ex.id}" class="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs sm:text-sm font-black rounded-2xl shadow-md transition active:scale-95 flex items-center gap-1.5">
+                        <a href="admin-rooms.html?courseId=${c.id}&templateId=${ex.id}" class="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-md transition active:scale-95 flex items-center gap-1.5">
                             <span>🚀 เปิดห้องสอบ</span>
                         </a>
-                        <a href="admin-questions.html?courseId=${c.id}&templateId=${ex.id}" class="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-200 text-xs sm:text-sm font-extrabold rounded-2xl transition active:scale-95 flex items-center gap-1.5">
+                        <a href="admin-questions.html?courseId=${c.id}&templateId=${ex.id}" class="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-200 text-xs sm:text-sm font-semibold rounded-2xl transition active:scale-95 flex items-center gap-1.5">
                             <span>✏️ แก้ไข</span>
                         </a>
                         <button onclick="deleteExamFromCourse(${ex.id}, ${c.id})" title="ลบชุดข้อสอบ" class="p-2.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-2xl transition active:scale-95 cursor-pointer text-base sm:text-lg border-2 border-rose-200">
@@ -784,11 +784,11 @@
 
         tbody.innerHTML = list.map((s, idx) => `
             <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
-                <td class="px-5 py-3.5 text-slate-400 font-mono text-center w-14 font-extrabold text-xs sm:text-sm">${idx + 1}</td>
-                <td class="px-5 py-3.5 font-mono font-black text-cyan-700 text-sm sm:text-base">${escapeHtml(s.studentId)}</td>
-                <td class="px-5 py-3.5 font-black text-slate-900 text-sm sm:text-base">${escapeHtml((s.prefix ? s.prefix + ' ' : '') + s.firstName + ' ' + (s.lastName || ''))}</td>
+                <td class="px-5 py-3.5 text-slate-400 font-mono text-center w-14 font-semibold text-xs sm:text-sm">${idx + 1}</td>
+                <td class="px-5 py-3.5 font-mono font-bold text-cyan-700 text-sm sm:text-base">${escapeHtml(s.studentId)}</td>
+                <td class="px-5 py-3.5 font-bold text-slate-900 text-sm sm:text-base">${escapeHtml((s.prefix ? s.prefix + ' ' : '') + s.firstName + ' ' + (s.lastName || ''))}</td>
                 <td class="px-5 py-3.5 text-slate-600 font-semibold text-xs sm:text-sm">${escapeHtml(s.fullNameEn || '-')}</td>
-                <td class="px-5 py-3.5 text-slate-700 font-extrabold text-xs sm:text-sm">${escapeHtml(s.class || '-')}</td>
+                <td class="px-5 py-3.5 text-slate-700 font-semibold text-xs sm:text-sm">${escapeHtml(s.class || '-')}</td>
                 <td class="px-5 py-3.5 text-center">
                     <button onclick="deleteRosterStudent(${s.id})" title="ลบนักศึกษาออกจากวิชา" class="text-rose-500 hover:text-rose-700 p-2 hover:bg-rose-50 rounded-xl transition text-base border border-rose-200 cursor-pointer">
                         🗑️

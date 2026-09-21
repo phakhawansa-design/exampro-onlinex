@@ -80,7 +80,7 @@
                 <img src="logo.png" alt="Logo" class="w-full h-full object-cover rounded-xl" />
             </div>
             <div>
-                <div class="font-black text-base text-slate-800 tracking-tight">Tab-<span style="background:linear-gradient(135deg,#06b6d4,#8b5cf6); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Lock</span></div>
+                <div class="font-bold text-base text-slate-800 tracking-tight">Tab-<span style="background:linear-gradient(135deg,#06b6d4,#8b5cf6); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Lock</span></div>
                 <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">ระบบสอบออนไลน์สำหรับนักศึกษา</div>
             </div>
         </div>
@@ -88,11 +88,11 @@
         <div class="flex items-center gap-3 sm:gap-4">
             <!-- Student Mini Info -->
             <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center text-white text-xs font-black shadow-sm">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-sm">
                     🎓
                 </div>
                 <div class="hidden sm:block text-left leading-tight">
-                    <div class="text-xs font-extrabold text-slate-800" id="header-student-name">กำลังโหลด...</div>
+                    <div class="text-xs font-semibold text-slate-800" id="header-student-name">กำลังโหลด...</div>
                     <div class="text-[10px] text-slate-400 font-mono" id="header-student-id">รหัส: -</div>
                 </div>
             </div>
@@ -118,7 +118,7 @@
                     </div>
                     <div>
                         <div class="flex items-center gap-2 flex-wrap">
-                            <h2 class="text-xl sm:text-2xl font-black text-slate-800" id="banner-student-name">สวัสดีครับ</h2>
+                            <h2 class="text-xl sm:text-2xl font-bold text-slate-800" id="banner-student-name">สวัสดีครับ</h2>
                             <span class="px-2.5 py-0.5 bg-emerald-100 border border-emerald-300 text-emerald-700 rounded-full text-[10px] font-bold">
                                 ✔ บัญชีพร้อมใช้งาน
                             </span>
@@ -132,7 +132,7 @@
                 </div>
 
                 <div class="flex gap-2 w-full sm:w-auto">
-                    <button onclick="switchTab('exam')" class="flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white rounded-xl text-xs font-black shadow-md shadow-cyan-500/20 active:scale-95 transition">
+                    <button onclick="switchTab('exam')" class="flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white rounded-xl text-xs font-bold shadow-md shadow-cyan-500/20 active:scale-95 transition">
                         🚪 เข้าห้องสอบ
                     </button>
                 </div>
@@ -141,13 +141,13 @@
 
         <!-- Tab Navigation Buttons -->
         <div class="flex p-1.5 bg-slate-100 border border-slate-200 rounded-2xl max-w-xl mx-auto select-none gap-1.5 shadow-inner">
-            <button id="tab-btn-exam" onclick="switchTab('exam')" class="tab-btn active flex-1 py-2.5 text-xs sm:text-sm font-extrabold rounded-xl transition flex items-center justify-center gap-1.5">
+            <button id="tab-btn-exam" onclick="switchTab('exam')" class="tab-btn active flex-1 py-2.5 text-xs sm:text-sm font-semibold rounded-xl transition flex items-center justify-center gap-1.5">
                 <span>🚪</span> เข้าห้องสอบ / รอสอบ
             </button>
-            <button id="tab-btn-history" onclick="switchTab('history')" class="tab-btn flex-1 py-2.5 text-xs sm:text-sm font-extrabold text-slate-600 hover:text-slate-800 rounded-xl transition flex items-center justify-center gap-1.5">
+            <button id="tab-btn-history" onclick="switchTab('history')" class="tab-btn flex-1 py-2.5 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-800 rounded-xl transition flex items-center justify-center gap-1.5">
                 <span>📊</span> ประวัติการสอบ
             </button>
-            <button id="tab-btn-profile" onclick="switchTab('profile')" class="tab-btn flex-1 py-2.5 text-xs sm:text-sm font-extrabold text-slate-600 hover:text-slate-800 rounded-xl transition flex items-center justify-center gap-1.5">
+            <button id="tab-btn-profile" onclick="switchTab('profile')" class="tab-btn flex-1 py-2.5 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-800 rounded-xl transition flex items-center justify-center gap-1.5">
                 <span>✏️</span> แก้ไขข้อมูลส่วนตัว
             </button>
         </div>
@@ -161,7 +161,7 @@
             <div id="exam-join-card" class="glass-card p-6 sm:p-10 max-w-lg mx-auto shadow-xl space-y-6 text-center">
                 <div class="space-y-2">
                     <span class="text-4xl block">🔑</span>
-                    <h3 class="text-xl font-black text-slate-800">เข้าห้องสอบออนไลน์</h3>
+                    <h3 class="text-xl font-bold text-slate-800">เข้าห้องสอบออนไลน์</h3>
                     <p class="text-xs text-slate-400">กรุณากรอกรหัส PIN 6 หลักที่อาจารย์ฉายหน้าห้องเรียน หรือสแกน QR Code เพื่อเตรียมตัวสอบ</p>
                 </div>
 
@@ -169,11 +169,11 @@
                     <div class="text-left">
                         <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1">รหัส PIN เข้าสอบ (Exam PIN 6 หลัก) *</label>
                         <input type="text" id="join-exam-pin" maxlength="7" placeholder="เช่น 849 201"
-                            class="dark-input text-center text-xl font-mono font-black text-cyan-600 tracking-widest uppercase">
+                            class="dark-input text-center text-xl font-mono font-bold text-cyan-600 tracking-widest uppercase">
                     </div>
 
                     <button onclick="checkAndJoinExam()" id="btn-join-exam"
-                        class="btn-primary w-full py-3.5 text-white font-black text-sm rounded-2xl flex items-center justify-center gap-2 active:scale-98 shadow-lg shadow-cyan-500/20">
+                        class="btn-primary w-full py-3.5 text-white font-bold text-sm rounded-2xl flex items-center justify-center gap-2 active:scale-98 shadow-lg shadow-cyan-500/20">
                         🚀 ตรวจสอบสิทธิ์ & เข้าสู่ห้องสอบ
                     </button>
                 </div>
@@ -195,10 +195,10 @@
                         ⏳
                     </div>
                     <div>
-                        <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-extrabold border border-amber-300 animate-pulse">
+                        <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-semibold border border-amber-300 animate-pulse">
                             🔒 รออาจารย์เริ่มการสอบ (Waiting for Host)
                         </span>
-                        <h3 class="text-xl sm:text-2xl font-black text-slate-800 mt-2" id="wait-exam-title">กำลังรอข้อมูลการสอบ...</h3>
+                        <h3 class="text-xl sm:text-2xl font-bold text-slate-800 mt-2" id="wait-exam-title">กำลังรอข้อมูลการสอบ...</h3>
                         <p class="text-xs text-slate-500 font-medium" id="wait-course-title">รายวิชา: -</p>
                     </div>
                 </div>
@@ -207,15 +207,15 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
                     <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-1">
                         <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">ผู้คุมสอบ</div>
-                        <div class="font-extrabold text-slate-800 text-sm" id="wait-teacher-name">-</div>
+                        <div class="font-semibold text-slate-800 text-sm" id="wait-teacher-name">-</div>
                     </div>
                     <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-1">
                         <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">เวลาที่ใช้ในการสอบ</div>
-                        <div class="font-extrabold text-slate-800 text-sm" id="wait-duration">-</div>
+                        <div class="font-semibold text-slate-800 text-sm" id="wait-duration">-</div>
                     </div>
                     <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm space-y-1 sm:col-span-2">
                         <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">ผู้เข้าสอบที่ได้รับการยืนยันสิทธิ์</div>
-                        <div class="font-extrabold text-emerald-700 text-sm flex items-center gap-1.5" id="wait-student-identity">
+                        <div class="font-semibold text-emerald-700 text-sm flex items-center gap-1.5" id="wait-student-identity">
                             <span>✔</span> <span>-</span>
                         </div>
                     </div>
@@ -248,7 +248,7 @@
             <div class="glass-card p-6 shadow-xl space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                     <div>
-                        <h3 class="text-base font-black text-slate-800 flex items-center gap-2">
+                        <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
                             <span>📊</span> บันทึกประวัติและผลการสอบ
                         </h3>
                         <p class="text-xs text-slate-400">รายการข้อสอบที่คุณได้ส่งคำตอบเข้าระบบเรียบร้อยแล้ว</p>
@@ -262,11 +262,11 @@
                     <table class="w-full text-xs">
                         <thead>
                             <tr class="bg-slate-50 border-b border-slate-200">
-                                <th class="text-left px-4 py-3 font-extrabold text-slate-500 uppercase text-[10px]">ลำดับ</th>
-                                <th class="text-left px-4 py-3 font-extrabold text-slate-500 uppercase text-[10px]">รายวิชา / ชุดข้อสอบ</th>
-                                <th class="text-left px-4 py-3 font-extrabold text-slate-500 uppercase text-[10px]">วันที่ / เวลาส่ง</th>
-                                <th class="text-center px-4 py-3 font-extrabold text-slate-500 uppercase text-[10px]">คะแนนที่ได้</th>
-                                <th class="text-center px-4 py-3 font-extrabold text-slate-500 uppercase text-[10px]">สถานะ</th>
+                                <th class="text-left px-4 py-3 font-semibold text-slate-500 uppercase text-[10px]">ลำดับ</th>
+                                <th class="text-left px-4 py-3 font-semibold text-slate-500 uppercase text-[10px]">รายวิชา / ชุดข้อสอบ</th>
+                                <th class="text-left px-4 py-3 font-semibold text-slate-500 uppercase text-[10px]">วันที่ / เวลาส่ง</th>
+                                <th class="text-center px-4 py-3 font-semibold text-slate-500 uppercase text-[10px]">คะแนนที่ได้</th>
+                                <th class="text-center px-4 py-3 font-semibold text-slate-500 uppercase text-[10px]">สถานะ</th>
                             </tr>
                         </thead>
                         <tbody id="history-table-body">
@@ -283,7 +283,7 @@
         <div id="tab-content-profile" class="space-y-6 hidden">
             <div class="glass-card p-6 sm:p-10 max-w-xl mx-auto shadow-xl space-y-6">
                 <div class="border-b border-slate-100 pb-3">
-                    <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                         <span>✏️</span> แก้ไขข้อมูลส่วนตัว & รหัสผ่าน
                     </h3>
                     <p class="text-xs text-slate-400">ชื่อและนามสกุลต้องเป็นภาษาไทย เพื่อให้ตรงกับบัญชีรายชื่อประจำวิชา</p>
@@ -324,7 +324,7 @@
                     </div>
 
                     <button onclick="saveStudentProfile()" id="btn-save-profile"
-                        class="btn-primary w-full py-3.5 text-white font-black text-sm rounded-2xl flex items-center justify-center gap-2 active:scale-98 shadow-lg shadow-cyan-500/20 mt-4">
+                        class="btn-primary w-full py-3.5 text-white font-bold text-sm rounded-2xl flex items-center justify-center gap-2 active:scale-98 shadow-lg shadow-cyan-500/20 mt-4">
                         💾 บันทึกการเปลี่ยนแปลงข้อมูล
                     </button>
                 </div>
@@ -416,10 +416,10 @@
                 const btn = document.getElementById(`tab-btn-${t}`);
                 const content = document.getElementById(`tab-content-${t}`);
                 if (t === tab) {
-                    btn.className = "tab-btn active flex-1 py-2.5 text-xs sm:text-sm font-extrabold rounded-xl transition flex items-center justify-center gap-1.5";
+                    btn.className = "tab-btn active flex-1 py-2.5 text-xs sm:text-sm font-semibold rounded-xl transition flex items-center justify-center gap-1.5";
                     content.classList.remove('hidden');
                 } else {
-                    btn.className = "tab-btn flex-1 py-2.5 text-xs sm:text-sm font-extrabold text-slate-600 hover:text-slate-800 rounded-xl transition flex items-center justify-center gap-1.5";
+                    btn.className = "tab-btn flex-1 py-2.5 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-800 rounded-xl transition flex items-center justify-center gap-1.5";
                     content.classList.add('hidden');
                 }
             });
@@ -570,7 +570,7 @@
                     <tr class="border-b border-slate-100 hover:bg-slate-50/80 transition">
                         <td class="px-4 py-3 text-center text-slate-400 font-mono w-12">${idx + 1}</td>
                         <td class="px-4 py-3">
-                            <div class="font-extrabold text-slate-800">${escapeHtml(item.exam_title || item.roomName)}</div>
+                            <div class="font-semibold text-slate-800">${escapeHtml(item.exam_title || item.roomName)}</div>
                             <div class="text-[10px] text-slate-500 font-medium">${escapeHtml(subjectName)}</div>
                         </td>
                         <td class="px-4 py-3 text-slate-500">

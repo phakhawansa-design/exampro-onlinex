@@ -72,8 +72,8 @@
                 <img src="logo.png" alt="Tab-Lock Logo" class="w-8 h-8 object-cover rounded-lg" />
             </div>
             <div class="logo-text leading-tight">
-                <div class="font-black text-lg tracking-tight text-slate-900">Tab-<span class="logo-gradient">Lock</span></div>
-                <div class="text-[10px] text-slate-500 uppercase tracking-widest font-extrabold">Online Proctoring</div>
+                <div class="font-bold text-lg tracking-tight text-slate-900">Tab-<span class="logo-gradient">Lock</span></div>
+                <div class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Online Proctoring</div>
             </div>
         </div>
 
@@ -146,17 +146,17 @@
     <div class="sidebar-inner p-4 border-t border-slate-200 bg-slate-50/60 space-y-3">
         <div class="flex items-center gap-3">
             <div class="relative flex-shrink-0">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 via-indigo-600 to-purple-600 flex items-center justify-center text-sm font-black text-white shadow-sm">อ</div>
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 via-indigo-600 to-purple-600 flex items-center justify-center text-sm font-bold text-white shadow-sm">อ</div>
                 <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white sidebar-online-dot online-dot"></span>
             </div>
             <div class="flex-1 min-w-0">
-                <div class="text-sm font-black text-slate-900 truncate" id="sidebar-teacher-name">อาจารย์ผู้ดูแล</div>
-                <div class="text-xs text-slate-500 font-extrabold flex items-center gap-1">
+                <div class="text-sm font-bold text-slate-900 truncate" id="sidebar-teacher-name">อาจารย์ผู้ดูแล</div>
+                <div class="text-xs text-slate-500 font-semibold flex items-center gap-1">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> ออนไลน์ • ผู้ดูแลระบบ
                 </div>
             </div>
         </div>
-        <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-black flex items-center justify-center gap-2 border border-red-200 transition-colors">
+        <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-red-200 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H2.25" /></svg>
             <span class="logout-btn-text">ออกจากระบบ</span>
         </a>
@@ -170,15 +170,15 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
                 <div class="flex items-center gap-3">
                     <span class="inline-block w-3 h-3 rounded-full bg-rose-500 pulse-active shadow-md"></span>
-                    <h1 class="text-xl md:text-2xl font-black text-slate-900">ศูนย์ตรวจสอบพฤติกรรมน่าสงสัย (Real-Time)</h1>
+                    <h1 class="text-xl md:text-2xl font-bold text-slate-900">ศูนย์ตรวจสอบพฤติกรรมน่าสงสัย (Real-Time)</h1>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button onclick="openActiveStudentsModalFromMonitoring()" class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500/20 px-4 py-2 rounded-2xl text-emerald-700 font-black text-sm animate-pulse transition cursor-pointer">
+                    <button onclick="openActiveStudentsModalFromMonitoring()" class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500/20 px-4 py-2 rounded-2xl text-emerald-700 font-bold text-sm animate-pulse transition cursor-pointer">
                         <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
                         <span id="active-students-badge">👨‍🎓 กำลังทำข้อสอบ: 0 คน</span>
                         <span class="text-xs text-emerald-800 underline ml-1 font-bold">👁️ ดูรายชื่อ</span>
                     </button>
-                    <button onclick="window.TabLockGuide.open('monitoring')" class="bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white font-extrabold px-3.5 py-2 rounded-xl text-xs md:text-sm transition duration-300 shadow-sm active:scale-95 flex items-center gap-1.5 shrink-0 cursor-pointer">
+                    <button onclick="window.TabLockGuide.open('monitoring')" class="bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white font-semibold px-3.5 py-2 rounded-xl text-xs md:text-sm transition duration-300 shadow-sm active:scale-95 flex items-center gap-1.5 shrink-0 cursor-pointer">
                         <span>💡 คู่มือหน้านี้</span>
                     </button>
                     <span class="text-xs md:text-sm font-bold text-slate-400" id="global-log-count">รวม 0 รายการ</span>
@@ -208,7 +208,7 @@
                     <span class="text-xs font-bold text-rose-700 flex items-center gap-2">
                         🚨 นักศึกษากลุ่มความเสี่ยงสูง (สลับหน้าจอ ≥ 3 ครั้ง)
                     </span>
-                    <span class="bg-rose-500/10 border border-rose-500/20 text-rose-600 text-[10px] font-extrabold px-2.5 py-1 rounded-lg animate-pulse" id="high-risk-count">0 คน</span>
+                    <span class="bg-rose-500/10 border border-rose-500/20 text-rose-600 text-[10px] font-semibold px-2.5 py-1 rounded-lg animate-pulse" id="high-risk-count">0 คน</span>
                 </div>
                 <div id="high-risk-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
             </div>
@@ -317,8 +317,8 @@
                     class="room-tab flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition ${r.roomId === currentRoomId ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-md shadow-rose-500/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}">
                     ${r.roomId !== 'ALL' ? '🏫' : ''} ${escapeHtml(displayName)}
                     ${isLive ? '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="กำลังเปิดสอบ (LIVE)"></span>' : ''}
-                    <span id="active-student-badge-${r.roomId}" class="hidden bg-emerald-100 border border-emerald-300 text-emerald-900 text-[10px] font-black px-2 py-0.5 rounded-lg shadow-2xs">👨‍🎓 0 คน</span>
-                    ${count > 0 ? `<span class="min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[10px] font-black flex items-center justify-center px-1.5 shadow-sm" title="พบพฤติกรรมน่าสงสัย ${count} คน">${count}</span>` : ''}
+                    <span id="active-student-badge-${r.roomId}" class="hidden bg-emerald-100 border border-emerald-300 text-emerald-900 text-[10px] font-bold px-2 py-0.5 rounded-lg shadow-2xs">👨‍🎓 0 คน</span>
+                    ${count > 0 ? `<span class="min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center px-1.5 shadow-sm" title="พบพฤติกรรมน่าสงสัย ${count} คน">${count}</span>` : ''}
                 </button>`;
             }).join('');
 
@@ -452,11 +452,11 @@
                     <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1 truncate">🏫 ${escapeHtml(roomName)}</div>
                     <div class="flex items-end justify-between">
                         <div>
-                            <div class="text-2xl font-extrabold text-slate-800">${r.count}</div>
+                            <div class="text-2xl font-semibold text-slate-800">${r.count}</div>
                             <div class="text-[9px] text-slate-400">พฤติกรรมรวม</div>
                         </div>
                         ${r.highRisk > 0
-                            ? `<div class="bg-rose-100 text-rose-600 text-[10px] font-black px-2 py-1 rounded-lg animate-pulse">⚠️ ${r.highRisk} คนเสี่ยง</div>`
+                            ? `<div class="bg-rose-100 text-rose-600 text-[10px] font-bold px-2 py-1 rounded-lg animate-pulse">⚠️ ${r.highRisk} คนเสี่ยง</div>`
                             : `<div class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2 py-1 rounded-lg">✅ ปกติ</div>`}
                     </div>
                 </div>`;
@@ -540,22 +540,22 @@
                         </div>
                         <div class="space-y-1.5">
                             <div class="flex items-center gap-2 flex-wrap">
-                                <strong class="text-slate-900 font-black text-base tracking-tight">${escapeHtml(log.name)}</strong>
+                                <strong class="text-slate-900 font-bold text-base tracking-tight">${escapeHtml(log.name)}</strong>
                                 <span class="text-xs font-bold text-slate-800 font-mono bg-slate-100 border border-slate-300 px-2.5 py-0.5 rounded-lg shadow-2xs">${escapeHtml(log.studentId)}</span>
-                                <span class="text-xs font-extrabold text-cyan-900 bg-cyan-100/90 border border-cyan-300 px-2.5 py-0.5 rounded-lg shadow-2xs">${escapeHtml(log.class || '—')}</span>
-                                ${currentRoomId === 'ALL' ? `<span class="text-xs font-extrabold text-violet-900 bg-violet-100/90 border border-violet-300 px-2.5 py-0.5 rounded-lg">🏫 ${escapeHtml(log.roomId)}</span>` : ''}
-                                ${isHigh ? '<span class="text-xs font-black bg-rose-600 text-white px-2.5 py-0.5 rounded-lg uppercase tracking-wider animate-pulse shadow-sm">⚠️ ความเสี่ยงสูง</span>' : ''}
+                                <span class="text-xs font-semibold text-cyan-900 bg-cyan-100/90 border border-cyan-300 px-2.5 py-0.5 rounded-lg shadow-2xs">${escapeHtml(log.class || '—')}</span>
+                                ${currentRoomId === 'ALL' ? `<span class="text-xs font-semibold text-violet-900 bg-violet-100/90 border border-violet-300 px-2.5 py-0.5 rounded-lg">🏫 ${escapeHtml(log.roomId)}</span>` : ''}
+                                ${isHigh ? '<span class="text-xs font-bold bg-rose-600 text-white px-2.5 py-0.5 rounded-lg uppercase tracking-wider animate-pulse shadow-sm">⚠️ ความเสี่ยงสูง</span>' : ''}
                             </div>
-                            <p class="text-rose-700 text-sm font-extrabold flex items-center gap-1">${escapeHtml(log.action)}</p>
+                            <p class="text-rose-700 text-sm font-semibold flex items-center gap-1">${escapeHtml(log.action)}</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-4 self-end sm:self-center shrink-0">
                         <div class="text-right font-mono">
-                            <div class="text-slate-900 text-sm font-black">${log.time}</div>
+                            <div class="text-slate-900 text-sm font-bold">${log.time}</div>
                             <div class="text-slate-500 text-xs font-bold mt-0.5">${cleanDate}</div>
                         </div>
                         <button onclick="sendDirectWarning('${log.studentId}', '${escapeHtml(log.name)}')"
-                            class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white rounded-xl text-xs font-black transition shadow-md flex items-center gap-1">
+                            class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white rounded-xl text-xs font-bold transition shadow-md flex items-center gap-1">
                             💬 ส่งเตือน
                         </button>
                     </div>
@@ -734,8 +734,8 @@
                     tbody.innerHTML = allStudents.map((s, idx) => `
                         <tr class="hover:bg-slate-50 transition-colors">
                             <td class="p-3 text-center font-bold text-slate-400">${idx + 1}</td>
-                            <td class="p-3 font-mono font-black text-blue-600">${escapeHtml(s.studentId)}</td>
-                            <td class="p-3 font-extrabold text-slate-800">${escapeHtml(s.name)}</td>
+                            <td class="p-3 font-mono font-bold text-blue-600">${escapeHtml(s.studentId)}</td>
+                            <td class="p-3 font-semibold text-slate-800">${escapeHtml(s.name)}</td>
                             <td class="p-3 text-center">
                                 <span class="bg-cyan-50 border border-cyan-200 text-cyan-700 font-bold px-2 py-0.5 rounded-md text-[11px]">${escapeHtml(s.class || s.roomName || 'ไม่ระบุ')}</span>
                             </td>
@@ -775,8 +775,8 @@
                     tbody.innerHTML = students.map((s, idx) => `
                         <tr class="hover:bg-slate-50 transition-colors">
                             <td class="p-3 text-center font-bold text-slate-400">${idx + 1}</td>
-                            <td class="p-3 font-mono font-black text-blue-600">${escapeHtml(s.studentId)}</td>
-                            <td class="p-3 font-extrabold text-slate-800">${escapeHtml(s.name)}</td>
+                            <td class="p-3 font-mono font-bold text-blue-600">${escapeHtml(s.studentId)}</td>
+                            <td class="p-3 font-semibold text-slate-800">${escapeHtml(s.name)}</td>
                             <td class="p-3 text-center">
                                 <span class="bg-cyan-50 border border-cyan-200 text-cyan-700 font-bold px-2 py-0.5 rounded-md text-[11px]">${escapeHtml(s.class || 'ไม่ระบุ')}</span>
                             </td>
@@ -828,7 +828,7 @@
         <div class="w-full max-w-2xl bg-white border border-slate-200 p-7 rounded-3xl shadow-2xl space-y-5 text-slate-800 flex flex-col max-h-[85vh]">
             <div class="flex justify-between items-start border-b border-slate-100 pb-3">
                 <div>
-                    <h3 class="text-base font-black text-slate-800 flex items-center gap-2">
+                    <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
                         <span>👨‍🎓</span> รายชื่อนักศึกษาที่กำลังทำข้อสอบอยู่
                     </h3>
                     <p class="text-xs text-slate-500 font-semibold mt-0.5" id="active-modal-room-title">ห้องสอบ: ...</p>
@@ -839,7 +839,7 @@
             <div class="flex-1 overflow-y-auto pr-1">
                 <table class="w-full text-left text-xs border-collapse">
                     <thead>
-                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-extrabold uppercase tracking-wider">
+                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider">
                             <th class="p-3 w-12 text-center">#</th>
                             <th class="p-3">รหัสนักศึกษา</th>
                             <th class="p-3">ชื่อ - นามสกุล</th>
@@ -855,7 +855,7 @@
 
             <div class="pt-3 border-t border-slate-100 flex justify-between items-center">
                 <span class="text-xs font-bold text-slate-400" id="active-modal-total-count">รวม 0 คน</span>
-                <button onclick="closeActiveStudentsModal()" class="px-5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-xs rounded-xl transition">
+                <button onclick="closeActiveStudentsModal()" class="px-5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition">
                     ปิดหน้าต่าง
                 </button>
             </div>

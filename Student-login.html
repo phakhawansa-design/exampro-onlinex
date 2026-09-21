@@ -53,7 +53,7 @@
                     <img src="logo.png" alt="Tab-Lock Logo" class="w-full h-full object-cover rounded-2xl" />
                 </div>
                 <div>
-                    <h1 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">Tab-<span style="background: linear-gradient(to right,#06b6d4,#6366f1,#8b5cf6); -webkit-background-clip:text; background-clip:text; color:transparent;">Lock</span></h1>
+                    <h1 class="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">Tab-<span style="background: linear-gradient(to right,#06b6d4,#6366f1,#8b5cf6); -webkit-background-clip:text; background-clip:text; color:transparent;">Lock</span></h1>
                     <h2 class="text-lg sm:text-xl font-bold text-slate-800 mt-1">เข้าสู่ระบบนักศึกษา</h2>
                     <p class="text-xs text-slate-400 font-medium mt-1">กรุณากรอกข้อมูลส่วนตัวและรหัสเพื่อทำข้อสอบ</p>
                 </div>
@@ -71,7 +71,7 @@
             <!-- Tab Switcher: Login / Register -->
             <div class="flex p-1 bg-slate-100 rounded-2xl border border-slate-200">
                 <button type="button" onclick="switchAuthTab('login')" id="auth-tab-login-btn"
-                    class="flex-1 py-2 text-xs font-black rounded-xl transition-all shadow-sm bg-white text-slate-800">
+                    class="flex-1 py-2 text-xs font-bold rounded-xl transition-all shadow-sm bg-white text-slate-800">
                     🔑 เข้าสู่ระบบเพื่อสอบ
                 </button>
                 <button type="button" onclick="switchAuthTab('register')" id="auth-tab-register-btn"
@@ -91,7 +91,7 @@
                     <input type="password" id="student-password" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="กรอกรหัสผ่านของคุณ">
                 </div>
                 <div class="pt-2">
-                    <button onclick="handleLoginAndEnter()" id="btn-login-submit" class="btn-primary w-full text-white py-3.5 rounded-xl sm:rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-[0.98] cursor-pointer">
+                    <button onclick="handleLoginAndEnter()" id="btn-login-submit" class="btn-primary w-full text-white py-3.5 rounded-xl sm:rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-[0.98] cursor-pointer">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
                         เข้าสู่ระบบ
                     </button>
@@ -142,7 +142,7 @@
                     🎉 <strong>สมัครแล้วเข้าใช้งานได้ทันที:</strong> บัญชีจะได้รับการอนุมัติอัตโนมัติ ไม่ต้องรอ Admin ตรวจสอบ สามารถเข้าสู่ระบบเพื่อสอบหรือดูประวัติได้ทันทีครับ
                 </div>
 
-                <button onclick="registerStudent()" id="btn-register-submit" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white rounded-xl sm:rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition cursor-pointer">
+                <button onclick="registerStudent()" id="btn-register-submit" class="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white rounded-xl sm:rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition cursor-pointer">
                     📝 ยืนยันการสมัครสมาชิก
                 </button>
 
@@ -170,7 +170,7 @@
                                 <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center shrink-0" style="background:linear-gradient(135deg,#06b6d4,#8b5cf6);">
                                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                 </div>
-                                <h2 class="text-base sm:text-lg font-black text-slate-800">สมุดข้อสอบออนไลน์</h2>
+                                <h2 class="text-base sm:text-lg font-bold text-slate-800">สมุดข้อสอบออนไลน์</h2>
                             </div>
                             <span id="exam-title-display" class="hidden exam-title-badge px-2.5 py-1 rounded-xl text-xs font-bold text-cyan-600 animate-pulse"></span>
                             <span class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-xl text-[9px] font-bold text-rose-600 border border-rose-500/20 bg-rose-500/5 uppercase tracking-wider animate-pulse flex items-center gap-1">
@@ -193,7 +193,7 @@
                 </div>
 
                 <!-- Anti-Cheat Switch Warning Badge -->
-                <div id="switch-warning-badge" class="hidden flex items-center gap-3 p-3 bg-amber-50 border border-amber-300 rounded-2xl text-xs font-extrabold text-amber-800 shadow-sm">
+                <div id="switch-warning-badge" class="hidden flex items-center gap-3 p-3 bg-amber-50 border border-amber-300 rounded-2xl text-xs font-semibold text-amber-800 shadow-sm">
                 </div>
 
                 <!-- Announcement Banner -->
@@ -216,7 +216,7 @@
                             <div class="text-[9px] text-slate-500 font-medium mt-0.5">ส่งคำตอบก่อนระบบล็อกกระดาษ</div>
                         </div>
                     </div>
-                    <div id="countdown-clock" class="text-lg sm:text-xl font-mono font-black text-indigo-700 bg-indigo-100 border border-indigo-200 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl self-end sm:self-auto">00:00:00</div>
+                    <div id="countdown-clock" class="text-lg sm:text-xl font-mono font-bold text-indigo-700 bg-indigo-100 border border-indigo-200 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl self-end sm:self-auto">00:00:00</div>
                 </div>
             </div>
 
@@ -226,7 +226,7 @@
             </div>
 
             <!-- Submit Button -->
-            <button onclick="submitExam()" class="btn-green w-full text-white py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-xl active:scale-[0.99] transition">
+            <button onclick="submitExam()" class="btn-green w-full text-white py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shadow-xl active:scale-[0.99] transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 ส่งกระดาษคำตอบเข้าระบบ
             </button>
@@ -240,7 +240,7 @@
                 ⏱️
             </div>
             <div>
-                <h3 id="times-up-title" class="text-xl sm:text-2xl font-black text-slate-800">หมดเวลาทำข้อสอบ!</h3>
+                <h3 id="times-up-title" class="text-xl sm:text-2xl font-bold text-slate-800">หมดเวลาทำข้อสอบ!</h3>
                 <p id="times-up-desc" class="text-xs text-slate-500 font-semibold mt-1.5 sm:mt-2 leading-relaxed">
                     ระบบได้ทำการบันทึกและส่งคำตอบของคุณเข้าระบบเรียบร้อยแล้ว
                 </p>
@@ -248,7 +248,7 @@
             <div class="p-3.5 sm:p-4 bg-slate-50 border border-slate-200/60 rounded-xl sm:rounded-2xl text-[11px] font-bold text-slate-600">
                 ✅ บันทึกคำตอบสำเร็จแล้ว สามารถออกจากหน้านี้ได้
             </div>
-            <button onclick="window.location.href='Student-login.html'" class="w-full bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-extrabold text-xs py-3.5 rounded-xl sm:rounded-2xl shadow-lg transition">
+            <button onclick="window.location.href='Student-login.html'" class="w-full bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-semibold text-xs py-3.5 rounded-xl sm:rounded-2xl shadow-lg transition">
                 กลับสู่หน้าหลัก
             </button>
         </div>
@@ -264,11 +264,11 @@
         <div class="w-full max-w-md glass p-6 sm:p-8 rounded-2xl sm:rounded-3xl text-center space-y-4 sm:space-y-6 shadow-2xl border-t-4 border-rose-500">
             <div class="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-rose-50 border border-rose-200 text-rose-500 text-2xl sm:text-3xl animate-pulse">⚠️</div>
             <div class="space-y-1.5 sm:space-y-2">
-                <h2 class="text-base sm:text-lg font-black text-slate-800 uppercase tracking-wide">สัญญาณคำเตือนจากผู้คุมสอบ</h2>
+                <h2 class="text-base sm:text-lg font-bold text-slate-800 uppercase tracking-wide">สัญญาณคำเตือนจากผู้คุมสอบ</h2>
                 <p class="text-xs text-rose-600 font-semibold">กรุณาปฏิบัติตามคำชี้แจงด้านล่างอย่างเคร่งครัด</p>
             </div>
             <div class="bg-rose-50 border border-rose-200 p-3.5 sm:p-4 rounded-xl text-left text-xs text-rose-700 font-semibold leading-relaxed break-words" id="warning-modal-message">กรุณาอย่าสลับหน้าจอ ระบบกำลังบันทึกพฤติกรรม</div>
-            <button onclick="acknowledgeWarning()" class="w-full py-3.5 text-white font-black text-xs rounded-xl sm:rounded-2xl tracking-wider transition-all active:scale-[0.98] shadow-lg shadow-rose-500/20" style="background:linear-gradient(135deg,#dc2626,#b91c1c);">
+            <button onclick="acknowledgeWarning()" class="w-full py-3.5 text-white font-bold text-xs rounded-xl sm:rounded-2xl tracking-wider transition-all active:scale-[0.98] shadow-lg shadow-rose-500/20" style="background:linear-gradient(135deg,#dc2626,#b91c1c);">
                 รับทราบคำเตือนและเข้าสอบต่อ
             </button>
         </div>
@@ -348,12 +348,12 @@
             const registerView = document.getElementById('auth-register-view');
 
             if (tab === 'login') {
-                loginBtn.className = "flex-1 py-2 text-xs font-black rounded-xl transition-all shadow-sm bg-white text-slate-800";
+                loginBtn.className = "flex-1 py-2 text-xs font-bold rounded-xl transition-all shadow-sm bg-white text-slate-800";
                 registerBtn.className = "flex-1 py-2 text-xs font-bold rounded-xl transition-all text-slate-500 hover:text-slate-800";
                 loginView.classList.remove('hidden');
                 registerView.classList.add('hidden');
             } else {
-                registerBtn.className = "flex-1 py-2 text-xs font-black rounded-xl transition-all shadow-sm bg-white text-slate-800";
+                registerBtn.className = "flex-1 py-2 text-xs font-bold rounded-xl transition-all shadow-sm bg-white text-slate-800";
                 loginBtn.className = "flex-1 py-2 text-xs font-bold rounded-xl transition-all text-slate-500 hover:text-slate-800";
                 registerView.classList.remove('hidden');
                 loginView.classList.add('hidden');
