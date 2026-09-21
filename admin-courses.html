@@ -508,6 +508,9 @@
                         <a href="admin-questions.html?courseId=${c.id}&templateId=${ex.id}" class="px-3 py-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold rounded-xl transition active:scale-95 flex items-center gap-1">
                             <span>✏️ แก้ไข</span>
                         </a>
+                        <button onclick="deleteExamFromCourse(${ex.id}, ${c.id})" title="ลบชุดข้อสอบ" class="p-2 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition active:scale-95 cursor-pointer">
+                            🗑️
+                        </button>
                     </div>
                 </div>
             `).join('');
@@ -515,6 +518,23 @@
         } catch(e) {
             console.error(e);
             listContainer.innerHTML = '<div class="text-center py-6 text-rose-500 font-bold">❌ โหลดข้อมูลข้อสอบไม่สำเร็จ</div>';
+        }
+    }
+
+    async function deleteExamFromCourse(templateId, courseId) {
+        if (!confirm("ยืนยันลบชุดข้อสอบนี้ออกจากรายวิชา?")) return;
+        try {
+            const res = await fetch('/api/library/delete-template', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ templateId })
+            });
+            if (res.ok) {
+                await openCourseExamsModal(courseId);
+                await loadCourses();
+            }
+        } catch(e) {
+            console.error(e);
         }
     }
 

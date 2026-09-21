@@ -164,54 +164,65 @@
             </div>
         </header>
 
-        <!-- Main Body: Multi-Room Dashboard Grid -->
+        <!-- Main Body: ศูนย์เปิดห้องสอบ & Multi-Room Control Center -->
         <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-            <div class="max-w-7xl mx-auto space-y-6">
+            <div class="max-w-7xl mx-auto space-y-8">
 
-                <!-- Header Banner / Explanation bar -->
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-white border border-slate-200/80 rounded-2xl shadow-xs">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-xl shrink-0">
-                            ✨
+                <!-- 1. SECTION: หน้าเปิดห้องสอบ (เลือกรายวิชาเพื่อเปิดสอบ) -->
+                <div class="space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 bg-gradient-to-r from-indigo-900 via-indigo-950 to-purple-950 rounded-3xl text-white shadow-xl relative overflow-hidden">
+                        <div class="relative z-10 space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-0.5 rounded-full bg-cyan-400/20 text-cyan-300 font-mono text-[10px] font-black uppercase tracking-wider">Exam Room Opener</span>
+                                <h2 class="text-lg sm:text-xl font-black tracking-tight">🚀 เลือกรายวิชาเพื่อเปิดห้องสอบ</h2>
+                            </div>
+                            <p class="text-xs text-slate-300 font-medium max-w-2xl leading-relaxed">
+                                คลิกเลือกรายวิชาที่ต้องการ เพื่อเลือกชุดข้อสอบ รับรหัส PIN 6 หลัก & QR Code ฉายจอให้นักศึกษามารอสอบ (นักศึกษาจะยังทำข้อสอบไม่ได้จนกว่าอาจารย์จะกดเปิดเผยแพร่)
+                            </p>
                         </div>
-                        <div>
-                            <h2 class="text-sm sm:text-base font-black text-slate-800">
-                                รายการห้องสอบที่เปิดใช้งานอยู่
-                            </h2>
-                            <p class="text-xs text-slate-500 font-medium">
-                                ครู 1 คนสามารถเปิดสอบได้มากกว่า 1 ห้องพร้อมกันในรายวิชาที่ต่างกัน (กด "+ สร้างห้องสอบ" เพื่อเพิ่มห้อง)
+                        <div class="relative z-10 shrink-0">
+                            <button onclick="openCreateRoomModal()" class="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white rounded-2xl text-xs font-black shadow-md transition active:scale-95 flex items-center gap-1.5 cursor-pointer">
+                                <span>➕</span>
+                                <span>เปิดห้องสอบด่วน</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Course Selection Cards Grid -->
+                    <div id="courses-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        <div class="col-span-full py-8 text-center text-slate-400 font-bold">กำลังโหลดรายวิชาทั้งหมด...</div>
+                    </div>
+                </div>
+
+                <!-- 2. SECTION: รายการห้องสอบที่เปิดใช้งานอยู่ (Active Exam Rooms) -->
+                <div class="space-y-4 pt-4 border-t border-slate-200/80">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-black text-sm">
+                                🏫
+                            </div>
+                            <div>
+                                <h3 class="text-base font-black text-slate-900">รายการห้องสอบที่เปิดใช้งานอยู่</h3>
+                                <p class="text-xs text-slate-400 font-medium">ห้องสอบสดที่กำลังเปิดรอสอบ หรือกำลังดำเนินการสอบอยู่ในขณะนี้</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Rooms Grid Container -->
+                    <div id="rooms-grid-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Dynamic Room Cards rendered here -->
+                    </div>
+
+                    <!-- Empty State (Shown when no active rooms) -->
+                    <div id="rooms-empty-state" class="hidden flex flex-col items-center justify-center p-8 bg-white rounded-3xl border-2 border-dashed border-slate-200 text-center space-y-3 max-w-lg mx-auto">
+                        <span class="text-3xl">⏳</span>
+                        <div class="space-y-1">
+                            <h4 class="text-sm font-black text-slate-700">ยังไม่มีห้องสอบที่เปิดใช้งาน</h4>
+                            <p class="text-xs text-slate-400 font-medium">
+                                เลือกรายวิชาจากด้านบนเพื่อเลือกชุดข้อสอบและเปิดห้องรอสอบได้ทันที
                             </p>
                         </div>
                     </div>
-
-                    <div class="flex items-center gap-2">
-                        <button onclick="openCreateRoomModal()" class="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-black transition active:scale-95 flex items-center gap-1.5 cursor-pointer">
-                            <span>➕</span>
-                            <span>เปิดห้องสอบเพิ่ม</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Active Rooms Grid Container -->
-                <div id="rooms-grid-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Dynamic Room Cards rendered here -->
-                </div>
-
-                <!-- Empty State (Shown when no active rooms) -->
-                <div id="rooms-empty-state" class="hidden flex flex-col items-center justify-center p-12 bg-white rounded-3xl border-2 border-dashed border-slate-200 text-center space-y-4 max-w-xl mx-auto my-8">
-                    <div class="w-20 h-20 rounded-3xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-4xl shadow-inner">
-                        🏫
-                    </div>
-                    <div class="space-y-1">
-                        <h3 class="text-lg font-black text-slate-800">ยังไม่มีห้องสอบที่เปิดใช้งานในขณะนี้</h3>
-                        <p class="text-xs text-slate-500 font-medium leading-relaxed max-w-sm">
-                            กดปุ่ม <b>"+ สร้างห้องสอบ"</b> เพื่อเลือกรายวิชา เลือกชุดข้อสอบ และกำหนดเวลาทำข้อสอบ จากนั้นระบบจะสร้างรหัส PIN และ QR Code ให้นักศึกษาเข้ามารอสอบทันที
-                        </p>
-                    </div>
-                    <button onclick="openCreateRoomModal()" class="px-6 py-3 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 hover:from-indigo-500 hover:to-purple-500 text-white rounded-2xl text-sm font-black shadow-lg shadow-indigo-600/25 transition active:scale-95 flex items-center gap-2 cursor-pointer">
-                        <span class="text-base font-black leading-none">+</span>
-                        <span>สร้างห้องสอบแรกของคุณ</span>
-                    </button>
                 </div>
 
             </div>
@@ -482,9 +493,22 @@
             await loadTeacherCourses();
             await refreshAllRoomsData();
             startGlobalPolling();
+
+            // ตรวจสอบ query params (หากเปลี่ยนมาจากหน้าจัดการรายวิชา)
+            const urlParams = new URLSearchParams(window.location.search);
+            const paramCourseId = urlParams.get('courseId');
+            const paramTemplateId = urlParams.get('templateId');
+            if (paramCourseId) {
+                await openCreateRoomForCourse(paramCourseId);
+                if (paramTemplateId) {
+                    setTimeout(() => {
+                        selectModalTemplate(paramTemplateId);
+                    }, 300);
+                }
+            }
         });
 
-        // 1. โหลดรายวิชาของอาจารย์
+        // 1. โหลดรายวิชาของอาจารย์ และวาดการ์ดวิชาสำหรับเลือกเปิดห้องสอบ
         async function loadTeacherCourses() {
             try {
                 const res = await fetch(`/api/teacher/courses?username=${encodeURIComponent(username)}`);
@@ -499,10 +523,70 @@
                         document.getElementById('step1-course-count').textContent = `ยังไม่มีรายวิชา`;
                         courseSelect.innerHTML = '<option value="">-- ยังไม่มีรายวิชาในระบบ (สร้างได้ที่เมนู "จัดการรายวิชา") --</option>';
                     }
+                    renderCoursesGrid();
                 }
             } catch(e) {
                 console.error("โหลดรายวิชาผิดพลาด:", e);
             }
+        }
+
+        // 1.1 วาดการ์ดรายวิชาสำหรับหน้าเปิดห้องสอบ
+        function renderCoursesGrid() {
+            const container = document.getElementById('courses-grid-container');
+            if (!container) return;
+
+            if (!courses || courses.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full p-8 text-center bg-white border border-slate-200 rounded-3xl space-y-3 shadow-xs">
+                        <span class="text-3xl">📚</span>
+                        <div class="font-black text-slate-800 text-sm">ยังไม่มีรายวิชาในระบบ</div>
+                        <p class="text-xs text-slate-400">กรุณาสร้างรายวิชาในเมนู "จัดการรายวิชา" ก่อนเปิดห้องสอบ</p>
+                        <a href="admin-courses.html" class="inline-block px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black shadow-sm transition active:scale-95">
+                            + สร้างรายวิชาใหม่
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = courses.map(c => `
+                <div onclick="openCreateRoomForCourse(${c.id})" class="bg-white border-2 border-slate-200 hover:border-indigo-500 rounded-3xl p-5 shadow-xs hover:shadow-lg transition cursor-pointer flex flex-col justify-between space-y-4 group">
+                    <div class="space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2.5 py-1 bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-xl text-xs font-mono font-black">
+                                ${escapeHtml(c.courseCode || 'วิชา')}
+                            </span>
+                            <span class="text-[11px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-lg">
+                                ${escapeHtml(c.semester || 'ทั่วไป')}
+                            </span>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-black text-slate-900 group-hover:text-indigo-600 transition line-clamp-1">
+                                ${escapeHtml(c.courseName)}
+                            </h3>
+                            <p class="text-xs text-slate-400 font-medium line-clamp-1 mt-0.5">${escapeHtml(c.description || 'ไม่มีคำอธิบาย')}</p>
+                        </div>
+                        <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs font-bold">
+                            <span class="text-slate-600">👥 นักศึกษา: <b class="text-cyan-600">${c.studentCount || 0} คน</b></span>
+                            <span class="text-slate-600">📝 ชุดข้อสอบ: <b class="text-indigo-600">${c.examCount || 0} ชุด</b></span>
+                        </div>
+                    </div>
+
+                    <button class="w-full py-2.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 group-hover:from-indigo-500 group-hover:to-purple-500 text-white rounded-xl text-xs font-black shadow-md shadow-indigo-600/20 transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
+                        <span>🚀</span>
+                        <span>เลือกวิชานี้เพื่อเปิดห้องสอบ</span>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // 1.2 เปิดโมดอลเลือกข้อสอบเมื่อคลิกเลือกวิชา
+        async function openCreateRoomForCourse(courseId) {
+            document.getElementById('create-room-modal').classList.remove('hidden');
+            const selectCourse = document.getElementById('modal-select-course');
+            selectCourse.value = courseId;
+            onModalCourseChanged(courseId);
+            await loadExamTemplatesForModal(courseId);
         }
 
         // 2. ดึงข้อมูลห้องสอบทั้งหมดของอาจารย์
@@ -710,28 +794,36 @@
             } else {
                 banner.classList.add('hidden');
             }
+            loadExamTemplatesForModal(courseId);
         }
 
-        // โหลดเทมเพลตชุดข้อสอบในคลังสำหรับโมดอลสร้างห้อง
-        async function loadExamTemplatesForModal() {
+        // โหลดเทมเพลตชุดข้อสอบในคลังเฉพาะของวิชาที่เลือก
+        async function loadExamTemplatesForModal(specificCourseId) {
             const listContainer = document.getElementById('modal-template-list');
             listContainer.innerHTML = '<div class="text-center py-4 text-slate-400">กำลังโหลดชุดข้อสอบ...</div>';
 
+            const targetCourseId = specificCourseId || document.getElementById('modal-select-course').value;
+
             try {
-                const res = await fetch(`/api/library/get-templates?username=${encodeURIComponent(username)}`);
+                const url = targetCourseId 
+                    ? `/api/library/get-templates?username=${encodeURIComponent(username)}&courseId=${encodeURIComponent(targetCourseId)}`
+                    : `/api/library/get-templates?username=${encodeURIComponent(username)}`;
+
+                const res = await fetch(url);
                 const templates = await res.json();
                 
-                document.getElementById('step2-template-count').textContent = `${(templates || []).length} ชุดในคลัง`;
+                document.getElementById('step2-template-count').textContent = `${(templates || []).length} ชุดในวิชานี้`;
 
                 let html = '';
                 if (Array.isArray(templates) && templates.length > 0) {
                     templates.forEach(t => {
+                        const nameStr = t.templateName || 'ชุดข้อสอบ';
                         html += `
-                            <div onclick="selectModalTemplate(${t.id}, '${escapeHtml(t.templateName)}')" id="modal-tpl-${t.id}" class="template-card-item border-2 border-slate-200 rounded-2xl p-3 flex items-center justify-between transition">
+                            <div onclick="selectModalTemplate(${t.id}, '${escapeHtml(nameStr)}')" id="modal-tpl-${t.id}" class="template-card-item border-2 border-slate-200 rounded-2xl p-3 flex items-center justify-between transition">
                                 <div class="flex items-center gap-2.5">
                                     <span class="text-xl">📝</span>
                                     <div>
-                                        <div class="font-black text-slate-800 text-xs">${escapeHtml(t.templateName)}</div>
+                                        <div class="font-black text-slate-800 text-xs">${escapeHtml(nameStr)}</div>
                                         <div class="text-[10px] text-slate-400 font-semibold">${t.questionCount || 0} ข้อ | สร้างเมื่อ: ${t.created_at || '-'}</div>
                                     </div>
                                 </div>
@@ -740,13 +832,14 @@
                         `;
                     });
                     listContainer.innerHTML = html;
-                    selectModalTemplate(templates[0].id, templates[0].templateName);
+                    selectModalTemplate(templates[0].id, templates[0].templateName || 'ชุดข้อสอบ');
                 } else {
+                    selectedTemplateId = null;
                     listContainer.innerHTML = `
                         <div class="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-center space-y-2">
-                            <p class="text-xs text-amber-800 font-bold">ยังไม่มีชุดข้อสอบในคลัง</p>
-                            <a href="admin-questions.html" class="inline-block px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-black shadow-xs transition">
-                                ✍️ ไปสร้างข้อสอบที่เมนู "จัดการข้อสอบ" ก่อน
+                            <p class="text-xs text-amber-800 font-bold">ยังไม่มีชุดข้อสอบในวิชานี้</p>
+                            <a href="admin-questions.html?courseId=${targetCourseId || ''}" class="inline-block px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-black shadow-xs transition">
+                                ✍️ ไปสร้างข้อสอบสำหรับวิชานี้ที่เมนู "จัดการข้อสอบ"
                             </a>
                         </div>
                     `;
