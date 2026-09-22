@@ -278,19 +278,14 @@
             </div>
 
             <!-- กล่องเลือกวิชาแบบ Dropdown ตรงกลาง เด่น ชัดเจน -->
-            <div class="w-full max-w-md mx-auto relative pt-1">
+            <div class="w-full max-w-xl mx-auto relative pt-1">
                 <select id="course-dropdown-selector" onchange="selectCourseFilter(this.value)" 
-                    class="w-full py-3.5 pl-6 pr-12 bg-white border-2 border-indigo-500 hover:border-indigo-600 focus:border-indigo-600 rounded-2xl text-sm sm:text-base font-bold text-slate-800 shadow-md shadow-indigo-500/10 focus:outline-none transition appearance-none cursor-pointer text-center">
+                    class="w-full py-4 pl-6 pr-12 bg-white border-2 border-indigo-500 hover:border-indigo-600 focus:border-indigo-600 rounded-2xl text-sm sm:text-base font-bold text-slate-800 shadow-md shadow-indigo-500/10 focus:outline-none transition appearance-none cursor-pointer text-center">
                     <option value="" disabled selected>👉 คลิกที่นี่เพื่อเลือกรายวิชา 👈</option>
                 </select>
                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-indigo-600 text-base font-bold pt-1">
                     ▼
                 </div>
-            </div>
-
-            <!-- ปุ่มเลือกวิชาแบบด่วน ตรงกลางจอ -->
-            <div class="flex items-center justify-center gap-2.5 flex-wrap max-w-4xl mx-auto pt-2" id="course-filter-tabs">
-                <span class="text-xs text-slate-400 font-bold px-3 py-1">⏳ กำลังโหลดรายวิชา...</span>
             </div>
         </div>
 
@@ -329,11 +324,8 @@
                 <div class="max-w-md mx-auto space-y-1.5">
                     <h3 class="text-xl font-extrabold text-slate-800">กรุณาเลือกรายวิชาก่อน</h3>
                     <p class="text-sm font-semibold text-slate-500 leading-relaxed">
-                        โปรดคลิกเลือกรายวิชาที่ต้องการตรวจสอบรายชื่อนักศึกษาจากรายการด้านล่าง หรือจากแถบตัวเลือกด้านบน
+                        โปรดคลิกเลือกรายวิชาที่ต้องการตรวจสอบรายชื่อนักศึกษาจากแถบตัวเลือกด้านบน
                     </p>
-                </div>
-                <div id="prompt-course-buttons" class="pt-4 flex flex-wrap justify-center gap-2.5 max-w-3xl mx-auto">
-                    <!-- Populated dynamically with course buttons -->
                 </div>
             </div>
 
@@ -588,11 +580,9 @@
     }
 
     function renderCourseFilterTabs() {
-        const container = document.getElementById('course-filter-tabs');
         const selectDropdown = document.getElementById('course-dropdown-selector');
-        const promptButtons = document.getElementById('prompt-course-buttons');
 
-        // 1. Dropdown
+        // Dropdown only
         if (selectDropdown) {
             selectDropdown.innerHTML = `
                 <option value="" ${!selectedCourseFilter ? 'selected disabled' : ''}>👉 คลิกเลือกรายวิชาที่ต้องการ...</option>
@@ -607,80 +597,6 @@
                 selectDropdown.value = selectedCourseFilter;
             }
         }
-
-        // 2. Buttons in Center Placeholder
-        if (promptButtons) {
-            if (!teacherCourses || teacherCourses.length === 0) {
-                promptButtons.innerHTML = `
-                    <div class="space-y-3 w-full text-center">
-                        <span class="text-xs text-slate-400 font-bold block">⚠️ ยังไม่พบรายวิชาในระบบ (สามารถสร้างวิชาใหม่ได้ที่เมนู "จัดการรายวิชา")</span>
-                        <button type="button" onclick="selectCourseFilter('ALL')" 
-                            class="px-6 py-3 rounded-2xl bg-gradient-to-r from-cyan-600 to-indigo-600 text-white font-bold text-sm shadow-md transition cursor-pointer active:scale-95 inline-flex items-center gap-2">
-                            <span>👥</span>
-                            <span>แสดงนักศึกษาทั้งหมด</span>
-                        </button>
-                    </div>
-                `;
-            } else {
-                promptButtons.innerHTML = `
-                    ${teacherCourses.map(c => `
-                        <button type="button" onclick="selectCourseFilter('${c.id}')" 
-                            class="px-5 py-3.5 rounded-2xl bg-white hover:bg-indigo-50 border-2 border-indigo-200 hover:border-indigo-400 text-indigo-950 font-bold text-xs sm:text-sm shadow-sm hover:shadow transition flex items-center gap-2.5 cursor-pointer active:scale-95">
-                            <span class="text-lg">📘</span>
-                            <span>[${escapeHtml(c.courseCode || 'วิชา')}] ${escapeHtml(c.courseName)}</span>
-                            <span class="bg-indigo-100 text-indigo-800 text-[11px] px-2.5 py-0.5 rounded-full font-extrabold">${c.studentCount || 0} คน</span>
-                        </button>
-                    `).join('')}
-                    <button type="button" onclick="selectCourseFilter('ALL')" 
-                        class="px-5 py-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 border-2 border-slate-300 text-slate-700 font-bold text-xs sm:text-sm shadow-sm transition flex items-center gap-2 cursor-pointer active:scale-95">
-                        <span class="text-lg">👥</span>
-                        <span>แสดงนักศึกษาทั้งหมดทุกวิชา</span>
-                    </button>
-                `;
-            }
-        }
-
-        // 3. Top Tabs (Centered and Prominent)
-        if (!container) return;
-
-        let html = '';
-        if (!teacherCourses || teacherCourses.length === 0) {
-            html += `
-                <button type="button" onclick="selectCourseFilter('ALL')" id="course-tab-ALL" 
-                    class="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all shadow-sm bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shrink-0 cursor-pointer flex items-center gap-2 active:scale-95">
-                    <span>👥</span>
-                    <span>แสดงนักศึกษาทั้งหมด</span>
-                </button>
-            `;
-        } else {
-            (teacherCourses || []).forEach(c => {
-                const isActive = String(selectedCourseFilter) === String(c.id);
-                const activeClass = isActive 
-                    ? 'bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shadow-md shadow-indigo-500/20 border-transparent ring-2 ring-indigo-400' 
-                    : 'bg-white hover:bg-indigo-50 text-slate-800 border-2 border-slate-200 hover:border-indigo-300';
-                const badgeClass = isActive ? 'bg-white/30 text-white' : 'bg-indigo-50 text-indigo-700 border border-indigo-200';
-
-                html += `
-                    <button type="button" onclick="selectCourseFilter('${c.id}')" id="course-tab-${c.id}" 
-                        class="px-5 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all ${activeClass} shrink-0 cursor-pointer flex items-center gap-2 active:scale-95 shadow-sm">
-                        <span class="text-base">📘</span>
-                        <span>[${escapeHtml(c.courseCode || 'วิชา')}] ${escapeHtml(c.courseName)}</span>
-                        <span class="${badgeClass} text-[11px] px-2.5 py-0.5 rounded-full font-extrabold">${c.studentCount || 0} คน</span>
-                    </button>
-                `;
-            });
-
-            const isAllActive = selectedCourseFilter === 'ALL';
-            html += `
-                <button type="button" onclick="selectCourseFilter('ALL')" id="course-tab-ALL" 
-                    class="px-5 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all shadow-sm ${isAllActive ? 'bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shadow-md shadow-indigo-500/20' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-2 border-slate-200'} shrink-0 cursor-pointer flex items-center gap-2 active:scale-95">
-                    <span class="text-base">👥</span>
-                    <span>นักศึกษาทั้งหมด</span>
-                </button>
-            `;
-        }
-
-        container.innerHTML = html;
     }
 
     async function selectCourseFilter(courseId) {
