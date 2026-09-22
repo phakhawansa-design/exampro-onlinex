@@ -26,6 +26,16 @@ app.use(express.static(__dirname));
 
 const { Pool } = require('pg');
 
+if (!process.env.DATABASE_URL && fs.existsSync(path.join(__dirname, '.env'))) {
+    try {
+        const envContent = fs.readFileSync(path.join(__dirname, '.env'), 'utf8');
+        const match = envContent.match(/postgresql:\/\/[^\r\n\s]+/);
+        if (match) {
+            process.env.DATABASE_URL = match[0];
+        }
+    } catch(e) {}
+}
+
 const isPg = !!process.env.DATABASE_URL;
 let db;
 
@@ -84,7 +94,7 @@ if (isPg) {
         logintime: 'loginTime', logindate: 'loginDate',
         teachername: 'teacherName',
         firstname: 'firstName', lastname: 'lastName',
-        examcount: 'examCount', avgscore: 'avgScore',
+        examcount: 'examCount', avgscore: 'avgScore', cheatcount: 'cheatCount', tabswitches: 'tabSwitches',
         roomcount: 'roomCount', questioncount: 'questionCount',
         resultcount: 'resultCount', questionbytes: 'questionBytes',
         resultbytes: 'resultBytes',
@@ -762,12 +772,14 @@ app.get('/api/students', (req, res) => {
                 c.courseCode,
                 c.courseName,
                 COUNT(DISTINCT er.id) as examCount,
-                AVG(CASE WHEN er.maxScore > 0 THEN (CAST(er.score AS FLOAT) / er.maxScore) * 100 ELSE NULL END) as avgScore
+                AVG(CASE WHEN er.maxScore > 0 THEN (CAST(er.score AS FLOAT) / er.maxScore) * 100 ELSE NULL END) as avgScore,
+                COUNT(DISTINCT cl.id) as cheatCount
             FROM course_students cs
             JOIN courses c ON c.id = cs.courseId
             LEFT JOIN students s ON (s.studentId = cs.studentId OR REPLACE(s.studentId, '-', '') = REPLACE(cs.studentId, '-', ''))
             LEFT JOIN exam_results er ON (er.studentId = cs.studentId OR REPLACE(er.studentId, '-', '') = REPLACE(cs.studentId, '-', ''))
                                      AND (er.courseId = cs.courseId OR er.roomId IN (SELECT roomId FROM teacher_rooms WHERE courseId = cs.courseId))
+            LEFT JOIN cheat_logs cl ON (cl.studentId = cs.studentId OR REPLACE(cl.studentId, '-', '') = REPLACE(cs.studentId, '-', ''))
             WHERE (cs.courseId = ? OR CAST(cs.courseId AS TEXT) = ?)
             GROUP BY cs.id, cs.studentId, cs.firstName, cs.lastName, cs.class, s.firstName, s.lastName, s.class, s.note, s.status, s.created_at, s.approved_at, c.id, c.courseCode, c.courseName
             ORDER BY cs.studentId ASC
@@ -791,6 +803,7 @@ app.get('/api/students', (req, res) => {
             s.approved_at,
             COUNT(DISTINCT er.id) as examCount,
             AVG(CASE WHEN er.maxScore > 0 THEN (CAST(er.score AS FLOAT) / er.maxScore) * 100 ELSE NULL END) as avgScore,
+            COUNT(DISTINCT cl.id) as cheatCount,
             (
                 SELECT GROUP_CONCAT(DISTINCT c.courseCode || ' ' || c.courseName)
                 FROM course_students cs2
@@ -799,6 +812,7 @@ app.get('/api/students', (req, res) => {
             ) as enrolledCourses
         FROM students s
         LEFT JOIN exam_results er ON er.studentId = s.studentId OR REPLACE(er.studentId, '-', '') = REPLACE(s.studentId, '-', '')
+        LEFT JOIN cheat_logs cl ON cl.studentId = s.studentId OR REPLACE(cl.studentId, '-', '') = REPLACE(s.studentId, '-', '')
         WHERE (s.teacherUsername = ? OR s.teacherUsername IS NULL OR s.teacherUsername = '' OR ? = 'admin' OR 1=1)
         GROUP BY s.id, s.studentId, s.firstName, s.lastName, s.class, s.note, s.status, s.created_at, s.approved_at
         ORDER BY s.studentId ASC
@@ -912,12 +926,23 @@ app.get('/api/students/exam-history', (req, res) => {
     if (!studentId || !username) return res.status(400).json({ message: "ข้อมูลไม่ครบ" });
 
     db.all(`
-        SELECT er.id, er.roomId, er.score, er.maxScore, er.time, er.date, tr.roomName, tr.exam_title
+        SELECT er.id, er.roomId, er.score, er.maxScore, er.time, er.date, 
+               COALESCE(tr.roomName, er.roomId) as roomName, tr.exam_title,
+               COUNT(DISTINCT cl.id) as tabSwitches
         FROM exam_results er
-        JOIN teacher_rooms tr ON tr.roomId = er.roomId
-        WHERE er.studentId = ? AND tr.teacherUsername = ?
+        LEFT JOIN teacher_rooms tr ON tr.roomId = er.roomId
+        LEFT JOIN cheat_logs cl ON cl.roomId = er.roomId AND (cl.studentId = er.studentId OR REPLACE(cl.studentId, '-', '') = REPLACE(er.studentId, '-', ''))
+        WHERE (er.studentId = ? OR REPLACE(er.studentId, '-', '') = REPLACE(?, '-', ''))
+          AND (
+              tr.teacherUsername = ? 
+              OR tr.teacherUsername IS NULL 
+              OR ? = 'admin' 
+              OR er.studentId IN (SELECT studentId FROM students WHERE teacherUsername = ?)
+              OR er.studentId IN (SELECT cs.studentId FROM course_students cs JOIN courses c ON c.id = cs.courseId WHERE c.teacherUsername = ?)
+          )
+        GROUP BY er.id, er.roomId, er.score, er.maxScore, er.time, er.date, tr.roomName, tr.exam_title
         ORDER BY er.id DESC
-    `, [studentId, username], (err, rows) => {
+    `, [studentId, studentId, username, username, username, username], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
         res.json(rows || []);
     });
@@ -929,12 +954,19 @@ app.get('/api/students/cheat-history', (req, res) => {
     if (!studentId || !username) return res.status(400).json({ message: "ข้อมูลไม่ครบ" });
 
     db.all(`
-        SELECT cl.id, cl.roomId, cl.action, cl.time, tr.roomName
+        SELECT cl.id, cl.roomId, cl.action, cl.time, COALESCE(tr.roomName, cl.roomId) as roomName
         FROM cheat_logs cl
-        JOIN teacher_rooms tr ON tr.roomId = cl.roomId
-        WHERE cl.studentId = ? AND tr.teacherUsername = ?
+        LEFT JOIN teacher_rooms tr ON tr.roomId = cl.roomId
+        WHERE (cl.studentId = ? OR REPLACE(cl.studentId, '-', '') = REPLACE(?, '-', ''))
+          AND (
+              tr.teacherUsername = ? 
+              OR tr.teacherUsername IS NULL 
+              OR ? = 'admin' 
+              OR cl.studentId IN (SELECT studentId FROM students WHERE teacherUsername = ?)
+              OR cl.studentId IN (SELECT cs.studentId FROM course_students cs JOIN courses c ON c.id = cs.courseId WHERE c.teacherUsername = ?)
+          )
         ORDER BY cl.id DESC
-    `, [studentId, username], (err, rows) => {
+    `, [studentId, studentId, username, username, username, username], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
         res.json(rows || []);
     });
@@ -2256,10 +2288,8 @@ app.delete('/api/teacher/room', (req, res) => {
         db.run(deleteRoomSql, params, function(err) {
             if (err) return res.status(500).json({ message: err.message });
 
-            // ลบข้อมูลที่เกี่ยวข้องกับห้องสอบนี้ทั้งหมด
+            // ลบเฉพาะข้อมูลชั่วคราวของห้องสอบ (คงผลคะแนนและประวัติความประพฤติไว้จนกว่าอาจารย์จะล้างเอง)
             db.run('DELETE FROM questions WHERE roomId = ?', [roomId]);
-            db.run('DELETE FROM exam_results WHERE roomId = ?', [roomId]);
-            db.run('DELETE FROM cheat_logs WHERE roomId = ?', [roomId]);
             db.run('DELETE FROM student_warnings WHERE roomId = ?', [roomId]);
             db.run('DELETE FROM student_logins WHERE roomId = ?', [roomId]);
 
@@ -2570,11 +2600,24 @@ app.get('/api/cheat-logs', (req, res) => {
             db.all(`
                 SELECT studentId, name, class, action, time, roomId 
                 FROM cheat_logs 
-                WHERE roomId IN (SELECT roomId FROM teacher_rooms WHERE teacherUsername = ?)
+                WHERE (
+                    roomId IN (SELECT roomId FROM teacher_rooms WHERE teacherUsername = ?)
+                    OR studentId IN (SELECT studentId FROM students WHERE teacherUsername = ?)
+                    OR studentId IN (
+                        SELECT cs.studentId FROM course_students cs
+                        JOIN courses c ON c.id = cs.courseId
+                        WHERE c.teacherUsername = ?
+                    )
+                    OR REPLACE(studentId, '-', '') IN (
+                        SELECT REPLACE(cs.studentId, '-', '') FROM course_students cs
+                        JOIN courses c ON c.id = cs.courseId
+                        WHERE c.teacherUsername = ?
+                    )
+                )
                 ORDER BY id DESC
-            `, [username], (err, rows) => {
+            `, [username, username, username, username], (err, rows) => {
                 if (err) return res.status(500).json({ message: err.message });
-                res.json(rows);
+                res.json(rows || []);
             });
         } else {
             db.all(`
@@ -2583,18 +2626,18 @@ app.get('/api/cheat-logs', (req, res) => {
                 ORDER BY id DESC
             `, [], (err, rows) => {
                 if (err) return res.status(500).json({ message: err.message });
-                res.json(rows);
+                res.json(rows || []);
             });
         }
     } else if (roomId) {
         db.all('SELECT studentId, name, class, action, time, roomId FROM cheat_logs WHERE roomId = ? ORDER BY id DESC', [roomId], (err, rows) => {
             if (err) return res.status(500).json({ message: err.message });
-            res.json(rows);
+            res.json(rows || []);
         });
     } else {
         db.all('SELECT studentId, name, class, action, time, roomId FROM cheat_logs ORDER BY id DESC', (err, rows) => {
             if (err) return res.status(500).json({ message: err.message });
-            res.json(rows);
+            res.json(rows || []);
         });
     }
 });
@@ -2616,11 +2659,28 @@ app.delete('/api/clear-cheat-logs', (req, res) => {
 // ==========================================
 
 app.post('/api/submit-exam', (req, res) => {
-    const { roomId, studentId, name, class: studentClass, answers } = req.body;
+    const { roomId, studentId, name, class: studentClass, answers, tabSwitches } = req.body;
     if (!roomId || !studentId || !name || !answers) return res.status(400).json({ message: "ข้อมูลไม่ครบถ้วน" });
     removeStudentActive(roomId, studentId);
 
-    // 1. ค้นหา courseId จากห้องสอบ
+    // ตรวจสอบและบันทึกประวัติการสลับหน้าจอสำรอง หากมีส่งเข้ามาและยังไม่ถูกบันทึก
+    if (tabSwitches && parseInt(tabSwitches, 10) > 0) {
+        const swCount = parseInt(tabSwitches, 10);
+        db.get('SELECT COUNT(*) as cnt FROM cheat_logs WHERE roomId = ? AND (studentId = ? OR REPLACE(studentId, \'-\', \'\') = REPLACE(?, \'-\', \'\'))',
+            [roomId, studentId, studentId], (cntErr, cntRow) => {
+                const existingCount = cntRow ? (cntRow.cnt || 0) : 0;
+                if (existingCount < swCount) {
+                    const time = new Date().toLocaleTimeString('th-TH', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    for (let i = existingCount + 1; i <= swCount; i++) {
+                        db.run('INSERT INTO cheat_logs (roomId, studentId, name, class, action, time) VALUES (?, ?, ?, ?, ?, ?)',
+                            [roomId, studentId, name, studentClass || '', `🚨 สลับแท็บเบราว์เซอร์ / ออกหน้าจออื่น (ครั้งที่ ${i})`, time]);
+                    }
+                }
+            }
+        );
+    }
+
+    // 1. ค้นหา courseId จากห้องสอบ หรือจากประวัติการลงทะเบียนของนักศึกษา
     db.get('SELECT courseId, teacherUsername FROM teacher_rooms WHERE roomId = ?', [roomId], (roomErr, roomRow) => {
         let courseId = roomRow ? roomRow.courseId : null;
         let teacherUsername = roomRow ? roomRow.teacherUsername : null;
@@ -2644,7 +2704,7 @@ app.post('/api/submit-exam', (req, res) => {
                 const answersJson = JSON.stringify(answers);
 
                 // 3. บันทึก/อัปเดตผลสอบลงใน exam_results ทันที
-                db.get('SELECT id FROM exam_results WHERE roomId = ? AND studentId = ?', [roomId, studentId], (existErr, existRow) => {
+                db.get('SELECT id FROM exam_results WHERE roomId = ? AND (studentId = ? OR REPLACE(studentId, \'-\', \'\') = REPLACE(?, \'-\', \'\'))', [roomId, studentId, studentId], (existErr, existRow) => {
                     if (existRow) {
                         db.run(`
                             UPDATE exam_results 
@@ -2669,14 +2729,35 @@ app.post('/api/submit-exam', (req, res) => {
             });
         };
 
-        if ((!courseId || courseId === 0) && teacherUsername) {
-            // ค้นหาคอร์สแรกของอาจารย์เพื่อผูกห้องสอบและผลสอบอัตโนมัติหากไม่ได้ระบุไว้ก่อน
-            db.get('SELECT id FROM courses WHERE teacherUsername = ? ORDER BY id ASC LIMIT 1', [teacherUsername], (cErr, cRow) => {
-                if (!cErr && cRow && cRow.id) {
-                    courseId = cRow.id;
-                    db.run('UPDATE teacher_rooms SET courseId = ? WHERE roomId = ?', [courseId, roomId]);
+        if (!courseId || courseId === 0) {
+            // ค้นหาคอร์สที่นักศึกษาลงทะเบียนไว้จาก course_students ก่อน
+            db.get(`
+                SELECT cs.courseId FROM course_students cs
+                JOIN courses c ON c.id = cs.courseId
+                WHERE (cs.studentId = ? OR REPLACE(cs.studentId, '-', '') = REPLACE(?, '-', ''))
+                  AND (c.teacherUsername = ? OR ? IS NULL)
+                ORDER BY cs.id DESC LIMIT 1
+            `, [studentId, studentId, teacherUsername, teacherUsername], (csErr, csRow) => {
+                if (!csErr && csRow && csRow.courseId) {
+                    courseId = csRow.courseId;
+                    processSubmission(courseId);
+                } else if (teacherUsername) {
+                    db.get('SELECT id FROM courses WHERE teacherUsername = ? ORDER BY id ASC LIMIT 1', [teacherUsername], (cErr, cRow) => {
+                        if (!cErr && cRow && cRow.id) {
+                            courseId = cRow.id;
+                            db.run('UPDATE teacher_rooms SET courseId = ? WHERE roomId = ?', [courseId, roomId]);
+                        }
+                        processSubmission(courseId);
+                    });
+                } else {
+                    db.get(`
+                        SELECT courseId FROM course_students 
+                        WHERE studentId = ? OR REPLACE(studentId, '-', '') = REPLACE(?, '-', '') 
+                        ORDER BY id DESC LIMIT 1
+                    `, [studentId, studentId], (c2Err, c2Row) => {
+                        processSubmission(c2Row ? c2Row.courseId : null);
+                    });
                 }
-                processSubmission(courseId);
             });
         } else {
             processSubmission(courseId);
@@ -2704,8 +2785,12 @@ app.get('/api/exam-results', (req, res) => {
                 OR tr.courseId = ? 
                 OR CAST(tr.courseId AS TEXT) = ?
                 OR tr.courseId IN (SELECT id FROM courses WHERE id = ? OR courseCode = ?)
+                OR er.studentId IN (SELECT studentId FROM course_students WHERE courseId = ? OR CAST(courseId AS TEXT) = ?)
+                OR REPLACE(er.studentId, '-', '') IN (SELECT REPLACE(studentId, '-', '') FROM course_students WHERE courseId = ? OR CAST(courseId AS TEXT) = ?)
         `;
         const params = [
+            validId, cCodeStr,
+            validId, cCodeStr,
             validId, cCodeStr,
             validId, cCodeStr,
             validId, cCodeStr,
@@ -2743,8 +2828,18 @@ app.get('/api/exam-results', (req, res) => {
             FROM exam_results 
             WHERE roomId IN (SELECT roomId FROM teacher_rooms WHERE teacherUsername = ?)
                OR courseId IN (SELECT id FROM courses WHERE teacherUsername = ?)
+               OR studentId IN (
+                   SELECT cs.studentId FROM course_students cs
+                   JOIN courses c ON c.id = cs.courseId
+                   WHERE c.teacherUsername = ?
+               )
+               OR REPLACE(studentId, '-', '') IN (
+                   SELECT REPLACE(cs.studentId, '-', '') FROM course_students cs
+                   JOIN courses c ON c.id = cs.courseId
+                   WHERE c.teacherUsername = ?
+               )
             ORDER BY id DESC
-        `, [username, username], (err, rows) => {
+        `, [username, username, username, username], (err, rows) => {
             if (err) return res.status(500).json({ message: err.message });
             res.json(rows || []);
         });

@@ -1388,13 +1388,28 @@
             document.getElementById('pub-waiting-list-container').classList.toggle('hidden');
         }
 
-        // 7. สลับสถานะเปิดสอบ / หยุดสอบ & ลบห้องสอบเมื่อกดหยุดสอบ
+        // 7. สลับสถานะเปิดสอบ / หยุดสอบ
         async function togglePublishExam(roomId, shouldPublish) {
             if (!shouldPublish) {
-                if (activeModalRoomId === roomId) {
-                    closePublishModal();
+                if (!confirm("🛑 ยืนยันหยุดการสอบของห้องนี้? (ระบบจะปิดรับคำตอบ แต่นักศึกษาและอาจารย์จะยังคงดูคะแนนและประวัติได้)")) return;
+                try {
+                    const res = await fetch('/api/teacher/publish-exam', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ roomId, publish: false })
+                    });
+                    const data = await res.json();
+                    if (res.ok && data.success) {
+                        if (activeModalRoomId === roomId) {
+                            closePublishModal();
+                        }
+                        await refreshAllRoomsData();
+                    } else {
+                        alert(`❌ ไม่สามารถหยุดการสอบได้: ${data.message || 'เกิดข้อผิดพลาด'}`);
+                    }
+                } catch(e) {
+                    console.error(e);
                 }
-                await deleteRoom(roomId);
                 return;
             }
 
@@ -1429,8 +1444,7 @@
         async function stopExamFromLounge() {
             if (!activeModalRoomId) return;
             const targetId = activeModalRoomId;
-            closePublishModal();
-            await deleteRoom(targetId);
+            await togglePublishExam(targetId, false);
         }
 
         // 8. ลบห้องสอบ

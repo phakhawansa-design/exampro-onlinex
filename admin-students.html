@@ -960,9 +960,10 @@
         currentHistStudentId = studentId; 
         currentHistTab = 'exam';
         
-        const sObj = allStudents.find(s => String(s.studentId) === String(studentId)) || {};
+        const cleanId = String(studentId).replace(/-/g, '');
+        const sObj = allStudents.find(s => String(s.studentId) === String(studentId) || String(s.studentId).replace(/-/g, '') === cleanId) || {};
         const realCheatCount = sObj.cheatCount !== undefined ? sObj.cheatCount : (DEFAULT_STUDENT_CHEATS[studentId] || []).length;
-        const realExamCount = examCount || sObj.examCount || (DEFAULT_STUDENT_EXAMS[studentId] || []).length || 1;
+        const realExamCount = examCount !== undefined ? examCount : (sObj.examCount !== undefined ? sObj.examCount : ((DEFAULT_STUDENT_EXAMS[studentId] || []).length));
 
         document.getElementById('hist-avatar').textContent = name.charAt(0) || '?';
         document.getElementById('hist-name').textContent = name;
@@ -1010,9 +1011,20 @@
         }
 
         if (!records || records.length === 0) {
-            records = DEFAULT_STUDENT_EXAMS[currentHistStudentId] || [
-                { roomId: 'ROOM-749', roomName: '[749-51-447] วิชาภาษาซีสำหรับการเขียนโปรแกรม', exam_title: 'สอบปลายภาค ปฏิบัติการเขียนโค้ดภาษาซี', score: 18, maxScore: 20, date: '2026-09-21', time: '14:30 น.', tabSwitches: 1 }
-            ];
+            records = DEFAULT_STUDENT_EXAMS[currentHistStudentId] || [];
+        }
+
+        if (!records || records.length === 0) {
+            document.getElementById('hist-exam-count').textContent = '0 ครั้ง';
+            document.getElementById('hist-avg').textContent = '—';
+            content.innerHTML = `
+                <div class="text-center py-12 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl space-y-2">
+                    <div class="text-5xl mb-1">📝</div>
+                    <div class="font-extrabold text-slate-700 text-base">ยังไม่พบประวัติการทำข้อสอบ</div>
+                    <div class="text-xs text-slate-500 font-medium">นักศึกษายังไม่ได้ส่งคำตอบหรือทำข้อสอบในระบบ</div>
+                </div>
+            `;
+            return;
         }
 
         document.getElementById('hist-exam-count').textContent = records.length + ' ครั้ง';

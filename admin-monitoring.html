@@ -329,7 +329,27 @@
             try {
                 const res = await fetch(`/api/teacher/rooms?username=${username}`);
                 rooms = await res.json();
-                // โหลด cheat log ก่อนเพื่อกรองห้องที่มีข้อมูล
+
+                // ค้นหาห้องสอบที่มีประวัติการสลับหน้าจออยู่เดิม (แม้ห้องจะปิดสอบหรือสอบเสร็จแล้ว)
+                try {
+                    const logsRes = await fetch(`/api/cheat-logs?roomId=ALL&username=${username}`);
+                    const allLogs = await logsRes.json();
+                    if (Array.isArray(allLogs)) {
+                        const logRoomIds = [...new Set(allLogs.map(l => l.roomId).filter(Boolean))];
+                        logRoomIds.forEach(lRoomId => {
+                            if (!rooms.some(r => r.roomId === lRoomId)) {
+                                rooms.push({
+                                    roomId: lRoomId,
+                                    roomName: `ห้อง ${lRoomId} (มีประวัติ)`,
+                                    is_published: 0,
+                                    questionCount: 0
+                                });
+                            }
+                        });
+                    }
+                } catch(e) {}
+
+                // โหลด cheat log เพื่อคำนวณตัวเลขและแสดงแท็บห้อง
                 await renderRoomTabsWithFilter();
             } catch(e) { console.error(e); }
         }
@@ -354,12 +374,6 @@
 
             // กรองห้องที่มีการเผยแพร่ข้อสอบ (is_published === 1) หรือห้องที่มีข้อสอบ หรือห้องที่มีประวัติทุจริต หรือห้องที่เลือกผ่าน URL
             const activeRooms = rooms.filter(r => r.is_published === 1 || r.questionCount > 0 || (roomCounts[r.roomId] && roomCounts[r.roomId] > 0) || r.roomId === currentRoomId);
-
-            if (activeRooms.length === 0) {
-                tabsEl.innerHTML = '<div class="text-xs text-slate-400 py-2 px-3">📭 ไม่มีห้องสอบที่กำลังเปิดสอบอยู่ขณะนี้</div>';
-                document.getElementById('global-log-count').textContent = 'รวม 0 รายการ';
-                return;
-            }
 
             if (!currentRoomId || (currentRoomId !== 'ALL' && !activeRooms.some(r => r.roomId === currentRoomId))) {
                 currentRoomId = 'ALL';

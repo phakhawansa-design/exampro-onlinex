@@ -875,7 +875,7 @@
                 const response = await fetch('/api/submit-exam', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ roomId: currentRoomId, studentId: currentStudentId, name: currentStudentName, class: currentStudentClass, answers: answersPayload })
+                    body: JSON.stringify({ roomId: currentRoomId, studentId: currentStudentId, name: currentStudentName, class: currentStudentClass, answers: answersPayload, tabSwitches: tabSwitchCount })
                 });
                 const result = await response.json();
                 if (response.ok) {
@@ -955,7 +955,7 @@
                 await fetch('/api/submit-exam', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ roomId: currentRoomId, studentId: currentStudentId, name: currentStudentName, class: currentStudentClass, answers: answersPayload })
+                    body: JSON.stringify({ roomId: currentRoomId, studentId: currentStudentId, name: currentStudentName, class: currentStudentClass, answers: answersPayload, tabSwitches: tabSwitchCount })
                 });
             } catch(e) { console.error('Auto-submit on exam end failed:', e); }
 
