@@ -1118,14 +1118,8 @@ app.post('/api/student/login', (req, res) => {
                             return;
                         }
 
-                        // มีบัญชีนักศึกษาอยู่แล้ว -> ตรวจสอบรหัสผ่าน
-                        if (student.password_hash) {
-                            if (student.password_hash !== inputHash && !(student.password_hash === defaultHash && inputPassword === '1234')) {
-                                return res.status(401).json({ success: false, message: "รหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง" });
-                            }
-                        }
-
-                        const isDefault = (!student.password_hash || student.password_hash === defaultHash || inputPassword === '1234');
+                        // มีบัญชีนักศึกษาอยู่แล้ว -> เข้าผ่าน QR/examCode + มีรายชื่อในวิชา = เข้าได้เลย ไม่ต้องตรวจรหัสผ่าน
+                        const isDefault = (!student.password_hash || student.password_hash === defaultHash);
                         checkStudentStatusAndLogin(student, isDefault, room);
                     });
                     return;

@@ -368,15 +368,25 @@
                     qrBanner.classList.remove('hidden');
                 }
 
-                // กรอกรหัสเริ่มต้น 1234 ให้อัตโนมัติ เพื่อให้นักศึกษาใส่แค่รหัสนักศึกษาตามที่ต้องการ
+                // ซ่อนช่องรหัสผ่านเมื่อเข้าผ่าน QR (ไม่จำเป็นต้องกรอก - ระบบตรวจจากรายชื่อวิชาอัตโนมัติ)
                 const passInput = document.getElementById('student-password');
                 if (passInput) {
                     passInput.value = '1234';
+                    // ซ่อนทั้ง div ที่ครอบช่องรหัสผ่าน (parent: .space-y-1.5)
+                    if (passInput.parentElement) passInput.parentElement.style.display = 'none';
                 }
+
+                // ซ่อนลิงก์สมัครสมาชิก (เข้าผ่าน QR ไม่ต้องสมัครก่อน)
+                const registerLink = document.querySelector('#auth-login-view .text-center.pt-1');
+                if (registerLink) registerLink.style.display = 'none';
+
+                // ซ่อน tab switcher (Login/Register) เมื่อเข้าผ่าน QR
+                const tabSwitcher = document.querySelector('.flex.p-1.bg-slate-100.rounded-2xl.border');
+                if (tabSwitcher) tabSwitcher.style.display = 'none';
 
                 const submitBtn = document.getElementById('btn-login-submit');
                 if (submitBtn) {
-                    submitBtn.innerHTML = `<span>🚀</span> <span>ยืนยันรหัส & เข้าสู่ห้องรอสอบ (PIN: ${codeParam})</span>`;
+                    submitBtn.innerHTML = `<span>🚀</span> <span>ยืนยันรหัสนักศึกษา & เข้าสู่ห้องสอบ</span>`;
                 }
 
                 // ดึงข้อมูลรายวิชาและผู้คุมสอบมาแสดงให้ทราบ
