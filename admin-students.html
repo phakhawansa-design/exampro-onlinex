@@ -262,47 +262,25 @@
     <main class="p-6 md:p-8 flex-grow max-w-[1500px] w-full mx-auto space-y-6 overflow-y-auto">
 
         <!-- Stats -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            <div class="glass-card p-5 sm:p-6 flex items-center gap-4 border-2 border-slate-200/90 shadow-sm">
+        <div class="flex flex-wrap gap-5">
+            <div class="glass-card p-5 sm:p-6 flex items-center gap-4 border-2 border-slate-200/90 shadow-sm min-w-[280px]">
                 <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-2xl flex-shrink-0">👤</div>
                 <div>
                     <div class="text-3xl font-bold text-slate-900" id="stat-total">0</div>
                     <div class="text-xs text-slate-500 font-semibold uppercase tracking-wide">นักศึกษาทั้งหมด</div>
                 </div>
             </div>
-            <div class="glass-card p-5 sm:p-6 flex items-center gap-4 border-2 border-slate-200/90 shadow-sm">
-                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-2xl flex-shrink-0">📝</div>
-                <div>
-                    <div class="text-3xl font-bold text-slate-900" id="stat-exam">0</div>
-                    <div class="text-xs text-slate-500 font-semibold uppercase tracking-wide">บันทึกผลสอบรวม</div>
-                </div>
-            </div>
-            <div class="glass-card p-5 sm:p-6 flex items-center gap-4 border-2 border-slate-200/90 shadow-sm">
-                <div class="w-12 h-12 rounded-2xl bg-violet-500/10 flex items-center justify-center text-2xl flex-shrink-0">📊</div>
-                <div>
-                    <div class="text-3xl font-bold text-slate-900" id="stat-avg">—</div>
-                    <div class="text-xs text-slate-500 font-semibold uppercase tracking-wide">คะแนนเฉลี่ยรวม %</div>
-                </div>
-            </div>
         </div>
 
-        <!-- Table Card with Approval Tabs -->
+        <!-- Table Card -->
         <div class="glass-card overflow-hidden border-2 border-slate-200/90 shadow-sm">
-            <div class="p-5 sm:p-6 border-b-2 border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div class="p-5 sm:p-6 border-b-2 border-slate-200 flex justify-between items-center gap-4">
                 <div class="flex items-center gap-3">
-                    <button onclick="switchStudentTab('all')" id="tab-btn-all" class="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shadow-md shadow-indigo-500/20 active:scale-95 cursor-pointer">
+                    <div class="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-2 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shadow-md shadow-indigo-500/20">
                         👥 นักศึกษาทั้งหมด <span id="student-count-badge" class="ml-1 text-xs bg-white/30 px-2.5 py-0.5 rounded-full font-bold">0</span>
-                    </button>
-                    <button onclick="switchStudentTab('pending')" id="tab-btn-pending" class="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition flex items-center gap-2 bg-slate-100 text-slate-700 hover:bg-slate-200 active:scale-95 cursor-pointer border border-slate-200">
-                        ⏳ คำขอรออนุมัติ <span id="pending-count-badge" class="ml-1 text-xs bg-amber-500 text-white px-2.5 py-0.5 rounded-full font-bold hidden">0</span>
-                    </button>
+                    </div>
                 </div>
-                <div id="pending-action-bar" class="hidden flex items-center gap-3">
-                    <button onclick="approveAllStudents()" class="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs sm:text-sm font-bold rounded-2xl transition shadow-md shadow-emerald-500/20 flex items-center gap-2 active:scale-95 cursor-pointer">
-                        ⚡ อนุมัติทั้งหมด (Approve All)
-                    </button>
-                </div>
-                <span class="text-xs sm:text-sm text-slate-500 font-semibold hidden sm:inline" id="student-count-label">0 คน</span>
+                <span class="text-xs sm:text-sm text-slate-500 font-semibold" id="student-count-label">0 คน</span>
             </div>
 
             <!-- View 1: All Students Table -->
@@ -321,25 +299,6 @@
                     </thead>
                     <tbody id="student-table-body">
                         <tr><td colspan="7" class="text-center py-16 text-slate-400 font-bold text-base">กำลังโหลดข้อมูล...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- View 2: Pending Approvals Table -->
-            <div id="view-pending-students" class="overflow-x-auto hidden">
-                <table class="w-full text-sm">
-                    <thead>
-                        <tr class="bg-amber-100/60 border-b-2 border-amber-200">
-                            <th class="text-left px-5 py-3.5 font-bold text-amber-900 uppercase tracking-wider text-xs">วันที่ลงทะเบียน</th>
-                            <th class="text-left px-5 py-3.5 font-bold text-amber-900 uppercase tracking-wider text-xs">รหัสนักศึกษา</th>
-                            <th class="text-left px-5 py-3.5 font-bold text-amber-900 uppercase tracking-wider text-xs">ชื่อ-นามสกุล</th>
-                            <th class="text-left px-5 py-3.5 font-bold text-amber-900 uppercase tracking-wider text-xs">ชั้น / ห้อง</th>
-                            <th class="text-center px-4 py-3.5 font-bold text-amber-900 uppercase tracking-wider text-xs">สถานะ</th>
-                            <th class="text-center px-4 py-3.5 font-bold text-amber-900 uppercase tracking-wider text-xs">การอนุมัติ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pending-table-body">
-                        <tr><td colspan="6" class="text-center py-16 text-slate-400 font-bold text-base">กำลังโหลดคำขอ...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -569,10 +528,11 @@
     }
 
     async function loadPendingStudents() {
+        const badge = document.getElementById('pending-count-badge');
+        if (!badge) return;
         try {
             const res = await fetch('/api/admin/pending-students');
             pendingStudents = await res.json();
-            const badge = document.getElementById('pending-count-badge');
             if (pendingStudents.length > 0) {
                 badge.textContent = pendingStudents.length;
                 badge.classList.remove('hidden');
@@ -593,20 +553,9 @@
         const viewPending = document.getElementById('view-pending-students');
         const pendingBar = document.getElementById('pending-action-bar');
 
-        if (tab === 'all') {
-            btnAll.className = "px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shadow-sm shadow-indigo-500/20 active:scale-95";
-            btnPending.className = "px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 active:scale-95";
-            viewAll.classList.remove('hidden');
-            viewPending.classList.add('hidden');
-            pendingBar.classList.add('hidden');
-        } else {
-            btnPending.className = "px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-sm shadow-amber-500/20 active:scale-95";
-            btnAll.className = "px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 active:scale-95";
-            viewAll.classList.add('hidden');
-            viewPending.classList.remove('hidden');
-            pendingBar.classList.remove('hidden');
-            loadPendingStudents();
-        }
+        if (viewAll) viewAll.classList.remove('hidden');
+        if (viewPending) viewPending.classList.add('hidden');
+        if (pendingBar) pendingBar.classList.add('hidden');
     }
 
     function renderPendingTable() {
@@ -704,10 +653,14 @@
         const totalExams = allStudents.reduce((s, st) => s + (st.examCount || 0), 0);
         const validAvgs = allStudents.filter(s => s.avgScore != null).map(s => s.avgScore);
         const overallAvg = validAvgs.length ? validAvgs.reduce((a, b) => a + b, 0) / validAvgs.length : null;
-        document.getElementById('stat-total').textContent = allStudents.length;
-        document.getElementById('stat-exam').textContent = totalExams;
-        document.getElementById('stat-avg').textContent = overallAvg ? overallAvg.toFixed(1) + '%' : '—';
-        document.getElementById('student-count-label').textContent = allStudents.length + ' คน';
+        const elTotal = document.getElementById('stat-total');
+        if (elTotal) elTotal.textContent = allStudents.length;
+        const elExam = document.getElementById('stat-exam');
+        if (elExam) elExam.textContent = totalExams;
+        const elAvg = document.getElementById('stat-avg');
+        if (elAvg) elAvg.textContent = overallAvg ? overallAvg.toFixed(1) + '%' : '—';
+        const elLabel = document.getElementById('student-count-label');
+        if (elLabel) elLabel.textContent = allStudents.length + ' คน';
         const badge = document.getElementById('student-count-badge');
         if (badge) badge.textContent = allStudents.length;
     }
