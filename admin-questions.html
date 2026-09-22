@@ -526,17 +526,21 @@
 
         // Tracking unsaved changes
         let hasUnsavedChanges = false;
+        let isSavedSuccessfully = false;
         let unsavedModalCallbacks = null;
 
         function markAsDirty() {
             hasUnsavedChanges = true;
+            isSavedSuccessfully = false;
         }
 
         function markAsClean() {
             hasUnsavedChanges = false;
+            isSavedSuccessfully = true;
         }
 
         function checkHasUnsavedChanges() {
+            if (isSavedSuccessfully) return false;
             if (hasUnsavedChanges) return true;
             if (questions && questions.length > 0) {
                 if (questions.length > 1) return true;
@@ -841,6 +845,7 @@
                             renderAllQuestionsList();
                             renderActiveQuestionStage();
                             hasUnsavedChanges = false;
+                            isSavedSuccessfully = true;
                             return;
                         }
                     }
@@ -1246,7 +1251,7 @@
                 const data = await res.json();
 
                 if (res.ok && data.success) {
-                    hasUnsavedChanges = false;
+                    markAsClean();
                     alert(`✅ บันทึกชุดข้อสอบเข้าสู่วิชา "${courseName}" เรียบร้อยแล้ว!\n(รวมข้อสอบทั้งสิ้น ${formatted.length} ข้อ)\n\n📌 เมื่อต้องการเริ่มสอบจริง ให้ไปที่เมนู "ห้องสอบ" แล้วกด "+ สร้างห้องสอบ"`);
                 } else {
                     alert(`❌ บันทึกไม่สำเร็จ: ${data.message || 'เกิดข้อผิดพลาด'}`);
