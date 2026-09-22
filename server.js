@@ -744,9 +744,8 @@ app.post('/api/teacher/create-rooms', (req, res) => {
 
 // ดึงรายชื่อนักศึกษาพร้อมสถิติการสอบ (รองรับแยกตามรายวิชา courseId)
 app.get('/api/students', (req, res) => {
-    const username = req.query.username;
+    const username = req.query.username || 'admin';
     const courseId = req.query.courseId;
-    if (!username) return res.status(400).json({ message: "กรุณาระบุ username" });
 
     if (courseId && courseId !== 'ALL') {
         const sql = `
@@ -1771,8 +1770,7 @@ app.get('/api/teacher/room-realtime-dashboard', (req, res) => {
 
 // ดึงรายการรายวิชาของอาจารย์
 app.get('/api/teacher/courses', (req, res) => {
-    const { username } = req.query;
-    if (!username) return res.status(400).json({ message: "กรุณาระบุ username" });
+    const username = req.query.username || 'admin';
 
     const sql = `
         SELECT c.*,
