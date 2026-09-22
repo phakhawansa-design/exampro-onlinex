@@ -25,12 +25,12 @@
 
         * { box-sizing: border-box; }
         body {
-            font-family: 'Kanit', 'Inter', sans-serif;
-            background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #faf5ff 100%);
-            background-attachment: fixed;
-            color: #334155;
+            font-family: 'Kanit', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
         }
-        /* ===== SIDEBAR (REDESIGNED FOR 25-60 Y.O. TEACHERS) ===== */
+
+        /* ===== SIDEBAR (CLEAN ACADEMIC THEME) ===== */
         #sidebar {
             background: #ffffff;
             width: 280px;
@@ -43,31 +43,72 @@
             border-right: 1px solid #e2e8f0;
             flex-shrink: 0;
             transition: width 0.25s ease-in-out;
-            box-shadow: 2px 0 12px rgba(15, 23, 42, 0.03);
+            box-shadow: 1px 0 10px rgba(15, 23, 42, 0.03);
         }
-        #sidebar::before { content: ''; position: absolute; top: -60px; left: -60px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(6, 182, 212, 0.04) 0%, transparent 70%); border-radius: 50%; animation: blobPulse 6s ease-in-out infinite; pointer-events: none; z-index: 0; }
-        #sidebar::after { content: ''; position: absolute; bottom: -60px; right: -40px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, transparent 70%); border-radius: 50%; animation: blobPulse 8s ease-in-out infinite reverse; pointer-events: none; z-index: 0; }
-        @keyframes blobPulse { 0%, 100% { transform: scale(1) translate(0, 0); opacity: 0.6; } 33% { transform: scale(1.15) translate(10px, -10px); opacity: 1; } 66% { transform: scale(0.9) translate(-5px, 8px); opacity: 0.7; } }
         .sidebar-inner { position: relative; z-index: 1; }
-        .logo-gradient { background: linear-gradient(135deg, #ec4899, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .logo-shield { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
-        .nav-section-header { display: flex; align-items: center; gap: 6px; padding: 8px 12px 4px 12px; }
-        .nav-section-title { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; color: #64748b; text-transform: uppercase; font-family: 'Kanit', sans-serif; }
-        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 16px; font-size: 15px; font-weight: 500; color: #334155; text-decoration: none; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border: 1.5px solid transparent; font-family: 'Kanit', sans-serif; }
-        .nav-link:hover { color: #ec4899; background: #fdf2f8; border-color: #cbd5e1; transform: translateX(3px); }
-        .nav-link.active { background: linear-gradient(135deg, #f472b6 0%, #818cf8 50%, #38bdf8 100%); color: #ffffff !important; font-weight: 600 !important; box-shadow: 0 8px 24px rgba(79, 70, 229, 0.35); border-color: transparent; }
-        .nav-link.active svg { color: #ffffff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
-
-        @keyframes onlinePulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
-            50% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+        
+        .nav-section-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px 4px 12px;
         }
-        .online-dot { animation: onlinePulse 2s ease-in-out infinite; }
-        @keyframes sidebarDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-        .sidebar-online-dot { animation: sidebarDot 2s ease-in-out infinite; }
-        select.dark-select, input.dark-input {
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+        .nav-link {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 14px; border-radius: 14px;
+            font-size: 15px; font-weight: 500;
+            color: #475569; text-decoration: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1.5px solid transparent;
+        }
+        .nav-link svg {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+        }
+        .nav-link:hover {
+            color: #1e3a8a; background: #eff6ff;
+            border-color: #dbeafe; transform: translateX(3px);
+        }
+        .nav-link.active {
+            background: #1e3a8a;
+            color: #ffffff !important; font-weight: 600 !important;
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);
+            border-color: transparent;
+        }
+        .nav-link.active svg { color: #ffffff; }
+
+        #main-area {
+            flex: 1;
             background: #f8fafc;
-            border: 1.5px solid #cbd5e1;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            color: #1e293b;
+        }
+        #top-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #e2e8f0;
+            padding: 14px 28px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .glass-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+        }
+        select.dark-select, input.dark-input {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
             color: #1e293b; border-radius: 12px;
             padding: 8px 14px; font-size: 13px;
             font-weight: 600;
@@ -76,180 +117,143 @@
             box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
             cursor: pointer;
         }
-        select.dark-select:hover, input.dark-input:hover {
-            background: #ffffff;
-            border-color: #64748b;
-        }
         select.dark-select:focus, input.dark-input:focus {
-            background: #ffffff;
-            border-color: #06b6d4;
-            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
         }
-        select.dark-select option { background: #ffffff; color: #1e293b; }
-        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.2); border-radius: 4px; }
-    
-        #main-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-            overflow-y: auto;
-            min-width: 0;
-            width: 100%;
-            background: #f8fafc;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(251, 207, 232, 0.35) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(186, 230, 253, 0.35) 0%, transparent 40%),
-                linear-gradient(to right, rgba(241, 245, 249, 0.6) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(241, 245, 249, 0.6) 1px, transparent 1px);
-            background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
-            font-family: 'Kanit', sans-serif;
-            color: #1e293b;
-        }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
-    <!-- Animated Background Blobs -->
-    <div class="fixed w-[500px] h-[500px] bg-cyan-500/5 blur-[120px] rounded-full -top-20 -left-20 pointer-events-none"></div>
-    <div class="fixed w-[550px] h-[550px] bg-pink-500/4 blur-[130px] rounded-full -bottom-20 -right-20 pointer-events-none"></div>
-    <div class="fixed inset-0 bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.02)_0%,transparent_70%)] pointer-events-none"></div>
-
-    <!-- 📊 Left Sidebar Navigation -->
+    <!-- ===== SIDEBAR ===== -->
     <aside id="sidebar">
-    <div class="sidebar-inner p-4 sm:p-5 space-y-4 flex-1 overflow-y-auto">
-        <!-- Logo Header -->
-        <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
-            <div class="logo-shield bg-white p-1.5 border border-slate-200 shadow-sm rounded-xl flex items-center justify-center">
-                <img src="logo.png" alt="Tab-Lock Logo" class="w-8 h-8 object-cover rounded-lg" />
+        <div class="sidebar-inner p-4 space-y-4 flex-1 overflow-y-auto">
+            <!-- Logo Header with RMUTI Crest -->
+            <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
+                <div class="w-10 h-12 bg-white rounded-lg p-1 border border-slate-200 flex items-center justify-center shrink-0 shadow-xs">
+                    <img src="logo_university.png" alt="ตรามหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน" class="w-full h-full object-contain" />
+                </div>
+                <div class="leading-tight">
+                    <div class="font-bold text-base tracking-tight text-slate-900">Tab-Lock <span class="text-blue-700 font-extrabold">RMUTI</span></div>
+                    <div class="text-[10px] text-amber-700 font-bold uppercase tracking-wider">ระบบสอบออนไลน์ มทร.อีสาน</div>
+                </div>
             </div>
-            <div class="logo-text leading-tight">
-                <div class="font-bold text-lg tracking-tight text-slate-900">Tab-<span class="logo-gradient">Lock</span></div>
-                <div class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Online Proctoring</div>
-            </div>
+
+            <!-- Navigation Menu -->
+            <nav class="space-y-4">
+                <!-- Category 1: หมวดข้อมูล -->
+                <div>
+                    <div class="nav-section-header">
+                        <span class="nav-section-title">หมวดข้อมูลพื้นฐาน</span>
+                    </div>
+                    <div class="space-y-1 mt-1">
+                        <a href="dashboard.html" class="nav-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+                            <span>1. แดชบอร์ดหลัก</span>
+                        </a>
+                        <a href="admin-courses.html" class="nav-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
+                            <span>2. จัดการรายวิชา</span>
+                        </a>
+                        <a href="admin-students.html" class="nav-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.62 48.62 0 0112 20.904a48.62 48.62 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0112 13.489a50.702 50.702 0 017.74-3.342M12 2.25V4.5m0 10.5v1.5c0 .9-.6 1.6-1.5 1.6a1.5 1.5 0 010-3c.9 0 1.5.7 1.5 1.4z" /></svg>
+                            <span>3. ประวัตินักศึกษา</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Category 2: หมวดการสอบ -->
+                <div>
+                    <div class="nav-section-header">
+                        <span class="nav-section-title">หมวดการจัดการสอบ</span>
+                    </div>
+                    <div class="space-y-1 mt-1">
+                        <a href="admin-library.html" class="nav-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+                            <span>4. คลังข้อสอบ</span>
+                        </a>
+                        <a href="admin-questions.html" class="nav-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+                            <span>5. สร้างข้อสอบ</span>
+                        </a>
+                        <a href="admin-rooms.html" class="nav-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 21h18M4.5 21V5.25A2.25 2.25 0 0 1 6.75 3h10.5a2.25 2.25 0 0 1 2.25 2.25V21" /></svg>
+                            <span>6. ห้องสอบ</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Category 3: หมวดประเมินผล -->
+                <div>
+                    <div class="nav-section-header">
+                        <span class="nav-section-title">หมวดประเมินและกำกับ</span>
+                    </div>
+                    <div class="space-y-1 mt-1">
+                        <a href="admin-results.html" class="nav-link active">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /></svg>
+                            <span>7. ตรวจสอบผลการสอบ</span>
+                        </a>
+                        <a href="admin-monitoring.html" class="nav-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" /></svg>
+                            <span>8. ตรวจสอบพฤติกรรมน่าสงสัย</span>
+                        </a>
+                    </div>
+                </div>
+            </nav>
         </div>
 
-        <!-- Navigation Menu -->
-        <nav class="space-y-4">
-
-            <!-- Category 1: หมวดข้อมูล -->
-            <div>
-                <div class="nav-section-header">
-                    <span class="nav-section-title">หมวดข้อมูล</span>
+        <!-- Bottom Profile Footer -->
+        <div class="sidebar-inner p-4 border-t border-slate-200 bg-slate-50 space-y-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-900 flex items-center justify-center text-sm font-bold text-white shadow-xs shrink-0">
+                    อ
                 </div>
-                <div class="space-y-1 mt-1">
-                    <a href="dashboard.html" class="nav-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
-                        <span>1. แดชบอร์ดหลัก</span>
-                    </a>
-                    <a href="admin-courses.html" class="nav-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
-                        <span>2. จัดการรายวิชา</span>
-                    </a>
-                    <a href="admin-students.html" class="nav-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.62 48.62 0 0112 20.904a48.62 48.62 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0112 13.489a50.702 50.702 0 017.74-3.342M12 2.25V4.5m0 10.5v1.5c0 .9-.6 1.6-1.5 1.6a1.5 1.5 0 010-3c.9 0 1.5.7 1.5 1.4z" /></svg>
-                        <span>3. ประวัตินักศึกษา</span>
-                    </a>
+                <div class="flex-1 min-w-0">
+                    <div class="text-sm font-bold text-slate-900 truncate" id="sidebar-teacher-name">อาจารย์ผู้ดูแล</div>
+                    <div class="text-xs text-slate-500 font-medium flex items-center gap-1.5 mt-0.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> เข้าสู่ระบบแล้ว
+                    </div>
                 </div>
             </div>
-
-            <!-- Category 2: หมวดการสอบ -->
-            <div>
-                <div class="nav-section-header">
-                    <span class="nav-section-title">หมวดการสอบ</span>
-                </div>
-                <div class="space-y-1 mt-1">
-                    <a href="admin-library.html" class="nav-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
-                        <span>4. คลังข้อสอบ</span>
-                    </a>
-                    <a href="admin-questions.html" class="nav-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
-                        <span>5. สร้างข้อสอบ</span>
-                    </a>
-                    <a href="admin-rooms.html" class="nav-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 21h18M4.5 21V5.25A2.25 2.25 0 0 1 6.75 3h10.5a2.25 2.25 0 0 1 2.25 2.25V21" /></svg>
-                        <span>6. ห้องสอบ</span>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Category 3: หมวดประเมินผล -->
-            <div>
-                <div class="nav-section-header">
-                    <span class="nav-section-title">หมวดประเมินผล</span>
-                </div>
-                <div class="space-y-1 mt-1">
-                    <a href="admin-results.html" class="nav-link active">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /></svg>
-                        <span>7. ตรวจสอบผลการสอบ</span>
-                    </a>
-                    <a href="admin-monitoring.html" class="nav-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" /></svg>
-                        <span>8. ตรวจสอบพฤติกรรมน่าสงสัย</span>
-                    </a>
-                </div>
-            </div>
-
-        </nav>
-    </div>
-
-    <!-- Bottom Profile Footer -->
-    <div class="sidebar-inner p-4 border-t border-slate-200 bg-slate-50/60 space-y-3">
-        <div class="flex items-center gap-3">
-            <div class="relative flex-shrink-0">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 via-indigo-600 to-purple-600 flex items-center justify-center text-sm font-bold text-white shadow-sm">อ</div>
-                <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white sidebar-online-dot online-dot"></span>
-            </div>
-            <div class="flex-1 min-w-0">
-                <div class="text-sm font-bold text-slate-900 truncate" id="sidebar-teacher-name">อาจารย์: ภควันต์ แสนเสริม</div>
-                <div class="text-xs text-slate-500 font-semibold flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> ออนไลน์ • ผู้ดูแลระบบ
-                </div>
-            </div>
+            <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2 px-3 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 border border-slate-200 hover:border-rose-200 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H2.25" /></svg>
+                <span>ออกจากระบบ</span>
+            </a>
         </div>
-        <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-red-200 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H2.25" /></svg>
-            <span class="logout-btn-text">ออกจากระบบ</span>
-        </a>
-    </div>
-</aside>
+    </aside>
 
     <!-- 💻 Main Display Area -->
     <div id="main-area">
         
         <!-- Header -->
         <header id="top-header">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
-                <!-- Title & Teacher Info Box Frame -->
-                <div class="header-card flex flex-col justify-center">
-                    <!-- Mobile view back button -->
-                    <div class="flex items-center gap-2">
-                        <a href="dashboard.html" class="md:hidden text-xs text-slate-500 hover:text-slate-800 font-bold">&larr; กลับ</a>
-                        <h1 class="text-xl md:text-2xl font-bold text-slate-900 flex items-center gap-2">
-                            <span>📊</span> ผลการสอบและสถานะนักศึกษา
-                        </h1>
-                    </div>
-                    <p id="teacher-display" class="text-sm text-indigo-600 font-bold mt-0.5 flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-indigo-500 inline-block animate-pulse"></span>
-                        <span>กำลังโหลดผู้ใช้...</span>
-                    </p>
-                </div>
-
-                <!-- Course Selector Dropdown Frame -->
-                <div class="header-card flex items-center gap-3 w-full sm:w-auto shrink-0 justify-end flex-nowrap">
-                    <span class="text-sm font-bold text-slate-700 whitespace-nowrap shrink-0">เลือกรายวิชา:</span>
-                    <select id="course-selector" onchange="onCourseChange()" 
-                        class="dark-select min-w-[220px] max-w-[320px] text-sm font-semibold">
-                        <!-- โดนโหลดรายวิชาของอาจารย์มาใส่ -->
-                    </select>
-                    <button onclick="window.TabLockGuide.open('results')" class="bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white font-semibold px-3.5 py-2 rounded-xl text-xs md:text-sm transition duration-300 shadow-sm active:scale-95 flex items-center gap-1.5 shrink-0 cursor-pointer whitespace-nowrap">
-                        <span>💡 คู่มือหน้านี้</span>
-                    </button>
+            <div class="flex items-center gap-3">
+                <button id="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')" class="md:hidden p-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+                <div>
+                    <h1 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight">7. ตรวจสอบผลการสอบ</h1>
+                    <p class="text-xs text-slate-500 font-medium">มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน &middot; ประจำภาคการศึกษาปัจจุบัน</p>
                 </div>
             </div>
+            <div class="flex items-center gap-3 flex-wrap sm:flex-nowrap">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-slate-700 whitespace-nowrap shrink-0 hidden sm:inline">เลือกรายวิชา:</span>
+                    <select id="course-selector" onchange="onCourseChange()" class="dark-select min-w-[200px] max-w-[280px]">
+                        <option value="">-- กำลังโหลดรายวิชา... --</option>
+                    </select>
+                </div>
+                <button onclick="window.TabLockGuide.open('results')" class="flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow-xs cursor-pointer">
+                    <span>💡</span>
+                    <span class="hidden sm:inline">คู่มือ</span>
+                </button>
+                <button onclick="exportToExcel()" class="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
+                    <span>📥</span>
+                    <span>ส่งออก Excel</span>
+                </button>
         </header>
 
         <!-- Main Workspace -->
@@ -441,8 +445,10 @@
         </main>
 
         <!-- Footer -->
-        <footer class="border-t border-slate-200 py-5 text-center text-slate-500 text-[10px]">
-            <p>&copy; 2026 ระบบการจัดการผลการสอบ Tab-Lock Online Proctoring System. สงวนลิขสิทธิ์ทั้งหมด.</p>
+        <footer class="border-t border-slate-200 bg-white py-3.5 px-8 text-center shrink-0">
+            <p class="text-xs text-slate-500 font-medium">
+                &copy; 2026 ระบบควบคุมและประเมินผลการสอบออนไลน์ Tab-Lock &middot; มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน (มทร.อีสาน)
+            </p>
         </footer>
     </div>
 
@@ -1249,12 +1255,11 @@
         if (!sidebar) return;
         localStorage.removeItem('sidebar_collapsed');
         sidebar.classList.remove('collapsed');
-        let activePage = window.location.pathname.split('/').pop() || 'dashboard.html';
-        if (activePage === 'admin-questions.html' || activePage === 'admin-excel.html') {
-            activePage = 'admin-portal.html';
-        }
+        let activePage = window.location.pathname.split('/').pop() || 'admin-results.html';
         document.querySelectorAll('nav a').forEach(a => {
-            a.className = a.getAttribute('href') === activePage ? 'nav-link active' : 'nav-link';
+            if (a.getAttribute('href') === activePage) {
+                a.className = 'nav-link active';
+            }
         });
     }
     if (document.readyState === 'loading') {
