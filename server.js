@@ -742,10 +742,43 @@ app.post('/api/teacher/create-rooms', (req, res) => {
 // 👨‍🎓 Student Management APIs (ระบบจัดการประวัตินักศึกษา)
 // ==========================================
 
-// ดึงรายชื่อนักศึกษาพร้อมสถิติการสอบ
+// ดึงรายชื่อนักศึกษาพร้อมสถิติการสอบ (รองรับแยกตามรายวิชา courseId)
 app.get('/api/students', (req, res) => {
     const username = req.query.username;
+    const courseId = req.query.courseId;
     if (!username) return res.status(400).json({ message: "กรุณาระบุ username" });
+
+    if (courseId && courseId !== 'ALL') {
+        const sql = `
+            SELECT 
+                cs.studentId, 
+                COALESCE(cs.firstName, s.firstName, 'นักศึกษา') as firstName, 
+                COALESCE(cs.lastName, s.lastName, '') as lastName, 
+                COALESCE(cs.class, s.class, '') as class, 
+                s.note, 
+                COALESCE(s.status, 'approved') as status,
+                s.created_at,
+                s.approved_at,
+                c.id as courseId,
+                c.courseCode,
+                c.courseName,
+                COUNT(DISTINCT er.id) as examCount,
+                AVG(CASE WHEN er.maxScore > 0 THEN (CAST(er.score AS FLOAT) / er.maxScore) * 100 ELSE NULL END) as avgScore
+            FROM course_students cs
+            JOIN courses c ON c.id = cs.courseId
+            LEFT JOIN students s ON (s.studentId = cs.studentId OR REPLACE(s.studentId, '-', '') = REPLACE(cs.studentId, '-', ''))
+            LEFT JOIN exam_results er ON (er.studentId = cs.studentId OR REPLACE(er.studentId, '-', '') = REPLACE(cs.studentId, '-', ''))
+                                     AND (er.courseId = cs.courseId OR er.roomId IN (SELECT roomId FROM teacher_rooms WHERE courseId = cs.courseId))
+            WHERE (cs.courseId = ? OR CAST(cs.courseId AS TEXT) = ?)
+            GROUP BY cs.id, cs.studentId, cs.firstName, cs.lastName, cs.class, s.note, s.status, s.created_at, s.approved_at, c.id, c.courseCode, c.courseName
+            ORDER BY cs.studentId ASC
+        `;
+        db.all(sql, [courseId, String(courseId)], (err, rows) => {
+            if (err) return res.status(500).json({ message: err.message });
+            res.json(rows || []);
+        });
+        return;
+    }
 
     const sql = `
         SELECT 
@@ -757,11 +790,16 @@ app.get('/api/students', (req, res) => {
             COALESCE(s.status, 'approved') as status,
             s.created_at,
             s.approved_at,
-            COUNT(er.id) as examCount,
-            AVG(CASE WHEN er.maxScore > 0 THEN (CAST(er.score AS FLOAT) / er.maxScore) * 100 ELSE NULL END) as avgScore
+            COUNT(DISTINCT er.id) as examCount,
+            AVG(CASE WHEN er.maxScore > 0 THEN (CAST(er.score AS FLOAT) / er.maxScore) * 100 ELSE NULL END) as avgScore,
+            (
+                SELECT GROUP_CONCAT(DISTINCT c.courseCode || ' ' || c.courseName)
+                FROM course_students cs2
+                JOIN courses c ON c.id = cs2.courseId
+                WHERE cs2.studentId = s.studentId OR REPLACE(cs2.studentId, '-', '') = REPLACE(s.studentId, '-', '')
+            ) as enrolledCourses
         FROM students s
-        LEFT JOIN teacher_rooms tr ON tr.teacherUsername = s.teacherUsername
-        LEFT JOIN exam_results er ON er.roomId = tr.roomId AND er.studentId = s.studentId
+        LEFT JOIN exam_results er ON er.studentId = s.studentId OR REPLACE(er.studentId, '-', '') = REPLACE(s.studentId, '-', '')
         WHERE (s.teacherUsername = ? OR s.teacherUsername IS NULL OR s.teacherUsername = '' OR ? = 'admin')
         GROUP BY s.id, s.studentId, s.firstName, s.lastName, s.class, s.note, s.status, s.created_at, s.approved_at
         ORDER BY s.studentId ASC
@@ -1530,6 +1568,195 @@ app.get('/api/teacher/room-roster-attendance', (req, res) => {
                         totalSubmitted,
                         totalActive,
                         totalNotJoined,
+                        students: studentStatusList
+                    });
+                });
+            });
+        });
+    });
+});
+
+// ==========================================
+// 📊 Real-time Exam Summary Dashboard API
+// ==========================================
+app.get('/api/teacher/room-realtime-dashboard', (req, res) => {
+    const { roomId } = req.query;
+    if (!roomId) return res.status(400).json({ message: "กรุณาระบุ roomId" });
+
+    // 1. ดึงข้อมูลห้องสอบ
+    db.get('SELECT r.*, c.courseCode, c.courseName FROM teacher_rooms r LEFT JOIN courses c ON c.id = r.courseId WHERE r.roomId = ?', [roomId], (err, room) => {
+        if (err || !room) return res.status(404).json({ message: "ไม่พบห้องสอบนี้" });
+
+        const courseId = room.courseId;
+
+        // 2. ดึงคำถามทั้งหมดในห้องสอบนี้
+        db.all('SELECT id, question, answer, a, b, c, d FROM questions WHERE roomId = ? ORDER BY id ASC', [roomId], (qErr, questionsRows) => {
+            const questions = questionsRows || [];
+
+            // 3. ดึงผลสอบทั้งหมดที่ส่งแล้วในห้องนี้
+            db.all('SELECT studentId, name, class, score, maxScore, time, date, answers_json FROM exam_results WHERE roomId = ? ORDER BY score DESC', [roomId], (rErr, resultRows) => {
+                const results = resultRows || [];
+                const submittedMap = new Map();
+                results.forEach(r => submittedMap.set(String(r.studentId), r));
+
+                // 4. ดึงรายชื่อนักศึกษาจาก course_students
+                const sqlEnrolled = 'SELECT * FROM course_students WHERE courseId = ? OR CAST(courseId AS TEXT) = ? ORDER BY studentId ASC';
+                db.all(sqlEnrolled, [courseId, String(courseId)], (csErr, enrolledRows) => {
+                    const enrolledList = enrolledRows || [];
+                    const activeMap = getActiveRoomStudentMap(roomId);
+
+                    // คำนวณสถานะนักศึกษา
+                    const studentStatusList = [];
+                    const enrolledSet = new Set();
+
+                    enrolledList.forEach(e => {
+                        const sIdStr = String(e.studentId);
+                        enrolledSet.add(sIdStr);
+
+                        const isSubmitted = submittedMap.get(sIdStr);
+                        const isActive = activeMap.get(sIdStr);
+
+                        let status = 'not_joined';
+                        let score = null;
+                        let maxScore = null;
+                        let submitTime = null;
+
+                        if (isSubmitted) {
+                            status = 'submitted';
+                            score = isSubmitted.score;
+                            maxScore = isSubmitted.maxScore;
+                            submitTime = isSubmitted.time;
+                        } else if (isActive) {
+                            status = 'active';
+                        }
+
+                        const fullName = `${e.prefix || ''}${e.firstName || ''} ${e.lastName || ''}`.trim() || 'นักศึกษา';
+                        studentStatusList.push({
+                            studentId: e.studentId,
+                            name: fullName,
+                            class: e.class || '-',
+                            status,
+                            score,
+                            maxScore,
+                            time: submitTime
+                        });
+                    });
+
+                    // เพิ่มนักศึกษาที่ส่งหรือกำลังสอบ แต่นอกรายชื่อ
+                    const extra = new Map([...submittedMap, ...activeMap]);
+                    extra.forEach((val, sIdStr) => {
+                        if (!enrolledSet.has(sIdStr)) {
+                            const isSubmitted = submittedMap.get(sIdStr);
+                            const isActive = activeMap.get(sIdStr);
+                            studentStatusList.push({
+                                studentId: sIdStr,
+                                name: isSubmitted ? isSubmitted.name : (val.name || val.studentName || 'นักศึกษา'),
+                                class: isSubmitted ? (isSubmitted.class || '-') : (val.class || '-'),
+                                status: isSubmitted ? 'submitted' : (isActive ? 'active' : 'not_joined'),
+                                score: isSubmitted ? isSubmitted.score : null,
+                                maxScore: isSubmitted ? isSubmitted.maxScore : null,
+                                time: isSubmitted ? isSubmitted.time : null
+                            });
+                        }
+                    });
+
+                    const totalEnrolled = enrolledList.length;
+                    const totalSubmitted = studentStatusList.filter(s => s.status === 'submitted').length;
+                    const totalActive = studentStatusList.filter(s => s.status === 'active').length;
+                    const totalNotJoined = Math.max(0, totalEnrolled - (totalSubmitted + totalActive));
+
+                    // คำนวณสถิติการกระจายคะแนน (Score Histogram)
+                    let scoreBuckets = { '0-25%': 0, '26-50%': 0, '51-75%': 0, '76-100%': 0 };
+                    let totalScore = 0;
+                    let maxScoreVal = 0;
+                    let minScoreVal = totalSubmitted > 0 ? 999999 : 0;
+                    let maxPossibleScore = questions.length;
+
+                    results.forEach(r => {
+                        const s = r.score || 0;
+                        const ms = r.maxScore || questions.length || 10;
+                        maxPossibleScore = ms;
+                        totalScore += s;
+                        if (s > maxScoreVal) maxScoreVal = s;
+                        if (s < minScoreVal) minScoreVal = s;
+
+                        const pct = ms > 0 ? (s / ms) * 100 : 0;
+                        if (pct <= 25) scoreBuckets['0-25%']++;
+                        else if (pct <= 50) scoreBuckets['26-50%']++;
+                        else if (pct <= 75) scoreBuckets['51-75%']++;
+                        else scoreBuckets['76-100%']++;
+                    });
+
+                    const avgScore = totalSubmitted > 0 ? parseFloat((totalScore / totalSubmitted).toFixed(1)) : 0;
+
+                    // 5. วิเคราะห์ข้อสอบที่ตอบผิดบ่อย (Top Missed Questions)
+                    const questionStats = [];
+                    questions.forEach((q, index) => {
+                        const qIdStr = String(q.id);
+                        const correctKey = (q.answer || '').trim().toLowerCase();
+                        let answeredCount = 0;
+                        let wrongCount = 0;
+                        let correctCount = 0;
+
+                        results.forEach(r => {
+                            if (!r.answers_json) return;
+                            try {
+                                const parsed = typeof r.answers_json === 'string' ? JSON.parse(r.answers_json) : r.answers_json;
+                                const studentAns = (parsed[qIdStr] !== undefined ? parsed[qIdStr] : parsed[index] || '').trim().toLowerCase();
+                                if (studentAns !== '') {
+                                    answeredCount++;
+                                    if (studentAns === correctKey) {
+                                        correctCount++;
+                                    } else {
+                                        wrongCount++;
+                                    }
+                                }
+                            } catch(e) {}
+                        });
+
+                        const wrongRate = totalSubmitted > 0 ? Math.round((wrongCount / totalSubmitted) * 100) : 0;
+                        questionStats.push({
+                            questionIndex: index + 1,
+                            questionId: q.id,
+                            questionText: q.question,
+                            correctAnswer: q.answer,
+                            correctText: q[q.answer] || q.answer,
+                            wrongCount,
+                            correctCount,
+                            totalAnswered: answeredCount,
+                            wrongRate
+                        });
+                    });
+
+                    // เรียงลำดับจากข้อที่ตอบผิดมากที่สุดไปน้อยที่สุด
+                    questionStats.sort((a, b) => b.wrongCount - a.wrongCount || b.wrongRate - a.wrongRate);
+
+                    res.json({
+                        success: true,
+                        room: {
+                            roomId: room.roomId,
+                            roomName: room.roomName,
+                            examTitle: room.exam_title || room.roomName,
+                            courseId: room.courseId,
+                            courseCode: room.courseCode || '',
+                            courseName: room.courseName || '',
+                            duration: room.duration || 60,
+                            isPublished: room.is_published === 1,
+                            questionCount: questions.length
+                        },
+                        summary: {
+                            totalEnrolled,
+                            totalJoined: totalSubmitted + totalActive,
+                            totalActive,
+                            totalSubmitted,
+                            totalNotJoined,
+                            avgScore,
+                            maxScore: maxScoreVal,
+                            minScore: totalSubmitted > 0 ? minScoreVal : 0,
+                            maxPossibleScore
+                        },
+                        histogram: scoreBuckets,
+                        topWrongQuestions: questionStats.slice(0, 10),
                         students: studentStatusList
                     });
                 });

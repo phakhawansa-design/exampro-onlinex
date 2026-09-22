@@ -372,7 +372,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-slate-200 text-xs sm:text-sm">
                         <label class="flex items-center gap-2.5 p-3 hover:bg-indigo-50/50 rounded-2xl cursor-pointer border-2 border-slate-200 transition">
                             <input type="checkbox" id="modal-chk-randomize" checked class="w-5 h-5 text-indigo-600 rounded-lg cursor-pointer">
-                            <span class="font-bold text-slate-800">🔀 สุ่มลำดับข้อสอบ</span>
+                            <span class="font-bold text-slate-800">🔀 สุ่มข้อสอบ & ตัวเลือก (ก-ง)</span>
                         </label>
                         <label class="flex items-center gap-2.5 p-3 hover:bg-indigo-50/50 rounded-2xl cursor-pointer border-2 border-slate-200 transition">
                             <input type="checkbox" id="modal-chk-show-score" checked class="w-5 h-5 text-indigo-600 rounded-lg cursor-pointer">
@@ -495,16 +495,17 @@
     <!-- 3. LIVE STUDENTS LIST MODAL                              -->
     <!-- ======================================================== -->
     <div id="live-students-modal" class="fixed inset-0 bg-slate-950/75 backdrop-blur-md z-50 flex items-center justify-center hidden p-4 sm:p-6 md:p-8">
-        <div class="bg-white rounded-3xl w-full max-w-4xl lg:max-w-5xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
+        <div class="bg-white rounded-3xl w-full max-w-4xl lg:max-w-5xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[92vh]">
+            <!-- Header -->
             <div class="px-7 py-5 bg-gradient-to-r from-slate-50 via-indigo-50/40 to-purple-50/30 border-b border-slate-200 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <span class="text-indigo-600 text-2xl p-2 bg-white rounded-2xl shadow-xs border border-slate-100">👨‍🎓</span>
+                    <span class="text-indigo-600 text-2xl p-2 bg-white rounded-2xl shadow-xs border border-slate-100">📊</span>
                     <div>
                         <div class="flex items-center gap-2">
-                            <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">รายชื่อนักศึกษาในรายวิชา & สถานะการเข้าสอบ</h3>
+                            <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">แดชบอร์ดสรุปผลสอบสด (Real-time Exam Dashboard)</h3>
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-xs">
                                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                <span>อัปเดตสดแบบเรียลไทม์</span>
+                                <span>อัปเดตสดทุก 2.5 วินาที</span>
                             </span>
                         </div>
                         <p id="live-students-room-name" class="text-xs sm:text-sm text-indigo-700 font-extrabold mt-0.5">-</p>
@@ -515,30 +516,98 @@
                 </button>
             </div>
 
-            <!-- Summary stats bar -->
-            <div class="p-4 border-b border-slate-200 bg-indigo-50/50 grid grid-cols-3 gap-4 text-center font-bold">
-                <div class="p-3.5 bg-white rounded-2xl border border-indigo-200/80 shadow-xs">
-                    <div class="text-xs sm:text-sm text-slate-500 font-bold">👥 ทั้งหมดในวิชา</div>
-                    <div id="students-modal-enrolled" class="text-xl sm:text-2xl font-black text-indigo-700 mt-1">0</div>
+            <!-- Top Summary stats bar (5 cards) -->
+            <div class="p-4 border-b border-slate-200 bg-slate-50/60 grid grid-cols-2 sm:grid-cols-5 gap-3 text-center font-bold">
+                <div class="p-3 bg-white rounded-2xl border border-indigo-200/80 shadow-xs">
+                    <div class="text-[11px] sm:text-xs text-slate-500 font-bold">👥 ทั้งหมดในวิชา</div>
+                    <div id="students-modal-enrolled" class="text-lg sm:text-2xl font-black text-indigo-700 mt-0.5">0</div>
                 </div>
-                <div class="p-3.5 bg-white rounded-2xl border border-emerald-200/80 shadow-xs">
-                    <div class="text-xs sm:text-sm text-emerald-600 font-bold">🟢 เข้าสอบแล้ว</div>
-                    <div id="students-modal-joined" class="text-xl sm:text-2xl font-black text-emerald-700 mt-1">0</div>
+                <div class="p-3 bg-white rounded-2xl border border-cyan-200/80 shadow-xs">
+                    <div class="text-[11px] sm:text-xs text-cyan-600 font-bold">🟢 กำลังทำข้อสอบ</div>
+                    <div id="students-modal-active" class="text-lg sm:text-2xl font-black text-cyan-600 mt-0.5">0</div>
                 </div>
-                <div class="p-3.5 bg-white rounded-2xl border border-rose-200/80 shadow-xs">
-                    <div class="text-xs sm:text-sm text-rose-600 font-bold">🔴 ยังไม่เข้าสอบ</div>
-                    <div id="students-modal-not-joined" class="text-xl sm:text-2xl font-black text-rose-700 mt-1">0</div>
+                <div class="p-3 bg-white rounded-2xl border border-emerald-200/80 shadow-xs">
+                    <div class="text-[11px] sm:text-xs text-emerald-600 font-bold">✅ ส่งข้อสอบแล้ว</div>
+                    <div id="students-modal-submitted" class="text-lg sm:text-2xl font-black text-emerald-700 mt-0.5">0</div>
+                </div>
+                <div class="p-3 bg-white rounded-2xl border border-rose-200/80 shadow-xs">
+                    <div class="text-[11px] sm:text-xs text-rose-600 font-bold">🔴 ยังไม่เข้าสอบ</div>
+                    <div id="students-modal-not-joined" class="text-lg sm:text-2xl font-black text-rose-700 mt-0.5">0</div>
+                </div>
+                <div class="p-3 bg-white rounded-2xl border border-amber-200/80 shadow-xs col-span-2 sm:col-span-1">
+                    <div class="text-[11px] sm:text-xs text-amber-600 font-bold">🎯 คะแนนเฉลี่ย</div>
+                    <div id="students-modal-avg-score" class="text-lg sm:text-2xl font-black text-amber-600 mt-0.5">-</div>
                 </div>
             </div>
 
-            <!-- Filter tabs -->
-            <div class="px-7 py-3 bg-slate-50/80 border-b border-slate-200 flex items-center gap-3 text-xs sm:text-sm font-bold">
-                <button onclick="filterLiveModalStudents('all')" id="tab-live-all" class="px-4 py-2 bg-indigo-600 text-white rounded-xl transition shadow-xs cursor-pointer font-bold">ทั้งหมด</button>
-                <button onclick="filterLiveModalStudents('joined')" id="tab-live-joined" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl transition cursor-pointer font-bold">🟢 เข้าสอบแล้ว</button>
-                <button onclick="filterLiveModalStudents('not_joined')" id="tab-live-not-joined" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl transition cursor-pointer font-bold">🔴 ยังไม่เข้าสอบ</button>
+            <!-- Dashboard Sub Tabs -->
+            <div class="px-6 py-2.5 bg-slate-100/80 border-b border-slate-200 flex items-center gap-2 text-xs sm:text-sm font-bold flex-wrap">
+                <button type="button" onclick="switchDashboardTab('roster')" id="dtab-btn-roster" class="px-4 py-2 bg-indigo-600 text-white rounded-xl shadow-xs cursor-pointer font-bold transition flex items-center gap-1.5">
+                    <span>👥</span> <span>รายชื่อและสถานะสด</span>
+                </button>
+                <button type="button" onclick="switchDashboardTab('histogram')" id="dtab-btn-histogram" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl cursor-pointer font-bold transition flex items-center gap-1.5">
+                    <span>📊</span> <span>การกระจายคะแนน (Histogram)</span>
+                </button>
+                <button type="button" onclick="switchDashboardTab('wrong_questions')" id="dtab-btn-wrong-questions" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl cursor-pointer font-bold transition flex items-center gap-1.5">
+                    <span>⚠️</span> <span>ข้อที่นักศึกษาตอบผิดเยอะที่สุด</span>
+                </button>
             </div>
 
-            <div id="students-modal-list" class="p-6 overflow-y-auto space-y-3 text-sm max-h-[55vh]"></div>
+            <!-- Content Area 1: Roster List -->
+            <div id="dtab-view-roster" class="flex flex-col flex-1 overflow-hidden">
+                <div class="px-7 py-2.5 bg-white border-b border-slate-200 flex items-center gap-2 text-xs font-bold">
+                    <span class="text-slate-400">กรองสถานะ:</span>
+                    <button onclick="filterLiveModalStudents('all')" id="tab-live-all" class="px-3 py-1.5 bg-indigo-600 text-white rounded-lg transition shadow-xs cursor-pointer font-bold">ทั้งหมด</button>
+                    <button onclick="filterLiveModalStudents('active')" id="tab-live-active" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition cursor-pointer font-bold">🟢 กำลังทำ</button>
+                    <button onclick="filterLiveModalStudents('submitted')" id="tab-live-submitted" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition cursor-pointer font-bold">✅ ส่งแล้ว</button>
+                    <button onclick="filterLiveModalStudents('not_joined')" id="tab-live-not-joined" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition cursor-pointer font-bold">🔴 ยังไม่เข้า</button>
+                </div>
+                <div id="students-modal-list" class="p-6 overflow-y-auto space-y-3 text-sm max-h-[50vh]"></div>
+            </div>
+
+            <!-- Content Area 2: Histogram Score Distribution -->
+            <div id="dtab-view-histogram" class="p-6 overflow-y-auto space-y-4 max-h-[55vh] hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+                        <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <span>📈</span> <span>ช่วงคะแนนสอบของนักศึกษา</span>
+                        </h4>
+                        <div id="histogram-bars-container" class="space-y-3 pt-2">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+                    <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 flex flex-col justify-between">
+                        <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <span>🎯</span> <span>สรุปภาพรวมคะแนน</span>
+                        </h4>
+                        <div class="grid grid-cols-3 gap-3 text-center my-auto">
+                            <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                                <div class="text-[11px] text-slate-400 font-bold">สูงสุด</div>
+                                <div id="hist-max-score" class="text-xl font-black text-emerald-600 mt-1">-</div>
+                            </div>
+                            <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                                <div class="text-[11px] text-slate-400 font-bold">ต่ำสุด</div>
+                                <div id="hist-min-score" class="text-xl font-black text-rose-600 mt-1">-</div>
+                            </div>
+                            <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                                <div class="text-[11px] text-slate-400 font-bold">เฉลี่ย</div>
+                                <div id="hist-avg-score" class="text-xl font-black text-amber-500 mt-1">-</div>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-400 text-center font-medium">สถิตินี้คำนวณจากนักศึกษาที่ส่งกระดาษคำตอบแล้วแบบ Real-time</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area 3: Top Wrong Questions Analysis -->
+            <div id="dtab-view-wrong-questions" class="p-6 overflow-y-auto space-y-3 max-h-[55vh] hidden">
+                <div class="text-xs text-slate-500 font-medium pb-2 border-b border-slate-200">
+                    💡 เรียงลำดับข้อสอบที่มีอัตราการตอบผิดมากที่สุด เพื่อให้อาจารย์สามารถทบทวนหรืออธิบายเพิ่มเติมแก่นักศึกษาได้
+                </div>
+                <div id="top-wrong-questions-list" class="space-y-3">
+                    <!-- Injected dynamically -->
+                </div>
+            </div>
         </div>
     </div>
 
@@ -910,8 +979,8 @@
                                         <span>🚀</span> <span>เริ่มสอบทันที</span>
                                     </button>
                                 `}
-                                <button onclick="openLiveStudentsModal('${room.roomId}')" class="py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-bold transition active:scale-95 flex items-center justify-center gap-1 cursor-pointer">
-                                    <span>👨‍🎓</span> <span>ดูรายชื่อ</span>
+                                <button onclick="openLiveStudentsModal('${room.roomId}')" class="py-2.5 bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-bold transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs">
+                                    <span>📊</span> <span>แดชบอร์ดสด</span>
                                 </button>
                             </div>
                         </div>
@@ -1325,19 +1394,45 @@
             }
         }
 
-        // 9. ดูรายชื่อนักศึกษาในห้องสอบสด & เปรียบเทียบกับรายชื่อในวิชาแบบเรียลไทม์
+        // 9. แดชบอร์ดสรุปผลสอบสดแบบ Real-time (Attendance, Score Histogram & Top Missed Questions)
         let currentLiveStudentsData = [];
+        let currentLiveDashboardData = null;
         let liveStudentsPollInterval = null;
         let currentLiveFilterTab = 'all';
+        let currentDashboardTab = 'roster';
+
+        function switchDashboardTab(tab) {
+            currentDashboardTab = tab;
+            const tabs = ['roster', 'histogram', 'wrong_questions'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`dtab-btn-${t.replace('_', '-')}`);
+                const view = document.getElementById(`dtab-view-${t.replace('_', '-')}`);
+                if (btn) {
+                    if (t === tab) {
+                        btn.className = 'px-4 py-2 bg-indigo-600 text-white rounded-xl shadow-xs cursor-pointer font-bold transition flex items-center gap-1.5';
+                    } else {
+                        btn.className = 'px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl cursor-pointer font-bold transition flex items-center gap-1.5';
+                    }
+                }
+                if (view) {
+                    if (t === tab) {
+                        view.classList.remove('hidden');
+                    } else {
+                        view.classList.add('hidden');
+                    }
+                }
+            });
+        }
 
         async function openLiveStudentsModal(roomId) {
             activeModalRoomId = roomId;
             const modal = document.getElementById('live-students-modal');
             const list = document.getElementById('students-modal-list');
-            list.innerHTML = '<div class="text-center py-6 text-slate-400 font-bold">กำลังตรวจสอบรายชื่อและการเข้าสอบแบบเรียลไทม์...</div>';
+            list.innerHTML = '<div class="text-center py-6 text-slate-400 font-bold">กำลังเชื่อมต่อแดชบอร์ดผลสอบสด...</div>';
             document.getElementById('live-students-room-name').textContent = `ห้องสอบ: ${roomId}`;
             modal.classList.remove('hidden');
 
+            switchDashboardTab('roster');
             await fetchAndRenderAttendance(roomId, true);
 
             // เริ่ม Polling แบบ Real-time อัตโนมัติทุก 2.5 วินาที
@@ -1354,24 +1449,37 @@
 
         async function fetchAndRenderAttendance(roomId, isFirstLoad = false) {
             try {
-                const res = await fetch(`/api/teacher/room-roster-attendance?roomId=${encodeURIComponent(roomId)}`);
+                const res = await fetch(`/api/teacher/room-realtime-dashboard?roomId=${encodeURIComponent(roomId)}`);
                 if (!res.ok) {
                     if (isFirstLoad) {
-                        document.getElementById('students-modal-list').innerHTML = '<div class="text-center py-6 text-rose-500 font-bold">ไม่สามารถดึงข้อมูลรายชื่อได้</div>';
+                        document.getElementById('students-modal-list').innerHTML = '<div class="text-center py-6 text-rose-500 font-bold">ไม่สามารถดึงข้อมูลแดชบอร์ดสดได้</div>';
                     }
                     return;
                 }
                 const data = await res.json();
-                document.getElementById('students-modal-enrolled').textContent = data.totalEnrolled || 0;
-                document.getElementById('students-modal-joined').textContent = data.totalJoined || 0;
-                document.getElementById('students-modal-not-joined').textContent = data.totalNotJoined || 0;
+                currentLiveDashboardData = data;
 
-                if (data.courseCode || data.courseName) {
-                    document.getElementById('live-students-room-name').textContent = `วิชา: [${data.courseCode}] ${data.courseName} | ห้อง: ${roomId}`;
+                const summary = data.summary || {};
+                document.getElementById('students-modal-enrolled').textContent = summary.totalEnrolled || 0;
+                document.getElementById('students-modal-active').textContent = summary.totalActive || 0;
+                document.getElementById('students-modal-submitted').textContent = summary.totalSubmitted || 0;
+                document.getElementById('students-modal-not-joined').textContent = summary.totalNotJoined || 0;
+
+                const avgEl = document.getElementById('students-modal-avg-score');
+                if (avgEl) {
+                    avgEl.textContent = summary.totalSubmitted > 0 
+                        ? `${summary.avgScore} / ${summary.maxPossibleScore}`
+                        : '-';
+                }
+
+                if (data.room && (data.room.courseCode || data.room.courseName)) {
+                    document.getElementById('live-students-room-name').textContent = `วิชา: [${data.room.courseCode}] ${data.room.courseName} | ${data.room.examTitle || ''} (ห้อง: ${roomId})`;
                 }
 
                 currentLiveStudentsData = data.students || [];
                 renderLiveModalStudentsList();
+                renderDashboardHistogram(data.histogram, summary);
+                renderTopWrongQuestions(data.topWrongQuestions);
             } catch(e) {
                 console.error("fetchAndRenderAttendance error:", e);
                 if (isFirstLoad) {
@@ -1382,13 +1490,13 @@
 
         function filterLiveModalStudents(filterType) {
             currentLiveFilterTab = filterType;
-            ['all', 'joined', 'not_joined'].forEach(f => {
+            ['all', 'active', 'submitted', 'not_joined'].forEach(f => {
                 const btn = document.getElementById(`tab-live-${f.replace('_', '-')}`);
                 if (btn) {
                     if (f === filterType) {
-                        btn.className = 'px-4 py-2 bg-indigo-600 text-white rounded-xl transition shadow-xs cursor-pointer font-bold';
+                        btn.className = 'px-3 py-1.5 bg-indigo-600 text-white rounded-lg transition shadow-xs cursor-pointer font-bold';
                     } else {
-                        btn.className = 'px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl transition cursor-pointer font-bold';
+                        btn.className = 'px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition cursor-pointer font-bold';
                     }
                 }
             });
@@ -1398,8 +1506,10 @@
         function renderLiveModalStudentsList() {
             const list = document.getElementById('students-modal-list');
             let filtered = currentLiveStudentsData;
-            if (currentLiveFilterTab === 'joined') {
-                filtered = currentLiveStudentsData.filter(s => s.status === 'joined' || s.status === 'submitted');
+            if (currentLiveFilterTab === 'active') {
+                filtered = currentLiveStudentsData.filter(s => s.status === 'active' || s.status === 'joined');
+            } else if (currentLiveFilterTab === 'submitted') {
+                filtered = currentLiveStudentsData.filter(s => s.status === 'submitted');
             } else if (currentLiveFilterTab === 'not_joined') {
                 filtered = currentLiveStudentsData.filter(s => s.status === 'not_joined');
             }
@@ -1410,33 +1520,135 @@
             }
 
             list.innerHTML = filtered.map(s => {
-                let badgeClass = 'bg-rose-100 text-rose-700 border border-rose-300';
-                if (s.status === 'submitted') {
-                    badgeClass = 'bg-emerald-600 text-white shadow-xs';
-                } else if (s.status === 'joined') {
-                    badgeClass = 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm';
-                } else if (s.statusText && s.statusText.includes('ออกจากห้อง')) {
-                    badgeClass = 'bg-amber-100 text-amber-800 border border-amber-300 font-bold';
+                const isSub = s.status === 'submitted';
+                const isActive = s.status === 'active' || s.status === 'joined';
+
+                let badgeHtml = '';
+                let borderClass = 'border-slate-200 bg-white';
+                if (isSub) {
+                    badgeHtml = `<span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-emerald-600 text-white shadow-xs">✅ ส่งข้อสอบแล้ว</span>`;
+                    borderClass = 'border-emerald-200 bg-emerald-50/20';
+                } else if (isActive) {
+                    badgeHtml = `<span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shadow-xs flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> กำลังสอบ</span>`;
+                    borderClass = 'border-cyan-200 bg-cyan-50/20';
+                } else {
+                    badgeHtml = `<span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-rose-100 text-rose-700 border border-rose-300">🔴 ยังไม่เข้าสอบ</span>`;
+                    borderClass = 'border-slate-200 bg-slate-50/50';
                 }
 
                 return `
-                    <div class="p-3.5 rounded-2xl border flex items-center justify-between ${s.statusBg || 'bg-slate-50 border-slate-200'} transition-all duration-200 shadow-xs hover:shadow-sm">
+                    <div class="p-3.5 rounded-2xl border flex items-center justify-between ${borderClass} transition-all duration-200 shadow-xs hover:shadow-sm">
                         <div>
                             <div class="font-extrabold text-slate-900 text-xs sm:text-sm flex items-center gap-2">
                                 <span>${escapeHtml(s.name)}</span>
-                                ${s.status === 'joined' ? '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-100/80 px-2 py-0.5 rounded-full border border-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> กำลังสอบ</span>' : ''}
                             </div>
                             <div class="text-[11px] text-slate-500 font-mono mt-0.5">
                                 รหัสนักศึกษา: <b>${escapeHtml(s.studentId)}</b> | กลุ่ม/ห้อง: ${escapeHtml(s.class || '-')}
                             </div>
                         </div>
                         <div class="text-right shrink-0">
-                            <span class="px-2.5 py-1 rounded-xl text-[10px] font-black ${badgeClass}">
-                                ${escapeHtml(s.statusText)}
-                            </span>
+                            ${badgeHtml}
                             ${s.score !== null && s.score !== undefined ? `
-                                <div class="text-xs font-extrabold text-emerald-700 mt-1">${s.score} / ${s.maxScore} คะแนน</div>
+                                <div class="text-xs font-black text-emerald-700 mt-1">${s.score} / ${s.maxScore} คะแนน</div>
                             ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderDashboardHistogram(histogram, summary) {
+            const container = document.getElementById('histogram-bars-container');
+            if (!container) return;
+
+            const maxEl = document.getElementById('hist-max-score');
+            const minEl = document.getElementById('hist-min-score');
+            const avgEl = document.getElementById('hist-avg-score');
+
+            if (summary && summary.totalSubmitted > 0) {
+                if (maxEl) maxEl.textContent = `${summary.maxScore} / ${summary.maxPossibleScore}`;
+                if (minEl) minEl.textContent = `${summary.minScore} / ${summary.maxPossibleScore}`;
+                if (avgEl) avgEl.textContent = `${summary.avgScore} คะแนน`;
+            } else {
+                if (maxEl) maxEl.textContent = '-';
+                if (minEl) minEl.textContent = '-';
+                if (avgEl) avgEl.textContent = '-';
+            }
+
+            if (!summary || summary.totalSubmitted === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-slate-400 font-bold">
+                        <div class="text-3xl mb-1">⏳</div>
+                        <div>ยังไม่มีนักศึกษาส่งกระดาษคำตอบ</div>
+                        <div class="text-[11px] text-slate-400 mt-1 font-normal">กราฟแท่งจะแสดงทันทีเมื่อมีนักศึกษาส่งข้อสอบ</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const buckets = [
+                { label: '0 - 25% (ต่ำมาก)', key: '0-25%', color: 'from-rose-500 to-red-600', text: 'text-rose-600' },
+                { label: '26 - 50% (ต้องปรับปรุง)', key: '26-50%', color: 'from-amber-400 to-orange-500', text: 'text-amber-600' },
+                { label: '51 - 75% (ปานกลาง)', key: '51-75%', color: 'from-cyan-500 to-blue-600', text: 'text-cyan-600' },
+                { label: '76 - 100% (ดีมาก)', key: '76-100%', color: 'from-emerald-500 to-teal-600', text: 'text-emerald-600' }
+            ];
+
+            const totalSub = summary.totalSubmitted || 1;
+            container.innerHTML = buckets.map(b => {
+                const count = histogram ? (histogram[b.key] || 0) : 0;
+                const pct = Math.round((count / totalSub) * 100);
+                return `
+                    <div class="space-y-1">
+                        <div class="flex items-center justify-between text-xs font-bold">
+                            <span class="text-slate-700">${b.label}</span>
+                            <span class="${b.text}">${count} คน (${pct}%)</span>
+                        </div>
+                        <div class="w-full bg-slate-200/80 rounded-full h-3 overflow-hidden p-0.5">
+                            <div class="bg-gradient-to-r ${b.color} h-full rounded-full transition-all duration-500" style="width: ${Math.max(pct, count > 0 ? 5 : 0)}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderTopWrongQuestions(questions) {
+            const container = document.getElementById('top-wrong-questions-list');
+            if (!container) return;
+
+            if (!questions || questions.length === 0 || questions.every(q => q.wrongCount === 0)) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-slate-400 font-bold">
+                        <div class="text-3xl mb-1">🎉</div>
+                        <div class="text-slate-600">ยังไม่มีประวัติการตอบผิด หรือยังไม่มีใครส่งข้อสอบ</div>
+                        <div class="text-[11px] text-slate-400 mt-1 font-normal">เมื่อมีนักศึกษาส่งคำตอบ ระบบจะวิเคราะห์ข้อสอบที่ตอบผิดบ่อยให้อัตโนมัติ</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = questions.filter(q => q.wrongCount > 0).map((q, idx) => {
+                return `
+                    <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 hover:border-indigo-300 transition">
+                        <div class="space-y-1 flex-1">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-rose-100 text-rose-700 font-black text-xs px-2.5 py-0.5 rounded-lg border border-rose-200">
+                                    อันดับ ${idx + 1} • ข้อที่ ${q.questionIndex}
+                                </span>
+                                <span class="text-xs font-bold text-slate-500">เฉลย: <strong class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-mono">${escapeHtml(q.correctAnswer?.toUpperCase() || '-')}</strong> (${escapeHtml(q.correctText || '')})</span>
+                            </div>
+                            <div class="text-xs sm:text-sm font-bold text-slate-900 line-clamp-2">
+                                ${escapeHtml(q.questionText)}
+                            </div>
+                        </div>
+                        <div class="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-200">
+                            <div class="text-xs font-extrabold text-rose-600 flex items-center gap-1">
+                                <span>ตอบผิด:</span>
+                                <span class="text-sm font-black">${q.wrongCount} คน</span>
+                                <span class="text-[11px] text-rose-400">(${q.wrongRate}%)</span>
+                            </div>
+                            <div class="w-24 sm:w-32 bg-slate-200 rounded-full h-2 overflow-hidden mt-1">
+                                <div class="bg-rose-500 h-full rounded-full" style="width: ${q.wrongRate}%"></div>
+                            </div>
                         </div>
                     </div>
                 `;

@@ -261,13 +261,44 @@
 
     <main class="p-6 md:p-8 flex-grow max-w-[1500px] w-full mx-auto space-y-6 overflow-y-auto">
 
-        <!-- Stats -->
-        <div class="flex flex-wrap gap-5">
-            <div class="glass-card p-5 sm:p-6 flex items-center gap-4 border-2 border-slate-200/90 shadow-sm min-w-[280px]">
-                <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-2xl flex-shrink-0">👤</div>
+        <!-- Course Filter Navigation Tabs -->
+        <div class="glass-card p-4 sm:p-5 border-2 border-slate-200/90 shadow-sm flex flex-col gap-3">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-200 text-xs font-bold text-slate-500">
+                <span class="flex items-center gap-1.5 text-indigo-700 font-extrabold text-sm">
+                    <span>📚</span> <span>แยกรายชื่อตามวิชาที่สอน:</span>
+                </span>
+                <span id="active-course-label" class="text-xs text-slate-500 font-bold bg-slate-100 px-3 py-1 rounded-full">แสดงนักศึกษาทั้งหมด</span>
+            </div>
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 max-w-full" id="course-filter-tabs">
+                <button type="button" onclick="selectCourseFilter('ALL')" id="course-tab-ALL" class="px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all shadow-sm bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shrink-0 cursor-pointer flex items-center gap-2">
+                    <span>👥</span>
+                    <span>นักศึกษาทั้งหมด</span>
+                    <span id="tab-count-ALL" class="bg-white/30 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats 3 Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <div class="glass-card p-5 sm:p-6 flex items-center gap-4 border-2 border-slate-200/90 shadow-sm">
+                <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-600 flex items-center justify-center text-2xl flex-shrink-0">👤</div>
                 <div>
                     <div class="text-3xl font-bold text-slate-900" id="stat-total">0</div>
-                    <div class="text-xs text-slate-500 font-semibold uppercase tracking-wide">นักศึกษาทั้งหมด</div>
+                    <div class="text-xs text-slate-500 font-semibold uppercase tracking-wide" id="stat-total-label">นักศึกษาทั้งหมด</div>
+                </div>
+            </div>
+            <div class="glass-card p-5 sm:p-6 flex items-center gap-4 border-2 border-slate-200/90 shadow-sm">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center text-2xl flex-shrink-0">📝</div>
+                <div>
+                    <div class="text-3xl font-bold text-slate-900" id="stat-exam">0</div>
+                    <div class="text-xs text-slate-500 font-semibold uppercase tracking-wide">จำนวนครั้งที่สอบรวม</div>
+                </div>
+            </div>
+            <div class="glass-card p-5 sm:p-6 flex items-center gap-4 border-2 border-slate-200/90 shadow-sm">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-2xl flex-shrink-0">🎯</div>
+                <div>
+                    <div class="text-3xl font-bold text-emerald-600" id="stat-avg">—</div>
+                    <div class="text-xs text-slate-500 font-semibold uppercase tracking-wide">คะแนนเฉลี่ยรวม</div>
                 </div>
             </div>
         </div>
@@ -276,7 +307,7 @@
         <div class="glass-card overflow-hidden border-2 border-slate-200/90 shadow-sm">
             <div class="p-5 sm:p-6 border-b-2 border-slate-200 flex justify-between items-center gap-4">
                 <div class="flex items-center gap-3">
-                    <div class="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-2 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shadow-md shadow-indigo-500/20">
+                    <div class="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-2 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shadow-md shadow-indigo-500/20" id="table-header-pill">
                         👥 นักศึกษาทั้งหมด <span id="student-count-badge" class="ml-1 text-xs bg-white/30 px-2.5 py-0.5 rounded-full font-bold">0</span>
                     </div>
                 </div>
@@ -501,30 +532,102 @@
         ]
     };
 
-    window.addEventListener('DOMContentLoaded', () => {
-        loadStudents();
-        loadPendingStudents();
+    let teacherCourses = [];
+    let selectedCourseFilter = 'ALL';
+
+    window.addEventListener('DOMContentLoaded', async () => {
+        await loadTeacherCourses();
+        await loadStudents('ALL');
+        await loadPendingStudents();
     });
 
-    async function loadStudents() {
+    async function loadTeacherCourses() {
         try {
-            const res = await fetch(`/api/students?username=${encodeURIComponent(username)}`);
+            const res = await fetch(`/api/teacher/courses?username=${encodeURIComponent(username)}`);
+            if (res.ok) {
+                teacherCourses = await res.json();
+                renderCourseFilterTabs();
+            }
+        } catch(e) {
+            console.error("Load courses error:", e);
+        }
+    }
+
+    function renderCourseFilterTabs() {
+        const container = document.getElementById('course-filter-tabs');
+        if (!container) return;
+
+        let html = `
+            <button type="button" onclick="selectCourseFilter('ALL')" id="course-tab-ALL" 
+                class="px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all shadow-sm ${selectedCourseFilter === 'ALL' ? 'bg-gradient-to-r from-cyan-600 to-indigo-600 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'} shrink-0 cursor-pointer flex items-center gap-2">
+                <span>👥</span>
+                <span>นักศึกษาทั้งหมด</span>
+                <span id="tab-count-ALL" class="${selectedCourseFilter === 'ALL' ? 'bg-white/30 text-white' : 'bg-slate-200 text-slate-800'} text-[10px] px-2 py-0.5 rounded-full font-bold">${allStudents.length}</span>
+            </button>
+        `;
+
+        (teacherCourses || []).forEach(c => {
+            const isActive = String(selectedCourseFilter) === String(c.id);
+            const activeClass = isActive 
+                ? 'bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shadow-sm' 
+                : 'bg-slate-100 hover:bg-slate-200 text-slate-700';
+            const badgeClass = isActive ? 'bg-white/30 text-white' : 'bg-slate-200 text-slate-800';
+
+            html += `
+                <button type="button" onclick="selectCourseFilter('${c.id}')" id="course-tab-${c.id}" 
+                    class="px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all ${activeClass} shrink-0 cursor-pointer flex items-center gap-2">
+                    <span>📘</span>
+                    <span>[${escapeHtml(c.courseCode || 'วิชา')}] ${escapeHtml(c.courseName)}</span>
+                    <span class="${badgeClass} text-[10px] px-2 py-0.5 rounded-full font-bold">${c.studentCount || 0} คน</span>
+                </button>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    async function selectCourseFilter(courseId) {
+        selectedCourseFilter = courseId;
+        const labelEl = document.getElementById('active-course-label');
+        const headerPill = document.getElementById('table-header-pill');
+
+        if (courseId === 'ALL') {
+            if (labelEl) labelEl.textContent = 'แสดงนักศึกษาทั้งหมด';
+            if (headerPill) headerPill.innerHTML = `👥 นักศึกษาทั้งหมด <span id="student-count-badge" class="ml-1 text-xs bg-white/30 px-2.5 py-0.5 rounded-full font-bold">0</span>`;
+            if (document.getElementById('stat-total-label')) document.getElementById('stat-total-label').textContent = 'นักศึกษาทั้งหมด';
+        } else {
+            const found = (teacherCourses || []).find(c => String(c.id) === String(courseId));
+            const courseNameStr = found ? `[${found.courseCode || 'วิชา'}] ${found.courseName}` : `วิชารหัส #${courseId}`;
+            if (labelEl) labelEl.textContent = `วิชา: ${courseNameStr}`;
+            if (headerPill) headerPill.innerHTML = `📘 ${escapeHtml(courseNameStr)} <span id="student-count-badge" class="ml-1 text-xs bg-white/30 px-2.5 py-0.5 rounded-full font-bold">0</span>`;
+            if (document.getElementById('stat-total-label')) document.getElementById('stat-total-label').textContent = `นักศึกษาในวิชา ${found?.courseCode || ''}`;
+        }
+
+        renderCourseFilterTabs();
+        await loadStudents(courseId);
+    }
+
+    async function loadStudents(courseId = selectedCourseFilter) {
+        try {
+            const url = courseId && courseId !== 'ALL'
+                ? `/api/students?username=${encodeURIComponent(username)}&courseId=${encodeURIComponent(courseId)}`
+                : `/api/students?username=${encodeURIComponent(username)}`;
+            const res = await fetch(url);
             if (res.ok) {
                 const data = await res.json();
-                if (Array.isArray(data) && data.length > 0) {
-                    allStudents = data;
-                }
+                allStudents = Array.isArray(data) ? data : [];
             }
         } catch(e) {
             console.warn("API โหลดนักศึกษา offline ใช้ข้อมูลสำรองแทน:", e);
-        }
-
-        if (!allStudents || allStudents.length === 0) {
-            allStudents = DEFAULT_STUDENT_LIST;
+            if (selectedCourseFilter === 'ALL') allStudents = DEFAULT_STUDENT_LIST;
         }
 
         updateStats();
         renderTable(allStudents);
+        const countAllEl = document.getElementById('tab-count-ALL');
+        if (countAllEl && selectedCourseFilter === 'ALL') {
+            countAllEl.textContent = allStudents.length;
+        }
     }
 
     async function loadPendingStudents() {
@@ -731,9 +834,11 @@
                 <td class="px-5 py-4"><span class="font-mono font-bold text-cyan-700 text-sm sm:text-base">${sid}</span></td>
                 <td class="px-5 py-4">
                     <div class="font-bold text-slate-900 text-sm sm:text-base">${fn} ${ln}</div>
-                    <div class="flex items-center gap-2 mt-0.5">
+                    <div class="flex items-center gap-2 mt-0.5 flex-wrap">
                         ${note ? `<span class="text-xs text-slate-400 font-medium">${note}</span>` : ''}
                         ${cheatBadge}
+                        ${s.enrolledCourses ? `<span class="text-[10px] text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-lg font-bold">📚 ${esc(s.enrolledCourses)}</span>` : ''}
+                        ${s.courseName ? `<span class="text-[10px] text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-lg font-bold">📚 [${esc(s.courseCode || '')}] ${esc(s.courseName)}</span>` : ''}
                     </div>
                 </td>
                 <td class="px-5 py-4">

@@ -698,7 +698,9 @@
                 badge.classList.remove('hidden');
             }
 
-            if (settings.randomize === 1) {
+            // สุ่มลำดับข้อสอบและตัวเลือก (ค่าเริ่มต้นเป็น 1 หรือตามการตั้งค่าห้องสอบ)
+            const isRandomizeEnabled = settings.randomize !== 0;
+            if (isRandomizeEnabled) {
                 examQuestions = shuffleArray(questions);
                 shouldRandomizeChoices = true;
             } else {
@@ -729,6 +731,8 @@
             renderExamQuestions();
         }
 
+        const thaiChoiceLetters = ['ก', 'ข', 'ค', 'ง', 'จ', 'ฉ', 'ช', 'ซ', 'ฌ', 'ญ'];
+
         function renderExamQuestions() {
             const container = document.getElementById('questions-container');
             container.innerHTML = examQuestions.map((q, qIndex) => {
@@ -740,15 +744,19 @@
                     }
                 });
                 const shuffledChoices = shouldRandomizeChoices ? shuffleArray(activeChoices) : activeChoices;
-                const choicesHtml = shuffledChoices.map(choice => `
-                    <label class="flex flex-col gap-2 p-3 sm:p-3.5 glass-light rounded-xl sm:rounded-2xl cursor-pointer hover:border-cyan-500/50 active:scale-[0.99] transition-all duration-200 group select-none min-h-[44px]" style="border:1.5px solid rgba(148, 163, 184, 0.3);">
-                        <div class="flex items-start gap-2.5 sm:gap-3">
-                            <input type="radio" name="q_${q.id}" value="${choice.key}" onchange="updateProgressBar()" class="w-4 h-4 sm:w-4.5 sm:h-4.5 mt-0.5 accent-cyan-500 shrink-0 cursor-pointer">
-                            <span class="text-xs sm:text-sm text-slate-700 group-hover:text-slate-950 font-medium transition leading-snug break-words flex-1">${escapeHtml(choice.text)}</span>
-                        </div>
-                        ${choice.img ? `<div class="mt-1 pl-6 sm:pl-7"><img src="${choice.img}" class="max-h-28 sm:max-h-36 max-w-full rounded-xl border border-slate-200 object-contain bg-slate-100"></div>` : ''}
-                    </label>
-                `).join('');
+                const choicesHtml = shuffledChoices.map((choice, cIndex) => {
+                    const thaiLabel = thaiChoiceLetters[cIndex] || `${cIndex+1}`;
+                    return `
+                        <label class="flex flex-col gap-2 p-3 sm:p-3.5 glass-light rounded-xl sm:rounded-2xl cursor-pointer hover:border-cyan-500/50 active:scale-[0.99] transition-all duration-200 group select-none min-h-[48px]" style="border:1.5px solid rgba(148, 163, 184, 0.3);">
+                            <div class="flex items-start gap-2.5 sm:gap-3">
+                                <input type="radio" name="q_${q.id}" value="${choice.key}" onchange="updateProgressBar()" class="w-4 h-4 sm:w-4.5 sm:h-4.5 mt-1 accent-cyan-500 shrink-0 cursor-pointer">
+                                <span class="w-6 h-6 rounded-lg bg-slate-100 group-hover:bg-cyan-100 group-hover:text-cyan-700 text-slate-700 font-bold text-xs flex items-center justify-center shrink-0 border border-slate-200 group-hover:border-cyan-300 transition-colors mt-0.5">${thaiLabel}.</span>
+                                <span class="text-xs sm:text-sm text-slate-700 group-hover:text-slate-950 font-medium transition leading-snug break-words flex-1 pt-0.5">${escapeHtml(choice.text)}</span>
+                            </div>
+                            ${choice.img ? `<div class="mt-1 pl-12"><img src="${choice.img}" class="max-h-28 sm:max-h-36 max-w-full rounded-xl border border-slate-200 object-contain bg-slate-100"></div>` : ''}
+                        </label>
+                    `;
+                }).join('');
                 return `
                     <div class="space-y-3 sm:space-y-4 ${qIndex > 0 ? 'pt-6 sm:pt-8' : ''}">
                         <div class="font-bold text-sm sm:text-base text-slate-800 flex items-start gap-2 sm:gap-2.5">
