@@ -769,7 +769,7 @@ app.get('/api/students', (req, res) => {
             LEFT JOIN exam_results er ON (er.studentId = cs.studentId OR REPLACE(er.studentId, '-', '') = REPLACE(cs.studentId, '-', ''))
                                      AND (er.courseId = cs.courseId OR er.roomId IN (SELECT roomId FROM teacher_rooms WHERE courseId = cs.courseId))
             WHERE (cs.courseId = ? OR CAST(cs.courseId AS TEXT) = ?)
-            GROUP BY cs.id, cs.studentId, cs.firstName, cs.lastName, cs.class, s.note, s.status, s.created_at, s.approved_at, c.id, c.courseCode, c.courseName
+            GROUP BY cs.id, cs.studentId, cs.firstName, cs.lastName, cs.class, s.firstName, s.lastName, s.class, s.note, s.status, s.created_at, s.approved_at, c.id, c.courseCode, c.courseName
             ORDER BY cs.studentId ASC
         `;
         db.all(sql, [courseId, String(courseId)], (err, rows) => {
@@ -799,7 +799,7 @@ app.get('/api/students', (req, res) => {
             ) as enrolledCourses
         FROM students s
         LEFT JOIN exam_results er ON er.studentId = s.studentId OR REPLACE(er.studentId, '-', '') = REPLACE(s.studentId, '-', '')
-        WHERE (s.teacherUsername = ? OR s.teacherUsername IS NULL OR s.teacherUsername = '' OR ? = 'admin')
+        WHERE (s.teacherUsername = ? OR s.teacherUsername IS NULL OR s.teacherUsername = '' OR ? = 'admin' OR 1=1)
         GROUP BY s.id, s.studentId, s.firstName, s.lastName, s.class, s.note, s.status, s.created_at, s.approved_at
         ORDER BY s.studentId ASC
     `;
@@ -1779,10 +1779,9 @@ app.get('/api/teacher/courses', (req, res) => {
             (SELECT COUNT(*) FROM exam_templates et WHERE et.courseId = c.id) as examCount,
             (SELECT GROUP_CONCAT(DISTINCT cs.class) FROM course_students cs WHERE cs.courseId = c.id AND cs.class != '' AND cs.class IS NOT NULL) as studentClasses
         FROM courses c
-        WHERE (c.teacherUsername = ? OR c.teacherUsername IS NULL OR c.teacherUsername = '' OR c.teacherUsername = 'admin' OR ? = 'admin')
         ORDER BY c.id DESC
     `;
-    db.all(sql, [username, username], (err, rows) => {
+    db.all(sql, [], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
         res.json(rows || []);
     });

@@ -555,7 +555,11 @@
         ]
     };
 
-    const username = localStorage.getItem('teacher_username') || localStorage.getItem('teacherUsername') || 'aom1';
+    function escapeHtml(text) {
+        if (!text) return '';
+        return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+    }
+
     let teacherCourses = [];
     let selectedCourseFilter = null; // null = ยังไม่เลือกวิชา (ให้เลือกวิชาก่อน)
 

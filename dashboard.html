@@ -3,28 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แผงควบคุมหลัก - Tab-Lock Online Proctoring System</title>
-    <meta name="description" content="แผงควบคุมหลักระบบสอบออนไลน์ Tab-Lock สำหรับอาจารย์ผู้ดูแลห้องสอบ">
+    <title>แผงควบคุมหลัก - มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน | Tab-Lock Proctoring</title>
+    <meta name="description" content="แผงควบคุมหลักระบบสอบออนไลน์ Tab-Lock สำหรับอาจารย์ มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet">
     <style>
         html { font-size: 100%; -webkit-text-size-adjust: 100%; }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
 
         @media (max-width: 768px) {
             #sidebar {
                 position: fixed;
-                top: 0; bottom: 0; left: -280px;
+                top: 0; bottom: 0; left: -290px;
                 z-index: 9999;
-                width: 260px !important;
+                width: 270px !important;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-                transition: left 0.3s ease-in-out;
+                transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             }
             #sidebar.mobile-open { left: 0 !important; }
         }
 
-        * { box-sizing: border-box; }
-        
-        /* ===== SIDEBAR (STANDARDIZED UX/UI FOR TEACHERS - PASTEL ACCENT) ===== */
+        /* ===== SIDEBAR (CLEAN ACADEMIC THEME) ===== */
         #sidebar {
             background: #ffffff;
             width: 280px;
@@ -34,41 +38,13 @@
             justify-content: space-between;
             position: relative;
             overflow: hidden;
-            border-right: 1px solid #f1f5f9;
+            border-right: 1px solid #e2e8f0;
             flex-shrink: 0;
             transition: width 0.25s ease-in-out;
-            box-shadow: 2px 0 16px rgba(244, 114, 182, 0.05);
-            font-family: 'Kanit', sans-serif;
-        }
-        #sidebar::before {
-            content: '';
-            position: absolute;
-            top: -60px; left: -60px;
-            width: 200px; height: 200px;
-            background: radial-gradient(circle, rgba(244, 114, 182, 0.08) 0%, transparent 70%);
-            border-radius: 50%;
-            animation: blobPulse 6s ease-in-out infinite;
-            pointer-events: none; z-index: 0;
-        }
-        @keyframes blobPulse {
-            0%, 100% { transform: scale(1) translate(0, 0); opacity: 0.6; }
-            33% { transform: scale(1.15) translate(10px, -10px); opacity: 1; }
-            66% { transform: scale(0.9) translate(-5px, 8px); opacity: 0.7; }
+            box-shadow: 1px 0 10px rgba(15, 23, 42, 0.03);
         }
         .sidebar-inner { position: relative; z-index: 1; }
-        .logo-gradient {
-            background: linear-gradient(135deg, #ec4899, #38bdf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .logo-shield {
-            width: 42px; height: 42px;
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-            overflow: hidden;
-        }
+        
         .nav-section-header {
             display: flex;
             align-items: center;
@@ -76,157 +52,125 @@
             padding: 8px 12px 4px 12px;
         }
         .nav-section-title {
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 0.04em;
-            color: #64748b;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
             text-transform: uppercase;
-            font-family: 'Kanit', sans-serif;
         }
         .nav-link {
             display: flex; align-items: center; gap: 12px;
-            padding: 12px 16px; border-radius: 16px;
-            font-size: 16px; font-weight: 500;
-            color: #334155; text-decoration: none;
+            padding: 10px 14px; border-radius: 14px;
+            font-size: 15px; font-weight: 500;
+            color: #475569; text-decoration: none;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1.5px solid transparent;
-            font-family: 'Kanit', sans-serif;
         }
         .nav-link svg {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             flex-shrink: 0;
-            min-width: 24px;
-            min-height: 24px;
         }
         .nav-link:hover {
-            color: #ec4899; background: #fdf2f8;
-            border-color: #fbcfe8; transform: translateX(3px);
+            color: #1e3a8a; background: #eff6ff;
+            border-color: #dbeafe; transform: translateX(3px);
         }
         .nav-link.active {
-            background: linear-gradient(135deg, #f472b6 0%, #818cf8 50%, #38bdf8 100%);
+            background: #1e3a8a;
             color: #ffffff !important; font-weight: 600 !important;
-            box-shadow: 0 8px 20px rgba(244, 114, 182, 0.3);
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);
             border-color: transparent;
         }
-        .nav-link.active svg { color: #ffffff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
+        .nav-link.active svg { color: #ffffff; }
 
-
-        /* ===== MAIN WORKSPACE (PASTEL LIGHT THEME) ===== */
+        /* ===== WORKSPACE THEME ===== */
         #main-area {
-            flex: 1; background: #f8fafc;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(251, 207, 232, 0.35) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(186, 230, 253, 0.35) 0%, transparent 40%),
-                linear-gradient(to right, rgba(241, 245, 249, 0.6) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(241, 245, 249, 0.6) 1px, transparent 1px);
-            background-size: 100% 100%, 100% 100%, 36px 36px, 36px 36px;
-            display: flex; flex-direction: column; overflow-x: hidden;
-            font-family: 'Kanit', sans-serif;
+            flex: 1;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
             color: #1e293b;
         }
         #top-header {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(16px);
-            border-bottom: 1px solid #f1f5f9;
-            padding: 18px 32px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #e2e8f0;
+            padding: 14px 28px;
             display: flex; align-items: center; justify-content: space-between;
         }
-        
-        /* Pastel Glass Cards */
-        .pastel-glass-card {
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(16px);
-            border: 1.5px solid #f1f5f9;
-            box-shadow: 0 10px 25px -5px rgba(244, 114, 182, 0.05), 0 8px 10px -6px rgba(56, 189, 248, 0.05);
+
+        /* Clean Academic Card */
+        .academic-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
+            border-radius: 20px;
+            transition: all 0.25s ease;
+        }
+        .academic-card:hover {
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+            border-color: #cbd5e1;
+        }
+
+        /* Academic Hero */
+        .academic-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #172554 100%);
+            color: #ffffff;
             border-radius: 24px;
             position: relative;
             overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.25);
         }
-        .pastel-glass-card:hover {
-            transform: translateY(-4px);
-            border-color: #fbcfe8;
-            box-shadow: 0 20px 35px -10px rgba(244, 114, 182, 0.15);
-        }
-
-        /* Pastel Hero Banner */
-        .pastel-hero-banner {
-            background: linear-gradient(135deg, #fce7f3 0%, #ffffff 50%, #e0f2fe 100%);
-            border: 1.5px solid rgba(244, 114, 182, 0.25);
-            box-shadow: 0 15px 35px -10px rgba(244, 114, 182, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-            position: relative;
-        }
-
-        .pastel-orb {
-            position: absolute; border-radius: 50%;
-            filter: blur(45px); opacity: 0.5;
-            animation: orbFloat 7s ease-in-out infinite;
+        .academic-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 24px 24px;
             pointer-events: none;
         }
-        @keyframes orbFloat {
-            0%, 100% { transform: translateY(0px) scale(1); }
-            50% { transform: translateY(-16px) scale(1.06); }
-        }
 
-        /* Pulse Dot Animation */
-        @keyframes pastelPulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.4); }
-            50% { box-shadow: 0 0 0 8px rgba(236, 72, 153, 0); }
-        }
-        .pastel-pulse-dot { animation: pastelPulse 2s ease-in-out infinite; }
-
-        /* Modal styling */
-        #gemini-modal {
-            display: none;
-            position: fixed; inset: 0; z-index: 9999;
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(8px);
-            align-items: center; justify-content: center;
-        }
-        #gemini-modal.open { display: flex; }
-
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #f8fafc; }
-        ::-webkit-scrollbar-thumb { background: rgba(244, 114, 182, 0.4); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(236, 72, 153, 0.6); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
 <!-- ===== SIDEBAR ===== -->
 <aside id="sidebar">
-    <div class="sidebar-inner p-4 sm:p-5 space-y-4 flex-1 overflow-y-auto">
-        <!-- Logo Header -->
+    <div class="sidebar-inner p-4 space-y-4 flex-1 overflow-y-auto">
+        <!-- Logo Header with RMUTI Crest -->
         <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
-            <div class="logo-shield bg-white p-1.5 border border-pink-100 shadow-xs rounded-xl flex items-center justify-center">
-                <img src="logo.png" alt="Tab-Lock Logo" class="w-8 h-8 object-cover rounded-lg" />
+            <div class="w-10 h-12 bg-white rounded-lg p-1 border border-slate-200 flex items-center justify-center shrink-0 shadow-xs">
+                <img src="logo_university.png" alt="ตรามหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน" class="w-full h-full object-contain" />
             </div>
-            <div class="logo-text leading-tight">
-                <div class="font-bold text-lg tracking-tight text-slate-900">Tab-<span class="logo-gradient">Lock</span></div>
-                <div class="text-[10px] text-pink-500 uppercase tracking-widest font-bold">Online Proctoring</div>
+            <div class="leading-tight">
+                <div class="font-bold text-base tracking-tight text-slate-900">Tab-Lock <span class="text-blue-700 font-extrabold">RMUTI</span></div>
+                <div class="text-[10px] text-amber-700 font-bold uppercase tracking-wider">ระบบสอบออนไลน์ มทร.อีสาน</div>
             </div>
         </div>
 
         <!-- Navigation Menu -->
         <nav class="space-y-4">
-
             <!-- Category 1: หมวดข้อมูล -->
             <div>
                 <div class="nav-section-header">
-                    <span class="nav-section-title">หมวดข้อมูล</span>
+                    <span class="nav-section-title">หมวดข้อมูลพื้นฐาน</span>
                 </div>
                 <div class="space-y-1 mt-1">
                     <a href="dashboard.html" class="nav-link active">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
                         <span>1. แดชบอร์ดหลัก</span>
                     </a>
                     <a href="admin-courses.html" class="nav-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
                         <span>2. จัดการรายวิชา</span>
                     </a>
                     <a href="admin-students.html" class="nav-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.62 48.62 0 0112 20.904a48.62 48.62 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0112 13.489a50.702 50.702 0 017.74-3.342M12 2.25V4.5m0 10.5v1.5c0 .9-.6 1.6-1.5 1.6a1.5 1.5 0 010-3c.9 0 1.5.7 1.5 1.4z" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.62 48.62 0 0112 20.904a48.62 48.62 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0112 13.489a50.702 50.702 0 017.74-3.342M12 2.25V4.5m0 10.5v1.5c0 .9-.6 1.6-1.5 1.6a1.5 1.5 0 010-3c.9 0 1.5.7 1.5 1.4z" /></svg>
                         <span>3. ประวัตินักศึกษา</span>
                     </a>
                 </div>
@@ -235,19 +179,19 @@
             <!-- Category 2: หมวดการสอบ -->
             <div>
                 <div class="nav-section-header">
-                    <span class="nav-section-title">หมวดการสอบ</span>
+                    <span class="nav-section-title">หมวดการจัดการสอบ</span>
                 </div>
                 <div class="space-y-1 mt-1">
                     <a href="admin-library.html" class="nav-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
                         <span>4. คลังข้อสอบ</span>
                     </a>
                     <a href="admin-questions.html" class="nav-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
                         <span>5. สร้างข้อสอบ</span>
                     </a>
                     <a href="admin-rooms.html" class="nav-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 21h18M4.5 21V5.25A2.25 2.25 0 0 1 6.75 3h10.5a2.25 2.25 0 0 1 2.25 2.25V21" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 21h18M4.5 21V5.25A2.25 2.25 0 0 1 6.75 3h10.5a2.25 2.25 0 0 1 2.25 2.25V21" /></svg>
                         <span>6. ห้องสอบ</span>
                     </a>
                 </div>
@@ -256,480 +200,559 @@
             <!-- Category 3: หมวดประเมินผล -->
             <div>
                 <div class="nav-section-header">
-                    <span class="nav-section-title">หมวดประเมินผล</span>
+                    <span class="nav-section-title">หมวดประเมินและกำกับ</span>
                 </div>
                 <div class="space-y-1 mt-1">
                     <a href="admin-results.html" class="nav-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /></svg>
                         <span>7. ตรวจสอบผลการสอบ</span>
                     </a>
                     <a href="admin-monitoring.html" class="nav-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" /></svg>
                         <span>8. ตรวจสอบพฤติกรรมน่าสงสัย</span>
                     </a>
                 </div>
             </div>
-
         </nav>
     </div>
 
     <!-- Bottom Profile Footer -->
-    <div class="sidebar-inner p-4 border-t border-slate-200 bg-slate-50/60 space-y-3">
+    <div class="sidebar-inner p-4 border-t border-slate-200 bg-slate-50 space-y-3">
         <div class="flex items-center gap-3">
-            <div class="relative flex-shrink-0">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 via-indigo-600 to-purple-600 flex items-center justify-center text-sm font-bold text-white shadow-sm">อ</div>
-                <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white sidebar-online-dot online-dot"></span>
+            <div class="w-10 h-10 rounded-xl bg-blue-900 flex items-center justify-center text-sm font-bold text-white shadow-xs shrink-0">
+                อ
             </div>
             <div class="flex-1 min-w-0">
-                <div class="text-sm font-bold text-slate-900 truncate" id="sidebar-teacher-name">อาจารย์: ภควันต์ แสนเสริม</div>
-                <div class="text-xs text-slate-500 font-semibold flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> ออนไลน์ • ผู้ดูแลระบบ
+                <div class="text-sm font-bold text-slate-900 truncate" id="sidebar-teacher-name">อาจารย์ผู้ดูแล</div>
+                <div class="text-xs text-slate-500 font-medium flex items-center gap-1.5 mt-0.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> เข้าสู่ระบบแล้ว
                 </div>
             </div>
         </div>
-        <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-red-200 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H2.25" /></svg>
-            <span class="logout-btn-text">ออกจากระบบ</span>
+        <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2 px-3 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 border border-slate-200 hover:border-rose-200 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H2.25" /></svg>
+            <span>ออกจากระบบ</span>
         </a>
     </div>
 </aside>
 
 <!-- ===== MAIN CONTENT ===== -->
 <div id="main-area">
-    <!-- Header -->
+    <!-- Top Header -->
     <header id="top-header">
         <div class="flex items-center gap-3">
-            <button id="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')" class="md:hidden p-2.5 rounded-xl bg-white border border-pink-100 text-slate-700 hover:bg-pink-50 transition">
+            <button id="mobile-menu-btn" onclick="document.getElementById('sidebar').classList.toggle('mobile-open')" class="md:hidden p-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
             </button>
             <div>
-                <h1 class="text-xl md:text-2xl font-bold text-slate-800 tracking-tight" id="welcome-text">ยินดีต้อนรับกลับมา 👋</h1>
-                <p class="text-xs md:text-sm font-semibold text-pink-600 mt-0.5 flex items-center gap-2">
-                    <span class="inline-block w-2 h-2 rounded-full bg-pink-400 animate-pulse"></span>
-                    Tab-Lock Online Proctoring System &middot; Teacher Dashboard
-                </p>
+                <h1 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight" id="welcome-text">ระบบควบคุมการสอบออนไลน์</h1>
+                <p class="text-xs text-slate-500 font-medium">มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน &middot; ประจำภาคการศึกษาปัจจุบัน</p>
             </div>
         </div>
         <div class="flex items-center gap-3">
-            <button onclick="window.TabLockGuide.open('dashboard')" class="flex items-center gap-2 bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-500 hover:to-blue-600 text-white px-4 py-2 rounded-full text-xs font-semibold transition shadow-md shadow-sky-400/20 active:scale-95 cursor-pointer">
+            <button onclick="window.TabLockGuide.open('dashboard')" class="flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition shadow-xs cursor-pointer">
                 <span>💡</span>
-                <span class="hidden sm:inline">คู่มือแนะนำ</span>
+                <span class="hidden sm:inline">คู่มือการใช้งาน</span>
             </button>
-            <div class="flex items-center gap-2 bg-pink-50 border border-pink-200 px-3.5 py-1.5 rounded-full">
-                <span class="w-2.5 h-2.5 rounded-full bg-pink-500 pastel-pulse-dot"></span>
-                <span class="text-xs font-bold text-pink-600 tracking-wider uppercase">AI SECURITY MATRIX ONLINE</span>
-            </div>
-            <div class="hidden sm:flex items-center gap-2 bg-sky-50 border border-sky-200 px-3.5 py-1.5 rounded-full">
-                <span class="text-xs text-sky-700 font-semibold" id="date-display"></span>
+            <div class="hidden sm:flex items-center gap-2 bg-slate-100 border border-slate-200 px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-700">
+                <span>📅</span>
+                <span id="date-display"></span>
             </div>
         </div>
     </header>
 
-    <!-- Main workspace -->
-    <main class="flex-1 p-6 md:p-8 space-y-8 overflow-y-auto max-w-[1450px] w-full mx-auto">
+    <!-- Main Workspace -->
+    <main class="flex-1 p-6 md:p-8 space-y-7 overflow-y-auto max-w-[1440px] w-full mx-auto">
 
-        <!-- ===== PASTEL HERO BANNER (PINK & SKY BLUE & WHITE) ===== -->
-        <div class="pastel-hero-banner rounded-3xl p-8 md:p-10 relative overflow-hidden">
-            <div class="pastel-orb w-96 h-96 bg-pink-300/40" style="top:-100px;right:-50px;animation-delay:0s;"></div>
-            <div class="pastel-orb w-72 h-72 bg-sky-300/40" style="bottom:-80px;left:80px;animation-delay:3.5s;"></div>
-            <div class="pastel-orb w-48 h-48 bg-purple-200/40" style="top:40px;left:45%;animation-delay:1.8s;"></div>
-
-            <div class="relative z-10">
-                <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
-                    
-                    <div class="space-y-4 max-w-3xl">
-                        <div class="inline-flex items-center gap-2.5 bg-white/90 border border-pink-200 px-4 py-1.5 rounded-full shadow-xs">
-                            <span class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span>
-                            <span class="text-xs font-bold text-pink-600 tracking-wider uppercase">🌸 PASTEL ENTERPRISE AI PLATFORM</span>
-                        </div>
-                        
-                        <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-800 leading-tight tracking-tight">
-                            ระบบประมวลผลสอบอัจฉริยะยุคใหม่<br>
-                            <span class="bg-gradient-to-r from-pink-500 via-purple-500 to-sky-500 bg-clip-text text-transparent">
-                                และวิเคราะห์ผลลัพธ์ห้องเรียน
-                            </span>
-                        </h1>
-                        
-                        <p class="text-slate-600 text-sm md:text-base leading-relaxed font-medium">
-                            ศูนย์กลางการควบคุมห้องสอบดิจิทัล ป้องกันการสลับหน้าจอ ถอดรหัสพฤติกรรมสุ่มเสี่ยง ด้วยปัญญาประดิษฐ์เรียลไทม์ พร้อมวิเคราะห์คุณภาพข้อสอบและรายงานผลสัมฤทธิ์ทางการเรียนรู้อัตโนมัติ
-                        </p>
-
-                        <div class="flex flex-wrap items-center gap-4 pt-2">
-                            <a href="admin-questions.html" class="inline-flex items-center gap-2.5 bg-gradient-to-r from-pink-400 via-rose-400 to-sky-400 hover:from-pink-500 hover:to-sky-500 text-white font-bold px-7 py-3.5 rounded-2xl text-sm transition-all duration-200 shadow-lg shadow-pink-500/20 active:scale-[0.98]">
-                                <span>📝</span>
-                                <span>จัดการข้อสอบ & คลังโจทย์</span>
-                            </a>
-                            <a href="admin-monitoring.html" class="inline-flex items-center gap-2.5 bg-white hover:bg-sky-50 text-sky-700 font-bold px-6 py-3.5 rounded-2xl text-sm transition-all duration-200 border border-sky-200 shadow-xs active:scale-[0.98]">
-                                <span>🚨</span>
-                                <span>ศูนย์เฝ้าระวังพฤติกรรม</span>
-                            </a>
-                        </div>
+        <!-- ===== HERO BANNER: RMUTI ACADEMIC PORTAL ===== -->
+        <div class="academic-hero p-7 md:p-9 relative">
+            <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                
+                <div class="space-y-3.5 max-w-3xl">
+                    <div class="inline-flex items-center gap-2 bg-blue-900/60 border border-blue-400/30 px-3 py-1 rounded-lg text-xs font-semibold text-blue-200">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>ระบบควบคุมและป้องกันการทุจริตการสอบ (Online Proctoring Portal)</span>
                     </div>
 
-                    <!-- University Emblem Status Visual Accent (Pastel Light) -->
-                    <div class="shrink-0 w-full lg:w-auto flex justify-center lg:justify-end">
-                        <div class="p-6 rounded-3xl bg-white/95 border border-pink-200 shadow-xl backdrop-filter backdrop-blur-xl flex flex-col items-center justify-center text-center space-y-3 min-w-[250px]">
-                            <div class="w-24 h-28 rounded-2xl bg-white border border-slate-200 flex items-center justify-center p-2 shadow-md overflow-hidden group hover:scale-105 transition-transform duration-300">
-                                <img src="logo_university.png" alt="ตรามหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน" class="w-full h-full object-contain filter drop-shadow-sm">
-                            </div>
-                            <div>
-                                <div class="text-[11px] font-black text-pink-600 uppercase tracking-widest">มทร.อีสาน (RMUTI)</div>
-                                <div class="text-sm font-black text-slate-800 mt-0.5">สถานะระบบ: ปลอดภัย</div>
-                            </div>
-                            <div class="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-xl text-xs font-bold text-emerald-600">
-                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                🔒 ล็อกเบราว์เซอร์ 100%
-                            </div>
-                        </div>
-                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
+                        ศูนย์อำนวยการและประเมินผลการสอบออนไลน์
+                    </h2>
 
+                    <p class="text-slate-300 text-sm md:text-base leading-relaxed font-normal">
+                        บริหารจัดการห้องสอบ ป้องกันการสลับหน้าจอ (Tab-Lock) ตรวจจับพฤติกรรมสุ่มเสี่ยงระหว่างสอบ และประมวลผลคะแนนวิชาการ Z-Score / T-Score อย่างแม่นยำตามเกณฑ์มาตรฐานมหาวิทยาลัย
+                    </p>
+
+                    <!-- Quick Operation Shortcuts -->
+                    <div class="flex flex-wrap items-center gap-3 pt-2">
+                        <a href="admin-rooms.html" class="inline-flex items-center gap-2 bg-white hover:bg-slate-100 text-slate-900 font-bold px-5 py-2.5 rounded-xl text-xs sm:text-sm transition shadow-sm active:scale-95">
+                            <span>🏫</span>
+                            <span>เปิดห้องสอบ / คุมสอบสด</span>
+                        </a>
+                        <a href="admin-questions.html" class="inline-flex items-center gap-2 bg-blue-800/80 hover:bg-blue-700 text-white font-semibold px-4 py-2.5 rounded-xl text-xs sm:text-sm border border-blue-600/40 transition active:scale-95">
+                            <span>📝</span>
+                            <span>จัดการคลังข้อสอบ</span>
+                        </a>
+                        <a href="admin-results.html" class="inline-flex items-center gap-2 bg-slate-800/80 hover:bg-slate-700 text-slate-200 font-semibold px-4 py-2.5 rounded-xl text-xs sm:text-sm border border-slate-700 transition active:scale-95">
+                            <span>📊</span>
+                            <span>สรุปผลการสอบ</span>
+                        </a>
+                    </div>
                 </div>
+
+                <!-- RMUTI Emblem Card -->
+                <div class="shrink-0 w-full lg:w-auto flex justify-center lg:justify-end">
+                    <div class="bg-white/10 backdrop-blur-md border border-white/20 p-5 rounded-2xl flex flex-col items-center justify-center text-center space-y-2.5 min-w-[220px]">
+                        <div class="w-20 h-24 bg-white rounded-xl p-1.5 shadow-md flex items-center justify-center">
+                            <img src="logo_university.png" alt="ตรามหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน" class="w-full h-full object-contain">
+                        </div>
+                        <div>
+                            <div class="text-[11px] font-bold text-amber-300 tracking-wider">มทร.อีสาน</div>
+                            <div class="text-xs font-semibold text-white mt-0.5">RMUTI Proctor Portal</div>
+                        </div>
+                        <div class="inline-flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-400/30 px-2.5 py-0.5 rounded-md text-[11px] font-medium text-emerald-300">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            <span>ระบบออนไลน์ปกติ</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
-        <!-- ===== PASTEL FEATURES GRID (3 TOP CARDS) ===== -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <!-- Gemini AI Generator -->
-            <div onclick="openGeminiModal()" class="pastel-glass-card p-6 cursor-pointer group hover:border-pink-300 transition-all duration-300 bg-gradient-to-br from-pink-50/50 to-white">
-                <div class="flex items-start justify-between gap-4">
-                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-400 to-purple-400 text-white flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-md shadow-pink-400/20">
-                        ✨
+        <!-- ===== LIVE KPI CARDS (CONNECTED TO ACTUAL DATABASE) ===== -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <!-- 1. ห้องสอบที่กำลังเปิดสอบ -->
+            <a href="admin-rooms.html" class="academic-card p-5 block group">
+                <div class="flex items-center justify-between">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-700 text-lg font-bold group-hover:bg-blue-100 transition">
+                        🏫
                     </div>
-                    <span class="text-[11px] font-bold text-pink-600 bg-pink-100 border border-pink-200 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                        AI GENERATOR
-                    </span>
+                    <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-md">เปิดสอบสด</span>
                 </div>
                 <div class="mt-4">
-                    <h3 class="text-lg font-bold text-slate-800 group-hover:text-pink-600 transition-colors">Gemini AI Generator</h3>
-                    <p class="text-xs md:text-sm text-slate-500 font-medium mt-1 leading-relaxed">
-                        ระบบสร้างโจทย์และแปลงข้อสอบอัตโนมัติด้วย AI Gem ปรับระดับความยากง่ายทันใจ 🚀
-                    </p>
-                </div>
-                <div class="mt-4 pt-3 border-t border-pink-100 flex items-center justify-between text-xs text-pink-600 font-bold">
-                    <span>เปิดเครื่องมือ AI</span>
-                    <span class="group-hover:translate-x-1 transition-transform">→</span>
-                </div>
-            </div>
-
-            <!-- Real-Time Data & Analytics -->
-            <a href="admin-results.html" class="pastel-glass-card p-6 group hover:border-sky-300 transition-all duration-300 bg-gradient-to-br from-sky-50/50 to-white">
-                <div class="flex items-start justify-between gap-4">
-                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-400 to-teal-400 text-white flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-md shadow-sky-400/20">
-                        📊
+                    <div class="text-xs text-slate-500 font-medium">ห้องสอบที่เปิดอยู่ขณะนี้</div>
+                    <div class="text-2xl font-bold text-slate-900 mt-1 flex items-baseline gap-1.5">
+                        <span id="stat-active-rooms">0</span>
+                        <span class="text-xs font-normal text-slate-500">ห้อง</span>
                     </div>
-                    <span class="text-[11px] font-bold text-sky-600 bg-sky-100 border border-sky-200 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                        REAL-TIME FEED
-                    </span>
-                </div>
-                <div class="mt-4">
-                    <h3 class="text-lg font-bold text-slate-800 group-hover:text-sky-600 transition-colors">Real-Time Data Engine</h3>
-                    <p class="text-xs md:text-sm text-slate-500 font-medium mt-1 leading-relaxed">
-                        ประมวลผลคะแนน Z-Score, T-Score และคำนวณสถิติวิเคราะห์ทันทีที่มีการส่งข้อสอบ
-                    </p>
-                </div>
-                <div class="mt-4 pt-3 border-t border-sky-100 flex items-center justify-between text-xs text-sky-600 font-bold">
-                    <span>ดูผลสอบเรียลไทม์</span>
-                    <span class="group-hover:translate-x-1 transition-transform">→</span>
+                    <div class="text-[11px] text-blue-600 font-medium mt-1 flex items-center gap-1">
+                        <span>ไปที่ศูนย์ห้องสอบ</span>
+                        <span class="group-hover:translate-x-1 transition-transform">→</span>
+                    </div>
                 </div>
             </a>
 
-            <!-- AI Anti-Cheat Guard -->
-            <a href="admin-monitoring.html" class="pastel-glass-card p-6 group hover:border-rose-300 transition-all duration-300 bg-gradient-to-br from-rose-50/50 to-white">
-                <div class="flex items-start justify-between gap-4">
-                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-400 to-pink-500 text-white flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-md shadow-rose-400/20">
-                        🛡️
+            <!-- 2. รายวิชาในความดูแล -->
+            <a href="admin-courses.html" class="academic-card p-5 block group">
+                <div class="flex items-center justify-between">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-700 text-lg font-bold group-hover:bg-indigo-100 transition">
+                        📚
                     </div>
-                    <span class="text-[11px] font-bold text-rose-600 bg-rose-100 border border-rose-200 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                        AI ANTI-CHEAT
-                    </span>
+                    <span class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-md">รายวิชา</span>
                 </div>
                 <div class="mt-4">
-                    <h3 class="text-lg font-bold text-slate-800 group-hover:text-rose-600 transition-colors">AI Anti-Cheat Guard</h3>
-                    <p class="text-xs md:text-sm text-slate-500 font-medium mt-1 leading-relaxed">
-                        ตรวจจับการสลับแท็บ หน้าจอ และวิเคราะห์พฤติกรรมผิดปกติตลอดการสอบ
-                    </p>
-                </div>
-                <div class="mt-4 pt-3 border-t border-rose-100 flex items-center justify-between text-xs text-rose-600 font-bold">
-                    <span>เปิดระบบเฝ้าระวัง</span>
-                    <span class="group-hover:translate-x-1 transition-transform">→</span>
+                    <div class="text-xs text-slate-500 font-medium">รายวิชาในความรับผิดชอบ</div>
+                    <div class="text-2xl font-bold text-slate-900 mt-1 flex items-baseline gap-1.5">
+                        <span id="stat-total-courses">-</span>
+                        <span class="text-xs font-normal text-slate-500">วิชา</span>
+                    </div>
+                    <div class="text-[11px] text-indigo-600 font-medium mt-1 flex items-center gap-1">
+                        <span>จัดการกลุ่มและวิชา</span>
+                        <span class="group-hover:translate-x-1 transition-transform">→</span>
+                    </div>
                 </div>
             </a>
+
+            <!-- 3. ชุดข้อสอบในคลัง -->
+            <a href="admin-library.html" class="academic-card p-5 block group">
+                <div class="flex items-center justify-between">
+                    <div class="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-700 text-lg font-bold group-hover:bg-purple-100 transition">
+                        📝
+                    </div>
+                    <span class="text-xs font-semibold text-purple-600 bg-purple-50 px-2.5 py-0.5 rounded-md">คลังข้อสอบ</span>
+                </div>
+                <div class="mt-4">
+                    <div class="text-xs text-slate-500 font-medium">ชุดข้อสอบในคลังทั้งหมด</div>
+                    <div class="text-2xl font-bold text-slate-900 mt-1 flex items-baseline gap-1.5">
+                        <span id="stat-total-templates">-</span>
+                        <span class="text-xs font-normal text-slate-500">ชุด</span>
+                    </div>
+                    <div class="text-[11px] text-purple-600 font-medium mt-1 flex items-center gap-1">
+                        <span>ดูคลังข้อสอบ</span>
+                        <span class="group-hover:translate-x-1 transition-transform">→</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 4. นักศึกษาในระบบ -->
+            <a href="admin-students.html" class="academic-card p-5 block group">
+                <div class="flex items-center justify-between">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700 text-lg font-bold group-hover:bg-emerald-100 transition">
+                        👨‍🎓
+                    </div>
+                    <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-md">นักศึกษา</span>
+                </div>
+                <div class="mt-4">
+                    <div class="text-xs text-slate-500 font-medium">นักศึกษาที่ลงทะเบียน</div>
+                    <div class="text-2xl font-bold text-slate-900 mt-1 flex items-baseline gap-1.5">
+                        <span id="stat-total-students">-</span>
+                        <span class="text-xs font-normal text-slate-500">คน</span>
+                    </div>
+                    <div class="text-[11px] text-emerald-600 font-medium mt-1 flex items-center gap-1">
+                        <span>ตรวจสอบรายชื่อ</span>
+                        <span class="group-hover:translate-x-1 transition-transform">→</span>
+                    </div>
+                </div>
+            </a>
+
         </div>
 
-        <!-- ===== SYSTEM METRICS COUNTER (4 PASTEL WIDGETS) ===== -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
-            <div class="pastel-glass-card p-5 flex items-center gap-4 bg-white">
-                <div class="w-12 h-12 rounded-xl bg-sky-100 border border-sky-200 flex items-center justify-center text-sky-600 text-xl font-bold shrink-0">
-                    ⚡
-                </div>
-                <div>
-                    <div class="text-xs text-slate-500 font-semibold uppercase tracking-wider">ความเร็วการตรวจจับ</div>
-                    <div class="text-lg font-bold text-sky-700 mt-0.5">&lt; 0.2 วินาที</div>
-                    <div class="text-[11px] text-emerald-600 font-bold">Real-Time Sync</div>
-                </div>
-            </div>
-
-            <div class="pastel-glass-card p-5 flex items-center gap-4 bg-white">
-                <div class="w-12 h-12 rounded-xl bg-pink-100 border border-pink-200 flex items-center justify-center text-pink-600 text-xl font-bold shrink-0">
-                    🔒
-                </div>
-                <div>
-                    <div class="text-xs text-slate-500 font-semibold uppercase tracking-wider">โหมดเบราว์เซอร์</div>
-                    <div class="text-lg font-bold text-pink-700 mt-0.5">Strict Lockdown</div>
-                    <div class="text-[11px] text-pink-600 font-bold">ป้องกัน คัดลอก/วาง</div>
-                </div>
-            </div>
-
-            <div class="pastel-glass-card p-5 flex items-center gap-4 bg-white">
-                <div class="w-12 h-12 rounded-xl bg-purple-100 border border-purple-200 flex items-center justify-center text-purple-600 text-xl font-bold shrink-0">
-                    📚
-                </div>
-                <div>
-                    <div class="text-xs text-slate-500 font-semibold uppercase tracking-wider">คลังข้อสอบ</div>
-                    <div class="text-lg font-bold text-purple-700 mt-0.5">AI & Excel Ready</div>
-                    <div class="text-[11px] text-purple-600 font-bold">นำเข้าข้อสอบอัตโนมัติ</div>
-                </div>
-            </div>
-
-            <div class="pastel-glass-card p-5 flex items-center gap-4 bg-white">
-                <div class="w-12 h-12 rounded-xl bg-emerald-100 border border-emerald-200 flex items-center justify-center text-emerald-600 text-xl font-bold shrink-0">
-                    👥
-                </div>
-                <div>
-                    <div class="text-xs text-slate-500 font-semibold uppercase tracking-wider">คัดกรองสิทธิ์ผู้สอบ</div>
-                    <div class="text-lg font-bold text-emerald-700 mt-0.5">Roster Guard Active</div>
-                    <div class="text-[11px] text-emerald-600 font-bold">ตรวจสอบรหัสนักศึกษา</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ===== MAIN MODULES & ACTION CARDS ===== -->
-        <div class="space-y-5">
+        <!-- ===== SECTION: LIVE ACTIVE EXAM ROOMS ===== -->
+        <div class="space-y-4">
             <div class="flex items-center justify-between">
-                <h2 class="text-base md:text-lg font-bold text-slate-800 tracking-tight flex items-center gap-2.5">
-                    <span class="w-2.5 h-6 bg-gradient-to-b from-pink-400 to-sky-400 rounded-full inline-block"></span>
-                    ระบบงานหลักประจำศูนย์สอบ
-                </h2>
-                <span class="text-xs text-slate-500 font-semibold">เลือกหัวข้อการทำงานที่ต้องการ</span>
+                <div class="flex items-center gap-2.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <h3 class="text-base font-bold text-slate-900">ห้องสอบที่กำลังเปิดอยู่ในขณะนี้ (Live Rooms)</h3>
+                </div>
+                <a href="admin-rooms.html" class="text-xs font-semibold text-blue-700 hover:text-blue-800 flex items-center gap-1">
+                    <span>จัดการห้องสอบทั้งหมด</span>
+                    <span>→</span>
+                </a>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Dynamic Container for Active Rooms -->
+            <div id="live-rooms-container">
+                <!-- Fallback / Empty State -->
+                <div class="academic-card p-6 text-center space-y-3 bg-slate-50/50 border-dashed border-2 border-slate-200">
+                    <div class="w-12 h-12 bg-white rounded-xl border border-slate-200 mx-auto flex items-center justify-center text-xl text-slate-400">
+                        ⏳
+                    </div>
+                    <div>
+                        <div class="font-bold text-slate-800 text-sm">ยังไม่มีห้องสอบที่กำลังดำเนินการอยู่ในขณะนี้</div>
+                        <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+                            อาจารย์สามารถเลือกรายวิชาและเปิดห้องสอบใหม่เพื่อรับรหัส PIN 6 หลัก และฉายจอให้นักศึกษาเข้าสอบได้ทันที
+                        </p>
+                    </div>
+                    <div>
+                        <a href="admin-rooms.html" class="inline-flex items-center gap-2 bg-blue-900 hover:bg-blue-800 text-white font-semibold px-4 py-2 rounded-xl text-xs shadow-xs transition">
+                            <span>➕</span>
+                            <span>เปิดห้องสอบใหม่</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== MAIN OPERATIONAL MODULES ===== -->
+        <div class="space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-base font-bold text-slate-900">ระบบงานหลักสำหรับอาจารย์ผู้สอน</h3>
+                <span class="text-xs text-slate-500 font-medium">เข้าถึงฟังก์ชันงานหลักอย่างสะดวกรวดเร็ว</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                
                 <!-- 1. คลังและจัดการข้อสอบ -->
-                <a href="admin-questions.html" class="pastel-glass-card p-7 space-y-5 block group hover:border-pink-300">
-                    <div class="flex items-center justify-between">
-                        <div class="w-14 h-14 rounded-2xl bg-pink-100 border border-pink-200 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
-                            📚
+                <a href="admin-questions.html" class="academic-card p-6 flex flex-col justify-between space-y-4 group">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-2xl group-hover:bg-blue-600 group-hover:text-white transition-colors shrink-0">
+                            📝
                         </div>
-                        <span class="p-2.5 rounded-full bg-pink-50 text-pink-400 group-hover:text-pink-600 group-hover:bg-pink-100 transition">
+                        <span class="text-slate-400 group-hover:text-blue-700 transition">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
                         </span>
                     </div>
                     <div>
-                        <h3 class="text-lg md:text-xl font-bold text-slate-800 group-hover:text-pink-600 transition-colors">1. ระบบจัดการคลังข้อสอบ (Question Vault)</h3>
-                        <p class="text-sm text-slate-500 mt-2 leading-relaxed font-medium">
-                            เพิ่ม แก้ไข ลบ และจัดหมวดหมู่ข้อสอบตามรายวิชา รองรับการอัปโหลดไฟล์ Excel, รูปภาพประกอบข้อสอบ และการสร้างข้อสอบด้วย AI
+                        <h4 class="text-base font-bold text-slate-900 group-hover:text-blue-700 transition-colors">
+                            1. ระบบจัดการคลังข้อสอบ (Question Bank)
+                        </h4>
+                        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                            สร้างและแก้ไขข้อสอบตามรายวิชา รองรับการนำเข้าไฟล์ Excel (.xlsx), แนบรูปภาพประกอบ และใช้งานระบบผู้ช่วยสร้างข้อสอบอัตโนมัติ
                         </p>
                     </div>
-                    <div class="space-y-2 pt-2">
-                        <div class="flex items-center justify-between text-xs text-slate-500 font-semibold">
-                            <span>สถานะระบบจัดการคลังข้อสอบ</span>
-                            <span class="text-pink-600 font-bold">พร้อมใช้งาน (Active)</span>
-                        </div>
-                        <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200">
-                            <div class="h-full bg-gradient-to-r from-pink-400 to-rose-400 rounded-full" style="width: 100%"></div>
-                        </div>
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-blue-700">
+                        <span>สร้างหรือแก้ไขชุดข้อสอบ</span>
+                        <span class="group-hover:translate-x-1 transition-transform">→</span>
                     </div>
                 </a>
 
-                <!-- 2. ตรวจสอบคะแนนสอบ -->
-                <a href="admin-results.html" class="pastel-glass-card p-7 space-y-5 block group hover:border-sky-300">
-                    <div class="flex items-center justify-between">
-                        <div class="w-14 h-14 rounded-2xl bg-sky-100 border border-sky-200 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
-                            📈
-                        </div>
-                        <span class="p-2.5 rounded-full bg-sky-50 text-sky-400 group-hover:text-sky-600 group-hover:bg-sky-100 transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
-                        </span>
-                    </div>
-                    <div>
-                        <h3 class="text-lg md:text-xl font-bold text-slate-800 group-hover:text-sky-600 transition-colors">2. ตรวจสอบคะแนนสอบ & วิเคราะห์ผลสัมฤทธิ์</h3>
-                        <p class="text-sm text-slate-500 mt-2 leading-relaxed font-medium">
-                            ตรวจสอบคะแนนรายบุคคล คำนวณค่าสถิติ Z-Score, T-Score, Item Analysis (ค่าความยาก p และค่าอำนาจจำแนก r) และส่งออกรายงาน Excel
-                        </p>
-                    </div>
-                    <div class="space-y-2 pt-2">
-                        <div class="flex items-center justify-between text-xs text-slate-500 font-semibold">
-                            <span>ระบบคำนวณ Z-Score / T-Score</span>
-                            <span class="text-sky-600 font-bold">เรียลไทม์ (Auto Analytics)</span>
-                        </div>
-                        <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200">
-                            <div class="h-full bg-gradient-to-r from-sky-400 to-teal-400 rounded-full" style="width: 100%"></div>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- 3. ตรวจสอบพฤติกรรมน่าสงสัย -->
-                <a href="admin-monitoring.html" class="pastel-glass-card p-7 space-y-5 block group hover:border-rose-300">
-                    <div class="flex items-center justify-between">
-                        <div class="w-14 h-14 rounded-2xl bg-rose-100 border border-rose-200 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
-                            🚨
-                        </div>
-                        <span class="p-2.5 rounded-full bg-rose-50 text-rose-400 group-hover:text-rose-600 group-hover:bg-rose-100 transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
-                        </span>
-                    </div>
-                    <div>
-                        <h3 class="text-lg md:text-xl font-bold text-slate-800 group-hover:text-rose-600 transition-colors">3. ระบบเฝ้าระวังพฤติกรรมน่าสงสัย (Live Threat Center)</h3>
-                        <p class="text-sm text-slate-500 mt-2 leading-relaxed font-medium">
-                            ติดตามการเข้าสอบสด รายงานสถิติการสลับหน้าจอ (Tab Switches) ตรวจจับกลุ่มเสี่ยง และส่งสัญญาณเตือนให้อาจารย์ระงับสิทธิ์การสอบทันที
-                        </p>
-                    </div>
-                    <div class="space-y-2 pt-2">
-                        <div class="flex items-center justify-between text-xs text-slate-500 font-semibold">
-                            <span>สถานะตรวจจับพฤติกรรม</span>
-                            <span class="text-rose-600 font-bold flex items-center gap-1.5">
-                                <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-                                Live Defense Monitor
-                            </span>
-                        </div>
-                        <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200">
-                            <div class="h-full bg-gradient-to-r from-rose-400 to-pink-500 rounded-full animate-pulse" style="width: 100%"></div>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- 4. จัดการรายวิชาและนักศึกษา -->
-                <a href="admin-courses.html" class="pastel-glass-card p-7 space-y-5 block group hover:border-purple-300">
-                    <div class="flex items-center justify-between">
-                        <div class="w-14 h-14 rounded-2xl bg-purple-100 border border-purple-200 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                <!-- 2. ศูนย์ห้องสอบ & คุมสอบสด -->
+                <a href="admin-rooms.html" class="academic-card p-6 flex flex-col justify-between space-y-4 group">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-2xl group-hover:bg-indigo-600 group-hover:text-white transition-colors shrink-0">
                             🏫
                         </div>
-                        <span class="p-2.5 rounded-full bg-purple-50 text-purple-400 group-hover:text-purple-600 group-hover:bg-purple-100 transition">
+                        <span class="text-slate-400 group-hover:text-indigo-700 transition">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
                         </span>
                     </div>
                     <div>
-                        <h3 class="text-lg md:text-xl font-bold text-slate-800 group-hover:text-purple-600 transition-colors">4. จัดการรายวิชาและรายชื่อนักศึกษา (Roster Guard)</h3>
-                        <p class="text-sm text-slate-500 mt-2 leading-relaxed font-medium">
-                            บริหารจัดการวิชาที่สอน จัดกลุ่มห้องเรียน นำเข้ารายชื่อนักศึกษาเพื่อคัดกรองสิทธิ์เข้าสอบ และกำหนดช่วงเวลาการเปิดห้องสอบ
+                        <h4 class="text-base font-bold text-slate-900 group-hover:text-indigo-700 transition-colors">
+                            2. ศูนย์ห้องสอบ & ควบคุมการสอบสด (Exam Rooms)
+                        </h4>
+                        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                            เปิดห้องสอบตามรายวิชา ฉายรหัส PIN 6 หลักและ QR Code ขึ้นจอฉาย เริ่ม/หยุดสอบ และติดตามจำนวนนักศึกษาที่เข้าห้องสอบแบบเรียลไทม์
                         </p>
                     </div>
-                    <div class="space-y-2 pt-2">
-                        <div class="flex items-center justify-between text-xs text-slate-500 font-semibold">
-                            <span>ระบบคัดกรองสิทธิ์เข้าสอบ</span>
-                            <span class="text-purple-600 font-bold">พร้อมคัดกรอง (Roster Guard)</span>
-                        </div>
-                        <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden p-0.5 border border-slate-200">
-                            <div class="h-full bg-gradient-to-r from-purple-400 to-indigo-400 rounded-full" style="width: 100%"></div>
-                        </div>
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-indigo-700">
+                        <span>เปิดห้องสอบและคุมสอบสด</span>
+                        <span class="group-hover:translate-x-1 transition-transform">→</span>
                     </div>
                 </a>
+
+                <!-- 3. จัดการรายวิชาและนักศึกษา -->
+                <a href="admin-courses.html" class="academic-card p-6 flex flex-col justify-between space-y-4 group">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-2xl group-hover:bg-purple-600 group-hover:text-white transition-colors shrink-0">
+                            👥
+                        </div>
+                        <span class="text-slate-400 group-hover:text-purple-700 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                        </span>
+                    </div>
+                    <div>
+                        <h4 class="text-base font-bold text-slate-900 group-hover:text-purple-700 transition-colors">
+                            3. จัดการรายวิชาและรายชื่อนักศึกษา (Course Roster)
+                        </h4>
+                        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                            ลงทะเบียนรายวิชา กำหนดห้องเรียน/กลุ่มเรียน นำเข้ารายชื่อนักศึกษาเพื่อจำกัดสิทธิ์เข้าสอบเฉพาะผู้มีรายชื่อในวิชา
+                        </p>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-purple-700">
+                        <span>จัดการรายวิชาและนักศึกษา</span>
+                        <span class="group-hover:translate-x-1 transition-transform">→</span>
+                    </div>
+                </a>
+
+                <!-- 4. ตรวจสอบผลสอบ & วิเคราะห์ข้อสอบ -->
+                <a href="admin-results.html" class="academic-card p-6 flex flex-col justify-between space-y-4 group">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center text-2xl group-hover:bg-teal-600 group-hover:text-white transition-colors shrink-0">
+                            📊
+                        </div>
+                        <span class="text-slate-400 group-hover:text-teal-700 transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                        </span>
+                    </div>
+                    <div>
+                        <h4 class="text-base font-bold text-slate-900 group-hover:text-teal-700 transition-colors">
+                            4. ตรวจสอบผลการสอบและวิเคราะห์ผลสัมฤทธิ์ (Results)
+                        </h4>
+                        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                            รายงานคะแนนรายบุคคล คำนวณค่าสถิติวิชาการ Z-Score, T-Score, วิเคราะห์ความยากของข้อสอบ (p/r) และส่งออกรายงาน Excel ได้ทันที
+                        </p>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-teal-700">
+                        <span>ดูผลการสอบและรายงานสถิติ</span>
+                        <span class="group-hover:translate-x-1 transition-transform">→</span>
+                    </div>
+                </a>
+
             </div>
         </div>
 
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-slate-100 bg-white py-4 px-8 text-center">
-        <p class="text-xs text-slate-500 font-medium">&copy; 2026 Tab-Lock Online Proctoring System &middot; Pastel Enterprise Edition &middot; สงวนลิขสิทธิ์</p>
+    <footer class="border-t border-slate-200 bg-white py-3.5 px-8 text-center">
+        <p class="text-xs text-slate-500 font-medium">
+            &copy; 2026 ระบบควบคุมและประเมินผลการสอบออนไลน์ Tab-Lock &middot; มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน (มทร.อีสาน)
+        </p>
     </footer>
 </div>
 
-<!-- ===== GEMINI AI MODAL ===== -->
-<div id="gemini-modal">
-    <div class="bg-white border border-pink-100 rounded-3xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
-        <!-- Modal Header -->
-        <div class="bg-gradient-to-r from-pink-400 via-purple-400 to-sky-400 p-6">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center text-2xl">✨</div>
-                    <div>
-                        <h2 class="text-white font-bold text-lg">สร้างข้อสอบด้วย Gemini AI</h2>
-                        <p class="text-white/90 text-xs mt-0.5">ระบบช่วยสร้างข้อสอบโดย AI อัจฉริยะ</p>
-                    </div>
-                </div>
-                <button onclick="closeGeminiModal()" class="text-white/80 hover:text-white transition text-xl font-bold leading-none p-1">✕</button>
-            </div>
-        </div>
-        <!-- Modal Body -->
-        <div class="p-6 space-y-4">
-            <p class="text-slate-600 text-sm leading-relaxed">
-                Tab-Lock รองรับการสร้างข้อสอบด้วย AI Gemini ผ่าน 2 วิธีสะดวก:
-            </p>
-            <div class="space-y-3">
-                <!-- Option 1 -->
-                <a href="admin-questions.html" onclick="closeGeminiModal()" class="flex items-start gap-4 p-4 rounded-2xl border border-pink-200 bg-pink-50/50 hover:bg-pink-100/50 transition cursor-pointer group block">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-400 to-purple-400 flex items-center justify-center text-lg flex-shrink-0 shadow-xs text-white">🤖</div>
-                    <div>
-                        <div class="text-sm font-bold text-slate-800 group-hover:text-pink-600 transition-colors">1. AI Generator ในระบบ Tab-Lock</div>
-                        <div class="text-xs text-slate-500 mt-1 leading-relaxed font-medium">ไปที่หน้า "จัดการข้อสอบ" แล้วกดปุ่ม <strong>AI Generator</strong> เพื่อให้ระบบสร้างข้อสอบตามหัวข้อที่ต้องการได้ทันที</div>
-                    </div>
-                </a>
-                <!-- Option 2 -->
-                <a href="https://gemini.google.com" target="_blank" rel="noopener" class="flex items-start gap-4 p-4 rounded-2xl border border-sky-200 bg-sky-50/50 hover:bg-sky-100/50 transition cursor-pointer group block">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-400 flex items-center justify-center text-lg flex-shrink-0 shadow-xs text-white">🌐</div>
-                    <div>
-                        <div class="text-sm font-bold text-slate-800 group-hover:text-sky-600 transition-colors">2. Gemini.google.com (Gem)</div>
-                        <div class="text-xs text-slate-500 mt-1 leading-relaxed font-medium">ใช้ Gemini Gem โดยตรง แล้วนำข้อสอบที่ได้มาวางผ่านระบบ Excel Import ของ Tab-Lock</div>
-                        <div class="text-[11px] text-sky-600 font-bold mt-1">↗ เปิดเว็บไซต์ Gemini ในแท็บใหม่</div>
-                    </div>
-                </a>
-            </div>
-            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4">
-                <p class="text-xs text-amber-800 font-medium leading-relaxed">
-                    💡 <strong>คำแนะนำ:</strong> แนะนำให้ใช้ AI Generator ในระบบ เพราะระบบจะนำเข้าข้อสอบเข้าคลังรายวิชาให้อัตโนมัติทันที
-                </p>
-            </div>
-        </div>
-        <!-- Modal Footer -->
-        <div class="px-6 pb-6">
-            <button onclick="closeGeminiModal()" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-bold transition">
-                ปิดหน้าต่าง
-            </button>
-        </div>
-    </div>
+<!-- Toast notification for copy PIN -->
+<div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-lg text-xs font-semibold opacity-0 transition-opacity pointer-events-none z-50">
+    คัดลอกรหัส PIN แล้ว
 </div>
 
 <script>
-    // Teacher info
+    // 1. Teacher Information & Welcome Header
     const rawTeacherName = localStorage.getItem('teacher_name') || localStorage.getItem('teacherName') || 'ภควันต์ แสนเสริม';
     const cleanTeacherName = rawTeacherName.replace(/^(อาจารย์[:\s]*|อ\.\s*)/, '');
     const teacherName = cleanTeacherName;
-    const teacherUsername = localStorage.getItem('teacher_username') || '';
-    document.getElementById('welcome-text').textContent = `ยินดีต้อนรับกลับมา, อาจารย์ ${teacherName} 👋`;
-    document.getElementById('sidebar-teacher-name').textContent = `อาจารย์: ${teacherName}`;
+    const teacherUsername = localStorage.getItem('teacher_username') || localStorage.getItem('teacherUsername') || 'admin';
 
-    // Date display
+    const welcomeEl = document.getElementById('welcome-text');
+    if (welcomeEl) {
+        welcomeEl.textContent = `ยินดีต้อนรับ อาจารย์${teacherName} 👋`;
+    }
+    const sidebarTeacherEl = document.getElementById('sidebar-teacher-name');
+    if (sidebarTeacherEl) {
+        sidebarTeacherEl.textContent = `อาจารย์: ${teacherName}`;
+    }
+
+    // 2. Thai Date Display
     const now = new Date();
-    const dateStr = now.toLocaleDateString('th-TH', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
-    document.getElementById('date-display').textContent = dateStr;
+    const dateStr = now.toLocaleDateString('th-TH', { 
+        weekday: 'short', 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+    });
+    const dateEl = document.getElementById('date-display');
+    if (dateEl) dateEl.textContent = dateStr;
 
-    // Gemini Modal
-    function openGeminiModal() {
-        document.getElementById('gemini-modal').classList.remove('hidden');
+    // Toast Notification
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        if (!toast) return;
+        toast.textContent = msg;
+        toast.style.opacity = '1';
+        setTimeout(() => { toast.style.opacity = '0'; }, 2000);
     }
-    function closeGeminiModal() {
-        document.getElementById('gemini-modal').classList.add('hidden');
-    }
 
-    // Collapsible Sidebar
-    function initSidebarCollapse() {
-        const sidebar = document.getElementById('sidebar');
-        if (!sidebar) return;
-
-        // Auto highlight active menu link
-        let activePage = window.location.pathname.split('/').pop() || 'dashboard.html';
-        if (activePage === 'admin-questions.html' || activePage === 'admin-excel.html') {
-            activePage = 'admin-portal.html';
-        }
-        document.querySelectorAll('nav a').forEach(a => {
-            a.className = a.getAttribute('href') === activePage ? 'nav-link active' : 'nav-link';
+    function copyPin(pin) {
+        navigator.clipboard.writeText(pin).then(() => {
+            showToast(`📋 คัดลอกรหัส PIN: ${pin} เรียบร้อยแล้ว`);
+        }).catch(() => {
+            alert(`รหัส PIN: ${pin}`);
         });
-
-        localStorage.removeItem('sidebar_collapsed');
-        sidebar.classList.remove('collapsed');
     }
-    document.addEventListener('DOMContentLoaded', initSidebarCollapse);
+
+    // Escape HTML helper
+    function escapeHtml(text) {
+        if (!text) return '';
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    // 3. Load Actual Database Metrics & Rooms
+    async function loadDashboardData() {
+        // A. Load Courses & Templates Count
+        try {
+            const courseRes = await fetch(`/api/teacher/courses?username=${encodeURIComponent(teacherUsername)}`);
+            if (courseRes.ok) {
+                const courses = await courseRes.json();
+                document.getElementById('stat-total-courses').textContent = courses.length;
+
+                // Total templates from courses
+                const totalTemplates = courses.reduce((sum, c) => sum + (parseInt(c.examCount) || 0), 0);
+                document.getElementById('stat-total-templates').textContent = totalTemplates;
+            }
+        } catch(e) {
+            console.error('โหลดข้อมูลรายวิชาล้มเหลว:', e);
+        }
+
+        // B. Load Total Enrolled Students
+        try {
+            const studentRes = await fetch('/api/students');
+            if (studentRes.ok) {
+                const students = await studentRes.json();
+                document.getElementById('stat-total-students').textContent = students.length;
+            }
+        } catch(e) {
+            console.error('โหลดข้อมูลนักศึกษาล้มเหลว:', e);
+        }
+
+        // C. Load Active Exam Rooms
+        try {
+            const roomRes = await fetch(`/api/teacher/rooms?username=${encodeURIComponent(teacherUsername)}`);
+            if (roomRes.ok) {
+                const rooms = await roomRes.json();
+                const activeRooms = (rooms || []).filter(r => {
+                    const isPub = r.is_published === 1;
+                    const hasTitle = r.exam_title && !r.exam_title.startsWith('ห้องสอบที่');
+                    const isCustom = r.roomId && r.roomId.includes('_room_');
+                    return isPub || hasTitle || isCustom;
+                });
+
+                document.getElementById('stat-active-rooms').textContent = activeRooms.length;
+
+                // Render Active Rooms Section
+                renderActiveRooms(activeRooms);
+            }
+        } catch(e) {
+            console.error('โหลดข้อมูลห้องสอบล้มเหลว:', e);
+        }
+    }
+
+    // Render Active Rooms Card
+    function renderActiveRooms(rooms) {
+        const container = document.getElementById('live-rooms-container');
+        if (!container) return;
+
+        if (!rooms || rooms.length === 0) {
+            container.innerHTML = `
+                <div class="academic-card p-6 text-center space-y-3 bg-slate-50/50 border-dashed border-2 border-slate-200">
+                    <div class="w-12 h-12 bg-white rounded-xl border border-slate-200 mx-auto flex items-center justify-center text-xl text-slate-400">
+                        ⏳
+                    </div>
+                    <div>
+                        <div class="font-bold text-slate-800 text-sm">ยังไม่มีห้องสอบที่กำลังดำเนินการอยู่ในขณะนี้</div>
+                        <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+                            อาจารย์สามารถเลือกรายวิชาและเปิดห้องสอบใหม่เพื่อรับรหัส PIN 6 หลัก และฉายจอให้นักศึกษาเข้าสอบได้ทันที
+                        </p>
+                    </div>
+                    <div>
+                        <a href="admin-rooms.html" class="inline-flex items-center gap-2 bg-blue-900 hover:bg-blue-800 text-white font-semibold px-4 py-2 rounded-xl text-xs shadow-xs transition">
+                            <span>➕</span>
+                            <span>เปิดห้องสอบใหม่</span>
+                        </a>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                ${rooms.map(room => {
+                    const isPub = room.is_published === 1;
+                    const courseText = room.courseName ? `[${room.courseCode || 'วิชา'}] ${room.courseName}` : 'ห้องสอบทั่วไป';
+                    const classText = room.studentClasses || room.courseClassroom || 'ห้องเรียนตามรายวิชา';
+                    const titleText = room.exam_title || room.roomName || 'สอบเก็บคะแนน';
+                    const pin = room.exam_code || '------';
+
+                    return `
+                        <div class="academic-card p-5 space-y-3.5 border-l-4 ${isPub ? 'border-l-emerald-500' : 'border-l-amber-500'}">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full ${isPub ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                                    ${isPub ? '🟢 กำลังเปิดสอบ (LIVE)' : '⏳ ห้องรอสอบ'}
+                                </span>
+                                <span class="text-[11px] font-mono font-semibold text-slate-400">#${escapeHtml(room.roomId)}</span>
+                            </div>
+
+                            <div>
+                                <div class="text-xs font-semibold text-blue-700 truncate">${escapeHtml(courseText)}</div>
+                                <div class="text-sm font-bold text-slate-900 mt-0.5 truncate">${escapeHtml(titleText)}</div>
+                                <div class="text-[11px] text-slate-500 mt-0.5">กลุ่ม: ${escapeHtml(classText)}</div>
+                            </div>
+
+                            <!-- PIN Code box -->
+                            <div onclick="copyPin('${pin}')" class="p-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl flex items-center justify-between cursor-pointer transition">
+                                <div>
+                                    <div class="text-[9px] text-cyan-300 font-bold uppercase tracking-wider">รหัส PIN เข้าสอบ</div>
+                                    <div class="text-xl font-bold font-mono tracking-widest">${escapeHtml(pin)}</div>
+                                </div>
+                                <span class="text-xs bg-white/10 px-2 py-1 rounded-md text-slate-200">📋 คัดลอก</span>
+                            </div>
+
+                            <!-- Action buttons -->
+                            <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-100">
+                                <a href="admin-rooms.html" class="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold text-center transition">
+                                    คุมห้องสอบ
+                                </a>
+                                <a href="admin-monitoring.html?room=${encodeURIComponent(room.roomId)}" class="py-1.5 px-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg text-xs font-semibold text-center transition">
+                                    เฝ้าระวัง
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+    }
+
+    // Initial Load
+    document.addEventListener('DOMContentLoaded', () => {
+        loadDashboardData();
+    });
 </script>
 <script src="user-guide-system.js"></script>
 </body>
