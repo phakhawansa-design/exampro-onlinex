@@ -52,10 +52,10 @@
         .logo-gradient { background: linear-gradient(135deg, #ec4899, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .logo-shield { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
         .nav-section-header { display: flex; align-items: center; gap: 6px; padding: 8px 12px 4px 12px; }
-        .nav-section-title { font-size: 12px; font-weight: 900; letter-spacing: 0.04em; color: #475569; text-transform: uppercase; }
-        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 16px; font-size: 15px; font-weight: 800; color: #1e293b; text-decoration: none; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border: 1.5px solid transparent; }
+        .nav-section-title { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; color: #64748b; text-transform: uppercase; font-family: 'Kanit', sans-serif; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 16px; font-size: 15px; font-weight: 500; color: #334155; text-decoration: none; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border: 1.5px solid transparent; font-family: 'Kanit', sans-serif; }
         .nav-link:hover { color: #ec4899; background: #fdf2f8; border-color: #cbd5e1; transform: translateX(3px); }
-        .nav-link.active { background: linear-gradient(135deg, #f472b6 0%, #818cf8 50%, #38bdf8 100%); color: #ffffff !important; font-weight: 900 !important; box-shadow: 0 8px 24px rgba(79, 70, 229, 0.35); border-color: transparent; }
+        .nav-link.active { background: linear-gradient(135deg, #f472b6 0%, #818cf8 50%, #38bdf8 100%); color: #ffffff !important; font-weight: 600 !important; box-shadow: 0 8px 24px rgba(79, 70, 229, 0.35); border-color: transparent; }
         .nav-link.active svg { color: #ffffff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
         #sidebar.collapsed { width: 78px !important; }
         #sidebar.collapsed .logo-text, #sidebar.collapsed nav span, #sidebar.collapsed .nav-section-title, #sidebar.collapsed .flex-1.min-w-0, #sidebar.collapsed .logout-btn-text { display: none !important; }
@@ -522,8 +522,13 @@
             if (!courseId) return;
 
             try {
-                const response = await fetch(`/api/exam-results?courseId=${encodeURIComponent(courseId)}&username=${username}`);
-                rawResultsData = await response.json();
+                const response = await fetch(`/api/exam-results?courseId=${encodeURIComponent(courseId)}&username=${encodeURIComponent(username)}`);
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.message || `HTTP Error ${response.status}`);
+                }
+                const data = await response.json();
+                rawResultsData = Array.isArray(data) ? data : [];
                 
                 // คำนวณสถิติ
                 calculateStats(rawResultsData);
@@ -534,11 +539,13 @@
                 // จัดเรียง กรอง และแสดงผล
                 filterAndRenderResults();
             } catch (err) {
-                console.error(err);
+                console.error("fetchResults error:", err);
+                rawResultsData = [];
+                calculateStats([]);
                 document.getElementById('results-table-body').innerHTML = `
                     <tr>
                         <td colspan="10" class="p-16 text-center text-rose-500 font-bold">
-                            ❌ ไม่สามารถเชื่อมต่อระบบหลังบ้านได้ กรุณาตรวจสอบการรันเซิร์ฟเวอร์
+                            ❌ ไม่สามารถเชื่อมต่อระบบหลังบ้านได้ (${escapeHtml(err.message || 'เกิดข้อผิดพลาดในการโหลดผลสอบ')})
                         </td>
                     </tr>`;
             }
@@ -546,7 +553,8 @@
 
         // คำนวณสถิติสรุปการ์ดบน
         function calculateStats(data) {
-            const count = data.length;
+            const safeData = Array.isArray(data) ? data : [];
+            const count = safeData.length;
             document.getElementById('stat-total').textContent = `${count} คน`;
 
             if (count === 0) {
@@ -560,9 +568,9 @@
             let max = -1;
             let min = 999999;
             let sum = 0;
-            let maxTotalScore = data[0].maxScore || 10;
+            let maxTotalScore = safeData[0].maxScore || 10;
 
-            data.forEach(student => {
+            safeData.forEach(student => {
                 const score = student.score;
                 if (score > max) max = score;
                 if (score < min) min = score;
@@ -574,7 +582,7 @@
 
             // คำนวณ ส่วนเบี่ยงเบนมาตรฐาน (SD)
             let varianceSum = 0;
-            data.forEach(student => {
+            safeData.forEach(student => {
                 varianceSum += Math.pow(student.score - avg, 2);
             });
             const variance = varianceSum / count; // population variance
@@ -588,11 +596,12 @@
 
         // เติมข้อมูลลง Dropdown กรองตามชั้นเรียน
         function populateClassFilter(data) {
+            const safeData = Array.isArray(data) ? data : [];
             const classSelect = document.getElementById('class-filter');
             const savedSelectedVal = classSelect.value; // เซฟค่าที่เลือกปัจจุบันไว้ก่อน
 
             // ดึงกลุ่มชั้นเรียนที่ไม่ซ้ำ
-            const classes = [...new Set(data.map(item => item.class).filter(Boolean))];
+            const classes = [...new Set(safeData.map(item => (item.class || '').trim()).filter(Boolean))];
             
             // วาดตัวเลือกใหม่
             classSelect.innerHTML = `<option value="ALL">แสดงทั้งหมดทุกชั้นเรียน</option>` + 

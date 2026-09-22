@@ -587,6 +587,11 @@
                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 user-select: none;
             }
+            body.page-questions .tablock-floating-guide-btn,
+            .page-questions .tablock-floating-guide-btn {
+                bottom: 85px !important;
+                right: 20px !important;
+            }
             .tablock-floating-guide-btn:hover {
                 transform: translateY(-3px) scale(1.03);
                 box-shadow: 0 15px 30px -5px rgba(6, 182, 212, 0.5), 0 10px 15px -5px rgba(99, 102, 241, 0.4);
@@ -827,6 +832,13 @@
         btn.id = 'tablock-floating-guide-btn';
         btn.className = 'tablock-floating-guide-btn';
         btn.setAttribute('title', 'กดเพื่อเปิดคู่มือสอนการใช้งานหน้านี้');
+
+        const pageKey = getCurrentPageKey();
+        if (pageKey === 'questions' || window.location.pathname.includes('admin-questions')) {
+            btn.style.bottom = '85px';
+            btn.style.right = '20px';
+        }
+
         btn.innerHTML = `
             <span class="tablock-guide-pulse-dot"></span>
             <span class="text-base">💡</span>

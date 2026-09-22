@@ -274,6 +274,46 @@
         </div>
     </div>
 
+    <!-- 🔑 Change Default Password Alert Modal -->
+    <div id="change-pass-modal" class="fixed inset-0 z-[105] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300 p-3 sm:p-4" style="background:rgba(15,23,42,0.65); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);">
+        <div class="w-full max-w-md bg-white border border-pink-200 p-6 sm:p-8 rounded-2xl sm:rounded-3xl text-center space-y-5 shadow-2xl transform scale-95 transition-all duration-300 relative overflow-hidden" id="change-pass-modal-card">
+            
+            <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-amber-400 via-pink-500 to-sky-500"></div>
+
+            <div class="w-16 h-16 bg-amber-50 border border-amber-200 text-amber-600 rounded-full flex items-center justify-center text-3xl mx-auto shadow-inner animate-bounce">
+                🔑
+            </div>
+
+            <div class="space-y-1.5">
+                <h3 class="text-lg sm:text-xl font-black text-slate-900">แจ้งเตือนเปลี่ยนรหัสผ่าน</h3>
+                <p class="text-xs text-slate-500 leading-relaxed font-medium">
+                    คุณกำลังใช้งานรหัสผ่านเริ่มต้น (<strong class="text-amber-600 font-mono">1234</strong>)<br>กรุณาตั้งรหัสผ่านใหม่ของคุณเพื่อความปลอดภัยก่อนเข้าสอบ
+                </p>
+            </div>
+
+            <div class="space-y-3 text-left">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">รหัสผ่านใหม่ (New Password)</label>
+                    <input type="password" id="modal-new-password" placeholder="ตั้งรหัสผ่านอย่างน้อย 4 ตัวอักษร..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold outline-none focus:border-indigo-500 transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">ยืนยันรหัสผ่านใหม่ (Confirm Password)</label>
+                    <input type="password" id="modal-confirm-password" placeholder="พิมพ์รหัสผ่านใหม่อีกครั้ง..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold outline-none focus:border-indigo-500 transition">
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center gap-2.5 pt-2">
+                <button onclick="submitNewPasswordModal()" class="w-full sm:w-2/3 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black rounded-2xl text-xs transition shadow-md shadow-emerald-500/25 active:scale-95 cursor-pointer">
+                    🔒 บันทึกรหัสผ่านใหม่
+                </button>
+                <button onclick="skipNewPasswordModal()" class="w-full sm:w-1/3 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-2xl text-xs transition active:scale-95 cursor-pointer">
+                    ข้ามไปก่อน
+                </button>
+            </div>
+
+        </div>
+    </div>
+
     <script>
         let examQuestions = [];
         let currentStudentId = "";
@@ -432,13 +472,63 @@
             }
         }
 
+        let pendingStudentIdForPassChange = '';
+        let pendingLoginTarget = null;
+
+        function showChangePassModal(stdId) {
+            pendingStudentIdForPassChange = stdId;
+            const modal = document.getElementById('change-pass-modal');
+            const card = document.getElementById('change-pass-modal-card');
+            if (modal && card) {
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                card.classList.remove('scale-95');
+                card.classList.add('scale-100');
+            }
+        }
+
+        async function submitNewPasswordModal() {
+            const newPass = document.getElementById('modal-new-password').value.trim();
+            const confirmPass = document.getElementById('modal-confirm-password').value.trim();
+
+            if (!newPass || newPass.length < 4) {
+                alert("⚠️ กรุณากรอกรหัสผ่านใหม่อย่างน้อย 4 ตัวอักษร");
+                return;
+            }
+            if (newPass !== confirmPass) {
+                alert("⚠️ รหัสผ่านใหม่และยืนยันรหัสผ่านไม่ตรงกัน");
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/student/change-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ studentId: pendingStudentIdForPassChange, newPassword: newPass })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    alert("🎉 เปลี่ยนรหัสผ่านใหม่เรียบร้อยแล้ว!");
+                    if (pendingLoginTarget) pendingLoginTarget();
+                } else {
+                    alert(`❌ ${data.message || 'เปลี่ยนรหัสผ่านล้มเหลว'}`);
+                }
+            } catch(e) {
+                alert("❌ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
+            }
+        }
+
+        function skipNewPasswordModal() {
+            if (pendingLoginTarget) pendingLoginTarget();
+        }
+
         async function handleLoginAndEnter() {
             const studentId = document.getElementById('student-id').value.trim();
-            const password = document.getElementById('student-password').value;
+            const passwordInput = document.getElementById('student-password').value;
+            const password = passwordInput ? passwordInput.trim() : '1234';
             const loginBtn = document.getElementById('btn-login-submit');
 
-            if (!studentId || !password) {
-                alert("⚠️ กรุณากรอกรหัสนักศึกษาและรหัสผ่าน");
+            if (!studentId) {
+                alert("⚠️ กรุณากรอกรหัสนักศึกษา");
                 return;
             }
 
@@ -465,13 +555,21 @@
                 localStorage.setItem('currentStudent', JSON.stringify(loginData.student));
                 sessionStorage.setItem('currentStudent', JSON.stringify(loginData.student));
 
-                // นำเข้าสู่หน้าระบบนักศึกษา (Student Portal) ทันที (หากสแกน QR Code มา ให้ส่งรหัส PIN ต่อไปด้วย)
-                const urlParams = new URLSearchParams(window.location.search);
-                const codeParam = urlParams.get('code') || urlParams.get('pin');
-                if (codeParam) {
-                    window.location.href = `student-portal.html?code=${encodeURIComponent(codeParam)}`;
+                const navigateTarget = () => {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const codeParam = urlParams.get('code') || urlParams.get('pin');
+                    if (codeParam) {
+                        window.location.href = `student-portal.html?code=${encodeURIComponent(codeParam)}`;
+                    } else {
+                        window.location.href = 'student-portal.html';
+                    }
+                };
+
+                if (loginData.isDefaultPassword) {
+                    pendingLoginTarget = navigateTarget;
+                    showChangePassModal(loginData.student.studentId);
                 } else {
-                    window.location.href = 'student-portal.html';
+                    navigateTarget();
                 }
             } catch(e) {
                 console.error(e);

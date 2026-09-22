@@ -180,8 +180,8 @@
     <header class="h-16 bg-white border-b border-pink-100 px-4 md:px-6 flex items-center justify-between shrink-0 shadow-sm z-30">
         <!-- Left: Back Button & Title -->
         <div class="flex items-center gap-3">
-            <a href="dashboard.html" class="flex items-center gap-2 px-3.5 py-2 bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 rounded-2xl text-xs sm:text-sm font-bold transition shadow-xs active:scale-95">
-                <span>←</span>
+            <a href="dashboard.html" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-pink-500 via-rose-500 to-sky-500 hover:from-pink-600 hover:to-sky-600 text-white font-black rounded-2xl text-xs sm:text-sm transition-all duration-200 shadow-md shadow-pink-500/30 hover:shadow-lg hover:shadow-pink-500/40 active:scale-95 border border-white/20 shrink-0">
+                <span class="text-base leading-none">🏠</span>
                 <span>กลับแดชบอร์ดหลัก</span>
             </a>
             <div class="h-6 w-px bg-slate-200 mx-1 hidden sm:block"></div>
@@ -216,11 +216,8 @@
             </div>
         </div>
 
-        <!-- Right: ปุ่มบันทึก & ออก -->
-        <div class="flex items-center gap-2">
-            <a href="dashboard.html" class="px-4 py-2 text-slate-700 hover:text-slate-950 hover:bg-slate-100 rounded-xl text-xs sm:text-sm font-bold transition active:scale-95">
-                ออก
-            </a>
+        <!-- Right: ปุ่มบันทึก -->
+        <div class="flex items-center gap-2 shrink-0 whitespace-nowrap">
             <!-- ปุ่มกดบันทึกเข้าสู่วิชา -->
             <button onclick="saveQuestionsToCourse()" id="btn-save-course" class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-2xl text-xs sm:text-sm font-bold shadow-md shadow-emerald-600/25 transition active:scale-95 flex items-center gap-2 cursor-pointer">
                 <span class="text-base">💾</span>
@@ -580,7 +577,30 @@
         window.addEventListener('DOMContentLoaded', async () => {
             await loadTeacherCourses();
             await loadExistingExamForCourse();
+            showCourseCheckModal();
         });
+
+        function showCourseCheckModal() {
+            const modal = document.getElementById('course-check-modal');
+            const card = document.getElementById('course-check-modal-card');
+            if (!modal || !card) return;
+            
+            setTimeout(() => {
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                card.classList.remove('scale-95');
+                card.classList.add('scale-100');
+            }, 300);
+        }
+
+        function confirmHasCourse() {
+            const modal = document.getElementById('course-check-modal');
+            const card = document.getElementById('course-check-modal-card');
+            if (!modal || !card) return;
+            
+            card.classList.remove('scale-100');
+            card.classList.add('scale-95');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+        }
 
         // 1. โหลดรายวิชาของอาจารย์
         async function loadTeacherCourses() {
@@ -1558,6 +1578,46 @@
             <div id="library-templates-list" class="flex-1 overflow-y-auto pr-1">
                 <!-- Loaded dynamically -->
             </div>
+        </div>
+    </div>
+
+    <!-- 3. Course Check Confirmation Modal (แจ้งเตือนสอบถามรายวิชาก่อนเริ่มสร้างข้อสอบ) -->
+    <div id="course-check-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-all duration-300 opacity-0 pointer-events-none">
+        <div class="bg-white/95 border border-pink-200 p-6 sm:p-8 rounded-3xl shadow-2xl max-w-md w-full mx-4 text-center space-y-6 transform scale-95 transition-all duration-300 relative overflow-hidden" id="course-check-modal-card">
+            
+            <!-- Top Gradient Accent bar -->
+            <div class="absolute top-0 left-0 right-0 h-2.5 bg-gradient-to-r from-pink-500 via-rose-500 to-sky-500"></div>
+
+            <!-- Animated Header Icon -->
+            <div class="relative inline-block mt-2">
+                <div class="w-20 h-20 bg-gradient-to-tr from-pink-100 via-rose-100 to-sky-100 rounded-full flex items-center justify-center text-4xl mx-auto shadow-inner border border-pink-200/80">
+                    📚
+                </div>
+            </div>
+
+            <!-- Message Header -->
+            <div class="space-y-2">
+                <h3 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                    คุณมีรายวิชาของคุณหรือยัง?
+                </h3>
+                <p class="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
+                    ก่อนเริ่มสร้างข้อสอบ กรุณายืนยันว่าคุณมีรายวิชาในระบบแล้ว หรือหากยังไม่มีสามารถสร้างรายวิชาใหม่ได้ทันที
+                </p>
+            </div>
+
+            <!-- Choice Action Buttons -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                <button onclick="confirmHasCourse()" class="w-full sm:w-1/2 py-3.5 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black rounded-2xl text-xs sm:text-sm transition-all duration-200 shadow-md shadow-emerald-500/25 active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                    <span>✅</span>
+                    <span>มีแล้ว (สร้างข้อสอบ)</span>
+                </button>
+                
+                <a href="admin-courses.html" class="w-full sm:w-1/2 py-3.5 px-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-black rounded-2xl text-xs sm:text-sm transition-all duration-200 shadow-md shadow-indigo-500/25 active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                    <span>➕</span>
+                    <span>ยังไม่มี (สร้างรายวิชา)</span>
+                </a>
+            </div>
+
         </div>
     </div>
 

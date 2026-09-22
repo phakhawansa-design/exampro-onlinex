@@ -957,6 +957,7 @@ app.post('/api/student/register', (req, res) => {
 });
 
 // 2. นักศึกษาเข้าสู่ระบบ (Student Login)
+// 2. นักศึกษาเข้าสู่ระบบ (Student Login - รองรับตรวจรหัสจากรายชื่อวิชา + รหัสเริ่มต้น 1234)
 app.post('/api/student/login', (req, res) => {
     const { studentId, password } = req.body;
     if (!studentId) {
@@ -964,29 +965,12 @@ app.post('/api/student/login', (req, res) => {
     }
 
     const cleanStudentId = studentId.trim();
+    const inputPassword = (password || '1234').trim();
+    const defaultHash = hashPassword('1234');
+    const inputHash = hashPassword(inputPassword);
 
-    db.get('SELECT * FROM students WHERE studentId = ?', [cleanStudentId], (err, student) => {
-        if (err) return res.status(500).json({ success: false, message: err.message });
-        if (!student) {
-            return res.status(404).json({ 
-                success: false, 
-                message: "ไม่พบรหัสนักศึกษานี้ในระบบ กรุณาสมัครสมาชิกก่อนครับ" 
-            });
-        }
-
-        // ตรวจสอบรหัสผ่าน (ถ้ามี password_hash ในระบบ)
-        if (student.password_hash) {
-            if (!password) {
-                return res.status(400).json({ success: false, message: "กรุณากรอกรหัสผ่าน" });
-            }
-            const hash = hashPassword(password);
-            if (student.password_hash !== hash) {
-                return res.status(401).json({ success: false, message: "รหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง" });
-            }
-        }
-
-        // ตรวจสอบสถานะการอนุมัติ (หากถูกปฏิเสธ)
-        const status = student.status || 'approved';
+    const checkStudentStatusAndLogin = (studentObj, isDefaultPassword) => {
+        const status = studentObj.status || 'approved';
         if (status === 'rejected') {
             return res.status(403).json({ 
                 success: false, 
@@ -997,15 +981,94 @@ app.post('/api/student/login', (req, res) => {
 
         res.json({
             success: true,
+            isDefaultPassword: !!isDefaultPassword,
             student: {
-                studentId: student.studentId,
-                firstName: student.firstName,
-                lastName: student.lastName,
-                name: `${student.firstName} ${student.lastName}`.trim(),
-                class: student.class || ''
+                studentId: studentObj.studentId,
+                firstName: studentObj.firstName || '',
+                lastName: studentObj.lastName || '',
+                name: `${studentObj.firstName || ''} ${studentObj.lastName || ''}`.trim() || studentObj.studentId,
+                class: studentObj.class || ''
             }
         });
+    };
+
+    db.get('SELECT * FROM students WHERE studentId = ?', [cleanStudentId], (err, student) => {
+        if (err) return res.status(500).json({ success: false, message: err.message });
+        
+        if (!student) {
+            // ไม่พบบัญชีในตาราง students -> ตรวจสอบในรายชื่อรายวิชาของอาจารย์ (course_students)
+            db.get('SELECT * FROM course_students WHERE studentId = ? ORDER BY id DESC LIMIT 1', [cleanStudentId], (csErr, csRow) => {
+                if (csErr) return res.status(500).json({ success: false, message: csErr.message });
+                if (!csRow) {
+                    return res.status(404).json({ 
+                        success: false, 
+                        message: "ไม่พบรหัสนักศึกษานี้ในรายชื่อรายวิชาของอาจารย์ กรุณาแจ้งอาจารย์ผู้สอนเพื่อเพิ่มรายชื่อก่อนเข้าสอบครับ" 
+                    });
+                }
+
+                const now = new Date().toISOString();
+                const fName = csRow.firstName || 'นักศึกษา';
+                const lName = csRow.lastName || '';
+                const cls = csRow.class || '';
+
+                // สร้างบัญชีในนักศึกษาให้อัตโนมัติโดยใช้รหัสผ่านเริ่มต้น 1234
+                db.run(
+                    `INSERT INTO students (studentId, firstName, lastName, class, password_hash, status, created_at, approved_at, approved_by)
+                     VALUES (?, ?, ?, ?, ?, 'approved', ?, ?, 'system_auto')`,
+                    [cleanStudentId, fName, lName, cls, defaultHash, now, now],
+                    function(insErr) {
+                        if (insErr) return res.status(500).json({ success: false, message: insErr.message });
+                        console.log(`✨ [สร้างบัญชีอัตโนมัติ] นักศึกษา ${cleanStudentId} (${fName}) จากรายชื่อวิชาเข้าสู่ระบบแล้ว`);
+                        
+                        checkStudentStatusAndLogin({
+                            studentId: cleanStudentId,
+                            firstName: fName,
+                            lastName: lName,
+                            class: cls,
+                            status: 'approved'
+                        }, true);
+                    }
+                );
+            });
+            return;
+        }
+
+        // กรณีมีบัญชีอยู่แล้วในระบบ students
+        if (student.password_hash) {
+            // ตรวจสอบรหัสผ่าน
+            if (student.password_hash !== inputHash && !(student.password_hash === defaultHash && inputPassword === '1234')) {
+                return res.status(401).json({ success: false, message: "รหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง" });
+            }
+        }
+
+        const isDefault = (student.password_hash === defaultHash || inputPassword === '1234');
+        checkStudentStatusAndLogin(student, isDefault);
     });
+});
+
+// 2.2 เปลี่ยนรหัสผ่านนักศึกษา (Student Change Password)
+app.post('/api/student/change-password', (req, res) => {
+    const { studentId, newPassword } = req.body;
+    if (!studentId || !newPassword) {
+        return res.status(400).json({ success: false, message: "กรุณาระบุรหัสนักศึกษาและรหัสผ่านใหม่" });
+    }
+
+    if (newPassword.trim().length < 4) {
+        return res.status(400).json({ success: false, message: "รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 4 ตัวอักษร" });
+    }
+
+    const cleanStudentId = studentId.trim();
+    const newHash = hashPassword(newPassword.trim());
+
+    db.run(
+        'UPDATE students SET password_hash = ? WHERE studentId = ?',
+        [newHash, cleanStudentId],
+        function(err) {
+            if (err) return res.status(500).json({ success: false, message: err.message });
+            console.log(`🔐 [เปลี่ยนรหัสผ่านสำเร็จ] นักศึกษา ${cleanStudentId} ตั้งรหัสผ่านใหม่เรียบร้อยแล้ว`);
+            res.json({ success: true, message: "🎉 เปลี่ยนรหัสผ่านใหม่เรียบร้อยแล้ว!" });
+        }
+    );
 });
 
 // 2.1 นักศึกษาแก้ไขข้อมูลส่วนตัว / เปลี่ยนรหัสผ่าน (Student Profile Update)
@@ -2211,7 +2274,7 @@ app.get('/api/exam-results', (req, res) => {
 
     if (courseId) {
         db.all(`
-            SELECT er.id, er.studentId, er.name, er.class, er.score, er.maxScore, er.time, er.date, er.roomId, er.answers_json, er.courseId
+            SELECT DISTINCT er.id, er.studentId, er.name, er.class, er.score, er.maxScore, er.time, er.date, er.roomId, er.answers_json, er.courseId
             FROM exam_results er
             LEFT JOIN teacher_rooms tr ON er.roomId = tr.roomId
             WHERE er.courseId = ? 
@@ -2226,7 +2289,6 @@ app.get('/api/exam-results', (req, res) => {
                    AND (er.courseId IS NULL OR er.courseId = 0) 
                    AND (tr.courseId IS NULL OR tr.courseId = 0)
                )
-            GROUP BY er.id
             ORDER BY er.id DESC
         `, [
             courseId, String(courseId),
