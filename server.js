@@ -1781,7 +1781,7 @@ app.get('/api/teacher/courses', (req, res) => {
             (SELECT COUNT(*) FROM exam_templates et WHERE et.courseId = c.id) as examCount,
             (SELECT GROUP_CONCAT(DISTINCT cs.class) FROM course_students cs WHERE cs.courseId = c.id AND cs.class != '' AND cs.class IS NOT NULL) as studentClasses
         FROM courses c
-        WHERE c.teacherUsername = ? OR ? = 'admin'
+        WHERE (c.teacherUsername = ? OR c.teacherUsername IS NULL OR c.teacherUsername = '' OR c.teacherUsername = 'admin' OR ? = 'admin')
         ORDER BY c.id DESC
     `;
     db.all(sql, [username, username], (err, rows) => {

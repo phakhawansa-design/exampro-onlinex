@@ -263,11 +263,16 @@
 
         <!-- Course Filter Navigation Tabs -->
         <div class="glass-card p-4 sm:p-5 border-2 border-slate-200/90 shadow-sm flex flex-col gap-3">
-            <div class="flex items-center justify-between pb-2 border-b border-slate-200 text-xs font-bold text-slate-500">
-                <span class="flex items-center gap-1.5 text-indigo-700 font-extrabold text-sm">
-                    <span>📚</span> <span>แยกรายชื่อตามวิชาที่สอน:</span>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-200">
+                <span class="flex items-center gap-2 text-indigo-700 font-extrabold text-sm sm:text-base">
+                    <span>📚</span> <span>แยกรายชื่อนักศึกษาตามวิชาที่สอน:</span>
                 </span>
-                <span id="active-course-label" class="text-xs text-slate-500 font-bold bg-slate-100 px-3 py-1 rounded-full">แสดงนักศึกษาทั้งหมด</span>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-xs text-slate-500 font-bold shrink-0">เลือกวิชา:</span>
+                    <select id="course-dropdown-selector" onchange="selectCourseFilter(this.value)" class="dark-select text-xs font-bold py-1.5 px-3 min-w-[220px]">
+                        <option value="ALL">👥 แสดงนักศึกษาทั้งหมด</option>
+                    </select>
+                </div>
             </div>
             <div class="flex items-center gap-2 overflow-x-auto pb-1 max-w-full" id="course-filter-tabs">
                 <button type="button" onclick="selectCourseFilter('ALL')" id="course-tab-ALL" class="px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all shadow-sm bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shrink-0 cursor-pointer flex items-center gap-2">
@@ -555,50 +560,70 @@
 
     function renderCourseFilterTabs() {
         const container = document.getElementById('course-filter-tabs');
+        const selectDropdown = document.getElementById('course-dropdown-selector');
+
+        if (selectDropdown) {
+            selectDropdown.innerHTML = `
+                <option value="ALL" ${selectedCourseFilter === 'ALL' ? 'selected' : ''}>👥 แสดงนักศึกษาทั้งหมดทุกวิชา (${allStudents.length} คน)</option>
+                ${(teacherCourses || []).map(c => `
+                    <option value="${c.id}" ${String(selectedCourseFilter) === String(c.id) ? 'selected' : ''}>
+                        📘 [${escapeHtml(c.courseCode || 'วิชา')}] ${escapeHtml(c.courseName)} ${c.description ? '(' + escapeHtml(c.description) + ')' : ''} (${c.studentCount || 0} คน)
+                    </option>
+                `).join('')}
+            `;
+            selectDropdown.value = selectedCourseFilter;
+        }
+
         if (!container) return;
 
         let html = `
             <button type="button" onclick="selectCourseFilter('ALL')" id="course-tab-ALL" 
-                class="px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all shadow-sm ${selectedCourseFilter === 'ALL' ? 'bg-gradient-to-r from-cyan-600 to-indigo-600 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'} shrink-0 cursor-pointer flex items-center gap-2">
+                class="px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all shadow-sm ${selectedCourseFilter === 'ALL' ? 'bg-gradient-to-r from-cyan-600 to-indigo-600 text-white' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'} shrink-0 cursor-pointer flex items-center gap-2">
                 <span>👥</span>
                 <span>นักศึกษาทั้งหมด</span>
                 <span id="tab-count-ALL" class="${selectedCourseFilter === 'ALL' ? 'bg-white/30 text-white' : 'bg-slate-200 text-slate-800'} text-[10px] px-2 py-0.5 rounded-full font-bold">${allStudents.length}</span>
             </button>
         `;
 
-        (teacherCourses || []).forEach(c => {
-            const isActive = String(selectedCourseFilter) === String(c.id);
-            const activeClass = isActive 
-                ? 'bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shadow-sm' 
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-700';
-            const badgeClass = isActive ? 'bg-white/30 text-white' : 'bg-slate-200 text-slate-800';
+        if (!teacherCourses || teacherCourses.length === 0) {
+            html += `<span class="text-xs text-slate-400 font-bold px-2 py-1 flex items-center gap-1">⚠️ ยังไม่พบรายวิชาที่สอนในระบบ</span>`;
+        } else {
+            (teacherCourses || []).forEach(c => {
+                const isActive = String(selectedCourseFilter) === String(c.id);
+                const activeClass = isActive 
+                    ? 'bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shadow-sm' 
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700';
+                const badgeClass = isActive ? 'bg-white/30 text-white' : 'bg-slate-200 text-slate-800';
 
-            html += `
-                <button type="button" onclick="selectCourseFilter('${c.id}')" id="course-tab-${c.id}" 
-                    class="px-4 py-2 rounded-2xl text-xs sm:text-sm font-bold transition-all ${activeClass} shrink-0 cursor-pointer flex items-center gap-2">
-                    <span>📘</span>
-                    <span>[${escapeHtml(c.courseCode || 'วิชา')}] ${escapeHtml(c.courseName)}</span>
-                    <span class="${badgeClass} text-[10px] px-2 py-0.5 rounded-full font-bold">${c.studentCount || 0} คน</span>
-                </button>
-            `;
-        });
+                html += `
+                    <button type="button" onclick="selectCourseFilter('${c.id}')" id="course-tab-${c.id}" 
+                        class="px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all ${activeClass} shrink-0 cursor-pointer flex items-center gap-2">
+                        <span>📘</span>
+                        <span>[${escapeHtml(c.courseCode || 'วิชา')}] ${escapeHtml(c.courseName)} ${c.description ? '(' + escapeHtml(c.description) + ')' : ''}</span>
+                        <span class="${badgeClass} text-[10px] px-2 py-0.5 rounded-full font-bold">${c.studentCount || 0} คน</span>
+                    </button>
+                `;
+            });
+        }
 
         container.innerHTML = html;
     }
 
     async function selectCourseFilter(courseId) {
         selectedCourseFilter = courseId;
-        const labelEl = document.getElementById('active-course-label');
+        const selectDropdown = document.getElementById('course-dropdown-selector');
+        if (selectDropdown && selectDropdown.value !== String(courseId)) {
+            selectDropdown.value = courseId;
+        }
+
         const headerPill = document.getElementById('table-header-pill');
 
         if (courseId === 'ALL') {
-            if (labelEl) labelEl.textContent = 'แสดงนักศึกษาทั้งหมด';
             if (headerPill) headerPill.innerHTML = `👥 นักศึกษาทั้งหมด <span id="student-count-badge" class="ml-1 text-xs bg-white/30 px-2.5 py-0.5 rounded-full font-bold">0</span>`;
             if (document.getElementById('stat-total-label')) document.getElementById('stat-total-label').textContent = 'นักศึกษาทั้งหมด';
         } else {
             const found = (teacherCourses || []).find(c => String(c.id) === String(courseId));
             const courseNameStr = found ? `[${found.courseCode || 'วิชา'}] ${found.courseName}` : `วิชารหัส #${courseId}`;
-            if (labelEl) labelEl.textContent = `วิชา: ${courseNameStr}`;
             if (headerPill) headerPill.innerHTML = `📘 ${escapeHtml(courseNameStr)} <span id="student-count-badge" class="ml-1 text-xs bg-white/30 px-2.5 py-0.5 rounded-full font-bold">0</span>`;
             if (document.getElementById('stat-total-label')) document.getElementById('stat-total-label').textContent = `นักศึกษาในวิชา ${found?.courseCode || ''}`;
         }
@@ -753,8 +778,8 @@
     }
 
     function updateStats() {
-        const totalExams = allStudents.reduce((s, st) => s + (st.examCount || 0), 0);
-        const validAvgs = allStudents.filter(s => s.avgScore != null).map(s => s.avgScore);
+        const totalExams = allStudents.reduce((s, st) => s + (parseInt(st.examCount, 10) || 0), 0);
+        const validAvgs = allStudents.filter(s => s.avgScore != null && !isNaN(parseFloat(s.avgScore))).map(s => parseFloat(s.avgScore));
         const overallAvg = validAvgs.length ? validAvgs.reduce((a, b) => a + b, 0) / validAvgs.length : null;
         const elTotal = document.getElementById('stat-total');
         if (elTotal) elTotal.textContent = allStudents.length;
