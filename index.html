@@ -3,6 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    (function() {
+      const p = new URLSearchParams(window.location.search);
+      const pin = p.get('pin') || p.get('code');
+      const room = p.get('roomId') || p.get('room');
+      if (pin || room) {
+        window.location.replace('Student-login.html?pin=' + encodeURIComponent(pin || '') + (room ? '&roomId=' + encodeURIComponent(room) : ''));
+      }
+    })();
+  </script>
   <title>Tab-Lock Online Proctoring System -- แพลตฟอร์มจัดการสอบออนไลน์ป้องกันการทุจริตแบบเรียลไทม์</title>
   <!-- Google Fonts: Kanit (weights 300 to 900) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">

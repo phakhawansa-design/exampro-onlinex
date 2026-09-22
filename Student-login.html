@@ -60,11 +60,12 @@
             </div>
 
             <!-- QR Code Scan Detection Banner -->
-            <div id="qr-detected-banner" class="hidden p-3 bg-emerald-50 border border-emerald-300 rounded-2xl text-xs font-bold text-emerald-800 flex items-center gap-2.5 shadow-sm">
-                <span class="text-base">📷</span>
-                <div class="leading-tight">
-                    <div>ตรวจพบรหัสจาก QR Code สำเร็จ!</div>
-                    <div class="text-[11px] text-emerald-600 font-normal">รหัส PIN: <strong id="qr-detected-pin" class="font-mono font-bold text-emerald-800"></strong></div>
+            <div id="qr-detected-banner" class="hidden p-3.5 bg-emerald-50 border border-emerald-300 rounded-2xl text-xs font-bold text-emerald-800 flex items-start gap-3 shadow-sm">
+                <span class="text-xl shrink-0">📷</span>
+                <div class="leading-tight space-y-1">
+                    <div class="text-sm font-bold text-emerald-900">ตรวจพบรหัสจาก QR Code สำเร็จ!</div>
+                    <div class="text-xs text-emerald-700 font-normal">รหัส PIN: <strong id="qr-detected-pin" class="font-mono font-bold text-emerald-900 text-sm"></strong></div>
+                    <div id="qr-detected-info" class="text-xs text-emerald-600 font-medium"></div>
                 </div>
             </div>
 
@@ -84,11 +85,15 @@
             <div id="auth-login-view" class="space-y-3.5 sm:space-y-4">
                 <div class="space-y-1.5">
                     <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">รหัสนักศึกษา *</label>
-                    <input type="text" id="student-id" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm font-mono transition-all" placeholder="เช่น 66101001">
+                    <input type="text" id="student-id" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm font-mono transition-all" placeholder="เช่น 66101001" autofocus>
                 </div>
                 <div class="space-y-1.5">
-                    <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">รหัสผ่าน *</label>
-                    <input type="password" id="student-password" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="กรอกรหัสผ่านของคุณ">
+                    <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">รหัสผ่าน (เริ่มต้น 1234) *</label>
+                    <input type="password" id="student-password" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="1234">
+                    <p class="text-[11px] text-slate-500 font-medium flex items-center gap-1.5 pt-0.5">
+                        <span>💡</span>
+                        <span>เข้าสอบครั้งแรกใช้รหัสเริ่มต้น <strong class="text-indigo-600 font-mono font-bold">1234</strong> (ระบบจะเตือนให้เปลี่ยนรหัสผ่าน)</span>
+                    </p>
                 </div>
                 <div class="pt-2">
                     <button onclick="handleLoginAndEnter()" id="btn-login-submit" class="btn-primary w-full text-white py-3.5 rounded-xl sm:rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-[0.98] cursor-pointer">
@@ -285,9 +290,9 @@
             </div>
 
             <div class="space-y-1.5">
-                <h3 class="text-lg sm:text-xl font-bold text-slate-800">แจ้งเตือนเปลี่ยนรหัสผ่าน</h3>
+                <h3 class="text-lg sm:text-xl font-bold text-slate-800">แจ้งเตือนเปลี่ยนรหัสผ่านสำหรับการเข้าใช้ครั้งแรก</h3>
                 <p class="text-xs text-slate-500 leading-relaxed font-normal">
-                    คุณกำลังใช้งานรหัสผ่านเริ่มต้น (<strong class="text-amber-600 font-mono">1234</strong>)<br>กรุณาตั้งรหัสผ่านใหม่ของคุณเพื่อความปลอดภัยก่อนเข้าสอบ
+                    คุณกำลังใช้งานรหัสผ่านเริ่มต้น (<strong class="text-amber-600 font-mono">1234</strong>)<br>กรุณาตั้งรหัสผ่านใหม่ของคุณเพื่อความปลอดภัยของบัญชีก่อนเข้าสู่ห้องรอสอบครับ
                 </p>
             </div>
 
@@ -342,26 +347,70 @@
             return arr;
         }
 
+        let currentUrlPin = '';
+        let currentUrlRoomId = '';
+
         window.addEventListener('DOMContentLoaded', async () => { 
             // ตรวจสอบ URL query parameters สำหรับการสแกน QR Code หรือกดลิงก์มา
             const urlParams = new URLSearchParams(window.location.search);
-            const codeParam = urlParams.get('code');
-            const roomParam = urlParams.get('room');
+            const codeParam = urlParams.get('pin') || urlParams.get('code');
+            const roomParam = urlParams.get('roomId') || urlParams.get('room');
             const autostartParam = urlParams.get('autostart');
 
+            currentUrlPin = codeParam || '';
+            currentUrlRoomId = roomParam || '';
+
             if (codeParam) {
-                const codeInput = document.getElementById('exam-code-input');
-                if (codeInput) {
-                    codeInput.value = codeParam;
-                    codeInput.classList.add('border-emerald-500', 'bg-emerald-50/50');
-                }
                 const qrBanner = document.getElementById('qr-detected-banner');
                 const qrPin = document.getElementById('qr-detected-pin');
                 if (qrBanner && qrPin) {
                     qrPin.textContent = codeParam;
                     qrBanner.classList.remove('hidden');
                 }
+
+                // กรอกรหัสเริ่มต้น 1234 ให้อัตโนมัติ เพื่อให้นักศึกษาใส่แค่รหัสนักศึกษาตามที่ต้องการ
+                const passInput = document.getElementById('student-password');
+                if (passInput) {
+                    passInput.value = '1234';
+                }
+
+                const submitBtn = document.getElementById('btn-login-submit');
+                if (submitBtn) {
+                    submitBtn.innerHTML = `<span>🚀</span> <span>ยืนยันรหัส & เข้าสู่ห้องรอสอบ (PIN: ${codeParam})</span>`;
+                }
+
+                // ดึงข้อมูลรายวิชาและผู้คุมสอบมาแสดงให้ทราบ
+                try {
+                    const roomRes = await fetch(`/api/student/get-room-by-code?examCode=${encodeURIComponent(codeParam)}&infoOnly=1`);
+                    if (roomRes.ok) {
+                        const roomInfo = await roomRes.json();
+                        const infoEl = document.getElementById('qr-detected-info');
+                        if (infoEl) {
+                            const courseTxt = roomInfo.courseName ? `[${roomInfo.courseCode || 'วิชา'}] ${roomInfo.courseName}` : (roomInfo.roomName || '');
+                            infoEl.textContent = `📚 ${courseTxt} • ผู้คุมสอบ: ${roomInfo.teacherName || 'อาจารย์'}`;
+                        }
+                    }
+                } catch(e) {
+                    console.log("Could not prefetch room info:", e);
+                }
+
+                // โฟกัสไปที่ช่องรหัสนักศึกษาทันที
+                const stdInput = document.getElementById('student-id');
+                if (stdInput) {
+                    stdInput.focus();
+                }
             }
+
+            // Keyboard enter event listeners
+            document.getElementById('student-id')?.addEventListener('keydown', e => {
+                if (e.key === 'Enter') handleLoginAndEnter();
+            });
+            document.getElementById('student-password')?.addEventListener('keydown', e => {
+                if (e.key === 'Enter') handleLoginAndEnter();
+            });
+            document.getElementById('modal-confirm-password')?.addEventListener('keydown', e => {
+                if (e.key === 'Enter') submitNewPasswordModal();
+            });
 
             // ถ้ามีการส่ง autostart=1 มา (เช่น จาก Waiting Room เมื่ออาจารย์กดเริ่มสอบ)
             const savedStudentRaw = localStorage.getItem('currentStudent');
@@ -507,7 +556,7 @@
                 });
                 const data = await res.json();
                 if (res.ok && data.success) {
-                    alert("🎉 เปลี่ยนรหัสผ่านใหม่เรียบร้อยแล้ว!");
+                    alert("🎉 เปลี่ยนรหัสผ่านใหม่เรียบร้อยแล้ว!\nระบบจะนำคุณเข้าสู่หน้ารอสอบอัตโนมัติครับ");
                     if (pendingLoginTarget) pendingLoginTarget();
                 } else {
                     alert(`❌ ${data.message || 'เปลี่ยนรหัสผ่านล้มเหลว'}`);
@@ -528,26 +577,34 @@
             const loginBtn = document.getElementById('btn-login-submit');
 
             if (!studentId) {
-                alert("⚠️ กรุณากรอกรหัสนักศึกษา");
+                alert("⚠️ กรุณากรอกรหัสนักศึกษาของคุณ");
+                document.getElementById('student-id').focus();
                 return;
             }
 
             loginBtn.disabled = true;
-            loginBtn.innerHTML = "⏳ กำลังเข้าสู่ระบบ...";
+            loginBtn.innerHTML = "⏳ กำลังตรวจสอบสิทธิ์และเข้าสู่ระบบ...";
 
             try {
-                // 1. ตรวจสอบ Login
+                // 1. ตรวจสอบ Login และสิทธิ์ในรายวิชา
                 const loginRes = await fetch('/api/student/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ studentId, password })
+                    body: JSON.stringify({ 
+                        studentId, 
+                        password,
+                        examCode: currentUrlPin,
+                        roomId: currentUrlRoomId
+                    })
                 });
                 const loginData = await loginRes.json();
 
                 if (!loginRes.ok || !loginData.success) {
                     alert(loginData.message || "❌ เข้าสู่ระบบไม่สำเร็จ กรุณาตรวจสอบรหัสนักศึกษาหรือรหัสผ่าน");
                     loginBtn.disabled = false;
-                    loginBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg> เข้าสู่ระบบ`;
+                    loginBtn.innerHTML = currentUrlPin 
+                        ? `<span>🚀</span> <span>ยืนยันรหัส & เข้าสู่ห้องรอสอบ (PIN: ${currentUrlPin})</span>` 
+                        : `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg> เข้าสู่ระบบ`;
                     return;
                 }
 
@@ -556,10 +613,10 @@
                 sessionStorage.setItem('currentStudent', JSON.stringify(loginData.student));
 
                 const navigateTarget = () => {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const codeParam = urlParams.get('code') || urlParams.get('pin');
-                    if (codeParam) {
-                        window.location.href = `student-portal.html?code=${encodeURIComponent(codeParam)}`;
+                    const code = currentUrlPin;
+                    const room = currentUrlRoomId;
+                    if (code) {
+                        window.location.href = `student-portal.html?code=${encodeURIComponent(code)}${room ? `&roomId=${encodeURIComponent(room)}` : ''}`;
                     } else {
                         window.location.href = 'student-portal.html';
                     }
@@ -573,9 +630,11 @@
                 }
             } catch(e) {
                 console.error(e);
-                alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+                alert("❌ ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
                 loginBtn.disabled = false;
-                loginBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg> เข้าสู่ระบบ`;
+                loginBtn.innerHTML = currentUrlPin 
+                    ? `<span>🚀</span> <span>ยืนยันรหัส & เข้าสู่ห้องรอสอบ (PIN: ${currentUrlPin})</span>` 
+                    : `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg> เข้าสู่ระบบ`;
             }
         }
 

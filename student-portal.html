@@ -464,6 +464,10 @@
 
                 if (!res.ok || !data.success) {
                     alert(`❌ ปฏิเสธการเข้าสอบ:\n\n${data.message || 'ไม่สามารถเข้าห้องสอบนี้ได้'}`);
+                    const params = new URLSearchParams(window.location.search);
+                    if (params.get('code') || params.get('pin')) {
+                        window.location.href = `Student-login.html?pin=${encodeURIComponent(pinInput)}`;
+                    }
                     return;
                 }
 
