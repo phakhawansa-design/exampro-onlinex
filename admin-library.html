@@ -115,34 +115,7 @@
         }
         .nav-link.active svg { color: #ffffff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
 
-        /* Collapsible Sidebar */
-        #sidebar.collapsed { width: 78px !important; }
-        #sidebar.collapsed .logo-text,
-        #sidebar.collapsed nav span,
-        #sidebar.collapsed .nav-section-title,
-        #sidebar.collapsed .flex-1.min-w-0,
-        #sidebar.collapsed .logout-btn-text { display: none !important; }
-        #sidebar.collapsed .nav-link { justify-content: center; padding: 12px; }
-        #sidebar.collapsed .logo-shield { margin: 0 auto; }
-        #sidebar-toggle {
-            position: absolute;
-            right: 12px; top: 22px;
-            width: 26px; height: 26px;
-            border-radius: 50%;
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
-            color: #475569;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 11px;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            z-index: 100;
-        }
-        #sidebar-toggle:hover { color: #0f172a; background: #f8fafc; transform: scale(1.08); }
-        #sidebar.collapsed #sidebar-toggle {
-            right: 10px; left: auto; top: 22px; margin: 0; transform: rotate(180deg);
-        }
+
 
         #main-area {
             flex: 1; background: #f8fafc;
@@ -209,8 +182,6 @@
 
     <!-- Sidebar Menu -->
     <aside id="sidebar">
-    <button id="sidebar-toggle" title="ย่อ/ขยายเมนู" onclick="document.getElementById('sidebar').classList.toggle('collapsed')">◀</button>
-
     <div class="sidebar-inner p-4 sm:p-5 space-y-4 flex-1 overflow-y-auto">
         <!-- Logo Header -->
         <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
@@ -296,7 +267,7 @@
                 <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white sidebar-online-dot online-dot"></span>
             </div>
             <div class="flex-1 min-w-0">
-                <div class="text-sm font-bold text-slate-900 truncate" id="sidebar-teacher-name">อาจารย์ผู้ดูแล</div>
+                <div class="text-sm font-bold text-slate-900 truncate" id="sidebar-teacher-name">อาจารย์: ภควันต์ แสนเสริม</div>
                 <div class="text-xs text-slate-500 font-semibold flex items-center gap-1">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> ออนไลน์ • ผู้ดูแลระบบ
                 </div>
@@ -385,9 +356,11 @@
     <script>
         // โหลดข้อมูลยืนยันตัวตน
         const username = localStorage.getItem('teacher_username') || localStorage.getItem('teacherUsername') || 'aom1';
-        const teacherName = localStorage.getItem('teacher_name') || username;
+        const rawTeacherName = localStorage.getItem('teacher_name') || localStorage.getItem('teacherName') || 'ภควันต์ แสนเสริม';
+        const cleanTeacherName = rawTeacherName.replace(/^(อาจารย์[:\s]*|อ\.\s*)/, '');
+        const teacherName = cleanTeacherName;
         const nameEl = document.getElementById('sidebar-teacher-name');
-        if (nameEl) nameEl.textContent = `อาจารย์: ${teacherName}`;
+        if (nameEl) nameEl.textContent = `อาจารย์: ${cleanTeacherName}`;
 
         let rooms = [];
 
@@ -697,22 +670,15 @@
     // Collapsible Sidebar
     function initSidebarCollapse() {
         const sidebar = document.getElementById('sidebar');
-        const toggleBtn = document.getElementById('sidebar-toggle');
-        if (!sidebar || !toggleBtn) return;
+        if (!sidebar) return;
+        localStorage.removeItem('sidebar_collapsed');
+        sidebar.classList.remove('collapsed');
         let activePage = window.location.pathname.split('/').pop() || 'dashboard.html';
         if (activePage === 'admin-questions.html' || activePage === 'admin-excel.html') {
             activePage = 'admin-portal.html';
         }
         document.querySelectorAll('nav a').forEach(a => {
             a.className = a.getAttribute('href') === activePage ? 'nav-link active' : 'nav-link';
-        });
-        const isCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
-        sidebar.classList.toggle('collapsed', isCollapsed);
-        toggleBtn.textContent = isCollapsed ? '▶' : '◀';
-        toggleBtn.addEventListener('click', () => {
-            const collapsed = sidebar.classList.toggle('collapsed');
-            toggleBtn.textContent = collapsed ? '▶' : '◀';
-            localStorage.setItem('sidebar_collapsed', collapsed.toString());
         });
     }
     if (document.readyState === 'loading') {

@@ -162,13 +162,6 @@
         .nav-link:hover { color: #ec4899; background: #fdf2f8; border-color: #cbd5e1; transform: translateX(3px); }
         .nav-link.active { background: linear-gradient(135deg, #f472b6 0%, #818cf8 50%, #38bdf8 100%); color: #ffffff !important; font-weight: 600 !important; box-shadow: 0 8px 24px rgba(79, 70, 229, 0.35); border-color: transparent; }
         .nav-link.active svg { color: #ffffff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
-        #sidebar.collapsed { width: 78px !important; }
-        #sidebar.collapsed .logo-text, #sidebar.collapsed nav span, #sidebar.collapsed .nav-section-title, #sidebar.collapsed .flex-1.min-w-0, #sidebar.collapsed .logout-btn-text { display: none !important; }
-        #sidebar.collapsed .nav-link { justify-content: center; padding: 12px; }
-        #sidebar.collapsed .logo-shield { margin: 0 auto; }
-        #sidebar-toggle { position: absolute; right: 12px; top: 22px; width: 26px; height: 26px; border-radius: 50%; background: #ffffff; border: 1px solid #cbd5e1; color: #475569; display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.3s ease; z-index: 100; }
-        #sidebar-toggle:hover { color: #0f172a; background: #f8fafc; transform: scale(1.08); }
-        #sidebar.collapsed #sidebar-toggle { right: 10px; left: auto; top: 22px; margin: 0; transform: rotate(180deg); }
     </style>
 </head>
 <body class="flex flex-col h-screen overflow-hidden select-none bg-slate-100">
@@ -1222,12 +1215,132 @@
         // ==========================================
         // 6. AI EXAM CONVERTER & QUESTION BANK MODALS
         // ==========================================
+        const AI_PROMPT_TEMPLATES = {
+            text: `คุณเป็น AI ผู้ช่วยแปลงข้อสอบ กรุณาแปลงข้อสอบที่ฉันส่งให้ทั้งหมด ออกมาเป็นรูปแบบข้อความตามโครงสร้างนี้เป๊ะๆ (ห้ามมีคำนำ คำลงท้าย หรือคำอธิบายอื่น ให้แสดงเฉพาะข้อสอบเท่านั้น):
+
+1. [โจทย์คำถาม]
+ก. [ตัวเลือก ก]
+ข. [ตัวเลือก ข]
+ค. [ตัวเลือก ค]
+ง. [ตัวเลือก ง]
+เฉลย: [ก, ข, ค หรือ ง]
+
+2. [โจทย์คำถามข้อถัดไป]
+ก. [ตัวเลือก ก]
+ข. [ตัวเลือก ข]
+ค. [ตัวเลือก ค]
+ง. [ตัวเลือก ง]
+เฉลย: [ก, ข, ค หรือ ง]`,
+
+            gen: `คุณเป็นผู้เชี่ยวชาญด้านการศึกษา ช่วยออกข้อสอบปรนัย 4 ตัวเลือก จำนวน 10 ข้อ พร้อมเฉลย โดยจัดรูปแบบผลลัพธ์ตามโครงสร้างนี้เป๊ะๆ (ห้ามมีข้อความเกริ่นนำหรือคำอธิบายอื่น):
+
+1. [โจทย์คำถาม]
+ก. [ตัวเลือก ก]
+ข. [ตัวเลือก ข]
+ค. [ตัวเลือก ค]
+ง. [ตัวเลือก ง]
+เฉลย: [ก, ข, ค หรือ ง]
+
+2. [โจทย์คำถามข้อถัดไป]
+ก. [ตัวเลือก ก]
+ข. [ตัวเลือก ข]
+ค. [ตัวเลือก ค]
+ง. [ตัวเลือก ง]
+เฉลย: [ก, ข, ค หรือ ง]`,
+
+            excel: `คุณเป็น AI ผู้ช่วยแปลงข้อสอบ กรุณาแปลงข้อสอบจากไฟล์ที่ฉันส่งให้ออกมาเป็นไฟล์ Excel (.xlsx) โดยมีโครงสร้างคอลัมน์ดังนี้:
+คอลัมน์ที่ต้องมี: question, a, b, c, d, answer
+โดย question = ข้อความโจทย์คำถาม, a/b/c/d = ตัวเลือก A/B/C/D, answer = ตัวอักษรเฉลยที่ถูกต้อง (a, b, c หรือ d)
+กฎ: แถวแรกต้องเป็น Header ชื่อคอลัมน์เท่านั้น ข้อมูลเริ่มแถวที่ 2 เป็นต้นไป ห้ามมีคอลัมน์อื่นนอกจากที่กำหนด ช่องว่างห้ามเว้น
+หากข้อสอบมีตัวเลือกมากกว่า 4 ข้อ ให้เพิ่มคอลัมน์ e, f, g ตามลำดับ และใส่ค่าที่ answer ให้ตรงกัน
+เมื่อแปลงเสร็จให้ส่งออกไฟล์ Excel ให้ฉันดาวน์โหลดทันที`
+        };
+
+        let currentActivePromptType = 'text';
+
         function openAiModal() {
             document.getElementById('ai-exam-modal').classList.remove('hidden');
+            switchPromptType(currentActivePromptType || 'text');
         }
 
         function closeAiModal() {
             document.getElementById('ai-exam-modal').classList.add('hidden');
+        }
+
+        function switchPromptType(type) {
+            currentActivePromptType = type;
+            const promptBox = document.getElementById('ai-prompt-box');
+            if (promptBox) {
+                promptBox.textContent = AI_PROMPT_TEMPLATES[type] || AI_PROMPT_TEMPLATES.text;
+            }
+
+            ['text', 'gen', 'excel'].forEach(t => {
+                const tabBtn = document.getElementById(`tab-prompt-${t}`);
+                if (tabBtn) {
+                    if (t === type) {
+                        tabBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-purple-700 shadow-xs transition';
+                    } else {
+                        tabBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition';
+                    }
+                }
+            });
+        }
+
+        function copyAiPrompt() {
+            const promptBox = document.getElementById('ai-prompt-box');
+            const promptText = promptBox ? promptBox.innerText : '';
+            if (!promptText) return;
+
+            navigator.clipboard.writeText(promptText).then(() => {
+                const btnText = document.getElementById('copy-ai-prompt-btn-text');
+                if (btnText) btnText.textContent = '✅ คัดลอกแล้ว!';
+                setTimeout(() => {
+                    if (btnText) btnText.textContent = 'คัดลอก Prompt';
+                }, 2500);
+            }).catch(() => {
+                const el = document.createElement('textarea');
+                el.value = promptText;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                alert('📋 คัดลอก Prompt เรียบร้อยแล้วครับ!');
+            });
+        }
+
+        function copyPromptAndOpenAI(provider) {
+            const promptBox = document.getElementById('ai-prompt-box');
+            const promptText = promptBox ? promptBox.innerText : '';
+            const targetUrl = provider === 'chatgpt' ? 'https://chatgpt.com' : 'https://gemini.google.com/app';
+
+            if (promptText) {
+                navigator.clipboard.writeText(promptText).then(() => {
+                    window.open(targetUrl, '_blank');
+                }).catch(() => {
+                    const el = document.createElement('textarea');
+                    el.value = promptText;
+                    document.body.appendChild(el);
+                    el.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(el);
+                    window.open(targetUrl, '_blank');
+                });
+            } else {
+                window.open(targetUrl, '_blank');
+            }
+        }
+
+        function clearAiInput() {
+            const input = document.getElementById('ai-text-input');
+            if (input) {
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        function triggerExcelImportFromAi() {
+            closeAiModal();
+            triggerExcelImport();
         }
 
         function parseAiTextToQuestions() {
@@ -1518,25 +1631,92 @@
     <!-- MODALS FOR AI EXAM & QUESTION LIBRARY                    -->
     <!-- ======================================================== -->
     
-    <!-- 1. AI Exam Converter Modal -->
-    <div id="ai-exam-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white w-full max-w-2xl rounded-3xl p-6 shadow-2xl border-2 border-purple-200 space-y-4 max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between border-b pb-3 border-slate-100">
-                <div class="flex items-center gap-2">
-                    <span class="text-2xl">🤖</span>
+    <!-- 1. AI Exam Converter Modal (พร้อมกล่อง Prompt สำเร็จรูปสไตล์ต้นฉบับ) -->
+    <div id="ai-exam-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 hidden">
+        <div class="bg-white w-full max-w-3xl rounded-3xl p-5 sm:p-7 shadow-2xl border-2 border-purple-200 space-y-4 max-h-[92vh] flex flex-col overflow-hidden">
+            
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between border-b pb-3 border-slate-100 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center text-2xl shadow-xs shrink-0">
+                        🤖
+                    </div>
                     <div>
-                        <h3 class="font-bold text-lg text-slate-900">ตัวแปลงข้อสอบจาก AI</h3>
-                        <p class="text-xs font-bold text-purple-700">วางข้อความโจทย์ข้อสอบจาก ChatGPT / Gemini / Claude ได้ทันที</p>
+                        <h3 class="font-bold text-lg sm:text-xl text-slate-900 leading-tight">ตัวช่วยสร้าง & แปลงข้อสอบจาก AI</h3>
+                        <p class="text-xs font-semibold text-purple-700">มี Prompt สำเร็จรูปให้คัดลอกไปสั่ง ChatGPT / Gemini / Claude ได้ทันที</p>
                     </div>
                 </div>
-                <button onclick="closeAiModal()" class="text-slate-400 hover:text-slate-700 font-bold text-xl">✕</button>
+                <button onclick="closeAiModal()" class="w-9 h-9 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 font-bold text-xl flex items-center justify-center transition cursor-pointer">✕</button>
             </div>
 
-            <div class="space-y-2 flex-1 flex flex-col overflow-hidden">
-                <label class="block text-xs font-bold text-slate-600">
-                    วางข้อความโจทย์ตามรูปแบบทั่วไป (เช่น 1. โจทย์... ก. ... ข. ... เฉลย: ข):
-                </label>
-                <textarea id="ai-text-input" rows="8" placeholder="1. เมืองหลวงของประเทศไทยคือเมืองใด?
+            <div class="overflow-y-auto pr-1 space-y-4 flex-1">
+                <!-- 4 Steps (รูปแบบคำแนะนำเข้าใจง่ายเหมือนระบบเดิม) -->
+                <ol class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700 bg-purple-50/60 p-3.5 rounded-2xl border border-purple-100 font-semibold">
+                    <li class="flex gap-2 items-start">
+                        <span class="shrink-0 w-5 h-5 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center text-[10px] mt-0.5">1</span>
+                        <div><strong>คัดลอก Prompt สำเร็จรูป</strong> จากกล่องด้านล่าง</div>
+                    </li>
+                    <li class="flex gap-2 items-start">
+                        <span class="shrink-0 w-5 h-5 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center text-[10px] mt-0.5">2</span>
+                        <div>กดปุ่ม <strong>เปิด Gemini / ChatGPT</strong> แล้ววาง Prompt ลงในแชท</div>
+                    </li>
+                    <li class="flex gap-2 items-start">
+                        <span class="shrink-0 w-5 h-5 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center text-[10px] mt-0.5">3</span>
+                        <div>ส่งเอกสารข้อสอบเดิม หรือระบุหัวข้อวิชาที่ต้องการให้ออกข้อสอบ</div>
+                    </li>
+                    <li class="flex gap-2 items-start">
+                        <span class="shrink-0 w-5 h-5 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center text-[10px] mt-0.5">4</span>
+                        <div><strong>คัดลอกผลลัพธ์จาก AI</strong> มาวางในช่องด้านล่าง แล้วกดแปลงข้อสอบ</div>
+                    </li>
+                </ol>
+
+                <!-- Prompt Section with Tabs -->
+                <div class="space-y-2">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex flex-wrap items-center gap-1.5 p-1 bg-slate-100 rounded-xl">
+                            <button type="button" onclick="switchPromptType('text')" id="tab-prompt-text" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-purple-700 shadow-xs transition cursor-pointer">
+                                📋 1. แปลงข้อสอบเป็นข้อความ
+                            </button>
+                            <button type="button" onclick="switchPromptType('gen')" id="tab-prompt-gen" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition cursor-pointer">
+                                💡 2. ให้ AI คิดข้อสอบใหม่
+                            </button>
+                            <button type="button" onclick="switchPromptType('excel')" id="tab-prompt-excel" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition cursor-pointer">
+                                📊 3. แปลงเป็นไฟล์ Excel (.xlsx)
+                            </button>
+                        </div>
+
+                        <button onclick="copyAiPrompt()" id="copy-ai-prompt-btn" class="text-xs font-bold bg-purple-100 hover:bg-purple-200 text-purple-800 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 shadow-2xs cursor-pointer">
+                            <span>📋</span>
+                            <span id="copy-ai-prompt-btn-text">คัดลอก Prompt</span>
+                        </button>
+                    </div>
+
+                    <!-- Prompt Text Box -->
+                    <div id="ai-prompt-box" class="bg-slate-900 text-slate-100 border border-slate-700 rounded-2xl p-3.5 text-xs leading-relaxed font-mono max-h-36 overflow-y-auto whitespace-pre-wrap select-all shadow-inner"></div>
+
+                    <!-- Quick Open AI Buttons -->
+                    <div class="flex flex-wrap items-center gap-2 pt-0.5">
+                        <span class="text-[11px] font-bold text-slate-400">เปิด AI ทันที:</span>
+                        <button type="button" onclick="copyPromptAndOpenAI('gemini')" class="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer">
+                            <span>✨</span> <span>คัดลอกแล้วเปิด Gemini AI →</span>
+                        </button>
+                        <button type="button" onclick="copyPromptAndOpenAI('chatgpt')" class="px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer">
+                            <span>💬</span> <span>คัดลอกแล้วเปิด ChatGPT →</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Input Textarea Section -->
+                <div class="space-y-2 pt-2 border-t border-slate-100">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                            <span>📥</span>
+                            <span>วางข้อความผลลัพธ์ที่ได้จาก AI ลงในช่องนี้ (เช่น 1. โจทย์... ก. ... ข. ... เฉลย: ข):</span>
+                        </label>
+                        <button type="button" onclick="clearAiInput()" class="text-[11px] text-slate-400 hover:text-rose-600 font-bold cursor-pointer">ล้างข้อความ</button>
+                    </div>
+                    <textarea id="ai-text-input" rows="5" placeholder="วางข้อความที่ AI ตอบกลับมาที่นี่ เช่น:
+1. เมืองหลวงของประเทศไทยคือเมืองใด?
 ก. เชียงใหม่
 ข. กรุงเทพมหานคร
 ค. ภูเก็ต
@@ -1548,16 +1728,27 @@
 ข. Windows
 ค. HTML
 ง. Chrome
-เฉลย: ข" class="w-full p-4 bg-slate-50 border-2 border-slate-200 focus:border-purple-600 rounded-2xl text-sm font-bold text-slate-900 outline-none leading-relaxed flex-1 font-mono"></textarea>
+เฉลย: ข" class="w-full p-3.5 bg-slate-50 hover:bg-white focus:bg-white border-2 border-slate-200 focus:border-purple-600 rounded-2xl text-xs sm:text-sm font-semibold text-slate-900 outline-none leading-relaxed font-mono shadow-inner transition"></textarea>
+                </div>
             </div>
 
-            <div class="flex items-center justify-end gap-3 pt-2 border-t border-slate-100">
-                <button onclick="closeAiModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs sm:text-sm font-bold transition">ยกเลิก</button>
-                <button onclick="parseAiTextToQuestions()" class="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-md shadow-purple-600/25 transition active:scale-95 flex items-center gap-1.5 cursor-pointer">
-                    <span>✨</span>
-                    <span>แปลงและนำเข้าข้อสอบ</span>
+            <!-- Modal Footer -->
+            <div class="flex items-center justify-between gap-3 pt-3 border-t border-slate-100 shrink-0">
+                <button onclick="closeAiModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer">
+                    ยกเลิก
                 </button>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="triggerExcelImportFromAi()" class="hidden sm:inline-flex px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-xs font-bold transition items-center gap-1.5 cursor-pointer">
+                        <span>📊</span>
+                        <span>นำเข้าด้วยไฟล์ Excel (.xlsx)</span>
+                    </button>
+                    <button onclick="parseAiTextToQuestions()" class="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-md shadow-purple-600/25 transition active:scale-95 flex items-center gap-2 cursor-pointer">
+                        <span>✨</span>
+                        <span>แปลงและนำเข้าข้อสอบ</span>
+                    </button>
+                </div>
             </div>
+
         </div>
     </div>
 
@@ -1582,37 +1773,37 @@
     </div>
 
     <!-- 3. Course Check Confirmation Modal (แจ้งเตือนสอบถามรายวิชาก่อนเริ่มสร้างข้อสอบ) -->
-    <div id="course-check-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-all duration-300 opacity-0 pointer-events-none">
+    <div id="course-check-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-all duration-300 opacity-0 pointer-events-none" style="font-family: 'Kanit', sans-serif;">
         <div class="bg-white/95 border border-pink-200 p-6 sm:p-8 rounded-3xl shadow-2xl max-w-md w-full mx-4 text-center space-y-6 transform scale-95 transition-all duration-300 relative overflow-hidden" id="course-check-modal-card">
             
             <!-- Top Gradient Accent bar -->
-            <div class="absolute top-0 left-0 right-0 h-2.5 bg-gradient-to-r from-pink-500 via-rose-500 to-sky-500"></div>
+            <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-pink-500 via-rose-500 to-sky-500"></div>
 
-            <!-- Animated Header Icon -->
+            <!-- Header Icon -->
             <div class="relative inline-block mt-2">
-                <div class="w-20 h-20 bg-gradient-to-tr from-pink-100 via-rose-100 to-sky-100 rounded-full flex items-center justify-center text-4xl mx-auto shadow-inner border border-pink-200/80">
+                <div class="w-16 h-16 bg-gradient-to-tr from-pink-100 via-rose-100 to-sky-100 rounded-full flex items-center justify-center text-3xl mx-auto shadow-inner border border-pink-200/80">
                     📚
                 </div>
             </div>
 
             <!-- Message Header -->
             <div class="space-y-2">
-                <h3 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                <h3 class="text-xl font-bold text-slate-800 tracking-normal">
                     คุณมีรายวิชาของคุณหรือยัง?
                 </h3>
-                <p class="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
-                    ก่อนเริ่มสร้างข้อสอบ กรุณายืนยันว่าคุณมีรายวิชาในระบบแล้ว หรือหากยังไม่มีสามารถสร้างรายวิชาใหม่ได้ทันที
+                <p class="text-xs sm:text-sm text-slate-500 font-normal leading-relaxed">
+                    ก่อนเริ่มสร้างข้อสอบ กรุณายืนยันว่าคุณมีรายวิชาในระบบแล้ว<br class="hidden sm:inline"> หรือหากยังไม่มีสามารถสร้างรายวิชาใหม่ได้ทันที
                 </p>
             </div>
 
             <!-- Choice Action Buttons -->
             <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-                <button onclick="confirmHasCourse()" class="w-full sm:w-1/2 py-3.5 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black rounded-2xl text-xs sm:text-sm transition-all duration-200 shadow-md shadow-emerald-500/25 active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                <button onclick="confirmHasCourse()" class="w-full sm:w-1/2 py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium rounded-2xl text-sm transition-all duration-200 shadow-md shadow-emerald-500/20 active:scale-95 flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap">
                     <span>✅</span>
                     <span>มีแล้ว (สร้างข้อสอบ)</span>
                 </button>
                 
-                <a href="admin-courses.html" class="w-full sm:w-1/2 py-3.5 px-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-black rounded-2xl text-xs sm:text-sm transition-all duration-200 shadow-md shadow-indigo-500/25 active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                <a href="admin-courses.html" class="w-full sm:w-1/2 py-3 px-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium rounded-2xl text-sm transition-all duration-200 shadow-md shadow-indigo-500/20 active:scale-95 flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap">
                     <span>➕</span>
                     <span>ยังไม่มี (สร้างรายวิชา)</span>
                 </a>

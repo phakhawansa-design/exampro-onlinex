@@ -1012,7 +1012,7 @@
         injectGuideStyles();
         createGuideModal();
         createFloatingGuideButton();
-        setTimeout(checkAndShowFirstTimeBanner, 300);
+        // Do NOT automatically show popup banner on page load
     }
 
     if (document.readyState === 'loading') {

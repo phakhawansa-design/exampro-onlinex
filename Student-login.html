@@ -285,28 +285,28 @@
             </div>
 
             <div class="space-y-1.5">
-                <h3 class="text-lg sm:text-xl font-black text-slate-900">แจ้งเตือนเปลี่ยนรหัสผ่าน</h3>
-                <p class="text-xs text-slate-500 leading-relaxed font-medium">
+                <h3 class="text-lg sm:text-xl font-bold text-slate-800">แจ้งเตือนเปลี่ยนรหัสผ่าน</h3>
+                <p class="text-xs text-slate-500 leading-relaxed font-normal">
                     คุณกำลังใช้งานรหัสผ่านเริ่มต้น (<strong class="text-amber-600 font-mono">1234</strong>)<br>กรุณาตั้งรหัสผ่านใหม่ของคุณเพื่อความปลอดภัยก่อนเข้าสอบ
                 </p>
             </div>
 
             <div class="space-y-3 text-left">
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">รหัสผ่านใหม่ (New Password)</label>
-                    <input type="password" id="modal-new-password" placeholder="ตั้งรหัสผ่านอย่างน้อย 4 ตัวอักษร..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold outline-none focus:border-indigo-500 transition">
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">รหัสผ่านใหม่ (New Password)</label>
+                    <input type="password" id="modal-new-password" placeholder="ตั้งรหัสผ่านอย่างน้อย 4 ตัวอักษร..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-medium outline-none focus:border-indigo-500 transition">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">ยืนยันรหัสผ่านใหม่ (Confirm Password)</label>
-                    <input type="password" id="modal-confirm-password" placeholder="พิมพ์รหัสผ่านใหม่อีกครั้ง..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-bold outline-none focus:border-indigo-500 transition">
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">ยืนยันรหัสผ่านใหม่ (Confirm Password)</label>
+                    <input type="password" id="modal-confirm-password" placeholder="พิมพ์รหัสผ่านใหม่อีกครั้ง..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-medium outline-none focus:border-indigo-500 transition">
                 </div>
             </div>
 
             <div class="flex flex-col sm:flex-row items-center gap-2.5 pt-2">
-                <button onclick="submitNewPasswordModal()" class="w-full sm:w-2/3 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black rounded-2xl text-xs transition shadow-md shadow-emerald-500/25 active:scale-95 cursor-pointer">
+                <button onclick="submitNewPasswordModal()" class="w-full sm:w-2/3 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium rounded-2xl text-xs transition shadow-md shadow-emerald-500/25 active:scale-95 cursor-pointer">
                     🔒 บันทึกรหัสผ่านใหม่
                 </button>
-                <button onclick="skipNewPasswordModal()" class="w-full sm:w-1/3 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-2xl text-xs transition active:scale-95 cursor-pointer">
+                <button onclick="skipNewPasswordModal()" class="w-full sm:w-1/3 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium rounded-2xl text-xs transition active:scale-95 cursor-pointer">
                     ข้ามไปก่อน
                 </button>
             </div>
@@ -643,6 +643,9 @@
                 body: JSON.stringify({ studentId: currentStudentId, name: currentStudentName, class: currentStudentClass, roomId: currentRoomId })
             }).catch(e => console.error(e));
 
+            // เริ่มส่ง Heartbeat ออนไลน์แบบเรียลไทม์
+            startStudentHeartbeat();
+
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('exam-screen').classList.remove('hidden');
 
@@ -772,6 +775,7 @@
         }
 
         async function submitExam(isAutoSubmit = false) {
+            stopStudentHeartbeat();
             if (examTimerInterval) clearInterval(examTimerInterval);
             if (announcementInterval) clearInterval(announcementInterval);
             if (warningInterval) clearInterval(warningInterval);
@@ -839,7 +843,10 @@
             publishCheckInterval = setInterval(async () => {
                 if (isExamFinished) { clearInterval(publishCheckInterval); return; }
                 try {
-                    const res = await fetch(`/api/teacher/get-publish-status?roomId=${encodeURIComponent(currentRoomId)}`);
+                    const sIdParam = encodeURIComponent(currentStudentId || '');
+                    const sNameParam = encodeURIComponent(currentStudentName || '');
+                    const sClsParam = encodeURIComponent(currentStudentClass || '');
+                    const res = await fetch(`/api/teacher/get-publish-status?roomId=${encodeURIComponent(currentRoomId)}&studentId=${sIdParam}&studentName=${sNameParam}&studentClass=${sClsParam}`);
                     if (!res.ok) return;
                     const data = await res.json();
                     if (data.is_published !== 1) {
@@ -854,6 +861,7 @@
         async function handleExamEnd(title, desc) {
             if (isExamFinished) return;
             isExamFinished = true;
+            stopStudentHeartbeat();
 
             if (examTimerInterval) clearInterval(examTimerInterval);
             if (announcementInterval) clearInterval(announcementInterval);
@@ -944,6 +952,57 @@
             if (!text) return '';
             return text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
         }
+
+        // ========================================================
+        // 💓 Real-time Live Presence (Heartbeat & Leave Notification)
+        // ========================================================
+        let studentHeartbeatInterval = null;
+
+        function startStudentHeartbeat() {
+            if (studentHeartbeatInterval) clearInterval(studentHeartbeatInterval);
+            const sendHeartbeat = () => {
+                if (isExamFinished || !currentRoomId || !currentStudentId) return;
+                fetch('/api/student/heartbeat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        roomId: currentRoomId,
+                        studentId: currentStudentId,
+                        name: currentStudentName,
+                        class: currentStudentClass,
+                        state: 'in_exam'
+                    })
+                }).catch(() => {});
+            };
+            sendHeartbeat();
+            studentHeartbeatInterval = setInterval(sendHeartbeat, 3000);
+        }
+
+        function stopStudentHeartbeat() {
+            if (studentHeartbeatInterval) {
+                clearInterval(studentHeartbeatInterval);
+                studentHeartbeatInterval = null;
+            }
+        }
+
+        function notifyLeaveRoom() {
+            if (isExamFinished || !currentRoomId || !currentStudentId) return;
+            const payload = JSON.stringify({ roomId: currentRoomId, studentId: currentStudentId });
+            if (navigator.sendBeacon) {
+                const blob = new Blob([payload], { type: 'text/plain' });
+                navigator.sendBeacon('/api/student/leave-room', blob);
+            } else {
+                fetch('/api/student/leave-room', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: payload,
+                    keepalive: true
+                }).catch(() => {});
+            }
+        }
+
+        window.addEventListener('beforeunload', notifyLeaveRoom);
+        window.addEventListener('pagehide', notifyLeaveRoom);
     </script>
     <script src="user-guide-system.js"></script>
 </body>

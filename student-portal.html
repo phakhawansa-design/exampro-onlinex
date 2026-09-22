@@ -534,9 +534,26 @@
         function cancelWaitingRoom() {
             if (waitingRoomInterval) clearInterval(waitingRoomInterval);
             waitingRoomInterval = null;
+            if (activeWaitingRoomId && currentStudent && currentStudent.studentId) {
+                fetch('/api/student/leave-room', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ roomId: activeWaitingRoomId, studentId: currentStudent.studentId }),
+                    keepalive: true
+                }).catch(() => {});
+            }
             document.getElementById('exam-waiting-room').classList.add('hidden');
             document.getElementById('exam-join-card').classList.remove('hidden');
         }
+
+        window.addEventListener('beforeunload', () => {
+            if (waitingRoomInterval && activeWaitingRoomId && currentStudent && currentStudent.studentId) {
+                const payload = JSON.stringify({ roomId: activeWaitingRoomId, studentId: currentStudent.studentId });
+                if (navigator.sendBeacon) {
+                    navigator.sendBeacon('/api/student/leave-room', new Blob([payload], { type: 'text/plain' }));
+                }
+            }
+        });
 
         // ==========================================
         // 📊 โหลดประวัติการสอบ
