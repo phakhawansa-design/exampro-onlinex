@@ -1089,7 +1089,7 @@ app.post('/api/student/login', (req, res) => {
                     }
 
                     // นักศึกษามีสิทธิ์ในวิชานี้ -> ตรวจสอบในตาราง students
-                    db.get('SELECT * FROM students WHERE studentId = ? OR REPLACE(studentId, "-", "") = ?', [cleanStudentId, normStudentId], (sErr, student) => {
+                    db.get("SELECT * FROM students WHERE studentId = ? OR REPLACE(studentId, '-', '') = ?", [cleanStudentId, normStudentId], (sErr, student) => {
                         if (sErr) return res.status(500).json({ success: false, message: sErr.message });
 
                         const now = new Date().toISOString();
@@ -1141,12 +1141,12 @@ app.post('/api/student/login', (req, res) => {
         checkStudentLoginStandard();
 
         function checkStudentLoginStandard() {
-            db.get('SELECT * FROM students WHERE studentId = ? OR REPLACE(studentId, "-", "") = ?', [cleanStudentId, normStudentId], (err, student) => {
+            db.get("SELECT * FROM students WHERE studentId = ? OR REPLACE(studentId, '-', '') = ?", [cleanStudentId, normStudentId], (err, student) => {
                 if (err) return res.status(500).json({ success: false, message: err.message });
                 
                 if (!student) {
                     // ไม่พบบัญชีในตาราง students -> ตรวจสอบในรายชื่อรายวิชาของอาจารย์ (course_students)
-                    db.get('SELECT * FROM course_students WHERE studentId = ? OR REPLACE(studentId, "-", "") = ? ORDER BY id DESC LIMIT 1', [cleanStudentId, normStudentId], (csErr, csRow) => {
+                    db.get("SELECT * FROM course_students WHERE studentId = ? OR REPLACE(studentId, '-', '') = ? ORDER BY id DESC LIMIT 1", [cleanStudentId, normStudentId], (csErr, csRow) => {
                         if (csErr) return res.status(500).json({ success: false, message: csErr.message });
                         if (!csRow) {
                             return res.status(404).json({ 
