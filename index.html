@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
+  <script src="auth-client.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script>
@@ -13,994 +14,252 @@
       }
     })();
   </script>
-  <title>Tab-Lock Online Proctoring System -- แพลตฟอร์มจัดการสอบออนไลน์ป้องกันการทุจริตแบบเรียลไทม์</title>
-  <!-- Google Fonts: Kanit (weights 300 to 900) -->
+  <title>Tab-Lock · ระบบสอบออนไลน์ มทร.อีสาน</title>
+  <meta name="description" content="ระบบสอบออนไลน์ ป้องกันการทุจริตแบบเรียลไทม์ และตรวจข้อสอบอัตนัยด้วย AI มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน">
+  <meta name="theme-color" content="#0b2a7a">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
-  
-  <!-- CDN Scripts for in-browser React & Framer Motion execution -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
-  
-  <script>
-    // Tailwind Config
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Kanit', 'sans-serif'],
-          }
-        }
-      }
-    }
-  </script>
-
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    /* GLOBAL STYLES */
-    html, body, #root {
-      background-color: #f8fafc;
-      color: #1e293b;
-      font-family: 'Kanit', 'Inter', sans-serif;
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      scroll-behavior: smooth;
-    }
+    :root{--navy:#0b2a7a;--blue:#1557e0;--cyan:#22c3e6;--orange:#ff7a1a;--orange2:#ff9a3c;--bg:#f3f6fb;--ink:#1b2540;--muted:#6b7895;--line:#e3e9f3;
+      --hex:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104'%3E%3Cpath d='M30 2h60l30 50-30 50H30L0 52z' fill='none' stroke='%23ffffff' stroke-opacity='.07' stroke-width='2'/%3E%3C/svg%3E")}
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Kanit',system-ui,sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden;line-height:1.6}
+    a{color:inherit;text-decoration:none}
+    .wrap{max-width:1140px;margin:0 auto;padding:0 20px}
+    .hex{clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 26px;border-radius:12px;font-weight:600;font-size:15px;border:0;cursor:pointer;font-family:inherit;transition:.2s}
+    .btn-or{background:linear-gradient(135deg,var(--orange),var(--orange2));color:#fff;box-shadow:0 14px 26px -10px rgba(255,122,26,.65)}
+    .btn-or:hover{transform:translateY(-2px);filter:brightness(1.05)}
+    .btn-ol{border:1.5px solid rgba(255,255,255,.75);color:#fff;background:rgba(255,255,255,.04)}
+    .btn-ol:hover{background:rgba(255,255,255,.14)}
+    .btn-navy{background:var(--navy);color:#fff;box-shadow:0 12px 24px -10px rgba(11,42,122,.6)}
+    .btn-navy:hover{background:var(--blue)}
 
-    * {
-      box-sizing: inherit;
-    }
+    /* nav */
+    nav{position:absolute;inset:0 0 auto;z-index:20;padding:18px 0}
+    nav .wrap{display:flex;align-items:center;gap:22px}
+    .brand{display:flex;align-items:center;gap:12px;color:#fff}
+    .brand img{width:46px;height:46px;background:#fff;border-radius:14px;padding:4px;object-fit:contain;box-shadow:0 8px 18px -8px rgba(0,0,0,.4)}
+    .brand b{display:block;font-size:19px;line-height:1.1;letter-spacing:.02em}
+    .brand small{font-size:12px;opacity:.8}
+    .menu{display:flex;gap:6px;margin-left:auto}
+    .menu a{color:rgba(255,255,255,.85);font-size:14px;padding:7px 12px;border-radius:8px}
+    .menu a:hover{background:rgba(255,255,255,.12);color:#fff}
+    .nav-cta{padding:9px 18px;font-size:14px}
+    @media(max-width:860px){.menu{display:none}.nav-cta{margin-left:auto}}
 
-    .hero-heading {
-      background: linear-gradient(135deg, #0f172a 0%, #06b6d4 50%, #8b5cf6 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+    /* hero */
+    .hero{position:relative;color:#fff;padding:130px 0 190px;background:var(--hex),linear-gradient(135deg,var(--navy) 0%,#0f3fae 48%,var(--blue) 100%);background-size:120px 104px,auto;clip-path:polygon(0 0,100% 0,100% 78%,0 100%)}
+    .hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+    .tag{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);padding:5px 14px;border-radius:99px;font-size:13px;margin-bottom:18px}
+    .tag i{width:8px;height:8px;border-radius:50%;background:#3cf0a8;box-shadow:0 0 0 4px rgba(60,240,168,.25)}
+    .hero h1{font-size:clamp(32px,4.4vw,50px);line-height:1.22;font-weight:600}
+    .hero h1 em{font-style:normal;color:var(--orange2)}
+    .hero p.lead{font-size:17px;opacity:.85;margin:16px 0 28px;max-width:520px;font-weight:300}
+    .cta{display:flex;flex-wrap:wrap;gap:12px}
+    .pin{margin-top:26px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);padding:10px 10px 10px 18px;border-radius:16px;max-width:460px}
+    .pin span{font-size:14px;opacity:.9}
+    .pin input{flex:1;min-width:140px;border:0;outline:0;border-radius:10px;padding:11px 14px;font-family:inherit;font-size:16px;letter-spacing:.2em;text-align:center;color:var(--ink)}
+    .pin button{padding:11px 18px}
+    .art{position:relative;height:420px}
+    .art .big{position:absolute;inset:10px 30px;background:#fff;overflow:hidden;box-shadow:0 30px 60px -20px rgba(0,0,0,.45)}
+    .art .big img{position:absolute;left:50%;top:6%;width:96%;transform:translateX(-50%) scale(1.06);object-fit:contain}
+    .art .h1{position:absolute;width:74px;height:64px;background:linear-gradient(135deg,var(--cyan),#3aa0ff);right:0;top:20px;animation:float 5s ease-in-out infinite}
+    .art .h2{position:absolute;width:52px;height:45px;background:linear-gradient(135deg,var(--orange),var(--orange2));left:0;bottom:60px;animation:float 6s ease-in-out infinite reverse}
+    .art .h3{position:absolute;width:30px;height:26px;right:40px;bottom:20px;background:rgba(255,255,255,.35)}
+    .badge-live{position:absolute;left:-6px;top:70px;background:#fff;color:var(--ink);border-radius:14px;padding:10px 14px;font-size:13px;box-shadow:0 18px 30px -12px rgba(0,0,0,.35);display:flex;gap:10px;align-items:center;animation:float 7s ease-in-out infinite}
+    .badge-live b{display:block;font-size:14px}
+    .badge-live .dot{width:34px;height:34px;border-radius:10px;background:#fff1e6;display:grid;place-items:center;font-size:18px}
+    .badge-ai{left:auto;right:-6px;top:auto;bottom:90px;animation-delay:-2s}
+    .badge-ai .dot{background:#e8f0ff}
+    @keyframes float{50%{transform:translateY(-12px)}}
+    @media(max-width:860px){.badge-live{left:0}.badge-ai{right:0;left:auto}.brand small{display:none}body{overflow-x:hidden}.hero{padding:110px 0 150px}.hero .wrap{grid-template-columns:1fr}.art{height:320px;max-width:380px;margin:0 auto;width:100%}}
 
-    /* Custom Hide Scrollbar for Marquees */
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
+    /* feature cards */
+    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:-150px;position:relative;z-index:5}
+    .card{background:#fff;border-radius:16px;padding:34px 26px 28px;text-align:center;box-shadow:0 22px 50px -24px rgba(11,42,122,.35);border:1px solid var(--line);transition:.25s}
+    .card:hover{transform:translateY(-6px)}
+    .ico{width:84px;height:74px;margin:0 auto 18px;display:grid;place-items:center;color:#fff;font-size:30px;position:relative}
+    .ico::after{content:"";position:absolute;inset:-10px -12px;border:1.5px dashed rgba(21,87,224,.18);clip-path:inherit}
+    .i-or{background:linear-gradient(135deg,var(--orange),var(--orange2))}.i-nv{background:linear-gradient(135deg,var(--navy),var(--blue))}.i-cy{background:linear-gradient(135deg,var(--cyan),#3aa0ff)}
+    .card h3{font-size:19px;font-weight:600;margin-bottom:8px}
+    .card p{font-size:14px;color:var(--muted);font-weight:300}
+    .card a{display:inline-block;margin-top:14px;font-size:14px;color:var(--blue);font-weight:500}
+    @media(max-width:860px){.cards{grid-template-columns:1fr;margin-top:-110px}}
 
-    /* Floating Portal Button styling */
-    .portal-float-btn {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 9999;
-      background: linear-gradient(135deg, #ec4899, #38bdf8);
-      box-shadow: 0 4px 20px rgba(8, 145, 178, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .portal-float-btn:hover {
-      transform: translateY(-3px) scale(1.04);
-      box-shadow: 0 8px 30px rgba(8, 145, 178, 0.6);
-    }
+    /* how */
+    section{padding:90px 0}
+    .split{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}
+    .sec-ico{width:44px;height:38px;display:grid;place-items:center;color:#fff;margin-bottom:14px}
+    h2{font-size:clamp(26px,3vw,34px);line-height:1.3;font-weight:600;color:var(--ink)}
+    .checks{list-style:none;margin:22px 0}
+    .checks li{display:flex;gap:12px;margin-bottom:14px;color:#4a5673;font-size:15px}
+    .checks li::before{content:"✓";flex:none;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--cyan);color:var(--cyan);display:grid;place-items:center;font-size:13px;font-weight:700;margin-top:1px}
+    .hexframe{position:relative;max-width:470px;margin:0 auto;aspect-ratio:1.155}
+    .hexframe .ring{position:absolute;inset:-26px;border:1.5px solid #dfe7f5;background:transparent}
+    .hexframe .pic{position:absolute;inset:0;background:#fff;box-shadow:0 30px 60px -24px rgba(11,42,122,.35);overflow:hidden}
+    .hexframe .pic img{width:100%;height:100%;object-fit:cover}
+    .dotdeco{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--blue)}
+    @media(max-width:860px){.split{grid-template-columns:1fr}.hexframe{max-width:300px}}
+
+    /* steps */
+    .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:36px}
+    .step{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 14px 34px -22px rgba(11,42,122,.3)}
+    .step b{display:grid;place-items:center;width:40px;height:35px;color:#fff;font-size:16px;margin-bottom:12px}
+    .step h4{font-size:16px;font-weight:600;margin-bottom:4px}
+    .step p{font-size:13.5px;color:var(--muted);font-weight:300}
+    @media(max-width:860px){.steps{grid-template-columns:1fr 1fr}}
+    .center{text-align:center}
+    .center .sec-ico{margin:0 auto 14px}
+    .sub{color:var(--muted);font-weight:300;margin-top:8px}
+
+    /* faq */
+    .faq{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:36px}
+    .faq details{background:#fff;border-radius:16px;padding:24px;border:1px solid var(--line);box-shadow:0 14px 34px -22px rgba(11,42,122,.3)}
+    .faq summary{cursor:pointer;font-weight:600;font-size:16px;list-style:none;display:flex;justify-content:space-between;gap:10px}
+    .faq summary::after{content:"+";color:var(--blue);font-size:22px;line-height:1}
+    .faq details[open] summary::after{content:"−"}
+    .faq p{margin-top:10px;color:var(--muted);font-size:14px;font-weight:300}
+    @media(max-width:860px){.faq{grid-template-columns:1fr}}
+
+    /* footer cta */
+    .foot{position:relative;color:#fff;text-align:center;padding:150px 0 40px;margin-top:40px;background:var(--hex),linear-gradient(135deg,var(--navy),var(--blue));background-size:120px 104px,auto;clip-path:polygon(0 22%,100% 0,100% 100%,0 100%)}
+    .foot .ico{margin-bottom:14px}
+    .foot h2{color:#fff}
+    .foot p.sub{color:rgba(255,255,255,.8)}
+    .foot .cta{justify-content:center;margin-top:26px}
+    .foot .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-top:70px;padding-top:22px;border-top:1px solid rgba(255,255,255,.15);font-size:13px;color:rgba(255,255,255,.75)}
+    .foot .bottom a{margin-left:16px}
+    .foot .bottom a:hover{color:#fff}
+    .ic{width:34px;height:34px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+    .ic.sm{width:22px;height:22px;stroke-width:2}
+    .btn .ic{width:19px;height:19px;stroke-width:2}
+    .badge-live .dot .ic{width:20px;height:20px;stroke-width:2}
+    .badge-live .dot{color:var(--orange)}.badge-ai .dot{color:var(--blue)}
+    .reveal{opacity:0;transform:translateY(24px);transition:.7s cubic-bezier(.2,.8,.2,1)}
+    .reveal.in{opacity:1;transform:none}
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
   </style>
 </head>
 <body>
-  <div id="root"></div>
-
-  <!-- React code with Babel compiler -->
-  <script type="text/babel">
-    const { useState, useEffect, useRef } = React;
-    const { motion, useScroll, useTransform, AnimatePresence } = window.Motion || {
-      // Fallback in case Framer Motion UMD fails to load
-      motion: {
-        div: (props) => <div {...props} />,
-        h1: (props) => <h1 {...props} />,
-        h2: (props) => <h2 {...props} />,
-        span: (props) => <span {...props} />,
-        p: (props) => <p {...props} />,
-        nav: (props) => <nav {...props} />,
-      }
-    };
-
-    // --- REUSABLE COMPONENTS ---
-
-    // ContactButton
-    const ContactButton = ({ className = '', onClick, label = "เข้าสู่ระบบ 🔒" }) => {
-      return (
-        <button
-          onClick={onClick}
-          className={`rounded-full transition-all duration-200 hover:scale-[1.03] active:scale-[0.98] font-medium tracking-wide text-white px-8 py-3 sm:px-10 sm:py-3.5 text-xs sm:text-sm md:text-base shadow-lg hover:shadow-cyan-500/30 ${className}`}
-          style={{
-            background: 'linear-gradient(135deg, #0891b2 0%, #2563eb 50%, #7c3aed 100%)',
-            boxShadow: '0 8px 25px rgba(8, 145, 178, 0.35)',
-          }}
-        >
-          {label}
-        </button>
-      );
-    };
-
-    // LiveProjectButton
-    const LiveProjectButton = ({ className = '', onClick, label = "เข้าสู่ระบบ ➔" }) => {
-      return (
-        <button
-          onClick={onClick}
-          className={`rounded-full border-2 border-[#D7E2EA] text-[#D7E2EA] font-medium uppercase tracking-widest px-4 py-2 sm:px-8 sm:py-3 text-xs sm:text-sm md:text-base whitespace-nowrap shrink-0 hover:bg-[#D7E2EA]/10 transition-colors duration-200 active:scale-[0.98] ${className}`}
-        >
-          {label}
-        </button>
-      );
-    };
-
-    // FadeIn Animation Wrapper
-    const FadeIn = ({ children, delay = 0, duration = 0.7, x = 0, y = 30, as = 'div', className = '' }) => {
-      const Component = motion[as] || motion.div;
-      return (
-        <Component
-          initial={{ opacity: 0, x, y }}
-          whileInView={{ opacity: 1, x: 0, y: 0 }}
-          viewport={{ once: true, margin: '50px', amount: 0 }}
-          transition={{
-            delay,
-            duration,
-            ease: [0.25, 0.1, 0.25, 1],
-          }}
-          className={className}
-        >
-          {children}
-        </Component>
-      );
-    };
-
-    // Magnet mouse-following hover effect
-    const Magnet = ({ children, padding = 150, strength = 3, activeTransition = 'transform 0.3s ease-out', inactiveTransition = 'transform 0.6s ease-in-out', className = '' }) => {
-      const [position, setPosition] = useState({ x: 0, y: 0 });
-      const [isActive, setIsActive] = useState(false);
-      const elementRef = useRef(null);
-
-      useEffect(() => {
-        const handleMouseMove = (e) => {
-          if (!elementRef.current) return;
-          const rect = elementRef.current.getBoundingClientRect();
-          const centerX = rect.left + rect.width / 2;
-          const centerY = rect.top + rect.height / 2;
-
-          const distanceX = e.clientX - centerX;
-          const distanceY = e.clientY - centerY;
-
-          const isInside =
-            e.clientX >= rect.left - padding &&
-            e.clientX <= rect.right + padding &&
-            e.clientY >= rect.top - padding &&
-            e.clientY <= rect.bottom + padding;
-
-          if (isInside) {
-            setIsActive(true);
-            setPosition({
-              x: distanceX / strength,
-              y: distanceY / strength,
-            });
-          } else {
-            setIsActive(false);
-            setPosition({ x: 0, y: 0 });
-          }
-        };
-
-        const handleMouseLeave = () => {
-          setIsActive(false);
-          setPosition({ x: 0, y: 0 });
-        };
-
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseleave', handleMouseLeave);
-        return () => {
-          window.removeEventListener('mousemove', handleMouseMove);
-          window.removeEventListener('mouseleave', handleMouseLeave);
-        };
-      }, [padding, strength]);
-
-      return (
-        <div
-          ref={elementRef}
-          className={`relative inline-block ${className}`}
-          style={{
-            transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
-            transition: isActive ? activeTransition : inactiveTransition,
-            willChange: 'transform',
-          }}
-        >
-          {children}
-        </div>
-      );
-    };
-
-    // Character character scroll text reveal component
-    const Character = ({ char, index, total, progress }) => {
-      if (!progress) return <span className="inline-block">{char === ' ' ? '\u00A0' : char}</span>;
-      
-      const start = index / total;
-      const end = Math.min(1, (index + 8) / total);
-      const opacity = useTransform(progress, [start, end], [0.2, 1]);
-
-      if (char === ' ') {
-        return <span className="inline-block">&nbsp;</span>;
-      }
-
-      return (
-        <span className="relative inline-block">
-          <span className="opacity-0">{char}</span>
-          <motion.span style={{ opacity }} className="absolute inset-0 select-none">
-            {char}
-          </motion.span>
-        </span>
-      );
-    };
-
-    const AnimatedText = ({ text, className = '', style }) => {
-      const containerRef = useRef(null);
-      let scrollYProgress = null;
-
-      try {
-        const { scrollYProgress: sp } = useScroll({
-          target: containerRef,
-          offset: ['start 0.8', 'end 0.2'],
-        });
-        scrollYProgress = sp;
-      } catch (e) {
-        // Safe fallback in case hooks fail
-      }
-
-      const chars = text.split('');
-      const total = chars.length;
-
-      return (
-        <p ref={containerRef} className={`flex flex-wrap ${className}`} style={style}>
-          {chars.map((char, index) => (
-            <Character
-              key={index}
-              char={char}
-              index={index}
-              total={total}
-              progress={scrollYProgress}
-            />
-          ))}
-        </p>
-      );
-    };
-
-
-    // --- SECTION 1: HERO SECTION ---
-    const HeroSection = ({ onPortalClick }) => {
-      return (
-        <section className="min-h-screen w-full flex flex-col justify-between relative overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-100/70" style={{ overflowX: 'clip' }}>
-          {/* Top Navigation Bar */}
-          <FadeIn delay={0} y={-20} as="nav" className="w-full px-4 sm:px-8 lg:px-12 py-4 sm:py-5 flex justify-between items-center z-30 border-b border-slate-200/60 bg-white/80 backdrop-blur-md sticky top-0">
-            <div className="flex items-center gap-3">
-              <img
-                src="logo.png"
-                alt="Tab-Lock Logo"
-                onError={(e) => { e.target.onerror = null; e.target.style.display = 'none'; }}
-                className="w-9 h-9 sm:w-10 sm:h-10 object-contain rounded-xl p-1 bg-white border border-slate-200 shadow-sm"
-              />
-              <div className="flex flex-col">
-                <span className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
-                  TAB<span className="text-cyan-600">-LOCK</span>
-                </span>
-                <span className="text-[10px] tracking-widest uppercase text-slate-400 font-semibold -mt-1 hidden sm:block">Proctoring System</span>
-              </div>
-            </div>
-
-            <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
-              <a href="#about" className="hover:text-cyan-600 transition-colors">เกี่ยวกับระบบ</a>
-              <a href="#features" className="hover:text-cyan-600 transition-colors">ฟีเจอร์เด่น</a>
-              <a href="#projects" className="hover:text-cyan-600 transition-colors">ระบบเข้าใช้งาน</a>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={onPortalClick}
-                className="px-5 py-2 sm:px-6 sm:py-2.5 rounded-full text-white font-semibold text-xs sm:text-sm bg-gradient-to-r from-cyan-600 via-blue-600 to-violet-600 hover:opacity-95 shadow-md shadow-cyan-500/25 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
-              >
-                <span>เข้าสู่ระบบ</span>
-                <span>🔒</span>
-              </button>
-            </div>
-          </FadeIn>
-
-          {/* Hero Content Area: 2-Column Responsive Layout */}
-          <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-16 flex items-center relative z-20">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center w-full">
-              
-              {/* Left Column: Heading, Info, CTAs */}
-              <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
-                <FadeIn delay={0.1} y={20}>
-                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-50 border border-cyan-200/80 text-cyan-800 text-xs sm:text-sm font-medium mb-5 shadow-xs">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-600"></span>
-                    </span>
-                    <span>ระบบป้องกันการทุจริตการสอบออนไลน์แบบเรียลไทม์</span>
-                  </div>
-                </FadeIn>
-
-                <FadeIn delay={0.2} y={30}>
-                  <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-slate-900 tracking-tight leading-[1.18] mb-4">
-                    ONLINE EXAM <br />
-                    <span className="hero-heading">PROCTORING SYSTEM</span>
-                  </h1>
-                </FadeIn>
-
-                <FadeIn delay={0.3} y={30}>
-                  <p className="text-slate-600 text-sm sm:text-base md:text-lg leading-relaxed max-w-xl font-normal mb-8">
-                    แพลตฟอร์มคุมสอบอัจฉริยะ ตรวจจับการสลับหน้าต่างและแท็บเบราว์เซอร์ พร้อมบันทึกพฤติกรรมผู้เข้าสอบ และวิเคราะห์ผลคะแนนอัตโนมัติ เพื่อการสอบที่โปร่งใส เที่ยงธรรม และปลอดภัยสูงสุด
-                  </p>
-                </FadeIn>
-
-                <FadeIn delay={0.4} y={30} className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-10 w-full">
-                  <button
-                    onClick={onPortalClick}
-                    className="px-7 py-3.5 rounded-2xl text-white font-bold text-sm sm:text-base bg-gradient-to-r from-cyan-600 via-blue-600 to-violet-600 hover:shadow-xl hover:shadow-cyan-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center gap-2.5 shadow-lg shadow-cyan-600/20"
-                  >
-                    <span>เข้าสู่ระบบสอบออนไลน์</span>
-                    <span>🔒</span>
-                  </button>
-                  <a
-                    href="#features"
-                    className="px-6 py-3.5 rounded-2xl font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200/90 shadow-sm hover:-translate-y-0.5 transition-all flex items-center gap-2 text-sm sm:text-base"
-                  >
-                    <span>ดูฟีเจอร์เด่น</span>
-                    <span>↓</span>
-                  </a>
-                </FadeIn>
-
-                {/* Key Metric Highlights */}
-                <FadeIn delay={0.5} y={30} className="w-full">
-                  <div className="grid grid-cols-3 gap-4 pt-6 border-t border-slate-200/80 max-w-lg mx-auto lg:mx-0 text-left">
-                    <div className="flex flex-col">
-                      <span className="text-xl sm:text-2xl font-bold text-slate-900">100%</span>
-                      <span className="text-xs text-slate-500 font-medium">ตรวจจับสลับหน้าจอ</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-xl sm:text-2xl font-bold text-cyan-600">Gemini</span>
-                      <span className="text-xs text-slate-500 font-medium">AI สร้างข้อสอบ</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-xl sm:text-2xl font-bold text-violet-600">Real-time</span>
-                      <span className="text-xs text-slate-500 font-medium">มอนิเตอร์การสอบ</span>
-                    </div>
-                  </div>
-                </FadeIn>
-              </div>
-
-              {/* Right Column: Visual Mascot & Interactive Live Badges */}
-              <div className="lg:col-span-5 flex justify-center items-center relative mt-4 lg:mt-0">
-                {/* Ambient glow behind card */}
-                <div className="absolute w-[260px] sm:w-[340px] h-[260px] sm:h-[340px] bg-gradient-to-tr from-cyan-400/20 via-blue-500/20 to-purple-500/20 rounded-full blur-3xl opacity-70 -z-10 animate-pulse pointer-events-none" />
-
-                <FadeIn delay={0.25} y={40}>
-                  <div className="relative">
-                    <Magnet padding={120} strength={3}>
-                      <div className="relative rounded-3xl bg-white p-3 shadow-2xl border border-slate-200/80 max-w-[260px] sm:max-w-[320px] md:max-w-[360px] transition-transform duration-300">
-                        <img
-                          src="student_avatar.jpg"
-                          alt="Tab-Lock Student Mascot"
-                          onError={(e) => { e.target.onerror = null; e.target.src = './images/hero_mascot.png'; }}
-                          className="w-full h-auto object-cover rounded-2xl select-none pointer-events-none"
-                        />
-                      </div>
-                    </Magnet>
-
-                    {/* Floating Status Badge 1 - Top Left */}
-                    <div className="absolute -top-3 -left-3 sm:-top-4 sm:-left-4 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-2.5 select-none pointer-events-none">
-                      <span className="relative flex h-2.5 w-2.5">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                      </span>
-                      <div className="text-left">
-                        <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Proctor Status</div>
-                        <div className="text-xs font-bold text-slate-800">ระบบพร้อมคุมสอบ</div>
-                      </div>
-                    </div>
-
-                    {/* Floating Status Badge 2 - Bottom Right */}
-                    <div className="absolute -bottom-3 -right-3 sm:-bottom-4 sm:-right-4 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-2 select-none pointer-events-none">
-                      <span className="text-base">🛡️</span>
-                      <div className="text-left">
-                        <div className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Anti-Cheating</div>
-                        <div className="text-xs font-bold text-cyan-700">Tab-Lock Active</div>
-                      </div>
-                    </div>
-                  </div>
-                </FadeIn>
-              </div>
-
-            </div>
-          </div>
-
-          {/* Bottom subtle bar */}
-          <div className="w-full px-4 sm:px-8 lg:px-12 py-3 border-t border-slate-200/50 bg-white/50 backdrop-blur-xs flex justify-between items-center text-xs text-slate-500 z-20">
-            <span>© Tab-Lock Proctoring Platform. All rights reserved.</span>
-            <a href="#about" className="hover:text-cyan-600 transition-colors flex items-center gap-1 font-medium">
-              <span>เลื่อนลงเพื่อดูรายละเอียด</span>
-              <span>↓</span>
-            </a>
-          </div>
-        </section>
-      );
-    };
-
-
-    // --- SECTION 2: MARQUEE SECTION ---
-    const row1Images = [
-      './images/student_exam_ui.jpg',
-      './images/student_studying.jpg',
-      './images/student_cartoon.jpg',
-      './images/teacher_cartoon.jpg',
-      './images/teacher_class.jpg',
-      './images/teacher_analytics.jpg',
-    ];
-
-    const row2Images = [
-      './images/admin_cartoon.jpg',
-      './images/admin_security.jpg',
-      './images/admin_database.jpg',
-      './images/exam_security_ui.jpg',
-      './images/classroom_stats_ui.jpg',
-      './images/ai_question_generation_ui.jpg',
-    ];
-
-    const MarqueeSection = () => {
-      const sectionRef = useRef(null);
-      const [scrollOffset, setScrollOffset] = useState(0);
-
-      useEffect(() => {
-        const handleScroll = () => {
-          if (!sectionRef.current) return;
-          const rect = sectionRef.current.getBoundingClientRect();
-          const sectionTop = rect.top + window.scrollY;
-          const offset = (window.scrollY - sectionTop + window.innerHeight) * 0.3;
-          setScrollOffset(offset);
-        };
-
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        handleScroll();
-
-        return () => {
-          window.removeEventListener('scroll', handleScroll);
-        };
-      }, []);
-
-      const tripledRow1 = [...row1Images, ...row1Images, ...row1Images];
-      const tripledRow2 = [...row2Images, ...row2Images, ...row2Images];
-
-      return (
-        <section
-          ref={sectionRef}
-          className="w-full bg-[#0C0C0C] pt-24 sm:pt-32 md:pt-40 pb-10 overflow-hidden flex flex-col gap-3"
-        >
-          <div className="w-full overflow-hidden">
-            <div
-              className="flex gap-3 w-max"
-              style={{
-                transform: `translateX(${scrollOffset - 2000}px)`,
-                willChange: 'transform',
-                transition: 'transform 0.1s ease-out',
-              }}
-            >
-              {tripledRow1.map((url, idx) => (
-                <img
-                  key={`r1-${idx}`}
-                  src={url}
-                  alt={`Marquee item ${idx}`}
-                  loading="lazy"
-                  onError={(e) => { e.target.onerror = null; e.target.src = 'logo.png'; }}
-                  className="w-[300px] h-[190px] sm:w-[360px] sm:h-[230px] md:w-[420px] md:h-[270px] rounded-2xl object-cover"
-                />
-              ))}
-            </div>
-          </div>
-
-          <div className="w-full overflow-hidden">
-            <div
-              className="flex gap-3 w-max"
-              style={{
-                transform: `translateX(-${scrollOffset + 1000}px)`,
-                willChange: 'transform',
-                transition: 'transform 0.1s ease-out',
-              }}
-            >
-              {tripledRow2.map((url, idx) => (
-                <img
-                  key={`r2-${idx}`}
-                  src={url}
-                  alt={`Marquee item ${idx}`}
-                  loading="lazy"
-                  onError={(e) => { e.target.onerror = null; e.target.src = 'logo.png'; }}
-                  className="w-[300px] h-[190px] sm:w-[360px] sm:h-[230px] md:w-[420px] md:h-[270px] rounded-2xl object-cover"
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      );
-    };
-
-
-    // --- SECTION 3: ABOUT SECTION ---
-    const AboutSection = ({ onPortalClick }) => {
-      return (
-        <section id="about" className="min-h-screen w-full relative bg-slate-50 px-5 sm:px-8 md:px-10 py-20 flex flex-col justify-center items-center overflow-hidden">
-          {/* Moon icon */}
-          <FadeIn
-            delay={0.1}
-            x={-80}
-            y={0}
-            duration={0.9}
-            className="absolute top-[4%] left-[1%] sm:left-[2%] md:left-[4%] z-0"
-          >
-            <img
-              src="https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/moon_icon.11395d36.png"
-              alt="Moon icon"
-              className="w-[120px] sm:w-[160px] md:w-[210px] h-auto object-contain select-none pointer-events-none"
-            />
-          </FadeIn>
-
-          {/* 3D object */}
-          <FadeIn
-            delay={0.25}
-            x={-80}
-            y={0}
-            duration={0.9}
-            className="absolute bottom-[8%] left-[3%] sm:left-[6%] md:left-[10%] z-0"
-          >
-            <img
-              src="https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/p59_1.4659672e.png"
-              alt="3D object left"
-              className="w-[100px] sm:w-[140px] md:w-[180px] h-auto object-contain select-none pointer-events-none"
-            />
-          </FadeIn>
-
-          {/* Lego icon */}
-          <FadeIn
-            delay={0.15}
-            x={80}
-            y={0}
-            duration={0.9}
-            className="absolute top-[4%] right-[1%] sm:right-[2%] md:right-[4%] z-0"
-          >
-            <img
-              src="https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/lego_icon-1.703bb594.png"
-              alt="Lego icon"
-              className="w-[120px] sm:w-[160px] md:w-[210px] h-auto object-contain select-none pointer-events-none"
-            />
-          </FadeIn>
-
-          {/* 3D group */}
-          <FadeIn
-            delay={0.3}
-            x={80}
-            y={0}
-            duration={0.9}
-            className="absolute bottom-[8%] right-[3%] sm:right-[6%] md:right-[10%] z-0"
-          >
-            <img
-              src="https://shrug-person-78902957.figma.site/_components/v2/ebb2b8f25d8e24d5f0a5ca8af4c950de81aa2fd7/Group_134-1.2e04f3ce.png"
-              alt="3D object right"
-              className="w-[130px] sm:w-[170px] md:w-[220px] h-auto object-contain select-none pointer-events-none"
-            />
-          </FadeIn>
-
-          <div className="relative z-10 flex flex-col items-center max-w-4xl w-full">
-            <FadeIn delay={0} y={40} className="w-full text-center">
-              <h2
-                className="hero-heading font-bold uppercase leading-none tracking-tight text-center"
-                style={{ fontSize: 'clamp(3rem, 12vw, 160px)' }}
-              >
-                About Us
-              </h2>
-            </FadeIn>
-
-            <div className="h-10 sm:h-14 md:h-16" />
-
-            <AnimatedText
-              text="ด้วยเทคโนโลยีป้องกันการทุจริตขั้นสูง Tab-Lock มุ่งเน้นไปที่ระบบตรวจจับการสลับหน้าต่าง (Window Switching), การสร้างข้อสอบที่มีความปลอดภัย และระบบตรวจข้อสอบอัตโนมัติ เรารู้สึกยินดีเป็นอย่างยิ่งที่ได้ช่วยเหลือสถาบันการศึกษาต่าง ๆ ที่ต้องการจัดสอบอย่างปลอดภัยและโปร่งใส มาร่วมกันทำให้การสอบของคุณปลอดภัยไปด้วยกัน!"
-              className="text-slate-700 font-medium leading-relaxed max-w-[560px] text-center justify-center"
-              style={{ fontSize: 'clamp(1rem, 2vw, 1.35rem)' }}
-            />
-
-            <div className="h-16 sm:h-20 md:h-24" />
-
-            <FadeIn delay={0.1} y={20}>
-              <ContactButton onClick={onPortalClick} label="เข้าสู่ระบบ 🔒" />
-            </FadeIn>
-          </div>
-        </section>
-      );
-    };
-
-
-    // --- SECTION 4: SERVICES SECTION ---
-    const servicesData = [
-      {
-        num: '01',
-        name: 'Anti-Cheating Guard',
-        desc: 'ระบบตรวจจับการสลับหน้าต่างและแท็บแบบเรียลไทม์ พร้อมสัญญาณเตือนอัตโนมัติเมื่อพบพฤติกรรมที่น่าสงสัย',
-      },
-      {
-        num: '02',
-        name: 'AI Question Generator',
-        desc: 'สร้างข้อสอบคุณภาพสูงในทุกหัวข้อได้ทันที โดยใช้ขุมพลังจากระบบ Google Gemini AI ที่รวมอยู่ในตัว',
-      },
-      {
-        num: '03',
-        name: 'Live Monitoring',
-        desc: 'ติดตามห้องสอบที่กำลังใช้งาน สถานะของนักเรียน และตรวจสอบบันทึกการทุจริตแบบเรียลไทม์ผ่านแดชบอร์ดของผู้สอน',
-      },
-      {
-        num: '04',
-        name: 'Analytics & Reports',
-        desc: 'รับผลการประมวลผลอัตโนมัติทั้งค่า Z-score, T-score, การวิเคราะห์รายข้อ (Item Analysis) และสามารถดาวน์โหลดผลลัพธ์ในรูปแบบไฟล์ Excel ได้',
-      },
-      {
-        num: '05',
-        name: 'Exam Template Bank',
-        desc: 'คลังจัดเก็บเทมเพลตที่อยู่ถาวร สามารถปรับแต่งกฎ สุ่มข้อสอบ และนำกลับมาใช้ซ้ำในห้องสอบต่าง ๆ ได้อย่างสะดวกสบาย',
-      },
-    ];
-
-    const ServicesSection = () => {
-      return (
-        <section id="features" className="bg-white rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] px-5 sm:px-8 md:px-10 py-20 sm:py-24 md:py-32 relative z-0">
-          <div className="max-w-5xl mx-auto w-full flex flex-col">
-            <FadeIn delay={0} y={40} className="w-full text-center">
-              <h2
-                className="text-[#0C0C0C] font-bold uppercase text-center leading-none tracking-tight mb-16 sm:mb-20 md:mb-28"
-                style={{ fontSize: 'clamp(3rem, 12vw, 160px)' }}
-              >
-                Features
-              </h2>
-            </FadeIn>
-
-            <div className="flex flex-col w-full">
-              {servicesData.map((service, index) => (
-                <FadeIn
-                  key={service.num}
-                  delay={index * 0.1}
-                  y={30}
-                  className="border-t border-[rgba(12,12,12,0.15)] last:border-b last:border-[rgba(12,12,12,0.15)]"
-                >
-                  <div className="flex flex-row items-center gap-6 sm:gap-10 md:gap-14 py-8 sm:py-10 md:py-12 w-full text-left">
-                    <div
-                      className="font-bold text-[#0C0C0C] select-none leading-none tracking-tight shrink-0 min-w-[70px] sm:min-w-[120px] md:min-w-[170px]"
-                      style={{ fontSize: 'clamp(2.5rem, 10vw, 140px)' }}
-                    >
-                      {service.num}
-                    </div>
-
-                    <div className="flex flex-col gap-2 md:gap-3 flex-1">
-                      <h3
-                        className="font-medium uppercase text-[#0C0C0C]"
-                        style={{ fontSize: 'clamp(1rem, 2.2vw, 2.1rem)' }}
-                      >
-                        {service.name}
-                      </h3>
-                      <p
-                        className="font-light leading-relaxed text-[#0C0C0C] opacity-60 max-w-2xl"
-                        style={{ fontSize: 'clamp(0.85rem, 1.6vw, 1.25rem)' }}
-                      >
-                        {service.desc}
-                      </p>
-                    </div>
-                  </div>
-                </FadeIn>
-              ))}
-            </div>
-          </div>
-        </section>
-      );
-    };
-
-
-    // --- SECTION 5: PROJECTS SECTION ---
-    const projectsData = [
-      {
-        num: '01',
-        category: 'Exam Environment',
-        name: 'Student Exam Portal',
-        link: 'Student-login.html',
-        col1Img1: './images/student_exam_ui.jpg',
-        col1Img2: './images/student_studying.jpg',
-        col2Img: './images/student_cartoon.jpg',
-      },
-      {
-        num: '02',
-        category: 'Management & Monitoring',
-        name: 'Teacher Dashboard',
-        link: 'teacher-login.html',
-        col1Img1: './images/teacher_analytics.jpg',
-        col1Img2: './images/teacher_class.jpg',
-        col2Img: './images/teacher_cartoon.jpg',
-      },
-      {
-        num: '03',
-        category: 'Global System Controls',
-        name: 'Super Admin Panel',
-        link: 'admin-login.html',
-        col1Img1: './images/admin_database.jpg',
-        col1Img2: './images/admin_security.jpg',
-        col2Img: './images/admin_cartoon.jpg',
-      },
-    ];
-
-    const StackingCard = ({ project, index, totalCards }) => {
-      const containerRef = useRef(null);
-      const targetScale = 1 - (totalCards - 1 - index) * 0.03;
-      const topOffset = index * 28;
-      let scale = 1;
-
-      try {
-        const { scrollYProgress } = useScroll({
-          target: containerRef,
-          offset: ['start start', 'end start'],
-        });
-        scale = useTransform(scrollYProgress, [0, 1], [1, targetScale]);
-      } catch (e) {
-        // Fallback
-      }
-
-      return (
-        <div
-          ref={containerRef}
-          className="sticky w-full h-[85vh] flex items-start justify-center"
-          style={{
-            top: `calc(6rem + ${topOffset}px)`,
-          }}
-        >
-          <motion.div
-            style={{ scale }}
-            className="w-full bg-[#0C0C0C] border-2 border-[#D7E2EA] rounded-[40px] sm:rounded-[50px] md:rounded-[60px] p-4 sm:p-6 md:p-8 flex flex-col gap-6 sm:gap-8 md:gap-10 shadow-2xl"
-          >
-            {/* Top Row */}
-            <div className="flex flex-wrap sm:flex-nowrap justify-between items-center gap-3 w-full">
-              <div className="flex items-center gap-2 sm:gap-4 md:gap-6 min-w-0 flex-1">
-                <span
-                  className="font-bold text-[#D7E2EA] leading-none shrink-0"
-                  style={{ fontSize: 'clamp(1.8rem, 5vw, 90px)' }}
-                >
-                  {project.num}
-                </span>
-                <div className="flex flex-col text-left min-w-0">
-                  <span className="text-[10px] sm:text-xs md:text-sm uppercase tracking-wider text-[#D7E2EA] opacity-60 truncate">
-                    {project.category}
-                  </span>
-                  <span className="text-xs sm:text-base md:text-xl font-bold text-[#D7E2EA] uppercase tracking-wide truncate">
-                    {project.name}
-                  </span>
-                </div>
-              </div>
-
-              <LiveProjectButton onClick={() => window.location.href = project.link} label="เข้าสู่ระบบ" />
-            </div>
-
-            {/* Bottom Row - Columns Image Grid */}
-            <div className="grid grid-cols-10 gap-3 sm:gap-4 md:gap-5 w-full flex-1 min-h-0 overflow-hidden">
-              <div className="col-span-4 flex flex-col gap-3 sm:gap-4 h-full justify-between">
-                <img
-                  src={project.col1Img1}
-                  alt={`${project.name} image 1`}
-                  onError={(e) => { e.target.onerror = null; e.target.src = 'logo.png'; }}
-                  className="w-full object-cover rounded-[20px] sm:rounded-[35px] md:rounded-[45px] lg:rounded-[60px] select-none pointer-events-none flex-1 min-h-0"
-                  style={{ height: 'clamp(130px, 16vw, 230px)' }}
-                />
-                <img
-                  src={project.col1Img2}
-                  alt={`${project.name} image 2`}
-                  onError={(e) => { e.target.onerror = null; e.target.src = 'logo.png'; }}
-                  className="w-full object-cover rounded-[20px] sm:rounded-[35px] md:rounded-[45px] lg:rounded-[60px] select-none pointer-events-none flex-1 min-h-0"
-                  style={{ height: 'clamp(160px, 22vw, 340px)' }}
-                />
-              </div>
-
-              <div className="col-span-6 h-full">
-                <img
-                  src={project.col2Img}
-                  alt={`${project.name} image 3`}
-                  onError={(e) => { e.target.onerror = null; e.target.src = 'logo.png'; }}
-                  className="w-full h-full object-cover rounded-[20px] sm:rounded-[35px] md:rounded-[45px] lg:rounded-[60px] select-none pointer-events-none"
-                />
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      );
-    };
-
-    const ProjectsSection = () => {
-      const sectionRef = useRef(null);
-      let scrollYProgress = null;
-
-      try {
-        const { scrollYProgress: sp } = useScroll({
-          target: sectionRef,
-          offset: ['start start', 'end end'],
-        });
-        scrollYProgress = sp;
-      } catch (e) {
-        // Fallback
-      }
-
-      const totalCards = projectsData.length;
-
-      return (
-        <section
-          ref={sectionRef}
-          id="projects"
-          className="bg-[#0C0C0C] rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] -mt-10 sm:-mt-12 md:-mt-14 pt-20 pb-20 relative z-10 px-5 sm:px-8 md:px-10 flex flex-col items-center"
-        >
-          <div className="max-w-5xl w-full flex flex-col gap-16 md:gap-20">
-            <FadeIn delay={0} y={40} className="w-full text-center">
-              <h2
-                className="hero-heading font-bold uppercase text-center leading-none tracking-tight"
-                style={{ fontSize: 'clamp(3rem, 12vw, 160px)' }}
-              >
-                Portals
-              </h2>
-            </FadeIn>
-
-            <div className="flex flex-col gap-24 sm:gap-32 w-full relative">
-              {projectsData.map((project, index) => (
-                <StackingCard
-                  key={project.num}
-                  project={project}
-                  index={index}
-                  totalCards={totalCards}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      );
-    };
-
-
-    // --- FLOATING PORTAL OVERLAY MODAL ---
-    const FloatingPortal = ({ isOpen, setIsOpen }) => {
-      return (
-        <React.Fragment>
-          {/* Floating trigger button */}
-          <button
-            onClick={() => setIsOpen(true)}
-            className="portal-float-btn px-5 py-3 rounded-full text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2.5 select-none cursor-pointer"
-            title="คลิกเพื่อเลือกบทบาทเข้าสู่ระบบ"
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-300 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-            </span>
-            <span>เข้าสู่ระบบสอบออนไลน์ 🔒</span>
-          </button>
-
-          {/* Modal overlay */}
-          <AnimatePresence>
-            {isOpen && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[99999] flex items-center justify-center p-3 sm:p-4"
-                onClick={() => setIsOpen(false)}
-              >
-                <motion.div
-                  initial={{ scale: 0.9, y: 20 }}
-                  animate={{ scale: 1, y: 0 }}
-                  exit={{ scale: 0.9, y: 20 }}
-                  transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-                  className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 max-w-xl w-full shadow-2xl space-y-4 sm:space-y-6 text-[#0C0C0C]"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="space-y-1">
-                      <h3 className="text-xl sm:text-2xl font-bold text-slate-800 uppercase tracking-wide">เข้าสู่ระบบสอบออนไลน์</h3>
-                      <p className="text-xs sm:text-sm text-slate-500 font-medium">กรุณาเลือกประเภทการใช้งานเพื่อเข้าสู่ระบบสอบ Tab-Lock</p>
-                    </div>
-                    <button
-                      onClick={() => setIsOpen(false)}
-                      className="text-slate-400 hover:text-slate-700 text-xl sm:text-2xl font-bold p-1 hover:bg-slate-100 rounded-lg transition shrink-0 ml-2"
-                    >
-                      ✕
-                    </button>
-                  </div>
-
-                  <div className="flex flex-col gap-3 sm:gap-4">
-                    <a
-                      href="Student-login.html"
-                      className="flex items-center justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 transition-all font-bold group"
-                    >
-                      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                        <img
-                          src="./images/student_cartoon.jpg"
-                          alt="Student 3D"
-                          onError={(e) => { e.target.onerror = null; e.target.src = 'logo.png'; }}
-                          className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover border border-cyan-100 shadow-sm shrink-0"
-                        />
-                        <div className="flex flex-col text-left min-w-0">
-                          <span className="text-sm sm:text-base text-cyan-800 leading-tight truncate font-bold">เข้าสู่ระบบนักศึกษา</span>
-                          <span className="text-[11px] sm:text-xs text-cyan-600 font-light truncate">สำหรับเข้าทำข้อสอบ</span>
-                        </div>
-                      </div>
-                      <span className="text-cyan-500 group-hover:translate-x-1 transition-transform text-base sm:text-lg shrink-0 ml-2">➔</span>
-                    </a>
-
-                    <a
-                      href="teacher-login.html"
-                      className="flex items-center justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-violet-50 hover:bg-violet-100 border border-violet-200 transition-all font-bold group"
-                    >
-                      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                        <img
-                          src="./images/teacher_cartoon.jpg"
-                          alt="Teacher 3D"
-                          onError={(e) => { e.target.onerror = null; e.target.src = 'logo.png'; }}
-                          className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover border border-violet-100 shadow-sm shrink-0"
-                        />
-                        <div className="flex flex-col text-left min-w-0">
-                          <span className="text-sm sm:text-base text-violet-800 leading-tight truncate font-bold">เข้าสู่ระบบอาจารย์</span>
-                          <span className="text-[11px] sm:text-xs text-violet-600 font-light truncate">สำหรับสร้างข้อสอบและดูรายงาน</span>
-                        </div>
-                      </div>
-                      <span className="text-violet-500 group-hover:translate-x-1 transition-transform text-base sm:text-lg shrink-0 ml-2">➔</span>
-                    </a>
-
-                    <a
-                      href="admin-login.html"
-                      className="flex items-center justify-between p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-rose-50 hover:bg-rose-100 border border-rose-200 transition-all font-bold group"
-                    >
-                      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                        <img
-                          src="./images/admin_cartoon.jpg"
-                          alt="Admin 3D"
-                          onError={(e) => { e.target.onerror = null; e.target.src = 'logo.png'; }}
-                          className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover border border-rose-100 shadow-sm shrink-0"
-                        />
-                        <div className="flex flex-col text-left min-w-0">
-                          <span className="text-sm sm:text-base text-rose-800 leading-tight truncate font-bold">ทางเข้าผู้ดูแลระบบ</span>
-                          <span className="text-[11px] sm:text-xs text-rose-600 font-light truncate">Super Admin Dashboard</span>
-                        </div>
-                      </div>
-                      <span className="text-rose-500 group-hover:translate-x-1 transition-transform text-base sm:text-lg shrink-0 ml-2">➔</span>
-                    </a>
-                  </div>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </React.Fragment>
-      );
-    };
-
-
-    // --- MAIN APP COMPONENT ---
-    const App = () => {
-      const [isPortalOpen, setIsPortalOpen] = useState(false);
-
-      return (
-        <div className="w-full min-h-screen bg-[#0C0C0C] text-[#D7E2EA] overflow-x-clip select-none relative">
-          <HeroSection onPortalClick={() => setIsPortalOpen(true)} />
-          <MarqueeSection />
-          <AboutSection onPortalClick={() => setIsPortalOpen(true)} />
-          <ServicesSection />
-          <ProjectsSection />
-          <FloatingPortal isOpen={isPortalOpen} setIsOpen={setIsPortalOpen} />
-        </div>
-      );
-    };
-
-    // Render App
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-  </script>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.6-3 8.1-7 10-4-1.9-7-5.4-7-10V6z"/><path d="M9 12l2.2 2.2L15.5 10"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3H7a1.5 1.5 0 0 0-1.5 1.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.5z"/><path d="M14 3v4.5h4.5M9 12.5h6M9 16h3.5"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3.5 20.5h17M6.5 20.5v-6M11 20.5V9M15.5 20.5v-8.5M20 20.5V5"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M10 6.5h10M10 12h10M10 17.5h10"/><path d="M3.5 6.5l1.3 1.3L7 5.5M3.5 12l1.3 1.3L7 11M3.5 17.5l1.3 1.3L7 16.5"/></symbol>
+  <symbol id="i-steps" viewBox="0 0 24 24"><path d="M4 19h5v-5h5V9h5V4"/><circle cx="19" cy="4" r="0.6"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 0 1 4.8.9c0 1.8-2.4 2.2-2.4 3.9M12 17.2v.1"/></symbol>
+  <symbol id="i-cap" viewBox="0 0 24 24"><path d="M2.5 9.5L12 5l9.5 4.5L12 14z"/><path d="M6.5 11.6v4.2c3.2 2.3 7.8 2.3 11 0v-4.2M21.5 9.5v5"/></symbol>
+  <symbol id="i-board" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8.5 20h7M7 8.5h6M7 11.5h4"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-gauge" viewBox="0 0 24 24"><path d="M4.2 17.5a9 9 0 1 1 15.6 0"/><path d="M12 13.5l3.5-3.5"/><circle cx="12" cy="13.5" r="1.2"/></symbol>
+</defs></svg>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="index.html"><img src="logo_university.png" alt="ตรามหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน"><span><b>Tab-Lock</b><small>มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน</small></span></a>
+    <div class="menu"><a href="#features">ความสามารถ</a><a href="#how">วิธีใช้งาน</a><a href="#faq">คำถามที่พบบ่อย</a><a href="grader-intro.html">ระบบตรวจอัตนัย AI</a></div>
+    <a class="btn btn-ol nav-cta" href="teacher-login.html">เข้าสู่ระบบอาจารย์</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <div class="tag"><i></i>ระบบสอบออนไลน์ มทร.อีสาน</div>
+      <h1>สอบออนไลน์อย่างมั่นใจ<br><em>ป้องกันทุจริต</em> และตรวจอัตนัยด้วย AI</h1>
+      <p class="lead">จัดสอบ ติดตามพฤติกรรมแบบเรียลไทม์ และให้ AI ช่วยตรวจข้อสอบอัตนัยเทียบกับเฉลย โดยอาจารย์เป็นผู้ยืนยันคะแนนสุดท้ายเสมอ</p>
+      <div class="cta">
+        <a class="btn btn-or" href="Student-login.html"><svg class="ic "><use href="#i-cap"/></svg> นักศึกษาเข้าสอบ</a>
+        <a class="btn btn-ol" href="teacher-login.html"><svg class="ic "><use href="#i-board"/></svg> อาจารย์เข้าสู่ระบบ</a>
+      </div>
+      <form class="pin" onsubmit="event.preventDefault();const v=this.pin.value.replace(/\s/g,'');if(v)location.href='Student-login.html?pin='+encodeURIComponent(v);">
+        <span>มีรหัส PIN ห้องสอบ?</span>
+        <input name="pin" inputmode="numeric" maxlength="7" placeholder="000 000" aria-label="รหัส PIN ห้องสอบ">
+        <button class="btn btn-or" type="submit">เข้าห้องสอบ</button>
+      </form>
+    </div>
+    <div class="art" aria-hidden="true">
+      <div class="big hex"><img src="images/hero_mascot.png" alt=""></div>
+      <i class="h1 hex"></i><i class="h2 hex"></i><i class="h3 hex"></i>
+      <div class="badge-live"><span class="dot"><svg class="ic "><use href="#i-eye"/></svg></span><span><b>ตรวจจับสลับหน้าจอ</b>แจ้งอาจารย์ทันที</span></div>
+      <div class="badge-live badge-ai"><span class="dot"><svg class="ic "><use href="#i-gauge"/></svg></span><span><b>ใกล้เคียงเฉลย 85%</b>AI เสนอ 8.5 / 10</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap" id="features">
+  <div class="cards">
+    <div class="card reveal"><div class="ico hex i-or"><svg class="ic "><use href="#i-shield"/></svg></div><h3>ป้องกันการทุจริต</h3><p>ตรวจจับการสลับแท็บ ย่อหน้าต่าง ล็อกคีย์ลัดคัดลอก และส่งคำเตือนถึงนักศึกษารายคนได้ทันที</p><a href="teacher-login.html">ดูหน้าคุมสอบ →</a></div>
+    <div class="card reveal"><div class="ico hex i-nv"><svg class="ic "><use href="#i-doc"/></svg></div><h3>ตรวจอัตนัยด้วย AI</h3><p>นำเข้า PDF กระดาษคำตอบ AI อ่านลายมือ เทียบความใกล้เคียงกับเฉลย แล้วเสนอคะแนนให้อาจารย์เลือก</p><a href="grader-intro.html">ดูวิธีทำงาน →</a></div>
+    <div class="card reveal"><div class="ico hex i-cy"><svg class="ic "><use href="#i-chart"/></svg></div><h3>ผลสอบและวิเคราะห์</h3><p>คะแนนรายข้อ สถิติห้องเรียน คะแนนรวมรายวิชา และส่งออก Excel ได้ในคลิกเดียว</p><a href="teacher-login.html">เข้าสู่ระบบ →</a></div>
+  </div>
+</div>
+
+<section id="how">
+  <div class="wrap split">
+    <div class="reveal">
+      <div class="sec-ico hex i-cy"><svg class="ic sm"><use href="#i-list"/></svg></div>
+      <h2>ครบในระบบเดียว<br>ตั้งแต่สร้างข้อสอบถึงส่งเกรด</h2>
+      <ul class="checks">
+        <li>สร้างรายวิชา นำเข้ารายชื่อนักศึกษา และสร้างข้อสอบเอง นำเข้าจาก Excel หรือให้ AI ช่วยออกข้อสอบ</li>
+        <li>เปิดห้องสอบด้วยรหัส PIN หรือ QR นักศึกษาเข้าสอบได้จากทุกอุปกรณ์</li>
+        <li>ติดตามผู้เข้าสอบและพฤติกรรมน่าสงสัยแบบเรียลไทม์</li>
+        <li>ข้อสอบอัตนัย: AI ช่วยตรวจ อาจารย์ตรวจทานและยืนยันทุกคะแนน</li>
+      </ul>
+      <a class="btn btn-navy" href="teacher-login.html">เริ่มใช้งานสำหรับอาจารย์</a>
+    </div>
+    <div class="reveal" style="position:relative">
+      <div class="hexframe"><div class="ring hex"></div><div class="pic hex"><img src="images/student_exam_ui.jpg" alt="ตัวอย่างหน้าจอทำข้อสอบ"></div></div>
+      <i class="dotdeco" style="left:4%;top:8%"></i><i class="dotdeco" style="right:2%;bottom:16%;background:var(--cyan)"></i>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:20px">
+  <div class="wrap center">
+    <div class="sec-ico hex i-nv"><svg class="ic sm"><use href="#i-steps"/></svg></div>
+    <h2>เริ่มใช้งานใน 4 ขั้นตอน</h2>
+    <p class="sub">สำหรับอาจารย์ผู้สอน</p>
+    <div class="steps" style="text-align:left">
+      <div class="step reveal"><b class="hex i-or">1</b><h4>สร้างรายวิชา</h4><p>เพิ่มรายวิชาและรายชื่อนักศึกษา</p></div>
+      <div class="step reveal"><b class="hex i-nv">2</b><h4>สร้างข้อสอบ</h4><p>ปรนัยในระบบ หรืออัตนัยพร้อมเฉลย</p></div>
+      <div class="step reveal"><b class="hex i-cy">3</b><h4>เปิดห้องสอบ</h4><p>แจก PIN ให้นักศึกษา แล้วคุมสอบแบบเรียลไทม์</p></div>
+      <div class="step reveal"><b class="hex i-or">4</b><h4>ตรวจและส่งออก</h4><p>ยืนยันคะแนน แล้วส่งออก Excel</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" style="padding-top:20px">
+  <div class="wrap center">
+    <div class="sec-ico hex i-or"><svg class="ic sm"><use href="#i-help"/></svg></div>
+    <h2>คำถามที่พบบ่อย</h2>
+    <div class="faq" style="text-align:left">
+      <details class="reveal"><summary>นักศึกษาเข้าสอบอย่างไร?</summary><p>กด "นักศึกษาเข้าสอบ" หรือใส่รหัส PIN ที่อาจารย์แจก แล้วล็อกอินด้วยรหัสนักศึกษา ครั้งแรกระบบจะให้ตั้งรหัสผ่านใหม่ก่อนเข้าสอบ</p></details>
+      <details class="reveal"><summary>ลืมรหัสผ่านต้องทำอย่างไร?</summary><p>ติดต่ออาจารย์ผู้สอนหรือผู้ดูแลระบบของคณะ เพื่อขอตั้งรหัสผ่านใหม่</p></details>
+      <details class="reveal"><summary>ข้อมูลนักศึกษาปลอดภัยไหม?</summary><p>รหัสผ่านถูกเข้ารหัส อาจารย์เห็นเฉพาะข้อมูลในรายวิชาของตนเอง และการตรวจด้วย AI อาจารย์เป็นผู้ยืนยันคะแนนเสมอ</p></details>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="ico hex i-or" style="margin:0 auto 14px"><svg class="ic "><use href="#i-cap"/></svg></div>
+    <h2>พร้อมเข้าสอบแล้วหรือยัง?</h2>
+    <p class="sub">เตรียมรหัสนักศึกษาและรหัส PIN จากอาจารย์ให้พร้อม</p>
+    <div class="cta"><a class="btn btn-or" href="Student-login.html">นักศึกษาเข้าสอบ</a><a class="btn btn-ol" href="teacher-login.html">อาจารย์เข้าสู่ระบบ</a></div>
+    <div class="bottom">
+      <span>© 2026 มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน · Tab-Lock Online Proctoring System</span>
+      <span><a href="grader-intro.html">ระบบตรวจอัตนัย AI</a><a href="register-teacher.html">สมัครบัญชีอาจารย์</a><a href="admin-login.html">ผู้ดูแลระบบ</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .15 });
+  document.querySelectorAll('.reveal').forEach((el, i) => { el.style.transitionDelay = (i % 4) * 80 + 'ms'; io.observe(el); });
+</script>
 </body>
 </html>

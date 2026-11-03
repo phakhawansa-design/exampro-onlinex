@@ -22,6 +22,14 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.text({ type: 'text/plain' }));
 app.use('/images', express.static(path.join(__dirname, 'images')));
+// 🔒 กันไม่ให้ดาวน์โหลดไฟล์ฝั่งเซิร์ฟเวอร์ (ฐานข้อมูล, โค้ด, สคริปต์) ผ่านเว็บ
+app.use((req, res, next) => {
+    const p = decodeURIComponent(req.path).toLowerCase();
+    if (/\.(db|db-journal|sqlite|bat|env|log|md)$/.test(p) || /^\/(server|auth|essay-grader|ai-quiz|backup|check_storage|make_pdf)\.js$/.test(p) || /^\/(package(-lock)?\.json|\.npmrc|\.gitignore)$/.test(p) || p.startsWith('/_backup') || p.startsWith('/node_modules') || p.startsWith('/.')) {
+        return res.status(404).end();
+    }
+    next();
+});
 app.use(express.static(__dirname));
 
 const { Pool } = require('pg');
@@ -166,7 +174,7 @@ if (isPg) {
         .catch(err => console.error('❌ เชื่อมต่อ Neon PostgreSQL ล้มเหลว:', err.message));
 
 } else {
-    const dbDir = path.join(__dirname, '.data');
+    const dbDir = process.env.DATA_DIR || path.join(__dirname, '.data');
     if (!fs.existsSync(dbDir)) {
         fs.mkdirSync(dbDir);
     }
@@ -177,6 +185,12 @@ if (isPg) {
         else console.log('🟢 เชื่อมต่อฐานข้อมูล SQLite สำเร็จ (ไฟล์: .data/exam_system.db)');
     });
 }
+
+// 🔐 ระบบยืนยันตัวตนด้วย token (auth.js) — ต้องลงทะเบียนก่อน API ทั้งหมด
+const { hashTeacherPassword, verifyTeacherPassword } = require('./auth');
+require('./auth').register(app, db, process.env.DATA_DIR || path.join(__dirname, '.data'));
+// 🤖 สร้าง/แปลงข้อสอบด้วย Claude (ai-quiz.js) — ถ้าไม่มี API key จะใช้คลังข้อสอบเดิม
+try { require('./ai-quiz')(app, db); } catch (e) { console.error('⚠️ โหลด AI Quiz ไม่สำเร็จ:', e.message); }
 
 // 🛠️ สร้างตารางข้อมูลทั้งหมด และทำการ Migration ตารางเดิมอย่างปลอดภัย
 db.serialize(() => {
@@ -452,7 +466,7 @@ db.serialize(() => {
 
     // 🛡️ Seed บัญชี Super Admin เริ่มต้น (admin / admin123)
     db.run(`INSERT OR IGNORE INTO teachers (username, password, name, status, role, created_at) VALUES (?, ?, ?, ?, ?, ?)`,
-        ['admin', 'admin123', 'ผู้ดูแลระบบ (Super Admin)', 'approved', 'admin', new Date().toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })],
+        ['admin', hashTeacherPassword('admin123'), 'ผู้ดูแลระบบ (Super Admin)', 'approved', 'admin', new Date().toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })],
         (err) => {
             if (!err) console.log('🛡️ Seed บัญชี Super Admin สำเร็จ (admin / admin123)');
         }
@@ -481,7 +495,7 @@ app.post('/api/admin/create-teacher', (req, res) => {
     const created_at = new Date().toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
     db.run('INSERT INTO teachers (username, password, name, phone, status, role, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)', 
-        [username, password, name, phone, 'pending', 'teacher', created_at], function(err) {
+        [username, hashTeacherPassword(password), name, phone, 'pending', 'teacher', created_at], function(err) {
         if (err) {
             if (err.message.includes('UNIQUE')) return res.status(400).json({ message: "Username นี้มีในระบบแล้ว" });
             return res.status(500).json({ message: err.message });
@@ -502,8 +516,17 @@ app.post('/api/admin/create-teacher', (req, res) => {
 // 🔑 API สำหรับให้อาจารย์ล็อกอินเข้าสู่ระบบ (ตรวจสอบสถานะ approved ก่อน)
 app.post('/api/teacher/login', (req, res) => {
     const { username, password } = req.body;
-    db.get('SELECT * FROM teachers WHERE username = ? AND password = ?', [username, password], (err, teacher) => {
+    db.get('SELECT * FROM teachers WHERE username = ?', [username], (err, found) => {
         if (err) return res.status(500).json({ message: err.message });
+        // 🔐 ตรวจรหัสผ่านแบบเข้ารหัส (รหัสเดิมที่ยังไม่เข้ารหัสจะถูกอัปเกรดอัตโนมัติเมื่อล็อกอินสำเร็จ)
+        let teacher = null;
+        if (found) {
+            const v = verifyTeacherPassword(found.password, password);
+            if (v.ok) {
+                teacher = found;
+                if (v.needsUpgrade) db.run('UPDATE teachers SET password = ? WHERE id = ?', [hashTeacherPassword(password), found.id]);
+            }
+        }
         if (!teacher) {
             return res.status(401).json({ success: false, message: "Username หรือ Password ไม่ถูกต้อง" });
         }
@@ -813,12 +836,14 @@ app.get('/api/students', (req, res) => {
         FROM students s
         LEFT JOIN exam_results er ON er.studentId = s.studentId OR REPLACE(er.studentId, '-', '') = REPLACE(s.studentId, '-', '')
         LEFT JOIN cheat_logs cl ON cl.studentId = s.studentId OR REPLACE(cl.studentId, '-', '') = REPLACE(s.studentId, '-', '')
-        WHERE (s.teacherUsername = ? OR s.teacherUsername IS NULL OR s.teacherUsername = '' OR ? = 'admin' OR 1=1)
+        WHERE (? = 'admin' OR s.teacherUsername = ?
+               OR s.studentId IN (SELECT cs3.studentId FROM course_students cs3 JOIN courses c3 ON c3.id = cs3.courseId WHERE c3.teacherUsername = ?))
         GROUP BY s.id, s.studentId, s.firstName, s.lastName, s.class, s.note, s.status, s.created_at, s.approved_at
         ORDER BY s.studentId ASC
     `;
 
-    db.all(sql, [username, username], (err, rows) => {
+    // 🔐 อาจารย์เห็นเฉพาะนักศึกษาในรายวิชาของตัวเอง (แอดมินเห็นทั้งหมด)
+    db.all(sql, [username, username, username], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
         res.json(rows || []);
     });
@@ -1089,6 +1114,9 @@ app.post('/api/student/login', (req, res) => {
     const inputPassword = (password || '1234').trim();
     const defaultHash = hashPassword('1234');
     const inputHash = hashPassword(inputPassword);
+    // 🔐 รหัสผ่านเริ่มต้นที่เดาได้: 1234 หรือ 4 หลักท้ายของรหัสนักศึกษา (บัญชีที่อาจารย์เพิ่มเอง)
+    const last4Hash = hashPassword(cleanStudentId.replace(/[^0-9]/g, '').slice(-4) || '1234');
+    const isGuessableHash = h => !h || h === defaultHash || h === last4Hash;
 
     const checkStudentStatusAndLogin = (studentObj, isDefaultPassword, roomObj) => {
         const status = studentObj.status || 'approved';
@@ -1187,8 +1215,11 @@ app.post('/api/student/login', (req, res) => {
                             return;
                         }
 
-                        // มีบัญชีนักศึกษาอยู่แล้ว -> เข้าผ่าน QR/examCode + มีรายชื่อในวิชา = เข้าได้เลย ไม่ต้องตรวจรหัสผ่าน
-                        const isDefault = (!student.password_hash || student.password_hash === defaultHash);
+                        // มีบัญชีนักศึกษาอยู่แล้ว -> 🔐 ต้องตรวจรหัสผ่านเสมอ (เดิมเข้าได้โดยไม่ตรวจรหัส ทำให้สอบแทนกันได้)
+                        if (student.password_hash && student.password_hash !== inputHash && !(student.password_hash === defaultHash && inputPassword === '1234')) {
+                            return res.status(401).json({ success: false, message: "รหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง" });
+                        }
+                        const isDefault = isGuessableHash(student.password_hash);
                         checkStudentStatusAndLogin(student, isDefault, room);
                     });
                     return;
@@ -1253,7 +1284,7 @@ app.post('/api/student/login', (req, res) => {
                     }
                 }
 
-                const isDefault = (!student.password_hash || student.password_hash === defaultHash || inputPassword === '1234');
+                const isDefault = isGuessableHash(student.password_hash) || inputPassword === '1234';
                 checkStudentStatusAndLogin(student, isDefault, room);
             });
         }
@@ -1811,9 +1842,11 @@ app.get('/api/teacher/courses', (req, res) => {
             (SELECT COUNT(*) FROM exam_templates et WHERE et.courseId = c.id) as examCount,
             (SELECT GROUP_CONCAT(DISTINCT cs.class) FROM course_students cs WHERE cs.courseId = c.id AND cs.class != '' AND cs.class IS NOT NULL) as studentClasses
         FROM courses c
+        WHERE (c.teacherUsername = ? OR ? = 'admin')
         ORDER BY c.id DESC
     `;
-    db.all(sql, [], (err, rows) => {
+    // 🔐 อาจารย์เห็นเฉพาะรายวิชาของตัวเอง (แอดมินเห็นทั้งหมด)
+    db.all(sql, [username, username], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
         res.json(rows || []);
     });
@@ -3158,8 +3191,16 @@ app.delete('/api/teacher/delete-question', (req, res) => {
 // Super Admin Login
 app.post('/api/superadmin/login', (req, res) => {
     const { username, password } = req.body;
-    db.get('SELECT * FROM teachers WHERE username = ? AND password = ? AND role = ?', [username, password, 'admin'], (err, admin) => {
+    db.get('SELECT * FROM teachers WHERE username = ? AND role = ?', [username, 'admin'], (err, found) => {
         if (err) return res.status(500).json({ message: err.message });
+        let admin = null;
+        if (found) {
+            const v = verifyTeacherPassword(found.password, password);
+            if (v.ok) {
+                admin = found;
+                if (v.needsUpgrade) db.run('UPDATE teachers SET password = ? WHERE id = ?', [hashTeacherPassword(password), found.id]);
+            }
+        }
         if (admin) {
             res.json({ success: true, admin: { username: admin.username, name: admin.name } });
         } else {
@@ -3168,9 +3209,20 @@ app.post('/api/superadmin/login', (req, res) => {
     });
 });
 
+// 🔑 แอดมินตั้งรหัสผ่านใหม่ให้อาจารย์ (หรือเปลี่ยนรหัสของตัวเอง) — รหัสถูกเก็บแบบเข้ารหัส
+app.post('/api/superadmin/reset-password', (req, res) => {
+    const { targetUsername, newPassword } = req.body || {};
+    if (!targetUsername || !newPassword || String(newPassword).length < 6) return res.status(400).json({ success: false, message: 'รหัสผ่านใหม่ต้องยาวอย่างน้อย 6 ตัวอักษร' });
+    db.run('UPDATE teachers SET password = ? WHERE username = ?', [hashTeacherPassword(newPassword), targetUsername], function(err) {
+        if (err) return res.status(500).json({ success: false, message: err.message });
+        if (!this || !this.changes) return res.status(404).json({ success: false, message: 'ไม่พบบัญชีนี้' });
+        res.json({ success: true, message: 'ตั้งรหัสผ่านใหม่เรียบร้อย' });
+    });
+});
+
 // ดึงรายชื่ออาจารย์ทั้งหมดพร้อมสถานะ
 app.get('/api/superadmin/teachers', (req, res) => {
-    db.all(`SELECT id, username, password, phone, name, status, role, created_at FROM teachers WHERE role != 'admin' ORDER BY 
+    db.all(`SELECT id, username, phone, name, status, role, created_at FROM teachers WHERE role != 'admin' ORDER BY 
         CASE status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 WHEN 'rejected' THEN 2 END, 
         id DESC`, [], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
@@ -3976,6 +4028,11 @@ app.get('/api/admin/storage-stats', (req, res) => {
         res.json(result);
     });
 });
+
+// 📝 ระบบตรวจข้อสอบอัตนัยด้วย AI (โมดูลแยก: essay-grader.js) — ถ้าโหลดไม่สำเร็จ ระบบสอบเดิมยังทำงานตามปกติ
+try { require('./essay-grader')(app, db); } catch (e) { console.error('⚠️ โหลด Essay Grader ไม่สำเร็จ:', e.message); }
+// 💾 สำรองฐานข้อมูลอัตโนมัติทุกวัน (backup.js)
+try { require('./backup')(db, process.env.DATA_DIR || path.join(__dirname, '.data')); } catch (e) { console.error('⚠️ โหลดระบบสำรองข้อมูลไม่สำเร็จ:', e.message); }
 
 app.listen(PORT, () => {
     console.log(`=======================================================`);

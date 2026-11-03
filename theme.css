@@ -1,0 +1,157 @@
+/* =====================================================================
+   🎨 theme.css — ธีมกลางของระบบ (มทร.อีสาน · น้ำเงินไล่เฉด + หกเหลี่ยม + ปุ่มส้ม)
+   โหลดต่อท้ายทุกหน้า เปลี่ยนเฉพาะหน้าตา ไม่แตะการทำงาน
+   ถ้าต้องการกลับไปหน้าตาเดิม: ลบบรรทัด <link href="theme.css"> และ <script src="theme.js"> ออก
+   ===================================================================== */
+:root {
+  --rm-navy: #0b2a7a;
+  --rm-blue: #1557e0;
+  --rm-cyan: #22c3e6;
+  --rm-orange: #ff7a1a;
+  --rm-orange-2: #ff9a3c;
+  --rm-bg: #f3f6fb;
+  --rm-ink: #1b2540;
+  --rm-line: #e3e9f3;
+  --rm-shadow: 0 14px 34px -14px rgba(21, 87, 224, .22);
+  --rm-hex: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104'%3E%3Cpath d='M30 2h60l30 50-30 50H30L0 52z' fill='none' stroke='%231557e0' stroke-opacity='.045' stroke-width='2'/%3E%3C/svg%3E");
+}
+
+body { font-family: 'Kanit', 'Inter', sans-serif !important; }
+
+/* ---------- แถบเมนูข้าง ---------- */
+#sidebar {
+  background: linear-gradient(175deg, var(--rm-navy) 0%, #0f3a9c 55%, var(--rm-blue) 130%) !important;
+  border-right: 0 !important;
+  box-shadow: 6px 0 30px -12px rgba(11, 42, 122, .45) !important;
+}
+#sidebar::before, #sidebar::after { display: none !important; }
+#sidebar .nav-section-title { color: rgba(255,255,255,.5) !important; letter-spacing: .08em; }
+#sidebar .nav-link {
+  color: rgba(255,255,255,.82) !important;
+  border-color: transparent !important;
+  border-radius: 14px !important;
+}
+#sidebar .nav-link svg { color: rgba(255,255,255,.7) !important; }
+#sidebar .nav-link:hover { background: rgba(255,255,255,.1) !important; color: #fff !important; transform: translateX(3px); }
+#sidebar .nav-link.active {
+  background: #fff !important;
+  color: var(--rm-navy) !important;
+  font-weight: 600 !important;
+  box-shadow: 0 10px 22px -8px rgba(0,0,0,.35) !important;
+}
+#sidebar .nav-link.active svg { color: var(--rm-orange) !important; }
+#sidebar [class*="text-slate-"], #sidebar [class*="text-gray-"] { color: rgba(255,255,255,.85) !important; }
+#sidebar [class*="border-slate-"] { border-color: rgba(255,255,255,.12) !important; }
+#sidebar [class*="bg-slate-50"] { background: rgba(255,255,255,.06) !important; }
+#sidebar .logo-gradient { background: none !important; -webkit-text-fill-color: var(--rm-orange-2) !important; }
+#sidebar .logo-shield, #sidebar .rm-logo { background: #fff !important; border-radius: 14px !important; }
+#sidebar .rm-logo img { object-fit: contain !important; }
+
+/* ---------- พื้นที่หลัก ---------- */
+#main-area { background: var(--rm-bg) var(--rm-hex) !important; background-size: 120px 104px !important; }
+#top-header {
+  background: rgba(255,255,255,.96) !important;
+  border-bottom: 1px solid var(--rm-line) !important;
+  box-shadow: 0 4px 20px -14px rgba(11,42,122,.35);
+  position: relative;
+}
+#top-header::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px;
+  background: linear-gradient(90deg, var(--rm-navy), var(--rm-blue), var(--rm-cyan));
+}
+#top-header h1 { color: var(--rm-navy) !important; }
+
+.glass-card {
+  background: #fff !important;
+  border: 1px solid var(--rm-line) !important;
+  border-radius: 18px !important;
+  box-shadow: var(--rm-shadow) !important;
+  backdrop-filter: none !important;
+}
+select.dark-select, input.dark-input, textarea.dark-input { border-color: #d4dcea !important; }
+select.dark-select:focus, input.dark-input:focus, textarea.dark-input:focus {
+  border-color: var(--rm-blue) !important;
+  box-shadow: 0 0 0 3px rgba(21,87,224,.15) !important;
+}
+.bg-blue-900 { background-color: var(--rm-navy) !important; }
+.bg-blue-900:hover, .hover\:bg-blue-800:hover { background-color: var(--rm-blue) !important; }
+.text-blue-900 { color: var(--rm-navy) !important; }
+::-webkit-scrollbar-thumb { background: #c5d2ea !important; }
+
+/* ---------- หน้าเข้าสู่ระบบ / สมัคร (อาจารย์ / แอดมิน) ---------- */
+body.rm-auth { background: var(--rm-bg) !important; position: relative; min-height: 100vh; }
+body.rm-auth::before {
+  content: ""; position: fixed; inset: 0 0 auto 0; height: 62vh; z-index: 0;
+  background: var(--rm-hex), linear-gradient(135deg, var(--rm-navy) 0%, #0f3fae 50%, var(--rm-blue) 100%);
+  background-size: 120px 104px, auto;
+  clip-path: polygon(0 0, 100% 0, 100% 70%, 0 100%);
+}
+body.rm-auth .blob, body.rm-auth .grid-overlay { display: none !important; }
+body.rm-auth .content-layer { position: relative; z-index: 1; }
+body.rm-auth .glass-card {
+  border: 0 !important; border-radius: 24px !important;
+  box-shadow: 0 30px 70px -20px rgba(11,42,122,.45) !important;
+}
+body.rm-auth .btn-submit {
+  background: linear-gradient(135deg, var(--rm-orange), var(--rm-orange-2)) !important;
+  box-shadow: 0 12px 24px -8px rgba(255,122,26,.55) !important;
+  border: 0 !important;
+}
+body.rm-auth .btn-submit:hover { filter: brightness(1.05); transform: translateY(-1px); }
+body.rm-auth .content-layer > div > p:last-child { color: rgba(27,37,64,.55) !important; }
+.rm-hexdeco { position: fixed; z-index: 0; width: 90px; height: 78px; clip-path: polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);
+  background: linear-gradient(135deg, var(--rm-cyan), var(--rm-blue)); opacity: .9; pointer-events: none; }
+.rm-uni { display: flex; align-items: center; justify-content: center; gap: 8px; color: #fff; font-size: 13px; font-weight: 500; margin-bottom: 18px; position: relative; z-index: 1; }
+.rm-uni img { width: 34px; height: 34px; object-fit: contain; background: #fff; border-radius: 10px; padding: 3px; }
+
+/* ---------- หน้านักศึกษา (เข้าสอบ / ทำข้อสอบ / พอร์ทัล) ---------- */
+body.rm-student { background: var(--rm-bg) var(--rm-hex) !important; background-size: 120px 104px !important; color: var(--rm-ink) !important; }
+body.rm-student > .fixed.pointer-events-none, body.rm-student .animate-blob, body.rm-student .animate-blob-delay { display: none !important; }
+/* แถบน้ำเงินตัดเฉียงด้านบน (เฉพาะตอนอยู่หน้าเข้าสู่ระบบ) */
+body.rm-student:has(#login-screen:not(.hidden))::before {
+  content: ""; position: fixed; inset: 0 0 auto 0; height: 60vh; z-index: 0; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104'%3E%3Cpath d='M30 2h60l30 50-30 50H30L0 52z' fill='none' stroke='%23ffffff' stroke-opacity='.07' stroke-width='2'/%3E%3C/svg%3E"), linear-gradient(135deg, var(--rm-navy) 0%, #0f3fae 50%, var(--rm-blue) 100%);
+  background-size: 120px 104px, auto;
+  clip-path: polygon(0 0, 100% 0, 100% 70%, 0 100%);
+}
+body.rm-student .glass {
+  background: #fff !important; backdrop-filter: none !important;
+  border: 1px solid var(--rm-line) !important;
+  box-shadow: 0 24px 60px -24px rgba(11,42,122,.35) !important;
+}
+body.rm-student #login-screen { border: 0 !important; border-radius: 24px !important; box-shadow: 0 30px 70px -20px rgba(11,42,122,.45) !important; }
+body.rm-student #login-screen h1 span { background: none !important; -webkit-text-fill-color: var(--rm-orange) !important; color: var(--rm-orange) !important; }
+body.rm-student .btn-primary, body.rm-student #btn-login-submit {
+  background: linear-gradient(135deg, var(--rm-orange), var(--rm-orange-2)) !important;
+  box-shadow: 0 12px 24px -8px rgba(255,122,26,.55) !important; border: 0 !important;
+}
+body.rm-student #btn-register-submit { background: linear-gradient(135deg, var(--rm-navy), var(--rm-blue)) !important; }
+body.rm-student .tab-active, body.rm-student .tab-btn.active { background: var(--rm-navy) !important; color: #fff !important; box-shadow: 0 8px 18px -8px rgba(11,42,122,.6) !important; }
+body.rm-student .input-dark, body.rm-student .dark-input { border-color: #d4dcea !important; font-size: 16px !important; } /* 16px กันมือถือซูมเองตอนพิมพ์ */
+body.rm-student .input-dark:focus, body.rm-student .dark-input:focus { border-color: var(--rm-blue) !important; box-shadow: 0 0 0 3px rgba(21,87,224,.15) !important; }
+body.rm-student .progress-bar { background: linear-gradient(90deg, var(--rm-blue), var(--rm-cyan)) !important; }
+body.rm-student .exam-title-badge { background: #eef4ff !important; border-color: #cfe0ff !important; color: var(--rm-blue) !important; }
+/* ตัวเลือกคำตอบ: ใหญ่ กดง่ายบนมือถือ และเห็นชัดว่าเลือกข้อไหน */
+body.rm-student #questions-container label { border-radius: 14px !important; padding: 14px 16px !important; background: #fff !important; border: 1.5px solid var(--rm-line) !important; }
+body.rm-student #questions-container label:hover { border-color: #9fbaf0 !important; }
+body.rm-student #questions-container label:has(input:checked) { border-color: var(--rm-blue) !important; background: #eef4ff !important; box-shadow: 0 6px 16px -10px rgba(21,87,224,.6); }
+body.rm-student #questions-container label:has(input:checked) span:first-of-type { background: var(--rm-blue) !important; color: #fff !important; border-color: var(--rm-blue) !important; }
+body.rm-student #questions-container label span { font-size: 15px; }
+body.rm-student #questions-container input[type=radio] { accent-color: var(--rm-blue); width: 18px; height: 18px; }
+body.rm-student #questions-container > div > div:first-child > span:first-child { background: var(--rm-navy) !important; color: #fff !important; border: 0 !important; }
+@media (max-width: 640px) {
+  body.rm-student #questions-container > div > div:first-child { font-size: 16px; }
+  body.rm-student #exam-screen .glass { border-radius: 18px !important; }
+}
+/* พอร์ทัลนักศึกษา */
+body.rm-student header.glass { border-bottom: 0 !important; box-shadow: 0 6px 24px -16px rgba(11,42,122,.5) !important; position: sticky; }
+body.rm-student header.glass::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: linear-gradient(90deg, var(--rm-navy), var(--rm-blue), var(--rm-cyan)); }
+body.rm-student .glass-card { background: #fff !important; border: 1px solid var(--rm-line) !important; border-radius: 18px !important; box-shadow: var(--rm-shadow) !important; }
+body.rm-student footer { color: #7a87a3 !important; }
+.rm-uni-s { display: flex; align-items: center; justify-content: center; gap: 10px; color: #fff; font-size: 14px; font-weight: 500; margin: 0 auto 16px; text-shadow: 0 1px 2px rgba(0,0,0,.2); }
+.rm-uni-s img { width: 38px; height: 38px; object-fit: contain; background: #fff; border-radius: 10px; padding: 3px; }
+
+/* ไอคอนเส้นที่แทนอีโมจิ (theme.js) */
+.rm-ic { width: 1.05em; height: 1.05em; display: inline-block; vertical-align: -0.16em; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.text-4xl > .rm-ic, .text-5xl > .rm-ic, .text-3xl > .rm-ic { stroke-width: 1.6; }
+[class*="-50"] > .rm-ic, .rm-ic-tint { color: var(--rm-blue); }

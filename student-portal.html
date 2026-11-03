@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
+    <script src="auth-client.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>หน้าหลักนักศึกษา - Tab-Lock Online Proctoring System</title>
@@ -66,6 +67,8 @@
             box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.18);
         }
     </style>
+    <link rel="stylesheet" href="theme.css">
+    <script src="theme.js" defer></script>
 </head>
 <body class="flex flex-col min-h-screen">
 
@@ -634,8 +637,8 @@
             }
 
             if (newPassword) {
-                if (newPassword.length < 4) {
-                    alert("⚠️ รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 4 ตัวอักษร");
+                if (newPassword.length < 6 || newPassword === '1234') {
+                    alert("⚠️ รหัสผ่านใหม่ต้องยาวอย่างน้อย 6 ตัวอักษร และห้ามเป็น 1234");
                     return;
                 }
                 if (newPassword !== confirmPassword) {
@@ -699,5 +702,6 @@
                 .replace(/'/g, '&#039;');
         }
     </script>
+<script src="essay-student.js"></script>
 </body>
 </html>

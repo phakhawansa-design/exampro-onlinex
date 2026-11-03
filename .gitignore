@@ -20,3 +20,6 @@ Thumbs.db
 .env.development.local
 .env.test.local
 .env.production.local
+
+# ไฟล์กระดาษคำตอบที่อัปโหลด (ข้อมูลนักเรียน)
+.data/essay_uploads/
