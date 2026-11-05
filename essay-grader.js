@@ -6,7 +6,7 @@
 //
 // ตั้งค่าใน .env:
 //   ANTHROPIC_API_KEY=sk-ant-...      (ถ้าไม่ใส่ จะทำงานในโหมดทดลอง/ผลจำลอง)
-//   ESSAY_MODEL=claude-sonnet-4-5     (ไม่บังคับ)
+//   ESSAY_MODEL=claude-sonnet-5-5     (ไม่บังคับ)
 //   ESSAY_CONFIDENCE_THRESHOLD=0.7    (ไม่บังคับ)
 // =====================================================================
 const fs = require('fs');
@@ -18,7 +18,7 @@ module.exports = function registerEssayGrader(app, db) {
     try { fs.mkdirSync(UPLOAD_DIR, { recursive: true }); } catch (e) {}
 
     const API_KEY = () => process.env.ANTHROPIC_API_KEY || '';
-    const MODEL = () => process.env.ESSAY_MODEL || 'claude-sonnet-4-5';
+    const MODEL = () => process.env.ESSAY_MODEL || 'claude-sonnet-5-5';
     const THRESHOLD = () => parseFloat(process.env.ESSAY_CONFIDENCE_THRESHOLD || '0.7');
     const MAX_FILE_BYTES = 30 * 1024 * 1024;
     const ALLOWED_MIME = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -91,8 +91,8 @@ module.exports = function registerEssayGrader(app, db) {
     });
 
     // ---------- ค่าใช้จ่าย API ----------
-    const PRICE_IN = () => parseFloat(process.env.ESSAY_PRICE_IN || '3');    // USD ต่อ 1 ล้าน token (ราคา Sonnet โดยประมาณ ปรับใน .env ได้)
-    const PRICE_OUT = () => parseFloat(process.env.ESSAY_PRICE_OUT || '15');
+    const PRICE_IN = () => parseFloat(process.env.ESSAY_PRICE_IN || '2');    // USD ต่อ 1 ล้าน token (ราคา Sonnet โดยประมาณ ปรับใน .env ได้)
+    const PRICE_OUT = () => parseFloat(process.env.ESSAY_PRICE_OUT || '10');
     const USD_THB = () => parseFloat(process.env.USD_THB || '35');
     app.get('/api/essay/usage', async (req, res) => {
         try {

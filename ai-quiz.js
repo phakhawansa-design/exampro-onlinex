@@ -6,7 +6,7 @@
 // =====================================================================
 module.exports = function registerAiQuiz(app) {
     const KEY = () => process.env.ANTHROPIC_API_KEY || '';
-    const MODEL = () => process.env.QUIZ_MODEL || process.env.ESSAY_MODEL || 'claude-sonnet-4-5';
+    const MODEL = () => process.env.QUIZ_MODEL || process.env.ESSAY_MODEL || 'claude-sonnet-5-5';
     const LETTERS = 'abcdefghij';
 
     app.get('/api/ai-quiz/status', (req, res) => res.json({ aiEnabled: !!KEY(), model: MODEL() }));
