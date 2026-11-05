@@ -10,16 +10,15 @@
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>สมัครบัญชีอาจารย์ - Tab-Lock Online Proctoring System</title>
-  <meta name="description" content="สร้างบัญชีอาจารย์ใหม่สำหรับ Tab-Lock Online Proctoring System" />
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>สมัครบัญชีอาจารย์ - ตรีเนตร e-Exam</title>
+  <meta name="description" content="สร้างบัญชีอาจารย์ใหม่สำหรับ ตรีเนตร e-Exam" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
   <style>
     html { font-size: 100%; -webkit-text-size-adjust: 100%; }
     body {
       margin: 0;
       font-family: 'Kanit', 'Inter', sans-serif;
-      background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #faf5ff 100%);
+      background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #eef4ff 100%);
       color: #334155;
       min-height: 100vh;
       overflow-x: hidden;
@@ -29,8 +28,8 @@
     .grid-overlay {
       position: fixed; inset: 0;
       background-image:
-        linear-gradient(rgba(99,102,241,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(99,102,241,0.02) 1px, transparent 1px);
+        linear-gradient(rgba(47,107,236,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(47,107,236,0.02) 1px, transparent 1px);
       background-size: 60px 60px;
       pointer-events: none; z-index: 0;
     }
@@ -46,7 +45,7 @@
     }
     .blob-2 {
       width: 320px; height: 320px;
-      background: radial-gradient(circle, rgba(139, 92, 246, 0.04) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(21,87,224, 0.04) 0%, transparent 70%);
       bottom: -100px; right: -100px;
       animation: radial-pulse 10s ease-in-out infinite reverse;
     }
@@ -167,6 +166,7 @@
   </style>
     <link rel="stylesheet" href="theme.css">
     <script src="theme.js" defer></script>
+    <link rel="stylesheet" href="tailwind.css">
 </head>
 <body>
   <div class="blob blob-1"></div>
@@ -183,11 +183,11 @@
         <!-- Header -->
         <div class="flex flex-col items-center text-center mb-6 sm:mb-7">
           <div class="shield-badge mb-3 sm:mb-4 overflow-hidden bg-white p-2 flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl shadow-sm">
-            <img src="logo.png" alt="Tab-Lock Logo" class="w-full h-full object-cover rounded-xl" />
+            <img src="trinetra-logo.svg" alt="ตรีเนตร e-Exam" class="w-full h-full object-cover rounded-xl" />
           </div>
-          <div class="text-xs font-bold tracking-[0.3em] text-emerald-600 uppercase mb-1">TAB-LOCK</div>
+          <div class="text-xs font-bold tracking-[0.3em] text-orange-500 uppercase mb-1">TRINETRA e-EXAM</div>
           <h1 class="text-xl sm:text-2xl font-bold text-slate-800 mb-1">สร้างบัญชีอาจารย์ใหม่</h1>
-          <p class="text-slate-500 text-xs sm:text-sm">กรอกข้อมูลเพื่อสมัครใช้งาน Tab-Lock</p>
+          <p class="text-slate-500 text-xs sm:text-sm">กรอกข้อมูลเพื่อสมัครใช้งานตรีเนตร e-Exam</p>
 
           <!-- Step dots -->
           <div class="flex gap-2 mt-3">
@@ -324,7 +324,7 @@
       </div>
 
       <!-- Footer -->
-      <p class="text-center text-slate-400 text-xs mt-6 tracking-wider">Tab-Lock Online Proctoring System</p>
+      <p class="text-center text-slate-400 text-xs mt-6 tracking-wider">ตรีเนตร e-Exam</p>
     </div>
   </div>
 

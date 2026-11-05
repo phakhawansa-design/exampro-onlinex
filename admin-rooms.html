@@ -2,10 +2,10 @@
 <html lang="th">
 <head>
     <script src="auth-client.js"></script>
+    <script src="qr-lite.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ศูนย์ห้องสอบ - Tab-Lock Online Proctoring System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>ศูนย์ห้องสอบ - ตรีเนตร e-Exam</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
     <style>
         html { font-size: 100%; -webkit-text-size-adjust: 100%; }
@@ -69,13 +69,13 @@
             flex-shrink: 0;
         }
         .nav-link:hover {
-            color: #1e3a8a; background: #eff6ff;
+            color: #0b2a7a; background: #eff6ff;
             border-color: #dbeafe; transform: translateX(3px);
         }
         .nav-link.active {
-            background: #1e3a8a;
+            background: #0b2a7a;
             color: #ffffff !important; font-weight: 600 !important;
-            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);
+            box-shadow: 0 4px 12px rgba(11,42,122, 0.25);
             border-color: transparent;
         }
         .nav-link.active svg { color: #ffffff; }
@@ -107,8 +107,8 @@
             cursor: pointer;
         }
         select.dark-select:focus, input.dark-input:focus {
-            border-color: #1e3a8a;
-            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
+            border-color: #0b2a7a;
+            box-shadow: 0 0 0 3px rgba(11,42,122, 0.15);
         }
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -119,18 +119,19 @@
             cursor: pointer;
         }
         .template-card-item:hover {
-            border-color: #1e3a8a;
+            border-color: #0b2a7a;
             background-color: #f8fafc;
             transform: translateY(-1px);
         }
         .template-card-item.selected {
-            border-color: #1e3a8a !important;
+            border-color: #0b2a7a !important;
             background-color: #eff6ff !important;
-            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.25);
+            box-shadow: 0 0 0 2px rgba(11,42,122, 0.25);
         }
     </style>
     <link rel="stylesheet" href="theme.css">
     <script src="theme.js" defer></script>
+    <link rel="stylesheet" href="tailwind.css">
 </head>
 <body class="flex h-screen overflow-hidden">
 
@@ -138,14 +139,14 @@
     <!-- ===== SIDEBAR ===== -->
     <aside id="sidebar">
         <div class="sidebar-inner p-4 space-y-4 flex-1 overflow-y-auto">
-            <!-- Logo Header with RMUTI Crest -->
+            <!-- Logo Header (ตรีเนตร e-Exam) -->
             <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
                 <div class="w-10 h-12 bg-white rounded-lg p-1 border border-slate-200 flex items-center justify-center shrink-0 shadow-xs">
-                    <img src="logo_university.png" alt="ตรามหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน" class="w-full h-full object-contain" />
+                    <img src="trinetra-logo.svg" alt="ตรีเนตร e-Exam" class="w-full h-full object-contain" />
                 </div>
                 <div class="leading-tight">
-                    <div class="font-bold text-base tracking-tight text-slate-900">Tab-Lock <span class="text-blue-700 font-extrabold">RMUTI</span></div>
-                    <div class="text-[10px] text-amber-700 font-bold uppercase tracking-wider">ระบบสอบออนไลน์ มทร.อีสาน</div>
+                    <div class="font-bold text-base tracking-tight text-slate-900">ตรีเนตร <span class="text-blue-700 font-extrabold">e-Exam</span></div>
+                    <div class="text-[10px] text-amber-700 font-bold uppercase tracking-wider">ตาที่ 3 ของอาจารย์</div>
                 </div>
             </div>
 
@@ -215,6 +216,10 @@
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" /></svg>
                             <span>10. ตรวจสอบพฤติกรรมน่าสงสัย</span>
                         </a>
+                        <a href="trinetra-report.html" class="nav-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            <span>11. รายงานรวมรายคน</span>
+                        </a>
                     </div>
                 </div>
             </nav>
@@ -256,7 +261,7 @@
                             0 ห้องสอบ
                         </span>
                     </div>
-                    <p class="text-xs text-slate-500 font-medium">มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน &middot; ประจำภาคการศึกษาปัจจุบัน</p>
+                    <p class="text-xs text-slate-500 font-medium">ตรีเนตร e-Exam &middot; ประจำภาคการศึกษาปัจจุบัน</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
@@ -342,7 +347,7 @@
         <!-- Footer -->
         <footer class="border-t border-slate-200 bg-white py-3.5 px-8 text-center shrink-0">
             <p class="text-xs text-slate-500 font-medium">
-                &copy; 2026 ระบบควบคุมและประเมินผลการสอบออนไลน์ Tab-Lock &middot; มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน (มทร.อีสาน)
+                &copy; 2026 ตรีเนตร e-Exam &middot; ตาที่ 3 ของอาจารย์ &middot; ทีม TEC Hope
             </p>
         </footer>
     </div>
@@ -453,7 +458,7 @@
                         </label>
                         <label class="flex items-center gap-2.5 p-3 hover:bg-indigo-50/50 rounded-2xl cursor-pointer border-2 border-slate-200 transition">
                             <input type="checkbox" id="modal-chk-tablock" checked class="w-5 h-5 text-indigo-600 rounded-lg cursor-pointer">
-                            <span class="font-bold text-slate-800">🛡️ เปิดระบบ Tab-Lock Proctoring</span>
+                            <span class="font-bold text-slate-800">🛡️ เปิดระบบตาเฝ้า (ตรวจจับสลับหน้าจอ)</span>
                         </label>
                     </div>
                 </div>
@@ -733,7 +738,7 @@
 
         const DEFAULT_COURSES = [
             { id: '749-51-447', courseCode: '749-51-447', courseName: 'ภาษาซีสำหรับการเขียนโปรแกรม (Computer Programming)', semester: 'ภาคเรียนที่ 2/2568', studentCount: 45, examCount: 3, description: 'รายวิชาคอมพิวเตอร์และเทคโนโลยีสารสนเทศ' },
-            { id: '749-52-101', courseCode: '749-52-101', courseName: 'การรักษาความปลอดภัยระบบเครือข่าย (Network Security)', semester: 'ภาคเรียนที่ 2/2568', studentCount: 38, examCount: 2, description: 'วิชาความปลอดภัยไซเบอร์และ Tab-Lock Proctoring' },
+            { id: '749-52-101', courseCode: '749-52-101', courseName: 'การรักษาความปลอดภัยระบบเครือข่าย (Network Security)', semester: 'ภาคเรียนที่ 2/2568', studentCount: 38, examCount: 2, description: 'วิชาความปลอดภัยไซเบอร์และ ตรีเนตร e-Exam' },
             { id: '749-53-202', courseCode: '749-53-202', courseName: 'เทคโนโลยีบล็อกเชนและปัญญาประดิษฐ์ (Blockchain & AI)', semester: 'ภาคเรียนที่ 2/2568', studentCount: 50, examCount: 4, description: 'วิทยาการคอมพิวเตอร์ประยุกต์' }
         ];
 
@@ -743,7 +748,7 @@
                 { id: 'tpl-102', templateName: 'แบบทดสอบปลายภาค การจัดการไฟล์ & Pointers ในภาษาซี', questionCount: 30, created_at: '2026-09-21' }
             ],
             '749-52-101': [
-                { id: 'tpl-201', templateName: 'แบบทดสอบ Cyber Security & Tab-Lock Protection', questionCount: 25, created_at: '2026-09-18' }
+                { id: 'tpl-201', templateName: 'แบบทดสอบ Cyber Security & การป้องกันสลับหน้าจอ', questionCount: 25, created_at: '2026-09-18' }
             ],
             '749-53-202': [
                 { id: 'tpl-301', templateName: 'แบบทดสอบ Blockchain Principles & Smart Contracts', questionCount: 15, created_at: '2026-09-15' },
@@ -1322,9 +1327,9 @@
                 document.getElementById('pub-modal-pin').textContent = examCode;
                 document.getElementById('pub-modal-room-info').textContent = `${roomData.examTitle || roomData.roomName} | รหัสห้อง: ${roomId}`;
 
-                const joinUrl = `${window.location.origin}/Student-login.html?pin=${encodeURIComponent(examCode)}&roomId=${encodeURIComponent(roomId)}`;
+                const joinUrl = `${window.location.origin}/Student-login.html?pin=${encodeURIComponent(examCode)}&roomId=${encodeURIComponent(roomId)}&openExternalBrowser=1`;
                 document.getElementById('pub-modal-link').value = joinUrl;
-                document.getElementById('pub-modal-qrcode').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(joinUrl)}`;
+                document.getElementById('pub-modal-qrcode').src = TrinetraQR.svgDataUrl(joinUrl, { size: 250, ecl: 'M' }); // สร้าง QR ในเว็บเอง ไม่ส่งลิงก์ไปเว็บภายนอก
 
                 const icon = document.getElementById('pub-modal-icon');
                 const title = document.getElementById('pub-modal-title');

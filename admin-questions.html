@@ -4,9 +4,8 @@
     <script src="auth-client.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>สร้างและจัดการข้อสอบ - Tab-Lock Exam</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <title>สร้างและจัดการข้อสอบ - ตรีเนตร e-Exam</title>
+    <script src="vendor/xlsx.full.min.js"></script><script>window.XLSX || document.write('<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>')</script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; }
@@ -38,9 +37,9 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
         .slide-item.active {
-            border-color: #4f46e5 !important;
-            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2), 0 4px 12px rgba(79, 70, 229, 0.1) !important;
-            background-color: #eef2ff !important;
+            border-color: #1557e0 !important;
+            box-shadow: 0 0 0 2px rgba(21,87,224, 0.2), 0 4px 12px rgba(21,87,224, 0.1) !important;
+            background-color: #eef4ff !important;
         }
 
         /* Choice Card Styling */
@@ -105,8 +104,8 @@
             transition: all 0.15s;
         }
         .setting-input:focus {
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+            border-color: #1557e0;
+            box-shadow: 0 0 0 3px rgba(21,87,224, 0.12);
         }
 
         @media (max-width: 768px) {
@@ -124,22 +123,24 @@
     </style>
     <link rel="stylesheet" href="theme.css">
     <script src="theme.js" defer></script>
+    <link rel="stylesheet" href="tailwind.css">
+    <style>/* มือถือ: ให้แถบหัวขึ้นบรรทัดใหม่ ไม่ล้นจอ */@media (max-width: 767px){body > header{height:auto;flex-wrap:wrap;row-gap:8px;padding-top:8px;padding-bottom:8px}body > header > div:nth-of-type(2){order:3;flex-basis:100%;max-width:none;margin:0;justify-content:flex-start;flex-wrap:wrap}body > header > div:nth-of-type(3){white-space:normal}}</style>
 </head>
 <body class="flex flex-col h-screen overflow-hidden select-none bg-slate-100">
 
     <!-- ======================================================== -->
     <!-- 1. TOP HEADER BAR                                        -->
-    <!-- RMUTI Academic Enterprise Theme                          -->
+    <!-- Trinetra Academic Theme                          -->
     <!-- ======================================================== -->
     <header class="h-16 bg-white border-b border-slate-200 px-4 md:px-6 flex items-center justify-between shrink-0 shadow-xs z-30">
-        <!-- Left: Back Button & Title with RMUTI crest -->
+        <!-- Left: Back Button & Title with ตรีเนตร logo -->
         <div class="flex items-center gap-3">
             <a href="dashboard.html" onclick="return confirmLeaveIfUnsaved(event, 'dashboard.html')" class="inline-flex items-center gap-2 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs sm:text-sm border border-slate-200 transition shadow-xs active:scale-95 shrink-0">
                 <span class="text-base leading-none">🏠</span>
                 <span class="hidden sm:inline">กลับแดชบอร์ด</span>
             </a>
             <div class="w-8 h-10 bg-white rounded-lg p-0.5 border border-slate-200 flex items-center justify-center shrink-0 shadow-xs hidden sm:flex">
-                <img src="logo_university.png" alt="ตรามหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน" class="w-full h-full object-contain" />
+                <img src="trinetra-logo.svg" alt="ตรีเนตร e-Exam" class="w-full h-full object-contain" />
             </div>
             <div>
                 <div class="flex items-center gap-2">
@@ -148,7 +149,7 @@
                     </h1>
                     <span class="text-[10px] font-bold px-2 py-0.5 bg-blue-100 text-blue-800 border border-blue-200 rounded-lg">CREATOR</span>
                 </div>
-                <span class="text-xs text-slate-500 font-medium" id="header-teacher-name">มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน</span>
+                <span class="text-xs text-slate-500 font-medium" id="header-teacher-name">ตรีเนตร e-Exam</span>
             </div>
         </div>
 

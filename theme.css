@@ -1,5 +1,5 @@
 /* =====================================================================
-   🎨 theme.css — ธีมกลางของระบบ (มทร.อีสาน · น้ำเงินไล่เฉด + หกเหลี่ยม + ปุ่มส้ม)
+   🎨 theme.css — ธีมกลางของระบบ (ตรีเนตร e-Exam · ธีมเดียวกับหน้าแรก: น้ำเงินไล่เฉด + หกเหลี่ยม + ปุ่มส้ม)
    โหลดต่อท้ายทุกหน้า เปลี่ยนเฉพาะหน้าตา ไม่แตะการทำงาน
    ถ้าต้องการกลับไปหน้าตาเดิม: ลบบรรทัด <link href="theme.css"> และ <script src="theme.js"> ออก
    ===================================================================== */
@@ -13,6 +13,7 @@
   --rm-ink: #1b2540;
   --rm-line: #e3e9f3;
   --rm-shadow: 0 14px 34px -14px rgba(21, 87, 224, .22);
+  --rm-hex-w: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104'%3E%3Cpath d='M30 2h60l30 50-30 50H30L0 52z' fill='none' stroke='%23ffffff' stroke-opacity='.07' stroke-width='2'/%3E%3C/svg%3E");
   --rm-hex: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104'%3E%3Cpath d='M30 2h60l30 50-30 50H30L0 52z' fill='none' stroke='%231557e0' stroke-opacity='.045' stroke-width='2'/%3E%3C/svg%3E");
 }
 
@@ -43,6 +44,8 @@ body { font-family: 'Kanit', 'Inter', sans-serif !important; }
 #sidebar [class*="text-slate-"], #sidebar [class*="text-gray-"] { color: rgba(255,255,255,.85) !important; }
 #sidebar [class*="border-slate-"] { border-color: rgba(255,255,255,.12) !important; }
 #sidebar [class*="bg-slate-50"] { background: rgba(255,255,255,.06) !important; }
+/* ปุ่มพื้นขาวในเมนูข้าง (เช่น ออกจากระบบ) ต้องใช้ตัวหนังสือสีเข้ม ไม่งั้นมองไม่เห็น */
+#sidebar .bg-white[class*="text-slate-"], #sidebar .bg-white[class*="text-slate-"] svg, #sidebar .bg-white[class*="text-slate-"] span { color: #be123c !important; }
 #sidebar .logo-gradient { background: none !important; -webkit-text-fill-color: var(--rm-orange-2) !important; }
 #sidebar .logo-shield, #sidebar .rm-logo { background: #fff !important; border-radius: 14px !important; }
 #sidebar .rm-logo img { object-fit: contain !important; }
@@ -92,12 +95,12 @@ body.rm-auth .glass-card {
   border: 0 !important; border-radius: 24px !important;
   box-shadow: 0 30px 70px -20px rgba(11,42,122,.45) !important;
 }
-body.rm-auth .btn-submit {
+body.rm-auth .btn-submit, body.rm-auth .btn-admin, body.rm-auth .btn-register {
   background: linear-gradient(135deg, var(--rm-orange), var(--rm-orange-2)) !important;
   box-shadow: 0 12px 24px -8px rgba(255,122,26,.55) !important;
   border: 0 !important;
 }
-body.rm-auth .btn-submit:hover { filter: brightness(1.05); transform: translateY(-1px); }
+body.rm-auth .btn-submit:hover, body.rm-auth .btn-admin:hover:not(:disabled), body.rm-auth .btn-register:hover:not(:disabled) { filter: brightness(1.05); transform: translateY(-1px); }
 body.rm-auth .content-layer > div > p:last-child { color: rgba(27,37,64,.55) !important; }
 .rm-hexdeco { position: fixed; z-index: 0; width: 90px; height: 78px; clip-path: polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);
   background: linear-gradient(135deg, var(--rm-cyan), var(--rm-blue)); opacity: .9; pointer-events: none; }
@@ -155,3 +158,90 @@ body.rm-student footer { color: #7a87a3 !important; }
 .rm-ic { width: 1.05em; height: 1.05em; display: inline-block; vertical-align: -0.16em; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 .text-4xl > .rm-ic, .text-5xl > .rm-ic, .text-3xl > .rm-ic { stroke-width: 1.6; }
 [class*="-50"] > .rm-ic, .rm-ic-tint { color: var(--rm-blue); }
+
+/* ---------- มือถือ / แท็บเล็ต ---------- */
+#main-area { min-width: 0; }
+.rm-menu-btn { display: none; }
+@media (max-width: 768px) {
+  /* เมนูข้างเป็นลิ้นชักซ้อนบนจอ (เดิมบางหน้ากฎเรียงผิดลำดับ ทำให้เมนูยังกินที่ 270px เนื้อหาเหลือแถบแคบ ๆ) */
+  #sidebar { position: fixed !important; top: 0 !important; bottom: 0 !important; left: -290px !important; z-index: 9999 !important;
+    width: 270px !important; min-height: 0 !important; height: 100% !important; overflow-y: auto !important; transition: left .3s cubic-bezier(.4,0,.2,1) !important; }
+  #sidebar.mobile-open { left: 0 !important; }
+  #main-area { width: 100% !important; margin-left: 0 !important; }
+  .rm-menu-btn { display: inline-flex; position: fixed; left: 12px; bottom: 16px; z-index: 9998; align-items: center; gap: 6px;
+    padding: 11px 16px; border-radius: 14px; border: 0; background: var(--rm-navy); color: #fff; font: 600 14px 'Kanit', sans-serif;
+    box-shadow: 0 12px 26px -10px rgba(11,42,122,.7); }
+  .rm-menu-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+  .rm-overlay { position: fixed; inset: 0; background: rgba(11,20,50,.45); z-index: 9990; }
+  body:not(.rm-sb-open) .rm-overlay { display: none; }
+  #top-header { padding: 12px 14px !important; flex-wrap: wrap; gap: 10px; }
+  #top-header h1 { font-size: 17px !important; }
+  #top-header .justify-between { flex-wrap: wrap; gap: 10px; }
+  #top-header a, #top-header button { white-space: nowrap; }
+  #main-area main, #main-area > main { padding: 14px !important; }
+  /* ตารางกว้าง: เลื่อนซ้ายขวาในกรอบแทนการล้นจอ */
+  #main-area table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; white-space: nowrap; }
+  #main-area .glass-card { border-radius: 14px !important; }
+  /* ปุ่มกดง่ายขึ้นบนจอสัมผัส */
+  #main-area button, #main-area .nav-link, #main-area a.btn { min-height: 38px; }
+}
+@media (min-width: 769px) and (max-width: 1100px) {
+  /* แท็บเล็ตแนวนอน / ไอแพด: เมนูข้างแคบลงเล็กน้อยให้เนื้อหามีที่มากขึ้น */
+  #sidebar { width: 230px !important; }
+  #sidebar .nav-link { font-size: 13.5px !important; padding: 9px 10px !important; }
+}
+
+/* ---------- ธีมเดียวกับหน้าแรก: ช่องกรอกและลิงก์ในหน้าเข้าสู่ระบบ/สมัคร ---------- */
+body.rm-auth .glass-input:focus { border-color: var(--rm-cyan) !important; box-shadow: 0 0 0 3px rgba(34,195,230,.15) !important; }
+body.rm-auth .toggle-pass:hover, body.rm-auth .link-primary { color: var(--rm-blue) !important; }
+body.rm-auth .back-link:hover { color: var(--rm-navy) !important; }
+
+/* ---------- พอร์ทัลนักศึกษา: แถบน้ำเงินหกเหลี่ยมด้านบนแบบหน้าแรก ---------- */
+body.rm-student:has(> main):not(:has(#login-screen))::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 330px; z-index: 0; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104'%3E%3Cpath d='M30 2h60l30 50-30 50H30L0 52z' fill='none' stroke='%23ffffff' stroke-opacity='.07' stroke-width='2'/%3E%3C/svg%3E"), linear-gradient(135deg, var(--rm-navy) 0%, #0f3fae 50%, var(--rm-blue) 100%);
+  background-size: 120px 104px, auto;
+  clip-path: polygon(0 0, 100% 0, 100% 72%, 0 100%);
+}
+body.rm-student:not(:has(#login-screen)) > main { position: relative; z-index: 1; }
+
+/* ---------- Super Admin: หัวน้ำเงินหกเหลี่ยมแบบหน้าแรก ---------- */
+body.rm-admin { background: var(--rm-bg) !important; position: relative; }
+body.rm-admin > header {
+  background: var(--rm-hex-w), linear-gradient(135deg, var(--rm-navy) 0%, #0f3fae 50%, var(--rm-blue) 100%) !important;
+  background-size: 120px 104px, auto !important; border-bottom: 0 !important; backdrop-filter: none !important;
+}
+body.rm-admin > header h1, body.rm-admin > header #admin-name-display { color: #fff !important; }
+body.rm-admin > header h1 + p { color: var(--rm-orange-2) !important; }
+body.rm-admin > header img { background: #fff; border: 0 !important; padding: 2px; }
+body.rm-admin::before {
+  content: ""; position: absolute; inset: 64px 0 auto 0; height: 190px; z-index: 0; pointer-events: none;
+  background: var(--rm-hex-w), linear-gradient(135deg, var(--rm-navy) 0%, #0f3fae 50%, var(--rm-blue) 100%);
+  background-size: 120px 104px, auto; clip-path: polygon(0 0, 100% 0, 100% 55%, 0 100%);
+}
+body.rm-admin > main { position: relative; z-index: 1; }
+body.rm-admin > main > div:first-child > div { box-shadow: 0 22px 50px -24px rgba(11,42,122,.45) !important; border-color: transparent !important; }
+body.rm-admin > footer { border-color: var(--rm-line) !important; }
+
+/* ---------- ปรับตามขนาดจอ: ปุ่มคู่มือ และหัวหน้า Super Admin ---------- */
+@media (max-width: 640px), (max-height: 500px) {
+  #tablock-floating-guide-btn { padding: 0 !important; width: 46px; height: 46px; justify-content: center; gap: 0 !important; bottom: 16px !important; right: 14px !important; }
+  #tablock-floating-guide-btn > span:last-child { display: none; }
+  #tablock-floating-guide-btn .tablock-guide-pulse-dot { position: absolute; top: 2px; right: 2px; }
+}
+@media (max-width: 900px) {
+  body.rm-admin > header { flex-wrap: wrap; gap: 12px; padding: 14px 16px !important; position: relative !important; }
+  body.rm-admin > header > div:last-child { width: 100%; gap: 8px !important; }
+  body.rm-admin > header > div:last-child > * { font-size: 12px !important; }
+  body.rm-admin::before { top: 0; height: 330px; }
+  body.rm-admin > main { padding: 16px !important; }
+}
+/* ระหว่างทำข้อสอบ: ปุ่มคู่มือเป็นปุ่มกลมเล็กทุกขนาดจอ ไม่บังตัวเลือก */
+body:has(#exam-screen:not(.hidden)) #tablock-floating-guide-btn { padding: 0 !important; width: 44px; height: 44px; justify-content: center; gap: 0 !important; bottom: 14px !important; right: 12px !important; opacity: .85; }
+body:has(#exam-screen:not(.hidden)) #tablock-floating-guide-btn > span:last-child { display: none; }
+body:has(#exam-screen:not(.hidden)) #tablock-floating-guide-btn .tablock-guide-pulse-dot { position: absolute; top: 2px; right: 2px; }
+/* มือถือ: ตัวหนังสือเล็กมาก ๆ อ่านยาก ขยายขึ้นเล็กน้อย */
+@media (max-width: 640px) {
+  .text-\[9px\] { font-size: 10.5px !important; }
+  .text-\[10px\] { font-size: 11px !important; }
+}

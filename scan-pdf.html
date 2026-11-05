@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2215%22%20fill%3D%22%230d3b8e%22/%3E%3Cg%20stroke%3D%22%23f6b818%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M32%204v4M18%209l2.5%203.5M46%209l-2.5%203.5M32%2056v4%22/%3E%3C/g%3E%3Cpath%20d%3D%22M32%2012C45%2022%2045%2042%2032%2052C19%2042%2019%2022%2032%2012Z%22%20fill%3D%22%23fff%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%228.5%22%20fill%3D%22%23f6b818%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%224%22%20fill%3D%22%23082a6b%22/%3E%3Ccircle%20cx%3D%2234.6%22%20cy%3D%2229.4%22%20r%3D%221.7%22%20fill%3D%22%23fff%22/%3E%3C/svg%3E">
+<title>ตรีเนตร e-Exam · สแกน PDF เป็นข้อความ (Demo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0d3b8e;--navy2:#082a6b;--gold:#f6b818;--gold2:#ffcf4a;--ink:#0f1b33;--mute:#5b6781;--line:#dfe5f0;--bg:#f3f6fb;--card:#fff;--ok:#16a34a;--warn:#d97706;--err:#dc2626}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:Prompt,"Leelawadee UI",Tahoma,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.55}
+h1,h2,h3{font-family:Kanit,Prompt,sans-serif;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* top bar */
+.top{background:linear-gradient(120deg,var(--navy2),var(--navy) 60%,#1450b8);color:#fff;position:relative;overflow:hidden}
+.top::after{content:"";position:absolute;right:-90px;top:-120px;width:340px;height:340px;border-radius:50%;background:var(--gold);opacity:.18}
+.bar{max-width:1240px;margin:0 auto;padding:16px 20px;display:flex;align-items:center;gap:14px;position:relative;z-index:1}
+.logo{width:46px;height:48px;object-fit:contain;background:#fff;border-radius:12px;padding:4px}
+.brand b{font-family:Kanit,sans-serif;font-size:24px;letter-spacing:.3px;display:block;line-height:1.1}
+.brand small{opacity:.8;font-size:13px}
+.tag{margin-left:auto;background:var(--gold);color:var(--navy2);font-weight:600;font-size:13px;padding:6px 12px;border-radius:999px;white-space:nowrap}
+.hero{max-width:1240px;margin:0 auto;padding:8px 20px 30px;position:relative;z-index:1}
+.hero h1{font-size:30px;line-height:1.25}
+.hero h1 em{font-style:normal;color:var(--gold2)}
+.hero p{margin:8px 0 0;opacity:.88;max-width:760px}
+
+main{max-width:1240px;margin:-14px auto 40px;padding:0 20px;position:relative;z-index:2;display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 6px 24px rgba(13,59,142,.07)}
+.side{padding:20px;position:sticky;top:16px}
+.step{display:flex;align-items:center;gap:10px;margin:0 0 12px}
+.step span{width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:600;font-size:14px;flex:none}
+.step h3{font-size:17px}
+.sec+.sec{margin-top:22px;padding-top:20px;border-top:1px dashed var(--line)}
+
+/* dropzone */
+.drop{border:2px dashed #b9c6e2;border-radius:16px;padding:22px 16px;text-align:center;background:#f7f9fd;transition:.15s;cursor:pointer}
+.drop.over{border-color:var(--gold);background:#fff8e2}
+.drop svg.big{width:44px;height:44px;color:var(--navy);stroke-width:1.5}
+.drop p{margin:6px 0 12px;color:var(--mute);font-size:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;padding:11px 18px;font-weight:600;cursor:pointer;transition:.15s}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.gold{background:var(--gold);color:var(--navy2);box-shadow:0 4px 0 #c58f00}
+.btn.gold:hover:not(:disabled){background:var(--gold2)}
+.btn.navy{background:var(--navy);color:#fff}
+.btn.navy:hover:not(:disabled){background:#1450b8}
+.btn.ghost{background:#eef2fa;color:var(--navy)}
+.btn.ghost:hover:not(:disabled){background:#e1e8f6}
+.btn.sm{padding:7px 12px;font-size:13.5px;border-radius:10px}
+.btn.wide{width:100%}
+.fileinfo{margin-top:12px;font-size:13.5px;color:var(--mute);display:none;background:#eef2fa;border-radius:10px;padding:8px 12px;word-break:break-all}
+.fileinfo b{color:var(--ink)}
+
+/* engine picker */
+.eng{display:grid;gap:10px}
+.eng label{display:flex;gap:12px;border:1.5px solid var(--line);border-radius:14px;padding:12px;cursor:pointer;transition:.15s}
+.eng label:hover{border-color:#b9c6e2}
+.eng input{display:none}
+.eng label:has(input:checked){border-color:var(--navy);background:#f2f6ff;box-shadow:inset 0 0 0 1px var(--navy)}
+.eng .ic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:#e7edf9;color:var(--navy);flex:none}
+.eng label:has(input:checked) .ic{background:var(--navy);color:#fff}
+.eng b{display:block;font-size:14.5px}
+.eng small{color:var(--mute);font-size:12.5px;display:block;line-height:1.45}
+.pill{display:inline-block;font-size:11px;font-weight:600;border-radius:999px;padding:1px 8px;margin-left:4px;vertical-align:1px}
+.pill.free{background:#dcfce7;color:#166534}
+.pill.paid{background:#fef3c7;color:#92400e}
+.opts{margin-top:14px;display:grid;gap:10px;font-size:14px}
+.opts .row{display:flex;align-items:center;gap:8px}
+.opts select,.opts input[type=password],.opts input[type=text]{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff}
+.opts select:focus,.opts input:focus,textarea:focus{outline:none;border-color:var(--navy)}
+.ai{display:none;gap:8px;background:#fffbea;border:1px solid #f5e1a0;border-radius:12px;padding:12px}
+.ai.show{display:grid}
+.ai .note{font-size:12.5px;color:#7a5b00;line-height:1.45}
+.lbl{font-size:13px;font-weight:500;color:var(--mute)}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;cursor:pointer}
+.chk input{margin-top:4px;accent-color:var(--navy)}
+
+/* results */
+.res{padding:0;min-height:420px}
+.rhead{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.rhead h2{font-size:19px;margin-right:auto}
+.prog{padding:12px 20px;border-bottom:1px solid var(--line);display:none}
+.prog.show{display:block}
+.prog .t{display:flex;justify-content:space-between;font-size:13.5px;color:var(--mute);margin-bottom:6px}
+.track{height:8px;background:#e7edf9;border-radius:99px;overflow:hidden}
+.track i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--navy),#2a6bdc);border-radius:99px;transition:width .25s}
+.empty{padding:70px 20px;text-align:center;color:var(--mute)}
+.empty svg{width:64px;height:64px;color:#b9c6e2;stroke-width:1.3}
+.empty h3{color:var(--ink);font-size:18px;margin:10px 0 4px}
+.pages{display:grid;gap:16px;padding:20px}
+.pg{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff}
+.pg .ph{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f7f9fd;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.pg .ph b{font-family:Kanit,sans-serif;font-size:15.5px;color:var(--navy)}
+.st{font-size:12.5px;font-weight:600;border-radius:999px;padding:2px 10px;background:#eef2fa;color:var(--mute)}
+.st.run{background:#dbeafe;color:#1d4ed8}
+.st.done{background:#dcfce7;color:#166534}
+.st.err{background:#fee2e2;color:#991b1b}
+.pg .ph .sp{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.pg .body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}
+.pg .img{background:#eef1f7;padding:12px;display:flex;align-items:flex-start;justify-content:center;border-right:1px solid var(--line);max-height:560px;overflow:auto}
+.pg .img canvas{max-width:100%;height:auto;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.12);border-radius:4px;cursor:zoom-in}
+.pg .txt{display:flex;flex-direction:column}
+.pg textarea{flex:1;min-height:300px;border:0;resize:vertical;padding:14px 16px;font-size:15.5px;line-height:1.75;font-family:Sarabun,Prompt,"Leelawadee UI",Tahoma,sans-serif;background:#fff}
+.pg .meta{font-size:12.5px;color:var(--mute);padding:8px 16px;border-top:1px solid var(--line);display:flex;gap:14px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--navy2);color:#fff;padding:10px 18px;border-radius:12px;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:50;max-width:calc(100% - 32px)}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.zoom{position:fixed;inset:0;background:rgba(8,20,48,.85);display:none;align-items:center;justify-content:center;z-index:40;padding:20px;cursor:zoom-out}
+.zoom.show{display:flex}
+.zoom img{max-width:100%;max-height:100%;border-radius:6px}
+footer{text-align:center;color:var(--mute);font-size:13px;padding:0 20px 30px}
+
+@media (max-width:980px){
+  main{grid-template-columns:1fr}
+  .side{position:static}
+  .pg .body{grid-template-columns:1fr}
+  .pg .img{border-right:0;border-bottom:1px solid var(--line);max-height:380px}
+}
+@media (max-width:560px){
+  .bar{padding:12px 16px}.hero{padding:4px 16px 26px}main{padding:0 16px}
+  .hero h1{font-size:23px}.tag{display:none}
+  .rhead{padding:14px 16px}.pages{padding:14px}
+  .rhead .btn{flex:1}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 15V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
+  <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M4 12h16"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5 14h6l-1 7 8-11h-6z"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M4 19h16"/></symbol>
+  <symbol id="i-redo" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
+</svg>
+
+<header class="top">
+  <div class="bar">
+    <img class="logo" alt="ตรีเนตร e-Exam" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2215%22%20fill%3D%22%230d3b8e%22/%3E%3Cg%20stroke%3D%22%23f6b818%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M32%204v4M18%209l2.5%203.5M46%209l-2.5%203.5M32%2056v4%22/%3E%3C/g%3E%3Cpath%20d%3D%22M32%2012C45%2022%2045%2042%2032%2052C19%2042%2019%2022%2032%2012Z%22%20fill%3D%22%23fff%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%228.5%22%20fill%3D%22%23f6b818%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%224%22%20fill%3D%22%23082a6b%22/%3E%3Ccircle%20cx%3D%2234.6%22%20cy%3D%2229.4%22%20r%3D%221.7%22%20fill%3D%22%23fff%22/%3E%3C/svg%3E" style="padding:0;background:none">
+    <div class="brand"><b>ตรีเนตร e-Exam</b><small>ตาที่ 3 ของอาจารย์</small></div>
+    <a class="tag" href="index.html" style="text-decoration:none">← กลับหน้าแรก</a>
+  </div>
+  <div class="hero">
+    <h1>นำเข้า PDF กระดาษคำตอบ แล้ว<em>ให้ตรีเนตรอ่าน</em>ออกมาเป็นข้อความ</h1>
+    <p>ทำงานในเบราว์เซอร์ทั้งหมด ไฟล์ไม่ถูกอัปโหลดไปที่ไหน ยกเว้นเมื่อเลือกโหมด Claude AI ภาพแต่ละหน้าจะถูกส่งไปให้ AI อ่าน</p>
+  </div>
+</header>
+
+<main>
+  <aside class="card side">
+    <div class="sec">
+      <div class="step"><span>1</span><h3>นำเข้าไฟล์ PDF</h3></div>
+      <div class="drop" id="drop" tabindex="0">
+        <svg class="i big"><use href="#i-up"/></svg>
+        <p>ลากไฟล์ PDF มาวางที่นี่<br>หรือกดปุ่มด้านล่าง</p>
+        <button class="btn gold" id="pick" type="button"><svg class="i"><use href="#i-doc"/></svg>เลือกไฟล์ PDF</button>
+        <input type="file" id="file" accept="application/pdf,.pdf" hidden>
+      </div>
+      <div class="fileinfo" id="fileinfo"></div>
+    </div>
+
+    <div class="sec">
+      <div class="step"><span>2</span><h3>เลือกตัวอ่าน</h3></div>
+      <div class="eng">
+        <label><input type="radio" name="eng" value="tess" checked>
+          <span class="ic"><svg class="i"><use href="#i-bolt"/></svg></span>
+          <span><b>อ่านในเครื่อง <span class="pill free">ฟรี</span></b><small>Tesseract OCR เหมาะกับตัวพิมพ์ ลายมือจะอ่านได้ไม่ค่อยแม่น ครั้งแรกโหลดข้อมูลภาษาไทยประมาณ 1–2 นาที</small></span></label>
+        <label><input type="radio" name="eng" value="ai">
+          <span class="ic"><svg class="i"><use href="#i-eye"/></svg></span>
+          <span><b>Claude AI <span class="pill paid">ใช้ API key</span></b><small>อ่านลายมือภาษาไทยได้แม่นกว่ามาก ประมาณ 0.3–0.6 บาทต่อหน้า</small></span></label>
+      </div>
+
+      <div class="opts">
+        <div class="ai" id="aibox">
+          <div><div class="lbl">Anthropic API key</div><input type="password" id="key" placeholder="sk-ant-..." autocomplete="off"></div>
+          <div><div class="lbl">โมเดล</div>
+            <select id="model">
+              <option value="claude-sonnet-4-5">Claude Sonnet 4.5 (แนะนำ)</option>
+              <option value="claude-haiku-4-5">Claude Haiku 4.5 (ถูกกว่า)</option>
+              <option value="claude-opus-4-1">Claude Opus 4.1 (แม่นสุด แพง)</option>
+            </select></div>
+          <label class="chk"><input type="checkbox" id="remember">จำ key ไว้ในเบราว์เซอร์นี้</label>
+          <div class="note">ใส่ key ในหน้าเว็บได้เฉพาะตอนทดลองเท่านั้น ถ้าใช้งานจริงต้องให้เซิร์ฟเวอร์เป็นผู้เรียก API</div>
+        </div>
+        <div id="tessopt"><div class="lbl">ภาษา</div>
+          <select id="lang"><option value="tha+eng">ไทย + อังกฤษ</option><option value="tha">ไทย</option><option value="eng">อังกฤษ</option></select></div>
+        <label class="chk"><input type="checkbox" id="pre" checked>ปรับภาพก่อนอ่าน (ขาวดำ เพิ่มความคมชัด)</label>
+        <label class="chk"><input type="checkbox" id="layer" checked>ถ้า PDF มีข้อความอยู่แล้ว ให้ดึงออกมาตรง ๆ โดยไม่ต้องสแกน</label>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="step"><span>3</span><h3>เริ่มสแกน</h3></div>
+      <button class="btn navy wide" id="run" disabled><svg class="i"><use href="#i-scan"/></svg>สแกนทุกหน้า</button>
+    </div>
+  </aside>
+
+  <section class="card res">
+    <div class="rhead">
+      <h2 id="rtitle">ผลการสแกน</h2>
+      <button class="btn ghost sm" id="copyAll" disabled><svg class="i"><use href="#i-copy"/></svg>คัดลอกทั้งหมด</button>
+      <button class="btn ghost sm" id="dl" disabled><svg class="i"><use href="#i-down"/></svg>ดาวน์โหลด .txt</button>
+    </div>
+    <div class="prog" id="prog"><div class="t"><span id="ptxt">กำลังเตรียม...</span><span id="ppct">0%</span></div><div class="track"><i id="pbar"></i></div></div>
+    <div class="empty" id="empty">
+      <svg class="i"><use href="#i-doc"/></svg>
+      <h3>ยังไม่มีไฟล์</h3>
+      <div>นำเข้า PDF ทางซ้าย แล้วแต่ละหน้าจะแสดงที่นี่ พร้อมข้อความที่อ่านได้ ซึ่งแก้ไขต่อได้</div>
+    </div>
+    <div class="pages" id="pages"></div>
+  </section>
+</main>
+<footer>© 2026 ตรีเนตร e-Exam · ทีม TEC Hope — เวอร์ชันทดลอง</footer>
+<div class="toast" id="toast"></div>
+<div class="zoom" id="zoom"><img alt=""></div>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+<script type="module">
+import * as pdfjsLib from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs';
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';
+
+const $ = s => document.querySelector(s);
+const ls = { get(k){try{return localStorage.getItem(k)}catch(e){return null}}, set(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}} };
+const state = { pdf:null, name:'', pages:[], busy:false, stop:false, worker:null, workerLang:'' };
+
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2600)}
+function prog(show,txt,p){const el=$('#prog');el.classList.toggle('show',show);if(txt!=null)$('#ptxt').textContent=txt;if(p!=null){$('#pbar').style.width=(p*100).toFixed(0)+'%';$('#ppct').textContent=(p*100).toFixed(0)+'%'}}
+const engine = () => document.querySelector('input[name=eng]:checked').value;
+
+// ---------- settings ----------
+const saved = ls.get('trinetra_key'); if(saved){$('#key').value=saved;$('#remember').checked=true}
+const savedModel = ls.get('trinetra_model'); if(savedModel) $('#model').value=savedModel;
+function syncEngine(){const ai=engine()==='ai';$('#aibox').classList.toggle('show',ai);$('#tessopt').style.display=ai?'none':''}
+document.querySelectorAll('input[name=eng]').forEach(r=>r.addEventListener('change',syncEngine));syncEngine();
+$('#remember').addEventListener('change',e=>ls.set('trinetra_key',e.target.checked?$('#key').value:null));
+$('#key').addEventListener('input',e=>{if($('#remember').checked)ls.set('trinetra_key',e.target.value)});
+$('#model').addEventListener('change',e=>ls.set('trinetra_model',e.target.value));
+
+// ---------- import ----------
+const drop=$('#drop'), file=$('#file');
+$('#pick').addEventListener('click',e=>{e.stopPropagation();file.click()});
+drop.addEventListener('click',()=>file.click());
+drop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();file.click()}});
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over')}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over')}));
+drop.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f)load(f)});
+file.addEventListener('change',()=>{if(file.files[0])load(file.files[0]);file.value=''});
+
+async function load(f){
+  if(state.busy){toast('กำลังสแกนอยู่ รอให้เสร็จก่อน');return}
+  if(!/\.pdf$/i.test(f.name)&&f.type!=='application/pdf'){toast('รองรับเฉพาะไฟล์ PDF');return}
+  try{
+    prog(true,'กำลังเปิดไฟล์...',0);
+    const pdf = await pdfjsLib.getDocument({data:new Uint8Array(await f.arrayBuffer())}).promise;
+    state.pdf=pdf; state.name=f.name.replace(/\.pdf$/i,''); state.pages=[];
+    $('#pages').innerHTML=''; $('#empty').style.display='none';
+    $('#fileinfo').style.display='block';
+    $('#fileinfo').innerHTML=`<b>${esc(f.name)}</b><br>${pdf.numPages} หน้า · ${(f.size/1048576).toFixed(2)} MB`;
+    $('#rtitle').textContent=`ผลการสแกน · ${pdf.numPages} หน้า`;
+    for(let i=1;i<=pdf.numPages;i++){
+      prog(true,`กำลังแสดงหน้า ${i}/${pdf.numPages}`,i/pdf.numPages);
+      await addPage(i);
+    }
+    prog(false); $('#run').disabled=false; updateTools();
+    toast(`นำเข้า ${pdf.numPages} หน้าแล้ว กด "สแกนทุกหน้า" เพื่อเริ่ม`);
+  }catch(err){console.error(err);prog(false);toast('เปิดไฟล์ไม่ได้: '+(err.message||err))}
+}
+
+async function addPage(n){
+  const page=await state.pdf.getPage(n);
+  const vp=page.getViewport({scale:2});
+  const cv=document.createElement('canvas');cv.width=Math.round(vp.width);cv.height=Math.round(vp.height);
+  const ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,cv.width,cv.height);
+  await page.render({canvasContext:ctx,viewport:vp}).promise;
+  const el=document.createElement('article');el.className='pg';
+  el.innerHTML=`<div class="ph"><b>หน้า ${n}</b><span class="st">ยังไม่สแกน</span>
+    <div class="sp"><button class="btn ghost sm" data-a="scan"><svg class="i"><use href="#i-redo"/></svg>สแกนหน้านี้</button>
+    <button class="btn ghost sm" data-a="copy"><svg class="i"><use href="#i-copy"/></svg>คัดลอก</button></div></div>
+    <div class="body"><div class="img"></div><div class="txt"><textarea placeholder="ข้อความที่อ่านได้จะแสดงที่นี่ และแก้ไขได้"></textarea><div class="meta"><span class="m1">—</span><span class="m2"></span></div></div></div>`;
+  el.querySelector('.img').appendChild(cv);
+  cv.addEventListener('click',()=>{const z=$('#zoom');z.querySelector('img').src=cv.toDataURL('image/jpeg',.9);z.classList.add('show')});
+  const p={n,page,canvas:cv,el,ta:el.querySelector('textarea'),st:el.querySelector('.st'),text:''};
+  p.ta.addEventListener('input',()=>{p.text=p.ta.value;updateTools()});
+  el.querySelector('[data-a=scan]').addEventListener('click',()=>runPages([p]));
+  el.querySelector('[data-a=copy]').addEventListener('click',()=>copy(p.ta.value));
+  state.pages.push(p);$('#pages').appendChild(el);
+}
+$('#zoom').addEventListener('click',()=>$('#zoom').classList.remove('show'));
+
+function setSt(p,cls,txt){p.st.className='st '+cls;p.st.textContent=txt}
+function updateTools(){const has=state.pages.some(p=>p.ta.value.trim());$('#copyAll').disabled=!has;$('#dl').disabled=!has}
+function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+
+// ---------- image preprocessing ----------
+function prepared(src){
+  const max=engine()==='ai'?1600:2400;
+  const k=Math.min(1,max/Math.max(src.width,src.height));
+  const c=document.createElement('canvas');c.width=Math.round(src.width*k);c.height=Math.round(src.height*k);
+  const x=c.getContext('2d');x.drawImage(src,0,0,c.width,c.height);
+  if(!$('#pre').checked) return c;
+  const im=x.getImageData(0,0,c.width,c.height),d=im.data,hist=new Uint32Array(256);
+  for(let i=0;i<d.length;i+=4){const g=(d[i]*299+d[i+1]*587+d[i+2]*114)/1000|0;d[i]=g;hist[g]++}
+  // contrast stretch between 1st and 99th percentile
+  const tot=c.width*c.height;let lo=0,hi=255,acc=0;
+  for(let v=0;v<256;v++){acc+=hist[v];if(acc>tot*.01){lo=v;break}}
+  acc=0;for(let v=255;v>=0;v--){acc+=hist[v];if(acc>tot*.01){hi=v;break}}
+  const span=Math.max(1,hi-lo);
+  for(let i=0;i<d.length;i+=4){let g=(d[i]-lo)*255/span;g=g<0?0:g>255?255:g;d[i]=d[i+1]=d[i+2]=g}
+  x.putImageData(im,0,0);return c;
+}
+
+// ---------- engines ----------
+async function viaLayer(p){
+  const tc=await p.page.getTextContent();
+  let out='',lastY=null;
+  for(const it of tc.items){
+    if(!('str' in it))continue;
+    const y=Math.round(it.transform[5]);
+    if(lastY!==null&&Math.abs(y-lastY)>3)out+='\n';
+    out+=it.str;if(it.hasEOL)out+='\n';lastY=y;
+  }
+  return fixThai(out).replace(/[ \t]+\n/g,'\n').replace(/\n{2,}/g,'\n').trim();
+}
+// Some PDFs store Thai vowels/tone marks as font-specific "private use" glyphs (U+F700–F71A); map them back to real Thai
+const PUA={0xF700:'ฐ',0xF701:'ิ',0xF702:'ี',0xF703:'ึ',0xF704:'ื',0xF705:'่',0xF706:'้',0xF707:'๊',0xF708:'๋',0xF709:'์',0xF70A:'่',0xF70B:'้',0xF70C:'๊',0xF70D:'๋',0xF70E:'์',0xF70F:'ญ',0xF710:'ั',0xF711:'็',0xF712:'่',0xF713:'้',0xF714:'๊',0xF715:'๋',0xF716:'์',0xF717:'ํ',0xF718:'ุ',0xF719:'ู',0xF71A:'ฺ'};
+function fixThai(t){
+  return t.replace(/[\uF700-\uF71A]/g,c=>PUA[c.charCodeAt(0)]||'')
+          .replace(/\u0E4D([\u0E48-\u0E4B]?)\u0E32/g,'$1\u0E33')   // ํ + า  -> ำ
+          .replace(/\u0E4D([\u0E48-\u0E4B])\u0E32/g,'$1\u0E33');
+}
+
+async function getWorker(){
+  const lang=$('#lang').value;
+  if(state.worker&&state.workerLang===lang)return state.worker;
+  if(state.worker){await state.worker.terminate();state.worker=null}
+  if(!window.Tesseract)throw new Error('โหลด Tesseract ไม่สำเร็จ (ต้องต่ออินเทอร์เน็ต)');
+  prog(true,'กำลังโหลดข้อมูลภาษา (ครั้งแรกอาจใช้เวลา 1–2 นาที)...',0);
+  const w=await Tesseract.createWorker(lang.split('+'),1,{logger:m=>{
+    if(m.status==='recognizing text'&&state.cur)prog(true,`หน้า ${state.cur.n}: กำลังอ่าน...`,state.base+m.progress*state.step);
+    else if(m.status&&m.status!=='recognizing text'&&typeof m.progress==='number')prog(true,'กำลังโหลด: '+m.status,m.progress);
+  }});
+  await w.setParameters({preserve_interword_spaces:'1'});
+  state.worker=w;state.workerLang=lang;return w;
+}
+async function viaTess(p){
+  const w=await getWorker();
+  const {data}=await w.recognize(prepared(p.canvas));
+  let t=data.text||'';
+  // Tesseract often inserts spaces between Thai characters; remove spaces that sit between two Thai chars
+  t=t.replace(/([฀-๿]) (?=[฀-๿])/g,'$1');
+  return {text:t.trim(),meta:`ความมั่นใจ ${Math.round(data.confidence||0)}%`};
+}
+
+const PROMPT=`นี่คือภาพหนึ่งหน้าของกระดาษคำตอบข้อสอบ ให้ถอดข้อความทั้งหมดในภาพออกมาตามที่เขียนจริงทุกตัวอักษร
+กติกา:
+- ห้ามแก้คำผิด ห้ามเติมหรือตัดคำ ถ้าผู้เขียนสะกดผิดให้คงไว้ตามเดิม
+- คงการขึ้นบรรทัดใหม่และเลขข้อตามต้นฉบับ
+- คำที่ขีดฆ่าทิ้ง ไม่ต้องใส่
+- ถ้าอ่านคำใดไม่ออก ให้ใส่ [อ่านไม่ออก] แทนคำนั้น
+- ตอบเฉพาะข้อความที่ถอดได้ ไม่ต้องอธิบายเพิ่ม`;
+async function viaAI(p){
+  const key=$('#key').value.trim();
+  if(!key)throw new Error('ยังไม่ได้ใส่ API key');
+  const img=prepared(p.canvas).toDataURL('image/jpeg',.85).split(',')[1];
+  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{
+    'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:$('#model').value,max_tokens:4096,messages:[{role:'user',content:[
+      {type:'image',source:{type:'base64',media_type:'image/jpeg',data:img}},{type:'text',text:PROMPT}]}]})});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){
+    const m=j.error?.message||r.statusText;
+    if(r.status===401)throw new Error('API key ไม่ถูกต้อง');
+    if(r.status===429)throw new Error('เรียกถี่เกินไป รอสักครู่แล้วลองใหม่');
+    throw new Error(`${r.status} ${m}`);
+  }
+  const text=(j.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('\n').trim();
+  const u=j.usage||{};
+  return {text,meta:`AI · token เข้า ${u.input_tokens??'-'} / ออก ${u.output_tokens??'-'}`};
+}
+
+// ---------- run ----------
+async function runPages(list){
+  if(state.busy){toast('กำลังสแกนอยู่');return}
+  if(engine()==='ai'&&!$('#key').value.trim()){toast('ใส่ Anthropic API key ก่อน');$('#key').focus();return}
+  state.busy=true;state.stop=false;$('#run').disabled=false;
+  $('#run').innerHTML='<svg class="i"><use href="#i-stop"/></svg>หยุด';$('#run').onclick=()=>{state.stop=true;toast('จะหยุดหลังหน้านี้')};
+  const t0=performance.now();let ok=0;
+  for(let i=0;i<list.length;i++){
+    if(state.stop)break;
+    const p=list[i];state.cur=p;state.base=i/list.length;state.step=1/list.length;
+    setSt(p,'run','กำลังอ่าน...');prog(true,`หน้า ${p.n} (${i+1}/${list.length})`,state.base);
+    const s=performance.now();
+    try{
+      let res=null;
+      if($('#layer').checked){const t=await viaLayer(p);if(t.replace(/\s/g,'').length>20)res={text:t,meta:'ดึงจากข้อความในไฟล์ PDF'}}
+      if(!res)res=engine()==='ai'?await viaAI(p):await viaTess(p);
+      p.text=res.text;p.ta.value=res.text||'';
+      setSt(p,'done',res.text?'อ่านแล้ว':'ไม่พบข้อความ');
+      p.el.querySelector('.m1').textContent=res.meta;
+      p.el.querySelector('.m2').textContent=`${((performance.now()-s)/1000).toFixed(1)} วินาที · ${(res.text||'').length} ตัวอักษร`;
+      ok++;
+    }catch(err){console.error(err);setSt(p,'err','ผิดพลาด');p.el.querySelector('.m1').textContent=err.message||String(err);
+      if(/API key|ไม่ได้โหลด|โหลด Tesseract/.test(err.message)){toast(err.message);break}}
+    updateTools();
+  }
+  prog(true,`เสร็จ ${ok}/${list.length} หน้า ใช้เวลา ${((performance.now()-t0)/1000).toFixed(1)} วินาที`,1);
+  setTimeout(()=>prog(false),2500);
+  state.busy=false;state.cur=null;
+  $('#run').innerHTML='<svg class="i"><use href="#i-scan"/></svg>สแกนทุกหน้า';$('#run').onclick=null;
+}
+$('#run').addEventListener('click',()=>{if(!state.busy)runPages(state.pages)});
+
+// ---------- export ----------
+function allText(){return state.pages.map(p=>`===== หน้า ${p.n} =====\n${p.ta.value.trim()}`).join('\n\n')}
+async function copy(t){try{await navigator.clipboard.writeText(t);toast('คัดลอกแล้ว')}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();toast('คัดลอกแล้ว')}}
+$('#copyAll').addEventListener('click',()=>copy(allText()));
+$('#dl').addEventListener('click',()=>{
+  const b=new Blob(['﻿'+allText()],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=(state.name||'trinetra')+'-ocr.txt';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+});
+window.__trinetra=state;
+</script>
+</body>
+</html>

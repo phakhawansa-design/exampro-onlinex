@@ -4,8 +4,7 @@
     <script src="auth-client.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Admin Dashboard - Tab-Lock Online Proctoring System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Super Admin Dashboard - ตรีเนตร e-Exam</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
     <style>
         html { font-size: 100%; -webkit-text-size-adjust: 100%; }
@@ -24,13 +23,13 @@
 
         body {
             font-family: 'Kanit', 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 50%, #faf5ff 100%) !important;
+            background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 50%, #eef4ff 100%) !important;
             background-attachment: fixed !important;
             color: #334155 !important;
         }
         .bg-grid {
-            background-image: linear-gradient(to right, rgba(99, 102, 241, 0.03) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(99, 102, 241, 0.03) 1px, transparent 1px) !important;
+            background-image: linear-gradient(to right, rgba(47,107,236, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(47,107,236, 0.03) 1px, transparent 1px) !important;
             background-size: 30px 30px;
         }
         header {
@@ -42,7 +41,7 @@
             color: #1e293b !important;
         }
         header p {
-            color: #4f46e5 !important;
+            color: #1557e0 !important;
         }
         header span {
             color: #1e293b !important;
@@ -76,7 +75,7 @@
         .storage-bar-bg { height: 7px; border-radius: 9999px; background: #e2e8f0; overflow: hidden; }
         .storage-bar-fill { height: 100%; border-radius: 9999px; transition: width 1s cubic-bezier(.4,0,.2,1); }
         .storage-card { background: #ffffff; border: 1px solid rgba(226, 232, 240, 0.8); border-radius: 16px; padding: 16px 20px; transition: all 0.25s; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
-        .storage-card:hover { border-color: rgba(99, 102, 241, 0.3); box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05); }
+        .storage-card:hover { border-color: rgba(47,107,236, 0.3); box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05); }
         .stat-chip-dark { display: inline-flex; align-items: center; gap: 3px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; padding: 2px 9px; font-size: 10px; font-weight: 600; color: #475569; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in-up { animation: fadeInUp 0.3s ease forwards; opacity: 0; }
@@ -91,9 +90,9 @@
             color: #1e293b !important;
         }
         .tab-btn.active {
-            background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+            background: linear-gradient(135deg, #1557e0, #0f3fae) !important;
             color: #ffffff !important;
-            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3) !important;
+            box-shadow: 0 4px 15px rgba(21,87,224, 0.3) !important;
             border-color: transparent !important;
         }
         /* Inputs */
@@ -106,8 +105,8 @@
             color: #94a3b8 !important;
         }
         input[type="text"]:focus {
-            border-color: #4f46e5 !important;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
+            border-color: #1557e0 !important;
+            box-shadow: 0 0 0 3px rgba(21,87,224, 0.15) !important;
         }
         /* Tables */
         table thead tr {
@@ -133,7 +132,7 @@
             color: #059669 !important;
         }
         table td.text-indigo-700 {
-            color: #4f46e5 !important;
+            color: #1557e0 !important;
         }
         /* Footer */
         footer {
@@ -158,20 +157,22 @@
     </style>
     <link rel="stylesheet" href="theme.css">
     <script src="theme.js" defer></script>
+    <link rel="stylesheet" href="tailwind.css">
 </head>
 <body class="min-h-screen bg-grid">
 
     <!-- Top Header Bar -->
     <header class="bg-white/80 backdrop-blur-md border-b border-rose-100 px-6 py-4 flex items-center justify-between sticky top-0 z-40">
         <div class="flex items-center gap-3">
-            <img src="logo.png" alt="Tab-Lock Logo" class="h-8 w-8 object-cover rounded-lg shadow-sm border border-slate-100" />
+            <img src="trinetra-logo.svg" alt="ตรีเนตร e-Exam" class="h-8 w-8 object-cover rounded-lg shadow-sm border border-slate-100" />
             <div>
                 <h1 class="text-base font-semibold text-slate-800 tracking-tight">Super Admin Dashboard</h1>
-                <p class="text-[10px] text-rose-600 font-bold uppercase tracking-widest">Tab-Lock Online Proctoring System</p>
+                <p class="text-[10px] text-rose-600 font-bold uppercase tracking-widest">ตรีเนตร e-Exam</p>
             </div>
         </div>
         <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap">
             <button onclick="resetTeacherPw(localStorage.getItem('admin_username') || 'admin')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">🔑 เปลี่ยนรหัสแอดมิน</button>
+            <button id="btn-backup" onclick="downloadBackup(this)" class="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 text-xs font-bold" title="ดาวน์โหลดข้อมูลทั้งหมดเก็บไว้ (แนะนำหลังสอบทุกครั้ง)">💾 ดาวน์โหลดข้อมูลสำรอง</button>
             <a href="admin-essay.html" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-pink-500 to-sky-500 text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5 active:scale-95">📝 ตรวจอัตนัย AI</a>
             <a href="admin-monitoring.html" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5 active:scale-95">
                 <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
@@ -384,7 +385,7 @@
     </main>
 
     <footer class="border-t border-rose-100 py-5 text-center text-slate-550 text-[10px] mt-10">
-        <p>&copy; 2026 Tab-Lock Online Proctoring System Super Admin Dashboard. สงวนสิทธิ์ทั้งหมด.</p>
+        <p>&copy; 2026 ตรีเนตร e-Exam · Super Admin. สงวนสิทธิ์ทั้งหมด.</p>
     </footer>
 
     <script>
@@ -866,5 +867,28 @@
         }
     </script>
     <script src="user-guide-system.js"></script>
+<script>
+// 💾 ดาวน์โหลดข้อมูลสำรองทั้งหมด (ผลสอบ ข้อสอบ ประวัติตาเฝ้า รายวิชา งานอัตนัย) เป็นไฟล์ JSON
+async function downloadBackup(btn) {
+    const old = btn.textContent; btn.disabled = true; btn.textContent = '⏳ กำลังเตรียมไฟล์...';
+    try {
+        const r = await fetch('/api/superadmin/backup-export');
+        if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error(j.message || ('HTTP ' + r.status)); }
+        const name = (/filename="([^"]+)"/.exec(r.headers.get('Content-Disposition') || '') || [])[1] || 'trinetra-backup.json';
+        const a = document.createElement('a'); a.href = URL.createObjectURL(await r.blob()); a.download = name; a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+        try { localStorage.setItem('tn_last_backup', new Date().toISOString()); } catch (e) {}
+        showLastBackup();
+    } catch (e) { alert('ดาวน์โหลดข้อมูลสำรองไม่สำเร็จ: ' + e.message); }
+    btn.disabled = false; btn.textContent = old;
+}
+function showLastBackup() {
+    const b = document.getElementById('btn-backup'); if (!b) return;
+    let t = null; try { t = localStorage.getItem('tn_last_backup'); } catch (e) {}
+    b.title = t ? 'สำรองล่าสุดจากเครื่องนี้: ' + new Date(t).toLocaleString('th-TH') + ' · แนะนำให้สำรองหลังสอบทุกครั้ง'
+                : 'ยังไม่เคยสำรองจากเครื่องนี้ · แนะนำให้สำรองหลังสอบทุกครั้ง (Neon แผนฟรีย้อนข้อมูลได้แค่ 6 ชั่วโมง)';
+}
+showLastBackup();
+</script>
 </body>
 </html>

@@ -4,9 +4,8 @@
     <script src="auth-client.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>การใช้พื้นที่จัดเก็บข้อมูล - Tab-Lock Online Proctoring System</title>
-    <meta name="description" content="ภาพรวมการใช้พื้นที่จัดเก็บข้อมูลของอาจารย์แต่ละท่านในระบบ Tab-Lock">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>การใช้พื้นที่จัดเก็บข้อมูล - ตรีเนตร e-Exam</title>
+    <meta name="description" content="ภาพรวมการใช้พื้นที่จัดเก็บข้อมูลของอาจารย์แต่ละท่านในระบบ ตรีเนตร e-Exam">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
     <style>
         html { font-size: 100%; -webkit-text-size-adjust: 100%; }
@@ -24,7 +23,7 @@
         }
 
         * { box-sizing: border-box; }
-        body { font-family: 'Kanit', 'Inter', sans-serif; background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #faf5ff 100%); background-attachment: fixed; color: #334155; }
+        body { font-family: 'Kanit', 'Inter', sans-serif; background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #eef4ff 100%); background-attachment: fixed; color: #334155; }
         /* ===== SIDEBAR (STANDARDIZED UX/UI FOR TEACHERS - REGULAR WEIGHT) ===== */
         #sidebar {
             background: #ffffff;
@@ -46,7 +45,7 @@
             position: absolute;
             top: -60px; left: -60px;
             width: 200px; height: 200px;
-            background: radial-gradient(circle, rgba(99,102,241,0.04) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(47,107,236,0.04) 0%, transparent 70%);
             border-radius: 50%;
             animation: blobPulse 6s ease-in-out infinite;
             pointer-events: none; z-index: 0;
@@ -58,7 +57,7 @@
         }
         .sidebar-inner { position: relative; z-index: 1; }
         .logo-gradient {
-            background: linear-gradient(135deg, #ec4899, #38bdf8);
+            background: linear-gradient(135deg, #ff7a1a, #38bdf8);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -101,25 +100,25 @@
             min-height: 24px;
         }
         .nav-link:hover {
-            color: #ec4899; background: #fdf2f8;
+            color: #ff7a1a; background: #fff6ed;
             border-color: #cbd5e1; transform: translateX(3px);
         }
         .nav-link.active {
-            background: linear-gradient(135deg, #f472b6 0%, #818cf8 50%, #38bdf8 100%);
+            background: linear-gradient(135deg, #ff9a3c 0%, #5a8cf5 50%, #38bdf8 100%);
             color: #ffffff !important; font-weight: 600 !important;
-            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.35);
+            box-shadow: 0 8px 24px rgba(21,87,224, 0.35);
             border-color: transparent;
         }
         .nav-link.active svg { color: #ffffff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
 
 
 
-        #main-area { flex: 1; background: #f8fafc; background-image: linear-gradient(to right, rgba(99,102,241,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.03) 1px, transparent 1px); background-size: 32px 32px; display: flex; flex-direction: column; overflow-x: hidden; }
+        #main-area { flex: 1; background: #f8fafc; background-image: linear-gradient(to right, rgba(47,107,236,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(47,107,236,0.03) 1px, transparent 1px); background-size: 32px 32px; display: flex; flex-direction: column; overflow-x: hidden; }
         #top-header { background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(226,232,240,0.8); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
         .glass-card { background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); border: 1px solid rgba(226,232,240,0.8); border-radius: 20px; box-shadow: 0 4px 20px rgba(15,23,42,0.04); }
         @keyframes sidebarDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         .sidebar-online-dot { animation: sidebarDot 2s ease-in-out infinite; }
-        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(6,182,212,0.3); border-radius: 4px; }
+        ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(34,195,230,0.3); border-radius: 4px; }
 
         /* Storage bar */
         .storage-bar-bg { height: 8px; border-radius: 9999px; background: #e2e8f0; overflow: hidden; }
@@ -146,6 +145,7 @@
     </style>
     <link rel="stylesheet" href="theme.css">
     <script src="theme.js" defer></script>
+    <link rel="stylesheet" href="tailwind.css">
 </head>
 <body class="flex h-screen overflow-hidden">
 
@@ -158,11 +158,11 @@
         <!-- Logo Header -->
         <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
             <div class="logo-shield bg-white p-1.5 border border-slate-200 shadow-sm rounded-xl flex items-center justify-center">
-                <img src="logo.png" alt="Tab-Lock Logo" class="w-8 h-8 object-cover rounded-lg" />
+                <img src="trinetra-logo.svg" alt="ตรีเนตร e-Exam" class="w-8 h-8 object-cover rounded-lg" />
             </div>
             <div class="logo-text leading-tight">
-                <div class="font-bold text-lg tracking-tight text-slate-900">Tab-<span class="logo-gradient">Lock</span></div>
-                <div class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Online Proctoring</div>
+                <div class="font-bold text-lg tracking-tight text-slate-900">ตรีเนตร <span class="logo-gradient">e-Exam</span></div>
+                <div class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">ตาที่ 3 ของอาจารย์</div>
             </div>
         </div>
 
@@ -232,6 +232,10 @@
                     <a href="admin-monitoring.html" class="nav-link">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" /></svg>
                         <span>10. ตรวจสอบพฤติกรรมน่าสงสัย</span>
+                    </a>
+                    <a href="trinetra-report.html" class="nav-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        <span>11. รายงานรวมรายคน</span>
                     </a>
                 </div>
             </div>

@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
+    <script src="inapp-guard.js"></script>
     <script src="auth-client.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>หน้าหลักนักศึกษา - Tab-Lock Online Proctoring System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>หน้าหลักนักศึกษา - ตรีเนตร e-Exam</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
     <style>
         html { font-size: 100%; -webkit-text-size-adjust: 100%; }
         * { box-sizing: border-box; }
         body {
             font-family: 'Kanit', 'Inter', sans-serif;
-            background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #faf5ff 100%);
+            background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #eef4ff 100%);
             background-attachment: fixed;
             color: #334155;
             min-height: 100vh;
@@ -31,22 +31,22 @@
             border-radius: 24px;
         }
         .btn-primary {
-            background: linear-gradient(135deg, #ec4899, #38bdf8);
-            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2);
+            background: linear-gradient(135deg, #ff7a1a, #38bdf8);
+            box-shadow: 0 4px 15px rgba(34,195,230, 0.2);
             transition: all 0.3s;
         }
         .btn-primary:hover {
-            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.35);
+            box-shadow: 0 4px 20px rgba(34,195,230, 0.35);
             transform: translateY(-1px);
         }
         .tab-btn {
             transition: all 0.2s ease;
         }
         .tab-btn.active {
-            background: linear-gradient(135deg, #ec4899, #38bdf8);
+            background: linear-gradient(135deg, #ff7a1a, #38bdf8);
             color: #ffffff;
             font-weight: 700;
-            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.25);
+            box-shadow: 0 4px 15px rgba(34,195,230, 0.25);
         }
         input, select {
             font-family: 'Kanit', sans-serif;
@@ -63,12 +63,13 @@
             transition: all 0.2s ease;
         }
         .dark-input:focus {
-            border-color: #06b6d4;
-            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.18);
+            border-color: #22c3e6;
+            box-shadow: 0 0 0 3px rgba(34,195,230, 0.18);
         }
     </style>
     <link rel="stylesheet" href="theme.css">
     <script src="theme.js" defer></script>
+    <link rel="stylesheet" href="tailwind.css">
 </head>
 <body class="flex flex-col min-h-screen">
 
@@ -80,10 +81,10 @@
     <header class="glass sticky top-0 z-40 border-b border-slate-200/80 px-4 sm:px-8 py-3.5 flex items-center justify-between">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-2xl bg-white p-1 border border-slate-200 shadow-sm flex items-center justify-center overflow-hidden">
-                <img src="logo.png" alt="Logo" class="w-full h-full object-cover rounded-xl" />
+                <img src="trinetra-logo.svg" alt="Logo" class="w-full h-full object-cover rounded-xl" />
             </div>
             <div>
-                <div class="font-bold text-base text-slate-800 tracking-tight">Tab-<span style="background:linear-gradient(135deg,#06b6d4,#8b5cf6); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Lock</span></div>
+                <div class="font-bold text-base text-slate-800 tracking-tight">ตรีเนตร <span style="background:linear-gradient(135deg,#22c3e6,#1557e0); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">e-Exam</span></div>
                 <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">ระบบสอบออนไลน์สำหรับนักศึกษา</div>
             </div>
         </div>
@@ -337,7 +338,7 @@
     </main>
 
     <footer class="text-center py-5 text-[11px] text-slate-400 border-t border-slate-200 mt-auto">
-        &copy; 2026 Tab-Lock Online Proctoring System · ระบบสอบออนไลน์ป้องกันการทุจริต
+        &copy; 2026 ตรีเนตร e-Exam · ระบบสอบออนไลน์ป้องกันการทุจริต
     </footer>
 
     <script>

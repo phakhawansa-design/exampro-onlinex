@@ -1,18 +1,34 @@
-// 🎨 theme.js — ใส่ตรา มทร.อีสาน และปรับหน้าตาเล็กน้อย (ไม่แตะการทำงานของหน้า)
+// 🎨 theme.js — ใส่โลโก้ตรีเนตร e-Exam และปรับหน้าตาเล็กน้อย (ไม่แตะการทำงานของหน้า)
 (function () {
-  const LOGO = 'logo_university.png';
+  const LOGO = 'trinetra-logo.svg';
   const run = () => {
     const page = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
-    // 1) เปลี่ยนโลโก้เดิมเป็นตรามหาวิทยาลัย
-    document.querySelectorAll('img[src$="logo.png"]').forEach(img => {
-      if (/logo_old|logo_university/.test(img.getAttribute('src'))) return;
-      img.src = LOGO; img.alt = 'ตรามหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน';
+    // 1) เปลี่ยนโลโก้เดิมเป็นโลโก้ตรีเนตร
+    document.querySelectorAll('img[src$="logo.png"], img[src$="logo_university.png"], img[src$="trinetra-logo.svg"]').forEach(img => {
+      if (/logo_old/.test(img.getAttribute('src'))) return;
+      img.src = LOGO; img.alt = 'ตรีเนตร e-Exam';
       img.style.objectFit = 'contain';
       if (img.closest('#sidebar')) img.parentElement.classList.add('rm-logo');
     });
     // 2) ชื่อใต้โลโก้ในแถบข้าง
     const sub = document.querySelector('#sidebar .logo-text > div:last-child');
-    if (sub) sub.textContent = 'มทร.อีสาน';
+    if (sub) sub.textContent = 'ตาที่ 3 ของอาจารย์';
+    // 2.5) ปุ่มเปิดเมนูบนมือถือ (บางหน้าเดิมไม่มีปุ่มนี้ ทำให้เปิดเมนูไม่ได้บนมือถือ)
+    const sb = document.getElementById('sidebar');
+    if (sb && !document.querySelector('.rm-menu-btn')) {
+      const hasOwn = [...document.querySelectorAll('button,[onclick]')].some(b => /mobile-open/.test(b.getAttribute('onclick') || '') || b.id === 'mobile-menu-btn');
+      const ov = document.createElement('div'); ov.className = 'rm-overlay'; document.body.appendChild(ov);
+      const close = () => { sb.classList.remove('mobile-open'); document.body.classList.remove('rm-sb-open'); };
+      ov.addEventListener('click', close);
+      sb.addEventListener('click', e => { if (e.target.closest('a')) close(); });
+      new MutationObserver(() => document.body.classList.toggle('rm-sb-open', sb.classList.contains('mobile-open'))).observe(sb, { attributes: true, attributeFilter: ['class'] });
+      if (!hasOwn) {
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'rm-menu-btn'; b.setAttribute('aria-label', 'เปิดเมนู');
+        b.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>เมนู';
+        b.addEventListener('click', () => sb.classList.toggle('mobile-open'));
+        document.body.appendChild(b);
+      }
+    }
     // 3) หน้านักศึกษา (เข้าสอบ / ทำข้อสอบ / พอร์ทัล)
     if (/^(student-login|student-portal)\.html$/.test(page)) {
       document.body.classList.add('rm-student');
@@ -20,21 +36,23 @@
       if (ls && !document.querySelector('.rm-uni-s')) {
         const box = document.createElement('div');
         box.style.cssText = 'width:100%;max-width:32rem;position:relative;z-index:1';
-        box.innerHTML = `<div class="rm-uni-s"><img src="${LOGO}" alt="">มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน</div>`;
+        box.innerHTML = `<div class="rm-uni-s"><img src="${LOGO}" alt="">ตรีเนตร e-Exam · ตาที่ 3 ของอาจารย์</div>`;
         ls.parentElement.style.flexDirection = 'column';
         ls.parentElement.insertBefore(box, ls);
-        // ซ่อนแถบชื่อมหาวิทยาลัยเมื่อเข้าสู่หน้าทำข้อสอบ
+        // ซ่อนแถบชื่อระบบเมื่อเข้าสู่หน้าทำข้อสอบ
         new MutationObserver(() => { box.style.display = ls.classList.contains('hidden') ? 'none' : ''; }).observe(ls, { attributes: true, attributeFilter: ['class'] });
       }
     }
+    // 3.5) หน้า Super Admin: หัวน้ำเงินแบบหน้าแรก
+    if (page === 'super-admin.html') document.body.classList.add('rm-admin');
     // 4) หน้าเข้าสู่ระบบ/สมัครของอาจารย์และแอดมิน
-    if (/^(teacher-login|admin-login|register-teacher)\.html$/.test(page)) {
+    if (/^(teacher-login|admin-login|register-teacher|finish)\.html$/.test(page)) {
       document.body.classList.add('rm-auth');
       const wrap = document.querySelector('.content-layer > div');
       if (wrap && !document.querySelector('.rm-uni')) {
         const u = document.createElement('div');
         u.className = 'rm-uni';
-        u.innerHTML = `<img src="${LOGO}" alt="">มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน`;
+        u.innerHTML = `<img src="${LOGO}" alt="">ตรีเนตร e-Exam · ตาที่ 3 ของอาจารย์`;
         wrap.prepend(u);
       }
       [['6%', '18%', 1], ['88%', '12%', .7], ['80%', '72%', .5]].forEach(([l, t, s]) => {

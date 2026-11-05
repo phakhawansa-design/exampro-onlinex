@@ -80,8 +80,12 @@ const STUDENT_ONLY = [
     'GET /api/student/essay-feedback', 'POST /api/student/change-password', 'POST /api/student/heartbeat',
     'POST /api/student/leave-room', 'POST /api/student/check-exam-access', 'GET /api/student/my-exam-history',
     'POST /api/student/update-profile', 'GET /api/get-warnings', 'POST /api/mark-warning-read',
-    'POST /api/report-cheat', 'POST /api/log-student-login', 'POST /api/submit-exam', 'GET /api/get-questions'
+    'POST /api/report-cheat', 'POST /api/log-student-login', 'POST /api/submit-exam', 'GET /api/get-questions',
+    'GET /api/student/progress', 'POST /api/student/progress', 'POST /api/student/answer-event'
 ];
+// รหัสผ่านเริ่มต้นของบัญชีผู้ดูแลระบบ (ตั้งเองได้ด้วย ADMIN_PASSWORD ใน .env) — ถ้ายังใช้ค่านี้อยู่ ระบบบังคับเปลี่ยนก่อนใช้งาน
+const DEFAULT_ADMIN_PASSWORD = 'admin123';
+const isWeakTeacherPw = (pw, username) => { pw = String(pw || ''); return pw.length < 8 || pw === DEFAULT_ADMIN_PASSWORD || pw.toLowerCase() === String(username || '').toLowerCase(); };
 // ยังใช้ได้แม้ยังไม่เปลี่ยนรหัสเริ่มต้น
 const ALLOW_BEFORE_PW_CHANGE = ['POST /api/student/change-password', 'POST /api/student/leave-room'];
 
@@ -153,8 +157,13 @@ function register(app, db, dataDir) {
         const finish = body => {
             try {
                 if (body && body.success) {
-                    if (body.teacher) body.token = auth.issue({ typ: 'teacher', u: body.teacher.username, role: body.teacher.role || 'teacher' });
-                    else if (body.admin) body.token = auth.issue({ typ: 'teacher', u: body.admin.username, role: 'admin' });
+                    // แอดมินที่ยังใช้รหัสเริ่มต้น → ได้ token แบบจำกัด ใช้ได้แค่เปลี่ยนรหัสผ่าน
+                    const who = body.teacher || body.admin;
+                    const weakAdmin = who && ((body.admin ? 'admin' : who.role) === 'admin') && String((req.body && req.body.password) || '') === DEFAULT_ADMIN_PASSWORD;
+                    if (weakAdmin) body.mustChangePassword = true;
+                    const mc = weakAdmin ? { mustChange: 1 } : {};
+                    if (body.teacher) body.token = auth.issue({ typ: 'teacher', u: body.teacher.username, role: body.teacher.role || 'teacher', ...mc });
+                    else if (body.admin) body.token = auth.issue({ typ: 'teacher', u: body.admin.username, role: 'admin', ...mc });
                     else if (body.student) body.token = auth.issue({ typ: 'student', u: String(body.student.studentId).trim(), ...(body.isDefaultPassword ? { mustChange: 1 } : {}) });
                     else if (p === '/api/student/change-password' && req.authUser && req.authUser.typ === 'student') {
                         body.token = auth.issue({ typ: 'student', u: req.authUser.u }); // เปลี่ยนรหัสแล้ว ออก token ใหม่ที่ไม่ติดเงื่อนไข
@@ -194,6 +203,10 @@ function register(app, db, dataDir) {
                 if (pw.length < 6 || pw === '1234' || pw === user.u) return res.status(400).json({ success: false, message: 'รหัสผ่านใหม่ต้องยาวอย่างน้อย 6 ตัวอักษร และห้ามเป็น 1234 หรือรหัสนักศึกษา' });
             }
             return next();
+        }
+        if (key === 'POST /api/teacher/change-own-password') return next(); // ตรวจ token เองในเส้นทางนี้
+        if (user && user.typ === 'teacher' && user.mustChange) {
+            return res.status(403).json({ success: false, mustChangePassword: true, message: 'กรุณาตั้งรหัสผ่านใหม่ก่อนใช้งาน (บัญชียังใช้รหัสผ่านเริ่มต้น)' });
         }
         if (!enforce) return next();
         if (!user || user.typ !== 'teacher') {
@@ -236,6 +249,24 @@ function register(app, db, dataDir) {
         })().catch(() => res.status(500).json({ success: false, message: 'ตรวจสิทธิ์ไม่สำเร็จ' }));
     });
 
+    // 🔐 อาจารย์/แอดมินเปลี่ยนรหัสผ่านของตัวเอง (ใช้ตอนถูกบังคับเปลี่ยนรหัสเริ่มต้น และเปลี่ยนเองได้ตามปกติ)
+    app.post('/api/teacher/change-own-password', (req, res) => {
+        const user = req.authUser;
+        if (!user || user.typ !== 'teacher') return res.status(401).json({ success: false, authRequired: true, message: 'กรุณาเข้าสู่ระบบ' });
+        const oldPw = String((req.body && req.body.oldPassword) || ''), newPw = String((req.body && req.body.newPassword) || '');
+        if (isWeakTeacherPw(newPw, user.u)) return res.status(400).json({ success: false, message: 'รหัสผ่านใหม่ต้องยาวอย่างน้อย 8 ตัวอักษร ห้ามเป็น admin123 และห้ามซ้ำกับชื่อผู้ใช้' });
+        if (newPw === oldPw) return res.status(400).json({ success: false, message: 'รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสเดิม' });
+        db.get('SELECT id, password FROM teachers WHERE username = ?', [user.u], (err, row) => {
+            if (err) return res.status(500).json({ success: false, message: err.message });
+            if (!row || !verifyTeacherPassword(row.password, oldPw).ok) return res.status(401).json({ success: false, message: 'รหัสผ่านเดิมไม่ถูกต้อง' });
+            db.run('UPDATE teachers SET password = ? WHERE id = ?', [hashTeacherPassword(newPw), row.id], err2 => {
+                if (err2) return res.status(500).json({ success: false, message: err2.message });
+                console.log(`🔐 ${user.u} เปลี่ยนรหัสผ่านของตัวเองแล้ว`);
+                res.json({ success: true, token: auth.issue({ typ: 'teacher', u: user.u, role: user.role || 'teacher' }), message: 'ตั้งรหัสผ่านใหม่เรียบร้อย' });
+            });
+        });
+    });
+
     // 🔑 อาจารย์รีเซ็ตรหัสผ่านนักศึกษา → ได้รหัสชั่วคราว นักศึกษาต้องตั้งรหัสใหม่ตอนเข้าสู่ระบบครั้งถัดไป
     app.post('/api/teacher/reset-student-password', (req, res) => {
         const user = req.authUser;
@@ -266,4 +297,4 @@ function register(app, db, dataDir) {
     return auth;
 }
 
-module.exports = { register, hashTeacherPassword, verifyTeacherPassword };
+module.exports = { register, hashTeacherPassword, verifyTeacherPassword, DEFAULT_ADMIN_PASSWORD };

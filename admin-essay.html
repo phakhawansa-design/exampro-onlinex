@@ -2,11 +2,11 @@
 <html lang="th">
 <head>
     <script src="auth-client.js"></script>
+    <script src="trinetra-mark.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ตรวจอัตนัยด้วย AI - Tab-Lock Online Proctoring System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <title>ตรวจอัตนัยด้วย AI - ตรีเนตร e-Exam</title>
+    <script src="vendor/xlsx.full.min.js"></script><script>window.XLSX || document.write('<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>')</script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
     <style>
         html { font-size: 100%; -webkit-text-size-adjust: 100%; }
@@ -74,13 +74,13 @@
             flex-shrink: 0;
         }
         .nav-link:hover {
-            color: #1e3a8a; background: #eff6ff;
+            color: #0b2a7a; background: #eff6ff;
             border-color: #dbeafe; transform: translateX(3px);
         }
         .nav-link.active {
-            background: #1e3a8a;
+            background: #0b2a7a;
             color: #ffffff !important; font-weight: 600 !important;
-            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.25);
+            box-shadow: 0 4px 12px rgba(11,42,122, 0.25);
             border-color: transparent;
         }
         .nav-link.active svg { color: #ffffff; }
@@ -118,31 +118,32 @@
             cursor: pointer;
         }
         select.dark-select:focus, input.dark-input:focus {
-            border-color: #1e3a8a;
-            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
+            border-color: #0b2a7a;
+            box-shadow: 0 0 0 3px rgba(11,42,122, 0.15);
         }
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         textarea.dark-input { background:#fff; border:1px solid #cbd5e1; color:#1e293b; border-radius:12px; padding:8px 14px; font-size:13px; font-weight:500; font-family:'Kanit',sans-serif; outline:none; width:100%; }
-        textarea.dark-input:focus { border-color:#1e3a8a; box-shadow:0 0 0 3px rgba(30,58,138,.15); }
+        textarea.dark-input:focus { border-color:#0b2a7a; box-shadow:0 0 0 3px rgba(11,42,122,.15); }
     </style>
     <link rel="stylesheet" href="theme.css">
     <script src="theme.js" defer></script>
+    <link rel="stylesheet" href="tailwind.css">
 </head>
 <body class="flex h-screen overflow-hidden">
 
     <!-- ===== SIDEBAR ===== -->
     <aside id="sidebar">
         <div class="sidebar-inner p-4 space-y-4 flex-1 overflow-y-auto">
-            <!-- Logo Header with RMUTI Crest -->
+            <!-- Logo Header (ตรีเนตร e-Exam) -->
             <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
                 <div class="w-10 h-12 bg-white rounded-lg p-1 border border-slate-200 flex items-center justify-center shrink-0 shadow-xs">
-                    <img src="logo_university.png" alt="ตรามหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน" class="w-full h-full object-contain" />
+                    <img src="trinetra-logo.svg" alt="ตรีเนตร e-Exam" class="w-full h-full object-contain" />
                 </div>
                 <div class="leading-tight">
-                    <div class="font-bold text-base tracking-tight text-slate-900">Tab-Lock <span class="text-blue-700 font-extrabold">RMUTI</span></div>
-                    <div class="text-[10px] text-amber-700 font-bold uppercase tracking-wider">ระบบสอบออนไลน์ มทร.อีสาน</div>
+                    <div class="font-bold text-base tracking-tight text-slate-900">ตรีเนตร <span class="text-blue-700 font-extrabold">e-Exam</span></div>
+                    <div class="text-[10px] text-amber-700 font-bold uppercase tracking-wider">ตาที่ 3 ของอาจารย์</div>
                 </div>
             </div>
 
@@ -212,6 +213,10 @@
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" /></svg>
                             <span>10. ตรวจสอบพฤติกรรมน่าสงสัย</span>
                         </a>
+                        <a href="trinetra-report.html" class="nav-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                            <span>11. รายงานรวมรายคน</span>
+                        </a>
                     </div>
                 </div>
             </nav>
@@ -247,7 +252,7 @@
                 </button>
                 <div>
                     <h1 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">9. ตรวจอัตนัยด้วย AI <span id="ai-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">กำลังตรวจสอบ...</span></h1>
-                    <p class="text-xs text-slate-500 font-medium">มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน &middot; อ่านลายมือ ให้คะแนนตาม Rubric อาจารย์ยืนยันคะแนนสุดท้าย</p>
+                    <p class="text-xs text-slate-500 font-medium">ตรีเนตร e-Exam &middot; อ่านลายมือ ให้คะแนนตาม Rubric อาจารย์ยืนยันคะแนนสุดท้าย</p>
                 </div>
             </div>
             <div class="flex items-center gap-3 flex-wrap sm:flex-nowrap">
@@ -335,6 +340,8 @@
                 <button onclick="closeImport();openEditor()" class="shrink-0 px-3 rounded-xl text-xs font-semibold bg-slate-100">＋ งานใหม่</button></div></label>
             <div class="text-sm font-semibold text-slate-700 mb-1">2. รูปแบบไฟล์</div>
             <div class="space-y-2 mb-4 text-sm">
+                <label class="flex gap-2 items-start p-3 rounded-xl border border-amber-300 bg-amber-50/50 cursor-pointer"><input type="radio" name="im-mode" value="mark" class="mt-1">
+                    <span><b>อ่านรหัสตรีเนตรอัตโนมัติ</b> <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-white">แนะนำ</span><br><span class="text-xs text-slate-500">ใช้กับกระดาษที่พิมพ์จากปุ่ม "🖨️ พิมพ์กระดาษคำตอบ" สแกนทั้งห้องรวมเป็นไฟล์เดียว (หรือหลายไฟล์ก็ได้ ลำดับหน้าสลับกันได้) ระบบอ่านรหัสมุมขวาบน แยกแผ่นและใส่ชื่อ-รหัสนักศึกษาให้เอง</span></span></label>
                 <label class="flex gap-2 items-start p-3 rounded-xl border border-slate-200 cursor-pointer"><input type="radio" name="im-mode" value="one" checked class="mt-1">
                     <span><b>1 ไฟล์ = นักเรียน 1 คน</b><br><span class="text-xs text-slate-500">ใช้ชื่อไฟล์เป็นชื่อนักเรียน เช่น 6501_สมชาย.pdf (เลือกหลายไฟล์พร้อมกันได้)</span></span></label>
                 <label class="flex gap-2 items-start p-3 rounded-xl border border-slate-200 cursor-pointer"><input type="radio" name="im-mode" value="split" class="mt-1">
@@ -394,17 +401,17 @@
 
     <style>
         .tab-btn{padding:8px 16px;border-radius:12px;font-size:13px;font-weight:700;color:#64748b}
-        .tab-btn.on{background:#1e3a8a;color:#fff;box-shadow:0 4px 12px rgba(30,58,138,.25)}
+        .tab-btn.on{background:#0b2a7a;color:#fff;box-shadow:0 4px 12px rgba(11,42,122,.25)}
         .pill-s{display:inline-block;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700}
         .tbl th{font-size:12px;color:#64748b;text-align:left;padding:8px;border-bottom:1px solid #e2e8f0;white-space:nowrap}
         .tbl td{padding:8px;border-bottom:1px solid #f1f5f9;font-size:13px;vertical-align:top}
         .a-item{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:12px;border:1px solid #e2e8f0;background:#fff}
-        .a-item.on{border-color:#1e3a8a;background:#eff6ff;box-shadow:0 0 0 3px rgba(30,58,138,.12)}
+        .a-item.on{border-color:#0b2a7a;background:#eff6ff;box-shadow:0 0 0 3px rgba(11,42,122,.12)}
         #drop{border:2px dashed #cbd5e1;border-radius:16px;padding:24px;text-align:center;transition:.2s}
-        #drop.over{border-color:#1e3a8a;background:#eff6ff}
+        #drop.over{border-color:#0b2a7a;background:#eff6ff}
     </style>
 
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
     <script>
     const username = localStorage.getItem('teacher_username') || 'admin';
     const rawTeacherName = localStorage.getItem('teacher_name') || localStorage.getItem('teacherName') || '';
@@ -424,6 +431,14 @@
     }
 
     let assignments = [], courses = [], cur = null, curData = null, tab = 'upload', poll = null, roster = [];
+    // 👁️ ประวัติตาเฝ้าของนักศึกษาในรายวิชาเดียวกัน (ใช้จัดลำดับคิวตรวจและแสดงในตารางผล)
+    let watchMap = {}, watchFirst = false;
+    const normId = id => String(id || '').replace(/[^0-9a-zA-Z]/g, '').toLowerCase();
+    const watchOf = s => watchMap[normId(s.student_id)] || null;
+    const watchBadge = s => { const w = watchOf(s); if (!w || !w.total) return '';
+        const parts = [w.switch ? `สลับจอ ${w.switch}` : '', w.fs ? `ออกเต็มจอ ${w.fs}` : '', w.gap ? `หายจากจอ ${w.gap}` : '', w.multi ? `หลายเครื่อง ${w.multi}` : '', w.answer ? `ตอบ/แก้หลังกลับมา ${w.answer}` : ''].filter(Boolean).join(' · ');
+        return `<span class="pill-s bg-red-50 text-red-700" title="${esc(w.events.map(e => '[' + e.room + ' ' + e.time + '] ' + e.action).join('\n'))}">👁️ ตาเฝ้า ${w.total} ครั้ง${parts ? ' (' + parts + ')' : ''}</span>`; };
+    const byWatch = list => list.slice().sort((a, b) => ((watchOf(b) || {}).total || 0) - ((watchOf(a) || {}).total || 0));
 
     // ---------- init ----------
     (async () => {
@@ -527,8 +542,11 @@
         Object.assign(cur, { submission_count: subsAll.length, done_count: subsAll.filter(x => x.status === 'done').length,
             review_count: subsAll.reduce((t, x) => t + x.grades.filter(g => g.status === 'review').length, 0) });
         renderList();
-        roster = [];
-        if (cur.course_id) { try { roster = await api(`/api/courses/${cur.course_id}/students`); } catch (e) {} }
+        roster = []; watchMap = {};
+        if (cur.course_id) {
+            try { roster = await api(`/api/courses/${cur.course_id}/students`); } catch (e) {}
+            try { const rep = await api(`/api/trinetra/course-report?username=${U}&courseId=${cur.course_id}`); rep.students.forEach(x => { watchMap[normId(x.studentId)] = x.watch; }); } catch (e) {}
+        }
         renderDetail();
         clearTimeout(poll);
         if (curData.submissions.some(s => s.status === 'pending' || s.status === 'grading')) poll = setTimeout(() => openAssignment(id), 4000);
@@ -558,10 +576,13 @@
               <p class="text-xs text-slate-500 mt-1">PDF หรือภาพ (1 ไฟล์ = นักเรียน 1 คน) ไม่เกิน 30MB · เลือกหลายไฟล์ได้ จะใช้ชื่อไฟล์เป็นชื่อนักเรียน</p></div>
             <div id="u-msg" class="text-sm mt-3"></div>`;
         else if (tab === 'results') body = subs.length ? `
+            ${Object.keys(watchMap).length ? `<div class="flex flex-wrap items-center gap-2 mb-3 text-xs">
+              <label class="inline-flex items-center gap-1.5 font-semibold text-slate-600"><input type="checkbox" ${watchFirst ? 'checked' : ''} onchange="watchFirst=this.checked;renderDetail()"> ให้คนที่มีประวัติตาเฝ้าขึ้นก่อน</label>
+              <span class="text-slate-500">· ${subs.filter(x => (watchOf(x) || {}).total).length} คนมีประวัติสลับหน้าจอ/ออกจากหน้าสอบในวิชานี้</span></div>` : ''}
             <div class="overflow-x-auto"><table class="tbl w-full"><thead><tr><th>#</th><th>นักเรียน</th><th>สถานะ</th>
               ${curData.assignment.questions.map(q => `<th>ข้อ ${q.no}<br><span class="font-normal">/${q.maxScore}</span></th>`).join('')}<th>รวม /${maxTotal()}</th><th></th></tr></thead><tbody>
-            ${subs.map((s, i) => { const [t, c] = subState(s); return `<tr><td>${i + 1}</td>
-              <td><b>${esc(s.student_name || s.file_name)}</b><div class="text-xs text-slate-500">${esc(s.student_id)}</div></td>
+            ${(watchFirst ? byWatch(subs) : subs).map((s, i) => { const [t, c] = subState(s); return `<tr><td>${i + 1}</td>
+              <td><b>${esc(s.student_name || s.file_name)}</b><div class="text-xs text-slate-500">${esc(s.student_id)}</div>${watchBadge(s) ? `<div class="mt-1">${watchBadge(s)}</div>` : ''}</td>
               <td><span class="pill-s ${c}">${t}</span>${s.error ? `<div class="text-xs text-red-600 max-w-[220px]">${esc(s.error)}</div>` : ''}</td>
               ${curData.assignment.questions.map(q => { const g = s.grades.find(x => x.question_no == q.no); return `<td class="${g && g.status === 'review' ? 'text-amber-600 font-bold' : ''}">${g ? (g.final_score ?? g.ai_score) : '–'}</td>`; }).join('')}
               <td class="font-bold">${s.status === 'done' ? total(s) : '–'}</td>
@@ -570,9 +591,9 @@
                 <button onclick="regrade(${s.id})" class="text-slate-500 text-xs">ตรวจใหม่</button> ·
                 <button onclick="delSub(${s.id})" class="text-red-500 text-xs">ลบ</button></td></tr>`; }).join('')}
             </tbody></table></div>` : '<p class="text-slate-500">ยังไม่มีไฟล์ อัปโหลดที่แท็บ "อัปโหลดกระดาษคำตอบ"</p>';
-        else body = reviewN ? subs.filter(s => s.grades.some(g => g.status === 'review')).map(s => `
+        else body = reviewN ? (Object.keys(watchMap).length ? '<p class="text-xs text-slate-500 mb-2">👁️ เรียงคนที่มีประวัติตาเฝ้า (สลับหน้าจอ/ออกจากหน้าสอบ) ในวิชานี้ขึ้นก่อน เพื่อให้ตรวจละเอียดเป็นลำดับแรก</p>' : '') + byWatch(subs.filter(s => s.grades.some(g => g.status === 'review'))).map(s => `
             <div class="flex justify-between items-center border border-amber-200 bg-amber-50/50 rounded-xl p-3 mb-2">
-              <div><b>${esc(s.student_name || s.file_name)}</b> <span class="text-xs text-slate-500">${esc(s.student_id)}</span>
+              <div><b>${esc(s.student_name || s.file_name)}</b> <span class="text-xs text-slate-500">${esc(s.student_id)}</span> ${watchBadge(s)}
                 <div class="text-xs text-amber-700">ข้อ ${s.grades.filter(g => g.status === 'review').map(g => g.question_no).join(', ')} · AI ไม่มั่นใจ</div></div>
               <button onclick="openReview(${s.id})" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-amber-500">ตรวจทาน</button></div>`).join('')
             : '<p class="text-emerald-700">✓ ไม่มีข้อที่รอตรวจทาน</p>';
@@ -581,10 +602,12 @@
             <div class="flex flex-wrap justify-between items-start gap-3 mb-4">
               <div><h2 class="text-xl font-bold text-slate-800">${esc(cur.title)}</h2>
                 <p class="text-xs text-slate-500">${curData.assignment.questions.length} ข้อ · คะแนนเต็ม ${maxTotal()} · ${subs.length} ไฟล์</p></div>
-              <div class="flex gap-2 text-xs font-semibold">
+              <div class="flex flex-wrap gap-2 text-xs font-semibold">
                 <button onclick="openEditor(cur)" class="px-3 py-2 rounded-xl bg-slate-100">✏️ แก้ไขงาน</button>
+                <button onclick="printSheets()" class="px-3 py-2 rounded-xl bg-amber-50 text-amber-800">🖨️ พิมพ์กระดาษคำตอบ</button>
                 <button onclick="exportXlsx()" class="px-3 py-2 rounded-xl bg-emerald-50 text-emerald-700">📊 ส่งออก Excel</button>
                 ${cur.course_id ? `<button onclick="exportCourse(${cur.course_id})" class="px-3 py-2 rounded-xl bg-indigo-50 text-indigo-700">📚 คะแนนรวมรายวิชา (ปรนัย+อัตนัย)</button>` : ''}
+                ${cur.course_id ? `<a href="trinetra-report.html?courseId=${cur.course_id}" class="px-3 py-2 rounded-xl bg-blue-900 text-white">👁️ รายงานรวมรายคน (ตาเฝ้า+ตาอ่าน)</a>` : ''}
                 <button onclick="delAssignment()" class="px-3 py-2 rounded-xl bg-red-50 text-red-600">ลบงาน</button></div></div>
             <div class="flex flex-wrap gap-1 mb-5 bg-slate-50 p-1 rounded-2xl w-fit">
               <button class="tab-btn ${tab === 'upload' ? 'on' : ''}" onclick="setTab('upload')">1. อัปโหลดกระดาษคำตอบ</button>
@@ -644,11 +667,18 @@
         $('#im-file').addEventListener('change', ev => { importFiles([...ev.target.files]); ev.target.value = ''; });
     })();
     let pdfLibP = null;
-    const loadPdfLib = () => pdfLibP || (pdfLibP = new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js'; s.onload = () => ok(window.PDFLib); s.onerror = () => no(new Error('โหลดตัวแยก PDF ไม่ได้ (ต้องต่ออินเทอร์เน็ต)')); document.head.append(s); }));
+    // 📦 ใช้ไฟล์ในโปรเจกต์ก่อน (vendor/) ถ้าไม่มีค่อยโหลดจากอินเทอร์เน็ต
+    const loadScript = src => new Promise((ok, no) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); });
+    const loadPdfLib = () => pdfLibP || (pdfLibP = loadScript('vendor/pdf-lib.min.js')
+        .catch(() => loadScript('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js'))
+        .then(() => { if (!window.PDFLib) throw 0; return window.PDFLib; })
+        .catch(() => { pdfLibP = null; throw new Error('โหลดตัวแยกไฟล์ PDF ไม่ได้'); }));
     const b64 = u8 => { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); };
     async function importFiles(files) {
         const aid = Number($('#im-a').value), msg = $('#im-msg');
-        const split = document.querySelector('input[name=im-mode]:checked').value === 'split';
+        const mode = document.querySelector('input[name=im-mode]:checked').value;
+        if (mode === 'mark') return importByMark(files, aid, msg);
+        const split = mode === 'split';
         const per = Math.max(1, parseInt($('#im-n').value) || 1);
         const jobs = [];
         try {
@@ -679,6 +709,92 @@
         }
         msg.innerHTML = `<span class="text-emerald-700">✓ นำเข้า ${ok}/${jobs.length} ไฟล์แล้ว AI กำลังตรวจ</span>`;
         if (ok) { tab = 'results'; setTimeout(closeImport, 900); await loadList(aid); }
+    }
+
+
+    // ---------- พิมพ์กระดาษคำตอบ + อ่านรหัสตรีเนตร ----------
+    function printSheets() {
+        if (!cur) return;
+        if (!cur.course_id) return alert('งานนี้ยังไม่ได้ผูกกับรายวิชา\nกด "✏️ แก้ไขงาน" แล้วเลือกรายวิชาก่อน ระบบจะดึงรายชื่อนักศึกษามาพิมพ์บนกระดาษให้');
+        window.open('essay-sheets.html?assignmentId=' + cur.id, '_blank');
+    }
+    let pdfjsP = null;
+    const loadPdfJs = () => pdfjsP || (pdfjsP = import(new URL('vendor/pdfjs/pdf.min.js', location.href).href)
+        .then(m => { m.GlobalWorkerOptions.workerSrc = new URL('vendor/pdfjs/pdf.worker.min.js', location.href).href; return m; })
+        .catch(() => import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs').then(m => {
+            m.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs'; return m; }))
+        .catch(() => { pdfjsP = null; throw new Error('โหลดตัวอ่าน PDF ไม่ได้'); }));
+    const canvasJpeg = cv => new Promise(ok => cv.toBlob(b => b.arrayBuffer().then(x => ok(new Uint8Array(x))), 'image/jpeg', 0.85));
+    async function importByMark(files, aid, msg) {
+        const a = assignments.find(x => x.id == aid);
+        if (!a || !a.course_id) { msg.innerHTML = '<span class="text-red-600">งานนี้ยังไม่ได้ผูกกับรายวิชา จึงจับชื่อนักศึกษาไม่ได้ กด "✏️ แก้ไขงาน" เลือกรายวิชาก่อน หรือใช้โหมดอื่น</span>'; return; }
+        if (!window.TrinetraMark) { msg.innerHTML = '<span class="text-red-600">ไม่พบไฟล์ trinetra-mark.js บนเซิร์ฟเวอร์</span>'; return; }
+        let ros = [], items = [];
+        const docs = [];   // PDFLib document ต่อไฟล์ (ใช้คัดลอกหน้า)
+        try {
+            ros = await api(`/api/courses/${a.course_id}/students`);
+            const [pdfjs, { PDFDocument }] = await Promise.all([loadPdfJs(), loadPdfLib()]);
+            for (const [fi, f] of files.entries()) {
+                if (f.type === 'application/pdf' || /\.pdf$/i.test(f.name)) {
+                    const bytes = new Uint8Array(await f.arrayBuffer());
+                    docs[fi] = await PDFDocument.load(bytes.slice(), { ignoreEncryption: true });
+                    const pdf = await pdfjs.getDocument({ data: bytes.slice() }).promise;
+                    for (let p = 1; p <= pdf.numPages; p++) {
+                        msg.innerHTML = `⏳ กำลังอ่านรหัส ${esc(f.name)} หน้า ${p}/${pdf.numPages}...`;
+                        const pg = await pdf.getPage(p), vp0 = pg.getViewport({ scale: 1 });
+                        const vp = pg.getViewport({ scale: Math.min(2.2, 1400 / Math.min(vp0.width, vp0.height)) });
+                        const cv = document.createElement('canvas'); cv.width = Math.round(vp.width); cv.height = Math.round(vp.height);
+                        const cx = cv.getContext('2d', { willReadFrequently: true }); cx.fillStyle = '#fff'; cx.fillRect(0, 0, cv.width, cv.height);
+                        await pg.render({ canvasContext: cx, viewport: vp }).promise;
+                        items.push({ file: f.name, fi, pi: p - 1, label: `${f.name} หน้า ${p}`, code: TrinetraMark.decodeCanvas(cv) });
+                    }
+                } else if (/^image\//.test(f.type)) {
+                    msg.innerHTML = `⏳ กำลังอ่านรหัส ${esc(f.name)}...`;
+                    const img = new Image(); img.src = URL.createObjectURL(f); await img.decode();
+                    const k = Math.min(1, 2400 / Math.max(img.naturalWidth, img.naturalHeight));
+                    const cv = document.createElement('canvas'); cv.width = Math.round(img.naturalWidth * k); cv.height = Math.round(img.naturalHeight * k);
+                    cv.getContext('2d', { willReadFrequently: true }).drawImage(img, 0, 0, cv.width, cv.height); URL.revokeObjectURL(img.src);
+                    items.push({ file: f.name, jpg: await canvasJpeg(cv), w: cv.width, h: cv.height, label: f.name, code: TrinetraMark.decodeCanvas(cv) });
+                }
+            }
+            // จัดกลุ่มตามนักศึกษา
+            const groups = new Map(), unknown = [], other = [];
+            for (const it of items) {
+                if (!it.code) unknown.push(it);
+                else if (it.code.assignmentId !== aid) other.push(it);
+                else { if (!groups.has(it.code.rosterId)) groups.set(it.code.rosterId, []); groups.get(it.code.rosterId).push(it); }
+            }
+            const build = async list => {
+                const out = await PDFDocument.create();
+                for (const it of list) {
+                    if (it.jpg) { const im = await out.embedJpg(it.jpg), pw = 595.28, ph = pw * it.h / it.w; out.addPage([pw, ph]).drawImage(im, { x: 0, y: 0, width: pw, height: ph }); }
+                    else { const [cp] = await out.copyPages(docs[it.fi], [it.pi]); out.addPage(cp); }
+                }
+                return b64(await out.save());
+            };
+            const jobs = [];
+            for (const [rid, list] of groups) {
+                list.sort((x, y) => x.code.page - y.code.page);
+                const r = ros.find(x => x.id == rid);
+                const name = r ? `${r.prefix || ''}${r.firstName || ''} ${r.lastName || ''}`.replace(/\s+/g, ' ').trim() : `ไม่พบในรายชื่อ (รหัสในระบบ #${rid})`;
+                const pages = list.map(x => x.code.page), dup = pages.length !== new Set(pages).size;
+                jobs.push({ sid: r ? r.studentId : '', name, fileName: `${r ? r.studentId : 'rid' + rid}_${name}.pdf`, mime: 'application/pdf', data: await build(list), note: dup ? 'มีแผ่นซ้ำ' : '' });
+            }
+            for (const it of unknown.concat(other)) jobs.push({ sid: '', name: `ไม่พบรหัส: ${it.label}`, fileName: it.label.replace(/[\\/:*?"<>|]/g, '_') + '.pdf', mime: 'application/pdf', data: await build([it]), note: other.includes(it) ? 'เป็นกระดาษของงานอื่น' : 'อ่านรหัสไม่ได้' });
+            const sizeErr = jobs.find(j => j.data.length * 0.75 > 30 * 1024 * 1024);
+            if (sizeErr) throw new Error(`${sizeErr.fileName}: ไฟล์ใหญ่เกิน 30MB`);
+            let ok = 0;
+            for (const [i, j] of jobs.entries()) {
+                msg.innerHTML = `⏳ กำลังอัปโหลด ${i + 1}/${jobs.length}: ${esc(j.name)}`;
+                try { await api('/api/essay/submissions', { body: { assignmentId: aid, fileName: j.fileName, mime: j.mime, dataBase64: j.data, studentId: j.sid, studentName: j.name } }); ok++; }
+                catch (e) { msg.innerHTML += `<div class="text-red-600">${esc(j.name)}: ${esc(e.message)}</div>`; }
+            }
+            const bad = unknown.length + other.length;
+            msg.innerHTML = `<div class="text-emerald-700">✓ อ่านรหัสได้ ${items.length - bad}/${items.length} หน้า · แยกได้ ${groups.size} คน · อัปโหลด ${ok}/${jobs.length} ไฟล์ AI กำลังตรวจ</div>` +
+                (bad ? `<div class="text-amber-700 mt-1">⚠️ ${bad} หน้าอ่านรหัสไม่ได้หรือเป็นของงานอื่น ถูกนำเข้าแยกเป็น "ไม่พบรหัส" ให้กด <b>แก้ชื่อ</b> ในแท็บผลคะแนน</div>` : '') +
+                (jobs.some(j => j.note === 'มีแผ่นซ้ำ') ? '<div class="text-amber-700 mt-1">⚠️ บางคนมีแผ่นเดียวกันสแกนซ้ำ ตรวจไฟล์ของคนนั้นอีกครั้ง</div>' : '');
+            if (ok) { tab = 'results'; await loadList(aid); setTimeout(() => { if (!bad) closeImport(); }, 1800); }
+        } catch (e) { msg.innerHTML = `<span class="text-red-600">${esc(e.message)}</span>`; }
     }
 
     async function upload(files) {
@@ -803,10 +919,10 @@
         try {
             const d = await api(`/api/essay/course-summary?username=${U}&courseId=${courseId}`);
             const c = courses.find(x => x.id == courseId) || {};
-            const head = ['รหัสนักเรียน', 'ชื่อ-สกุล', ...d.columns.map(x => `${x.label} (/${x.max})`), 'รวม', `เต็ม (${d.columns.reduce((t, x) => t + x.max, 0)})`, 'ร้อยละ'];
+            const head = ['รหัสนักเรียน', 'ชื่อ-สกุล', ...d.columns.map(x => `${x.label} (/${x.max})`), 'รวม', `เต็ม (${d.columns.reduce((t, x) => t + x.max, 0)})`, 'ร้อยละ', 'ตาเฝ้า (ครั้ง)'];
             const totalMax = d.columns.reduce((t, x) => t + x.max, 0);
             const rows = d.students.map(s => { const sc = d.columns.map(x => s.scores[x.key] ?? ''); const sum = sc.reduce((t, v) => t + (Number(v) || 0), 0);
-                return [s.studentId, s.name, ...sc, sum, totalMax, totalMax ? +(sum / totalMax * 100).toFixed(1) : '']; });
+                return [s.studentId, s.name, ...sc, sum, totalMax, totalMax ? +(sum / totalMax * 100).toFixed(1) : '', (watchMap[normId(s.studentId)] || {}).total || 0]; });
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([head, ...rows]), 'คะแนนรวม');
             XLSX.writeFile(wb, `คะแนนรวม_${c.courseCode || courseId}.xlsx`);

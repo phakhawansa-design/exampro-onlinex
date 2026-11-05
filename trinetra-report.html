@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="auth-client.js"></script>
+<title>รายงานรวมรายคน · ตรีเนตร e-Exam</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2215%22%20fill%3D%22%230d3b8e%22/%3E%3Cpath%20d%3D%22M8%2033c8-11%2040-12%2048-2-8%2011-40%2012-48%202z%22%20fill%3D%22%23eef4ff%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%229%22%20fill%3D%22%232a8cf0%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%223.5%22%20fill%3D%22%23021033%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0d3b8e;--navy2:#082a6b;--or:#e8663d;--gold:#f6b818;--ink:#14213d;--mut:#5b6b82;--line:#e3e9f3;--bg:#f3f6fb;--card:#fff;--red:#d64045;--amber:#b7791f;--green:#0f8a5f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Kanit,"Leelawadee UI",Tahoma,sans-serif;font-size:15px}
+a{color:inherit}
+header{background:linear-gradient(120deg,var(--navy2),var(--navy) 60%,#1450b8);color:#fff;padding:18px 20px 64px}
+.top{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.nlogo{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:rgba(255,255,255,.12);box-shadow:0 0 0 2px rgba(255,255,255,.8);flex:none}
+.nlogo svg{width:38px;height:19px;overflow:visible}
+.top h1{margin:0;font-size:21px;font-weight:600;line-height:1.25}
+.top h1 small{display:block;font-size:13px;font-weight:400;opacity:.8}
+.back{margin-left:auto;text-decoration:none;font-size:14px;padding:8px 14px;border-radius:99px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25)}
+main{max-width:1240px;margin:-44px auto 40px;padding:0 16px}
+.panel{background:var(--card);border-radius:20px;box-shadow:0 14px 40px -24px rgba(13,59,142,.45);padding:18px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+select,input[type=search]{font:inherit;font-size:14.5px;padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);min-width:0}
+#course{flex:1 1 280px;font-weight:500}
+.btn{font:inherit;font-size:14px;font-weight:500;border:0;border-radius:12px;padding:10px 14px;cursor:pointer;background:#e9eef7;color:var(--navy);white-space:nowrap}
+.btn.pr{background:var(--navy);color:#fff}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
+.card{background:var(--card);border-radius:16px;padding:14px 16px;border:1px solid var(--line)}
+.card b{display:block;font-size:26px;font-weight:600;line-height:1.1}
+.card span{font-size:13px;color:var(--mut)}
+.card.w b{color:var(--red)}
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:4px 0 12px}
+.tools label{font-size:14px;color:var(--mut);display:flex;align-items:center;gap:6px}
+.note{font-size:12.5px;color:var(--mut);margin:0 0 10px}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+table{width:100%;border-collapse:collapse;font-size:14px;background:#fff}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:#f7f9fd;font-weight:600;font-size:12.5px;color:var(--mut);position:sticky;top:0;white-space:nowrap}
+th .ty{display:inline-block;font-size:10.5px;padding:1px 6px;border-radius:99px;margin-bottom:2px}
+.ty.mc{background:#e6efff;color:var(--navy)}.ty.essay{background:#fff3d6;color:#8a5a00}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.st:hover td{background:#fafcff}
+tr.flag td:first-child{box-shadow:inset 4px 0 0 var(--red)}
+.nm b{font-weight:500}.nm small{display:block;color:var(--mut);font-size:12px}
+.chips{display:flex;gap:4px;flex-wrap:wrap}
+.chip{font-size:12px;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.c-multi{background:#fde2f1;color:#a3195b}.c-ans{background:#e6f4ff;color:#0b5cad}.c-switch{background:#fde8e8;color:var(--red)}.c-fs{background:#efe7ff;color:#6a3fc2}.c-gap{background:#fff1dc;color:var(--amber)}.c-other{background:#eef1f5;color:var(--mut)}.c-ok{background:#e2f6ee;color:var(--green)}
+.xb{font:inherit;font-size:12.5px;border:0;background:none;color:var(--navy);cursor:pointer;padding:2px 4px;white-space:nowrap}
+tr.det td{background:#fbfcff;padding:4px 14px 14px}
+.ev{display:grid;grid-template-columns:72px 1fr;gap:4px 12px;font-size:13.5px;margin-top:8px;position:sticky;left:14px;max-width:min(1100px,calc(100vw - 80px))}
+.ev .rm{grid-column:1/-1;font-weight:600;color:var(--navy);margin-top:6px}
+.ev time{color:var(--mut);font-variant-numeric:tabular-nums}
+.empty{padding:40px 10px;text-align:center;color:var(--mut)}
+@media(max-width:820px){.cards{grid-template-columns:repeat(2,1fr)}header{padding-bottom:58px}.top h1{font-size:18px}.ev{grid-template-columns:1fr}.ev time{margin-top:6px}}
+@media print{header,.tools .btn,.back,#course,.noprint{display:none!important}main{margin:0;padding:0}.panel{box-shadow:none;padding:0}body{background:#fff}tr.det{display:table-row!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <span class="nlogo"><svg viewBox="0 0 600 300" aria-hidden="true"><path d="M40,160 C130,60 470,50 560,140 C480,250 140,262 40,160Z" fill="#eef4ff"/><circle cx="305" cy="155" r="82" fill="#2a8cf0"/><circle cx="305" cy="155" r="82" fill="none" stroke="#04174a" stroke-width="10"/><circle cx="305" cy="155" r="30" fill="#021033"/><ellipse cx="272" cy="120" rx="22" ry="13" fill="#fff"/><path d="M28,162 C125,52 475,40 572,138" fill="none" stroke="#ffcf4a" stroke-width="22" stroke-linecap="round"/></svg></span>
+    <h1>รายงานรวมรายคน · ตาเฝ้า + ตาอ่าน<small>คะแนนปรนัย อัตนัย และประวัติระหว่างสอบของนักศึกษาแต่ละคนในหน้าเดียว</small></h1>
+    <a class="back" href="dashboard.html">← กลับหน้าจัดการ</a>
+  </div>
+</header>
+<main>
+  <div class="panel">
+    <div class="row">
+      <select id="course" aria-label="เลือกรายวิชา"><option value="">กำลังโหลดรายวิชา...</option></select>
+      <button class="btn" id="b-csv">⬇️ ดาวน์โหลด CSV (Excel)</button>
+      <button class="btn" id="b-print">🖨️ พิมพ์</button>
+    </div>
+    <div class="cards" id="cards"></div>
+    <div class="tools noprint">
+      <input type="search" id="q" placeholder="ค้นหารหัสหรือชื่อ" style="flex:1 1 200px">
+      <select id="sort" aria-label="เรียงลำดับ">
+        <option value="watch">เรียง: ประวัติตาเฝ้ามากสุดก่อน</option>
+        <option value="id">เรียง: รหัสนักศึกษา</option>
+        <option value="low">เรียง: คะแนนรวมน้อยสุดก่อน</option>
+        <option value="high">เรียง: คะแนนรวมมากสุดก่อน</option>
+      </select>
+      <label><input type="checkbox" id="only"> เฉพาะคนที่มีประวัติตาเฝ้า</label>
+    </div>
+    <p class="note">ประวัติตาเฝ้า: <span class="chip c-switch">สลับหน้าจอ</span> <span class="chip c-fs">ออกเต็มจอ</span> <span class="chip c-gap">หายจากหน้าสอบ</span> <span class="chip c-multi">หลายเครื่อง</span> <span class="chip c-ans">ตอบ/แก้หลังกลับมา</span> · ใช้ประกอบการพิจารณาเท่านั้น การสลับหน้าจอไม่ได้แปลว่าทุจริตเสมอ (เช่น เน็ตหลุด มีสายเรียกเข้า)</p>
+    <div class="tw" id="tw"><div class="empty">เลือกรายวิชาเพื่อดูรายงาน</div></div>
+  </div>
+</main>
+<script>
+(function () {
+  const U = localStorage.getItem('teacher_username');
+  if (!U) { location.href = 'teacher-login.html'; return; }
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const KIND = { switch: ['สลับหน้าจอ', 'c-switch'], fs: ['ออกเต็มจอ', 'c-fs'], gap: ['หายจากหน้าสอบ', 'c-gap'], multi: ['หลายเครื่อง', 'c-multi'], other: ['อื่น ๆ', 'c-other'], answer: ['ตอบ/แก้หลังกลับมา', 'c-ans'] };
+  let data = null, open = new Set();
+
+  async function api(url) {
+    const r = await fetch(url); const j = await r.json().catch(() => ({}));
+    if (!r.ok || j.success === false) throw new Error(j.message || 'โหลดข้อมูลไม่สำเร็จ');
+    return j;
+  }
+  async function init() {
+    try {
+      const cs = await api(`/api/teacher/courses?username=${encodeURIComponent(U)}`);
+      const want = new URLSearchParams(location.search).get('courseId');
+      $('course').innerHTML = cs.length
+        ? cs.map(c => `<option value="${c.id}" ${String(c.id) === want ? 'selected' : ''}>${esc(c.courseCode || '')} ${esc(c.courseName || '')}${c.semester ? ' · ' + esc(c.semester) : ''}</option>`).join('')
+        : '<option value="">ยังไม่มีรายวิชา</option>';
+      if (cs.length) load();
+    } catch (e) { $('tw').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+  }
+  async function load() {
+    const id = $('course').value; if (!id) return;
+    history.replaceState(null, '', '?courseId=' + id);
+    $('tw').innerHTML = '<div class="empty">กำลังโหลด...</div>';
+    try { data = await api(`/api/trinetra/course-report?username=${encodeURIComponent(U)}&courseId=${id}`); open = new Set(); render(); }
+    catch (e) { data = null; $('cards').innerHTML = ''; $('tw').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+  }
+  const chips = w => (w.total || w.answer)
+    ? ['switch', 'fs', 'gap', 'multi', 'other', 'answer'].filter(k => w[k]).map(k => `<span class="chip ${KIND[k][1]}">${KIND[k][0]} ${w[k]}</span>`).join('')
+    : '<span class="chip c-ok">ไม่มีประวัติ</span>';
+  function rows() {
+    const qv = $('q').value.trim().toLowerCase(), only = $('only').checked, so = $('sort').value;
+    let list = data.students.filter(s => (!only || s.watch.total) && (!qv || (s.studentId + ' ' + s.name).toLowerCase().includes(qv)));
+    const by = { id: (a, b) => a.studentId.localeCompare(b.studentId), watch: (a, b) => b.watch.total - a.watch.total || a.studentId.localeCompare(b.studentId),
+      low: (a, b) => a.total - b.total, high: (a, b) => b.total - a.total };
+    return list.sort(by[so] || by.id);
+  }
+  function render() {
+    const d = data, avg = d.students.length && d.totalMax ? (d.students.reduce((t, s) => t + (s.percent || 0), 0) / d.students.length).toFixed(1) : '–';
+    $('cards').innerHTML = `
+      <div class="card"><b>${d.summary.students}</b><span>นักศึกษาในรายงาน</span></div>
+      <div class="card w"><b>${d.summary.watched}</b><span>คนที่มีประวัติตาเฝ้า</span></div>
+      <div class="card"><b>${d.summary.events}</b><span>เหตุการณ์ตาเฝ้าทั้งหมด</span></div>
+      <div class="card"><b>${avg}${avg === '–' ? '' : '%'}</b><span>คะแนนรวมเฉลี่ย (${d.columns.length} รายการ)</span></div>`;
+    const list = rows();
+    if (!d.students.length) { $('tw').innerHTML = '<div class="empty">ยังไม่มีข้อมูลนักศึกษาในรายวิชานี้</div>'; return; }
+    const cols = d.columns, span = cols.length + 6;
+    $('tw').innerHTML = `<table><thead><tr><th>รหัส</th><th>ชื่อ-สกุล</th>
+      ${cols.map(c => `<th class="n"><span class="ty ${c.type}">${c.type === 'mc' ? 'ปรนัย' : 'อัตนัย'}</span><br>${esc(c.label)}<br>/${c.max || '–'}</th>`).join('')}
+      <th class="n">รวม<br>/${d.totalMax}</th><th class="n">%</th><th>ตาเฝ้า</th><th class="noprint"></th></tr></thead><tbody>
+      ${list.map(s => {
+        const k = s.studentId, isOpen = open.has(k);
+        return `<tr class="st ${s.watch.total ? 'flag' : ''}"><td>${esc(k)}</td><td class="nm"><b>${esc(s.name || '–')}</b>${s.class ? `<small>${esc(s.class)}</small>` : ''}</td>
+          ${cols.map(c => `<td class="n">${s.scores[c.key] ?? '–'}</td>`).join('')}
+          <td class="n"><b>${s.total}</b></td><td class="n">${s.percent ?? '–'}</td>
+          <td><div class="chips">${chips(s.watch)}</div></td>
+          <td class="noprint">${(s.watch.total || s.watch.answer) ? `<button class="xb" data-k="${esc(k)}">${isOpen ? 'ซ่อน ▴' : 'ดูรายละเอียด ▾'}</button>` : ''}</td></tr>` +
+          (isOpen || (s.watch.total && window.matchMedia('print').matches) ? detail(s, span) : '');
+      }).join('')}
+      </tbody></table>`;
+  }
+  function detail(s, span) {
+    const byRoom = {};
+    s.watch.events.forEach(e => (byRoom[e.room] = byRoom[e.room] || []).push(e));
+    return `<tr class="det"><td colspan="${span}"><div class="ev">${Object.entries(byRoom).map(([room, ev]) =>
+      `<div class="rm">📝 ${esc(room)} · ${ev.length} ครั้ง</div>` + ev.map(e => `<time>${esc(e.time)}</time><div><span class="chip ${KIND[e.kind][1]}">${KIND[e.kind][0]}</span> ${esc(e.action)}</div>`).join('')
+    ).join('')}</div></td></tr>`;
+  }
+  function csv() {
+    if (!data) return;
+    const cols = data.columns, q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const head = ['รหัส', 'ชื่อ-สกุล', 'ชั้นเรียน', ...cols.map(c => `${c.type === 'mc' ? 'ปรนัย' : 'อัตนัย'}: ${c.label} (/${c.max})`), `รวม (/${data.totalMax})`, 'ร้อยละ', 'สลับหน้าจอ', 'ออกเต็มจอ', 'หายจากหน้าสอบ', 'หลายเครื่อง', 'ตอบ/แก้หลังกลับมา', 'รายละเอียดตาเฝ้า'];
+    const lines = [head, ...rows().map(s => [s.studentId, s.name, s.class, ...cols.map(c => s.scores[c.key] ?? ''), s.total, s.percent ?? '', s.watch.switch, s.watch.fs, s.watch.gap, s.watch.multi, s.watch.answer,
+      s.watch.events.map(e => `[${e.room} ${e.time}] ${e.action}`).join(' | ')])];
+    const blob = new Blob(['﻿' + lines.map(r => r.map(q).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = `รายงานรวม_${data.course.code || data.course.id}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  }
+  $('course').addEventListener('change', load);
+  ['q', 'sort', 'only'].forEach(id => $(id).addEventListener(id === 'q' ? 'input' : 'change', () => data && render()));
+  $('tw').addEventListener('click', e => { const b = e.target.closest('.xb'); if (!b) return; const k = b.dataset.k; open.has(k) ? open.delete(k) : open.add(k); render(); });
+  $('b-csv').addEventListener('click', csv);
+  $('b-print').addEventListener('click', () => { if (data) { data.students.forEach(s => s.watch.total && open.add(s.studentId)); render(); } window.print(); });
+  init();
+})();
+</script>
+</body>
+</html>

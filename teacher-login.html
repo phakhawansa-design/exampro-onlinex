@@ -10,9 +10,8 @@
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>เข้าสู่ระบบอาจารย์ - Tab-Lock Online Proctoring System</title>
-  <meta name="description" content="ระบบเข้าสู่ระบบสำหรับอาจารย์ผู้สอน Tab-Lock Online Proctoring System" />
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>เข้าสู่ระบบอาจารย์ - ตรีเนตร e-Exam</title>
+  <meta name="description" content="ระบบเข้าสู่ระบบสำหรับอาจารย์ผู้สอน ตรีเนตร e-Exam" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
     <style>
         html { font-size: 100%; -webkit-text-size-adjust: 100%; }
@@ -20,7 +19,7 @@
     body {
       margin: 0;
       font-family: 'Kanit', 'Inter', sans-serif;
-      background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #faf5ff 100%);
+      background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #eef4ff 100%);
       color: #334155;
       min-height: 100vh;
       overflow-x: hidden;
@@ -30,8 +29,8 @@
     .grid-overlay {
       position: fixed; inset: 0;
       background-image:
-        linear-gradient(rgba(99,102,241,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(99,102,241,0.02) 1px, transparent 1px);
+        linear-gradient(rgba(47,107,236,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(47,107,236,0.02) 1px, transparent 1px);
       background-size: 60px 60px;
       pointer-events: none; z-index: 0;
     }
@@ -47,7 +46,7 @@
     }
     .blob-2 {
       width: 320px; height: 320px;
-      background: radial-gradient(circle, rgba(139, 92, 246, 0.04) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(21,87,224, 0.04) 0%, transparent 70%);
       bottom: -100px; right: -100px;
       animation: radial-pulse 10s ease-in-out infinite reverse;
     }
@@ -63,7 +62,7 @@
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
       border: 1px solid rgba(226, 232, 240, 0.8);
-      border-top: 1px solid rgba(6, 182, 212, 0.25);
+      border-top: 1px solid rgba(34,195,230, 0.25);
       box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
       border-radius: 24px;
     }
@@ -83,21 +82,21 @@
     }
     .glass-input::placeholder { color: #94a3b8; }
     .glass-input:focus {
-      border-color: #06b6d4;
+      border-color: #22c3e6;
       background: #ffffff;
-      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+      box-shadow: 0 0 0 3px rgba(34,195,230, 0.15);
     }
 
     /* Submit button */
     .btn-submit {
-      background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
-      box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2);
+      background: linear-gradient(135deg, #22c3e6 0%, #1557e0 100%);
+      box-shadow: 0 4px 15px rgba(34,195,230, 0.2);
       transition: all 0.3s ease;
       border: none;
       cursor: pointer;
     }
     .btn-submit:hover:not(:disabled) {
-      box-shadow: 0 4px 20px rgba(6, 182, 212, 0.35);
+      box-shadow: 0 4px 20px rgba(34,195,230, 0.35);
       transform: translateY(-2px);
     }
     .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
@@ -108,10 +107,10 @@
       color: #64748b; padding: 0;
       transition: color 0.2s;
     }
-    .toggle-pass:hover { color: #06b6d4; }
+    .toggle-pass:hover { color: #22c3e6; }
 
     /* Links */
-    .link-primary { color: #06b6d4; transition: color 0.2s; }
+    .link-primary { color: #22c3e6; transition: color 0.2s; }
     .link-primary:hover { color: #22d3ee; }
     .link-secondary { color: #64748b; transition: color 0.2s; font-size: 0.8rem; }
     .link-secondary:hover { color: #cbd5e1; }
@@ -131,8 +130,8 @@
 
     /* Shield badge */
     .shield-badge {
-      background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(139, 92, 246, 0.1));
-      border: 1px solid rgba(6, 182, 212, 0.2);
+      background: linear-gradient(135deg, rgba(34,195,230, 0.1), rgba(21,87,224, 0.1));
+      border: 1px solid rgba(34,195,230, 0.2);
       border-radius: 16px;
       padding: 10px;
       display: inline-flex;
@@ -140,8 +139,8 @@
       animation: shield-glow 3s ease-in-out infinite;
     }
     @keyframes shield-glow {
-      0%, 100% { box-shadow: 0 0 20px rgba(99,102,241,0.4); }
-      50% { box-shadow: 0 0 40px rgba(99,102,241,0.75); }
+      0%, 100% { box-shadow: 0 0 20px rgba(47,107,236,0.4); }
+      50% { box-shadow: 0 0 40px rgba(47,107,236,0.75); }
     }
 
     /* Input wrapper */
@@ -156,6 +155,7 @@
   </style>
     <link rel="stylesheet" href="theme.css">
     <script src="theme.js" defer></script>
+    <link rel="stylesheet" href="tailwind.css">
 </head>
 <body>
   <div class="blob blob-1"></div>
@@ -171,9 +171,9 @@
         <!-- Header -->
         <div class="flex flex-col items-center text-center mb-6 sm:mb-8">
           <div class="shield-badge mb-3 sm:mb-4 overflow-hidden bg-white p-2 flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl shadow-sm">
-            <img src="logo.png" alt="Tab-Lock Logo" class="w-full h-full object-cover rounded-xl" />
+            <img src="trinetra-logo.svg" alt="ตรีเนตร e-Exam" class="w-full h-full object-cover rounded-xl" />
           </div>
-          <div class="text-xs font-bold tracking-[0.3em] text-cyan-600 uppercase mb-1">TAB-LOCK</div>
+          <div class="text-xs font-bold tracking-[0.3em] text-orange-500 uppercase mb-1">TRINETRA e-EXAM</div>
           <h1 class="text-xl sm:text-2xl font-bold text-slate-800 mb-1">เข้าสู่ระบบอาจารย์ผู้สอน</h1>
           <p class="text-slate-500 text-xs sm:text-sm">กรุณาใส่ข้อมูลเพื่อเข้าสู่ระบบ</p>
         </div>
@@ -253,7 +253,7 @@
       </div>
 
       <!-- Footer -->
-      <p class="text-center text-slate-450 text-xs mt-6 tracking-wider">Tab-Lock Online Proctoring System</p>
+      <p class="text-center text-slate-450 text-xs mt-6 tracking-wider">ตรีเนตร e-Exam</p>
     </div>
   </div>
 

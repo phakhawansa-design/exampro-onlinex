@@ -1,5 +1,5 @@
 /**
- * Tab-Lock Online Proctoring System - Interactive User Guide & Onboarding Tour System
+ * ตรีเนตร e-Exam - Interactive User Guide & Onboarding Tour System
  * ระบบคู่มือแนะแนวการใช้งานอัจฉริยะ แสดงอัตโนมัติเฉพาะครั้งแรกที่เข้าใช้งานแต่ละหน้า
  * และคงปุ่ม "💡 แนะนำวิธีใช้งาน" เพื่อให้อาจารย์และนักศึกษากดเปิดดูคู่มือซ้ำได้ตลอดเวลา
  */
@@ -13,13 +13,13 @@
             title: 'แดชบอร์ดหลัก (Dashboard)',
             icon: '🏠',
             badge: 'หน้าเริ่มต้น',
-            summary: 'ศูนย์กลางควบคุมภาพรวมของระบบสอบออนไลน์ Tab-Lock',
+            summary: 'ศูนย์กลางควบคุมภาพรวมของระบบสอบออนไลน์ ตรีเนตร e-Exam',
             steps: [
                 {
-                    title: 'ยินดีต้อนรับสู่ Tab-Lock Proctoring',
+                    title: 'ยินดีต้อนรับสู่ ตรีเนตร e-Exam',
                     badge: 'ภาพรวมระบบ',
                     icon: '🎓',
-                    content: 'Tab-Lock คือระบบจัดสอบและประมวลผลอัจฉริยะ พร้อมระบบ <strong>AI Anti-Cheat</strong> ตรวจจับการสลับแท็บหน้าจอ และระบบวิเคราะห์ผลสอบอัตโนมัติ ช่วยให้อาจารย์จัดสอบได้อย่างสะดวก รวดเร็ว และโปร่งใส',
+                    content: 'ตรีเนตร e-Exam คือระบบจัดสอบและประมวลผลอัจฉริยะ พร้อมระบบ <strong>AI Anti-Cheat</strong> ตรวจจับการสลับแท็บหน้าจอ และระบบวิเคราะห์ผลสอบอัตโนมัติ ช่วยให้อาจารย์จัดสอบได้อย่างสะดวก รวดเร็ว และโปร่งใส',
                     tip: '💡 สามารถดูสถิติต่างๆ และสลับเมนูได้จาก Sidebar แถบเมนูด้านซ้ายตลอดเวลา'
                 },
                 {
@@ -575,14 +575,14 @@
                 align-items: center;
                 gap: 8px;
                 padding: 10px 18px;
-                background: linear-gradient(135deg, #06b6d4, #6366f1);
+                background: linear-gradient(135deg, #22c3e6, #2f6bec);
                 color: #ffffff;
                 font-family: 'Kanit', sans-serif;
                 font-size: 13px;
                 font-weight: 800;
                 border-radius: 9999px;
                 border: 2px solid rgba(255, 255, 255, 0.85);
-                box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.4), 0 8px 10px -6px rgba(99, 102, 241, 0.3);
+                box-shadow: 0 10px 25px -5px rgba(34,195,230, 0.4), 0 8px 10px -6px rgba(47,107,236, 0.3);
                 cursor: pointer;
                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 user-select: none;
@@ -594,7 +594,7 @@
             }
             .tablock-floating-guide-btn:hover {
                 transform: translateY(-3px) scale(1.03);
-                box-shadow: 0 15px 30px -5px rgba(6, 182, 212, 0.5), 0 10px 15px -5px rgba(99, 102, 241, 0.4);
+                box-shadow: 0 15px 30px -5px rgba(34,195,230, 0.5), 0 10px 15px -5px rgba(47,107,236, 0.4);
             }
             .tablock-floating-guide-btn:active {
                 transform: scale(0.96);
@@ -641,7 +641,7 @@
                 max-height: 90vh;
                 border-radius: 28px;
                 border: 2px solid rgba(255, 255, 255, 0.9);
-                box-shadow: 0 25px 60px -15px rgba(6, 182, 212, 0.25), 0 20px 30px -10px rgba(99, 102, 241, 0.2), 0 0 0 1px rgba(226, 232, 240, 0.8);
+                box-shadow: 0 25px 60px -15px rgba(34,195,230, 0.25), 0 20px 30px -10px rgba(47,107,236, 0.2), 0 0 0 1px rgba(226, 232, 240, 0.8);
                 display: flex;
                 flex-direction: column;
                 overflow: hidden;
@@ -681,7 +681,7 @@
             }
             .tablock-step-dot.active {
                 width: 28px;
-                background: linear-gradient(135deg, #06b6d4, #6366f1);
+                background: linear-gradient(135deg, #22c3e6, #2f6bec);
             }
         `;
         document.head.appendChild(style);
