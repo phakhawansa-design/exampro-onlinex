@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2215%22%20fill%3D%22%230d3b8e%22/%3E%3Cg%20stroke%3D%22%23f6b818%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M32%204v4M18%209l2.5%203.5M46%209l-2.5%203.5M32%2056v4%22/%3E%3C/g%3E%3Cpath%20d%3D%22M32%2012C45%2022%2045%2042%2032%2052C19%2042%2019%2022%2032%2012Z%22%20fill%3D%22%23fff%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%228.5%22%20fill%3D%22%23f6b818%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%224%22%20fill%3D%22%23082a6b%22/%3E%3Ccircle%20cx%3D%2234.6%22%20cy%3D%2229.4%22%20r%3D%221.7%22%20fill%3D%22%23fff%22/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" href="trinetra-icon.png">
 <title>ตรีเนตร e-Exam · ตาที่ 3 ของอาจารย์ — ระบบสแกนและตรวจข้อสอบ</title>
 <meta name="description" content="ตรีเนตร e-Exam ระบบสแกนกระดาษคำตอบ อ่านลายมือ และเสนอคะแนนเทียบเฉลย ให้อาจารย์ตรวจทานและยืนยัน">
 <meta property="og:type" content="website">
@@ -473,6 +473,9 @@ html,body{height:auto;overflow-x:hidden;overflow-y:auto;scroll-behavior:smooth}
 #intro .iclose{filter:drop-shadow(0 0 8px #5fd8ff) drop-shadow(0 0 18px #4cc9ff);animation:inGlowLid .9s ease-in-out infinite alternate,inHide .25s 1.05s forwards}
 #intro .istreak{transform-box:fill-box;transform-origin:50% 50%;animation:inSpin2 8s linear infinite}
 #intro .ipower{opacity:0;animation:inPower 1.8s 1.3s ease-out forwards}
+#intro .iopen{display:none}
+#intro .ipower2{opacity:0;mix-blend-mode:screen;animation:inPower2 1.8s 1.3s ease-out forwards}
+@keyframes inPower2{0%{opacity:0}15%{opacity:.85}100%{opacity:0}}
 #intro .ibr{position:relative;text-align:center;color:#fff;opacity:0;transform:translateY(14px);animation:inUp .7s 2.3s ease-out forwards;font-family:Kanit,Prompt,"Leelawadee UI",Tahoma,sans-serif;text-shadow:0 0 18px rgba(95,216,255,.6)}
 #intro .ibr b{display:block;font-size:clamp(30px,5.2vmin,56px);font-weight:600;letter-spacing:.5px;line-height:1.15}
 #intro .ibr span{color:#ffcf4a}
@@ -740,20 +743,13 @@ body{font-family:Kanit,Prompt,"Leelawadee UI",Tahoma,sans-serif!important}
         <radialGradient id="ipw"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset=".35" stop-color="#9eeaff" stop-opacity=".8"/><stop offset="1" stop-color="#4cc9ff" stop-opacity="0"/></radialGradient>
         <filter id="iblur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="7"/></filter>
       </defs>
+      <defs>
+        <radialGradient id="imf" cx="50%" cy="50%" r="50%"><stop offset=".6" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+        <mask id="imk" maskUnits="userSpaceOnUse" x="0" y="-60" width="600" height="420"><ellipse cx="305" cy="155" rx="160" ry="134" fill="url(#imf)"/></mask>
+      </defs>
       <g class="iball">
-        <path d="M40,160 C130,60 470,50 560,140 C480,250 140,262 40,160Z" fill="url(#iws)"/>
-        <g clip-path="url(#iwc)">
-          <circle cx="305" cy="155" r="90" fill="#4cc9ff" opacity=".55" filter="url(#iblur)"/>
-          <circle cx="305" cy="155" r="86" fill="url(#iir)"/>
-          <g class="istreak" stroke="#e6fbff" stroke-opacity=".5" stroke-width="1.6"><line x1="327.0" y1="155.0" x2="375.0" y2="155.0"/><line x1="326.7" y1="158.8" x2="387.7" y2="169.6"/><line x1="325.7" y1="162.5" x2="370.8" y2="178.9"/><line x1="324.1" y1="166.0" x2="377.7" y2="197.0"/><line x1="321.9" y1="169.1" x2="358.6" y2="200.0"/><line x1="319.1" y1="171.9" x2="359.0" y2="219.3"/><line x1="316.0" y1="174.1" x2="340.0" y2="215.6"/><line x1="312.5" y1="175.7" x2="333.7" y2="233.9"/><line x1="308.8" y1="176.7" x2="317.2" y2="223.9"/><line x1="305.0" y1="177.0" x2="305.0" y2="239.0"/><line x1="301.2" y1="176.7" x2="292.8" y2="223.9"/><line x1="297.5" y1="175.7" x2="276.3" y2="233.9"/><line x1="294.0" y1="174.1" x2="270.0" y2="215.6"/><line x1="290.9" y1="171.9" x2="251.0" y2="219.3"/><line x1="288.1" y1="169.1" x2="251.4" y2="200.0"/><line x1="285.9" y1="166.0" x2="232.3" y2="197.0"/><line x1="284.3" y1="162.5" x2="239.2" y2="178.9"/><line x1="283.3" y1="158.8" x2="222.3" y2="169.6"/><line x1="283.0" y1="155.0" x2="235.0" y2="155.0"/><line x1="283.3" y1="151.2" x2="222.3" y2="140.4"/><line x1="284.3" y1="147.5" x2="239.2" y2="131.1"/><line x1="285.9" y1="144.0" x2="232.3" y2="113.0"/><line x1="288.1" y1="140.9" x2="251.4" y2="110.0"/><line x1="290.9" y1="138.1" x2="251.0" y2="90.7"/><line x1="294.0" y1="135.9" x2="270.0" y2="94.4"/><line x1="297.5" y1="134.3" x2="276.3" y2="76.1"/><line x1="301.2" y1="133.3" x2="292.8" y2="86.1"/><line x1="305.0" y1="133.0" x2="305.0" y2="71.0"/><line x1="308.8" y1="133.3" x2="317.2" y2="86.1"/><line x1="312.5" y1="134.3" x2="333.7" y2="76.1"/><line x1="316.0" y1="135.9" x2="340.0" y2="94.4"/><line x1="319.1" y1="138.1" x2="359.0" y2="90.7"/><line x1="321.9" y1="140.9" x2="358.6" y2="110.0"/><line x1="324.1" y1="144.0" x2="377.7" y2="113.0"/><line x1="325.7" y1="147.5" x2="370.8" y2="131.1"/><line x1="326.7" y1="151.2" x2="387.7" y2="140.4"/></g>
-          <circle cx="305" cy="155" r="86" fill="none" stroke="#04174a" stroke-width="5"/>
-          <circle cx="305" cy="155" r="20" fill="#021033"/>
-          <circle cx="305" cy="155" r="27" fill="none" stroke="#9eeaff" stroke-width="3" opacity=".8"/>
-          <circle class="ipower" cx="305" cy="155" r="80" fill="url(#ipw)"/>
-          <circle cx="305" cy="155" r="86" fill="url(#ish)"/>
-          <ellipse cx="270" cy="118" rx="24" ry="14" transform="rotate(-22 270 118)" fill="#fff"/>
-          <circle cx="340" cy="190" r="7" fill="#fff"/>
-        </g>
+        <g mask="url(#imk)"><image href="trinetra-eye-intro.jpg" x="140" y="-7" width="324" height="324" preserveAspectRatio="xMidYMid slice"/></g>
+        <g class="ilook"><circle class="ipower2" cx="305" cy="155" r="70" fill="url(#ipw)"/></g>
       </g>
       <g class="iopen" fill="none" stroke="#06102e" stroke-linecap="round">
         <path d="M28,162 C125,52 475,40 572,138" stroke-width="16"/>
@@ -1163,7 +1159,7 @@ body{font-family:Kanit,Prompt,"Leelawadee UI",Tahoma,sans-serif!important}
 
 
 <footer id="foot"><div class="fg">
-  <div><div class="crest"><img alt="ตรีเนตร e-Exam" src="data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20128%20128%22%20role%3D%22img%22%20aria-label%3D%22%E0%B8%95%E0%B8%A3%E0%B8%B5%E0%B9%80%E0%B8%99%E0%B8%95%E0%B8%A3%20e-Exam%22%3E%20%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23082a6b%22/%3E%3Cstop%20offset%3D%22.6%22%20stop-color%3D%22%230d3b8e%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%231450b8%22/%3E%3C/linearGradient%3E%3C/defs%3E%20%3Crect%20width%3D%22128%22%20height%3D%22128%22%20rx%3D%2230%22%20fill%3D%22url%28%23g%29%22/%3E%20%3Cg%20transform%3D%22translate%2814%2039%29%20scale%28.1667%29%22%3E%20%3Cpath%20d%3D%22M40%2C160%20C130%2C60%20470%2C50%20560%2C140%20C480%2C250%20140%2C262%2040%2C160Z%22%20fill%3D%22%23eef4ff%22/%3E%20%3Ccircle%20cx%3D%22305%22%20cy%3D%22155%22%20r%3D%2282%22%20fill%3D%22%232a8cf0%22/%3E%20%3Ccircle%20cx%3D%22305%22%20cy%3D%22155%22%20r%3D%2282%22%20fill%3D%22none%22%20stroke%3D%22%2304174a%22%20stroke-width%3D%2210%22/%3E%20%3Ccircle%20cx%3D%22305%22%20cy%3D%22155%22%20r%3D%2230%22%20fill%3D%22%23021033%22/%3E%20%3Cellipse%20cx%3D%22272%22%20cy%3D%22120%22%20rx%3D%2222%22%20ry%3D%2213%22%20fill%3D%22%23fff%22/%3E%20%3Cpath%20d%3D%22M28%2C162%20C125%2C52%20475%2C40%20572%2C138%22%20fill%3D%22none%22%20stroke%3D%22%23ffcf4a%22%20stroke-width%3D%2222%22%20stroke-linecap%3D%22round%22/%3E%20%3C/g%3E%20%3C/svg%3E%20"><h4>ตรีเนตร e-Exam · ตาที่ 3 ของอาจารย์</h4></div><p>ระบบสแกนกระดาษคำตอบและตรวจข้อสอบอัตนัย อ่านลายมือ เทียบ Rubric และเสนอคะแนนให้อาจารย์ยืนยัน</p></div>
+  <div><div class="crest"><img alt="ตรีเนตร e-Exam" src="trinetra-logo.svg"><h4>ตรีเนตร e-Exam · ตาที่ 3 ของอาจารย์</h4></div><p>ระบบสแกนกระดาษคำตอบและตรวจข้อสอบอัตนัย อ่านลายมือ เทียบ Rubric และเสนอคะแนนให้อาจารย์ยืนยัน</p></div>
   <div id="contact"><h4>ติดต่อ / ขอเดโม</h4><p>ผู้จัดทำ: ทีม <b>TEC Hope</b><br>อีเมล: <a href="mailto:aomsin1417za@gmail.com">aomsin1417za@gmail.com</a></p><a class="ctaf" id="mail" href="mailto:aomsin1417za@gmail.com?subject=%E0%B8%82%E0%B8%AD%E0%B9%80%E0%B8%94%E0%B9%82%E0%B8%A1%20%E0%B8%95%E0%B8%A3%E0%B8%B5%E0%B9%80%E0%B8%99%E0%B8%95%E0%B8%A3%20e-Exam">ส่งอีเมลถึงทีม</a></div>
   <div><h4>ลิงก์</h4><p><a href="#s1">กลับไปหน้าแรก</a><br><a href="#demo">ลองประมวลผลภาพ</a><br><a href="#faq">คำถามที่พบบ่อย</a><br><a href="scan-pdf.html">Demo สแกน PDF</a></p></div>
 </div><p class="cp">© 2026 ตรีเนตร e-Exam · ทีม TEC Hope · สร้างด้วย OpenCV + Claude Vision</p></footer>
@@ -1576,7 +1572,7 @@ Promise.all(Object.values(IMG).map(u=>{const i=new Image();i.src=u;return i.deco
 <script id="rm-pre-js">
 (function(){
   const logo=document.querySelector('#nav .logo');
-  if(logo){logo.innerHTML='<img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2215%22%20fill%3D%22%230d3b8e%22/%3E%3Cg%20stroke%3D%22%23f6b818%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%3E%3Cpath%20d%3D%22M32%204v4M18%209l2.5%203.5M46%209l-2.5%203.5M32%2056v4%22/%3E%3C/g%3E%3Cpath%20d%3D%22M32%2012C45%2022%2045%2042%2032%2052C19%2042%2019%2022%2032%2012Z%22%20fill%3D%22%23fff%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%228.5%22%20fill%3D%22%23f6b818%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%224%22%20fill%3D%22%23082a6b%22/%3E%3Ccircle%20cx%3D%2234.6%22%20cy%3D%2229.4%22%20r%3D%221.7%22%20fill%3D%22%23fff%22/%3E%3C/svg%3E" alt="ตรีเนตร e-Exam" class="eye">ตรีเนตร e-Exam<small>ตาที่ 3 ของอาจารย์</small>';}
+  if(logo){logo.innerHTML='<img src="trinetra-logo.svg" alt="ตรีเนตร e-Exam" class="eye">ตรีเนตร e-Exam<small>ตาที่ 3 ของอาจารย์</small>';}
   // ไอคอนในวงจรหน้าแรก: น้ำเงินกรมท่า
   const fix=()=>document.querySelectorAll('#hub use').forEach(u=>{if(/#2e8cf5/i.test(u.getAttribute('style')||''))u.style.color='#0d3b8e';if(/#fff/i.test(u.getAttribute('style')||''))u.style.color='#082a6b';});
   fix();setTimeout(fix,500);

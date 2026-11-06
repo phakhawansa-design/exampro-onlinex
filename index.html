@@ -15,7 +15,7 @@
       }
     })();
   </script>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2215%22%20fill%3D%22%230d3b8e%22/%3E%3Csvg%20x%3D%224%22%20y%3D%2218%22%20width%3D%2256%22%20height%3D%2228%22%20viewBox%3D%220%200%20600%20300%22%3E%3Cpath%20d%3D%22M40%2C160%20C130%2C60%20470%2C50%20560%2C140%20C480%2C250%20140%2C262%2040%2C160Z%22%20fill%3D%22%23eef4ff%22/%3E%3Ccircle%20cx%3D%22305%22%20cy%3D%22155%22%20r%3D%2282%22%20fill%3D%22%232a8cf0%22/%3E%3Ccircle%20cx%3D%22305%22%20cy%3D%22155%22%20r%3D%2282%22%20fill%3D%22none%22%20stroke%3D%22%2304174a%22%20stroke-width%3D%2210%22/%3E%3Ccircle%20cx%3D%22305%22%20cy%3D%22155%22%20r%3D%2230%22%20fill%3D%22%23021033%22/%3E%3Cellipse%20cx%3D%22272%22%20cy%3D%22120%22%20rx%3D%2222%22%20ry%3D%2213%22%20fill%3D%22%23fff%22/%3E%3Cpath%20d%3D%22M28%2C162%20C125%2C52%20475%2C40%20572%2C138%22%20fill%3D%22none%22%20stroke%3D%22%23ffcf4a%22%20stroke-width%3D%2222%22%20stroke-linecap%3D%22round%22/%3E%3C/svg%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" href="trinetra-icon.png">
   <title>ตรีเนตร e-Exam · ตาที่ 3 ของอาจารย์</title>
   <meta name="description" content="ระบบสอบออนไลน์ ป้องกันการทุจริตแบบเรียลไทม์ และตรวจข้อสอบอัตนัยด้วย AI">
   <meta name="theme-color" content="#0b2a7a">
@@ -219,6 +219,10 @@
 #intro .iclose{filter:drop-shadow(0 0 8px #5fd8ff) drop-shadow(0 0 18px #4cc9ff);animation:inGlowLid .9s ease-in-out infinite alternate,inHide .25s 1.05s forwards}
 #intro .istreak{transform-box:fill-box;transform-origin:50% 50%;animation:inSpin2 8s linear infinite}
 #intro .ipower{opacity:0;animation:inPower 1.8s 1.3s ease-out forwards}
+/* ดวงตาจากรูป: ใช้เปลือกตา/ขนตาในรูปเอง ซ่อนเส้นเปลือกตาแบบเดิม */
+#intro .iopen{display:none}
+#intro .ipower2{opacity:0;mix-blend-mode:screen;animation:inPower2 1.8s 1.3s ease-out forwards}
+@keyframes inPower2{0%{opacity:0}15%{opacity:.85}100%{opacity:0}}
 #intro .ibr{position:relative;text-align:center;color:#fff;opacity:0;transform:translateY(14px);animation:inUp .7s 2.3s ease-out forwards;font-family:Kanit,Prompt,"Leelawadee UI",Tahoma,sans-serif;text-shadow:0 0 18px rgba(95,216,255,.6)}
 #intro .ibr b{display:block;font-size:clamp(30px,5.2vmin,56px);font-weight:600;letter-spacing:.5px;line-height:1.15}
 #intro .ibr span{color:#ffcf4a}
@@ -295,8 +299,8 @@
 @media (max-width:1179px){#intro .hud{display:none}#intro .ichips{display:flex;opacity:0;animation:show .5s 2.5s forwards}}
 
 /* ===== v3: brand logo, eye-to-logo flight, short mode ===== */
-.nlogo{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(140deg,#082a6b,#0d3b8e 60%,#1450b8);box-shadow:0 0 0 2px rgba(255,255,255,.85),0 8px 18px -8px rgba(0,0,0,.45);flex:none}
-.nlogo svg{width:40px;height:20px;overflow:visible}
+.nlogo{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;overflow:hidden;background:linear-gradient(140deg,#082a6b,#0d3b8e 60%,#1450b8);box-shadow:0 0 0 2px rgba(255,255,255,.85),0 8px 18px -8px rgba(0,0,0,.45);flex:none}
+.nlogo svg{width:40px;height:20px;overflow:visible}.nlogo img{width:100%;height:100%;border-radius:inherit;display:block}
 .nlogo.land{animation:land .7s cubic-bezier(.2,1.6,.4,1)}
 @keyframes land{0%{transform:scale(1.25);box-shadow:0 0 0 2px #fff,0 0 30px 10px rgba(95,216,255,.8)}100%{transform:none}}
 .brand b i{font-style:normal;color:#ffcf4a}
@@ -314,8 +318,11 @@
 /* ===== v4: space → energy → warp → clouds ===== */
 #intro #ifx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}
 #intro #ibolt{z-index:0}
+/* v5: เนบิวลา WebGL อยู่ชั้นล่างสุด ดวงตาเยื้องขึ้นด้านบน */
+#intro #ineb{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
 #intro .iflash,#intro .ihex{display:none!important}
-#intro .ist{z-index:2;top:3vh}
+#intro .ist{z-index:2;top:-7vh}
+#intro .ibr{top:-4vh}
 #intro .ibr,#intro .hud{z-index:3}
 #intro .iaura{opacity:.0}
 #intro.go .iaura{animation:inAura 1.2s 1.3s cubic-bezier(.2,.8,.2,1) forwards!important}
@@ -365,6 +372,7 @@
     <div class="ialert"><span class="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg></span><span><b>ตาเฝ้า · ตรวจพบการสลับหน้าจอ</b><small>นักศึกษา 6501 ออกจากหน้าสอบ · ครั้งที่ 1 · 10:42:05</small><em>✓ บันทึกแล้ว และแจ้งอาจารย์ผู้คุมสอบ</em></span></div>
   </div>
   <div class="s2">
+    <canvas id="ineb"></canvas>
     <canvas id="ibolt"></canvas>
     <i class="iflash"></i>
     <div class="ist">
@@ -378,20 +386,13 @@
         <radialGradient id="ipw"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset=".35" stop-color="#9eeaff" stop-opacity=".8"/><stop offset="1" stop-color="#4cc9ff" stop-opacity="0"/></radialGradient>
         <filter id="iblur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="7"/></filter>
       </defs>
+      <defs>
+        <radialGradient id="imf" cx="50%" cy="50%" r="50%"><stop offset=".6" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+        <mask id="imk" maskUnits="userSpaceOnUse" x="0" y="-60" width="600" height="420"><ellipse cx="305" cy="155" rx="160" ry="134" fill="url(#imf)"/></mask>
+      </defs>
       <g class="iball">
-        <path d="M40,160 C130,60 470,50 560,140 C480,250 140,262 40,160Z" fill="url(#iws)"/>
-        <g clip-path="url(#iwc)"><g class="ilook">
-          <circle cx="305" cy="155" r="90" fill="#4cc9ff" opacity=".55" filter="url(#iblur)"/>
-          <circle cx="305" cy="155" r="86" fill="url(#iir)"/>
-          <g class="istreak" stroke="#e6fbff" stroke-opacity=".5" stroke-width="1.6"><line x1="327.0" y1="155.0" x2="375.0" y2="155.0"/><line x1="326.7" y1="158.8" x2="387.7" y2="169.6"/><line x1="325.7" y1="162.5" x2="370.8" y2="178.9"/><line x1="324.1" y1="166.0" x2="377.7" y2="197.0"/><line x1="321.9" y1="169.1" x2="358.6" y2="200.0"/><line x1="319.1" y1="171.9" x2="359.0" y2="219.3"/><line x1="316.0" y1="174.1" x2="340.0" y2="215.6"/><line x1="312.5" y1="175.7" x2="333.7" y2="233.9"/><line x1="308.8" y1="176.7" x2="317.2" y2="223.9"/><line x1="305.0" y1="177.0" x2="305.0" y2="239.0"/><line x1="301.2" y1="176.7" x2="292.8" y2="223.9"/><line x1="297.5" y1="175.7" x2="276.3" y2="233.9"/><line x1="294.0" y1="174.1" x2="270.0" y2="215.6"/><line x1="290.9" y1="171.9" x2="251.0" y2="219.3"/><line x1="288.1" y1="169.1" x2="251.4" y2="200.0"/><line x1="285.9" y1="166.0" x2="232.3" y2="197.0"/><line x1="284.3" y1="162.5" x2="239.2" y2="178.9"/><line x1="283.3" y1="158.8" x2="222.3" y2="169.6"/><line x1="283.0" y1="155.0" x2="235.0" y2="155.0"/><line x1="283.3" y1="151.2" x2="222.3" y2="140.4"/><line x1="284.3" y1="147.5" x2="239.2" y2="131.1"/><line x1="285.9" y1="144.0" x2="232.3" y2="113.0"/><line x1="288.1" y1="140.9" x2="251.4" y2="110.0"/><line x1="290.9" y1="138.1" x2="251.0" y2="90.7"/><line x1="294.0" y1="135.9" x2="270.0" y2="94.4"/><line x1="297.5" y1="134.3" x2="276.3" y2="76.1"/><line x1="301.2" y1="133.3" x2="292.8" y2="86.1"/><line x1="305.0" y1="133.0" x2="305.0" y2="71.0"/><line x1="308.8" y1="133.3" x2="317.2" y2="86.1"/><line x1="312.5" y1="134.3" x2="333.7" y2="76.1"/><line x1="316.0" y1="135.9" x2="340.0" y2="94.4"/><line x1="319.1" y1="138.1" x2="359.0" y2="90.7"/><line x1="321.9" y1="140.9" x2="358.6" y2="110.0"/><line x1="324.1" y1="144.0" x2="377.7" y2="113.0"/><line x1="325.7" y1="147.5" x2="370.8" y2="131.1"/><line x1="326.7" y1="151.2" x2="387.7" y2="140.4"/></g>
-          <circle cx="305" cy="155" r="86" fill="none" stroke="#04174a" stroke-width="5"/>
-          <circle cx="305" cy="155" r="20" fill="#021033"/>
-          <circle cx="305" cy="155" r="27" fill="none" stroke="#9eeaff" stroke-width="3" opacity=".8"/>
-          <circle class="ipower" cx="305" cy="155" r="80" fill="url(#ipw)"/>
-          <circle cx="305" cy="155" r="86" fill="url(#ish)"/>
-          <ellipse cx="270" cy="118" rx="24" ry="14" transform="rotate(-22 270 118)" fill="#fff"/>
-          <circle cx="340" cy="190" r="7" fill="#fff"/>
-        </g></g>
+        <g mask="url(#imk)"><image href="trinetra-eye-intro.jpg" x="140" y="-7" width="324" height="324" preserveAspectRatio="xMidYMid slice"/></g>
+        <g class="ilook"><circle class="ipower2" cx="305" cy="155" r="70" fill="url(#ipw)"/></g>
       </g>
       <g class="iopen" fill="none" stroke="#06102e" stroke-linecap="round">
         <path d="M28,162 C125,52 475,40 572,138" stroke-width="16"/>
@@ -441,7 +442,55 @@
     neb=document.createElement('canvas');neb.width=W;neb.height=H;const n=neb.getContext('2d');
     [[.22,.25,.5,'rgba(88,60,200,.22)'],[.8,.2,.45,'rgba(30,110,220,.24)'],[.65,.8,.55,'rgba(20,70,170,.2)'],[.12,.82,.4,'rgba(140,60,190,.14)']].forEach(([x,y,r,c])=>{const g=n.createRadialGradient(W*x,H*y,0,W*x,H*y,Math.max(W,H)*r);g.addColorStop(0,c);g.addColorStop(1,'rgba(0,0,0,0)');n.fillStyle=g;n.fillRect(0,0,W,H)})}
   size();addEventListener('resize',size);
-  const stars=Array.from({length:LOW?220:460},()=>({x:(Math.random()*2-1)*1.6,y:(Math.random()*2-1)*1.6,z:Math.random()*.95+.05,tw:Math.random()*6.28,px:null,py:null}));
+  /* ---------- v5: เนบิวลา 3 มิติ (WebGL) + ดาวสมจริง + เมาส์ขยับมุมมอง ---------- */
+  let MX=0,MY=0,mx=0,my=0;
+  addEventListener('pointermove',e=>{MX=e.clientX/innerWidth*2-1;MY=e.clientY/innerHeight*2-1},{passive:true});
+  /* สีดาวตามอุณหภูมิ: ขาวอมฟ้า (ส่วนใหญ่) ฟ้า เหลืองนวล ส้ม */
+  const starCol=()=>{const k=Math.random();return k<.6?[225,235,255]:k<.8?[175,200,255]:k<.93?[255,240,215]:[255,200,165]};
+  const GL=(()=>{const c=document.getElementById('ineb');if(!c)return null;
+    let g=null;try{g=c.getContext('webgl',{antialias:false,alpha:false,powerPreference:'high-performance'})}catch(e){}
+    if(!g)return null;
+    const OCT=LOW?4:6,RES=LOW?.5:.75;
+    const vs='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
+    /* เมฆเนบิวลา 2 ชั้นคนละระยะ (ชั้นใกล้ขยับมากกว่า = รู้สึกเป็น 3 มิติ) แถบแสงลาเวนเดอร์เฉียง + แกนส้มแดงด้านบน */
+    const fs=`precision mediump float;uniform vec2 r;uniform float t,w;uniform vec2 m;
+float h(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1.,0.)),f.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),f.x),f.y);}
+float fbm(vec2 p){float v=0.,a=.5;mat2 R=mat2(.8,.6,-.6,.8);for(int i=0;i<${OCT};i++){v+=a*n(p);p=R*p*2.03+3.1;a*=.5;}return v;}
+vec3 layer(vec2 uv,float d){vec2 p=uv*(1.5+d*.6)+vec2(t*.010,-t*.005)*(1.+d)+m*(.05+d*.07);
+ vec2 q=vec2(fbm(p+t*.018),fbm(p+vec2(5.2,1.3)-t*.014));
+ float c=fbm(p+2.2*q),c2=fbm(p*2.3+3.*q+vec2(1.7,9.2));
+ float band=exp(-pow((uv.y-.02+uv.x*.3)*3.+(q.x-.5)*1.8,2.));
+ vec3 col=vec3(.25,.22,.66)*smoothstep(.35,.85,c)*(.3+.9*band);
+ col+=vec3(.75,.72,1.)*pow(smoothstep(.5,.95,c2),2.)*band*1.7;
+ vec2 k=uv-vec2(-.05,.36);float core=exp(-dot(k,k)*2.3);
+ col+=mix(vec3(.5,.08,.12),vec3(1.,.45,.22),smoothstep(.4,.9,c2))*smoothstep(.28,.8,c)*core*2.6;
+ col*=.5+.5*smoothstep(.25,.62,fbm(p*3.1+q*2.));
+ return col;}
+void main(){vec2 uv=(gl_FragCoord.xy-.5*r)/r.y;uv/=1.+w*2.4;
+ vec3 col=vec3(.004,.008,.03)+layer(uv,0.)*1.15+layer(uv*1.35+vec2(3.1,-1.7),1.)*.55;
+ vec2 e=uv-vec2(0.,.1);col+=vec3(.22,.32,.85)*exp(-dot(e,e)*7.)*.4;
+ col*=1.-.38*dot(uv,uv);gl_FragColor=vec4(pow(col,vec3(.92)),1.);}`;
+    const sh=(ty,src)=>{const s=g.createShader(ty);g.shaderSource(s,src);g.compileShader(s);return g.getShaderParameter(s,g.COMPILE_STATUS)?s:null};
+    const v=sh(g.VERTEX_SHADER,vs),f=sh(g.FRAGMENT_SHADER,fs);if(!v||!f)return null;
+    const pr=g.createProgram();g.attachShader(pr,v);g.attachShader(pr,f);g.linkProgram(pr);if(!g.getProgramParameter(pr,g.LINK_STATUS))return null;
+    g.useProgram(pr);g.bindBuffer(g.ARRAY_BUFFER,g.createBuffer());g.bufferData(g.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),g.STATIC_DRAW);
+    const al=g.getAttribLocation(pr,'a');g.enableVertexAttribArray(al);g.vertexAttribPointer(al,2,g.FLOAT,false,0,0);
+    const U={r:g.getUniformLocation(pr,'r'),t:g.getUniformLocation(pr,'t'),w:g.getUniformLocation(pr,'w'),m:g.getUniformLocation(pr,'m')};
+    const fit=()=>{c.width=Math.round(innerWidth*RES);c.height=Math.round(innerHeight*RES);g.viewport(0,0,c.width,c.height)};fit();addEventListener('resize',fit);
+    return (t,w,a)=>{c.style.opacity=a;g.uniform2f(U.r,c.width,c.height);g.uniform1f(U.t,t+3);g.uniform1f(U.w,w);g.uniform2f(U.m,mx,-my);g.drawArrays(g.TRIANGLES,0,3)};
+  })();
+  /* ดาวไกลหลายพันดวง วาดครั้งเดียวเก็บไว้ ขยับช้า ๆ ตามเมาส์ */
+  let dust=null;
+  const mkDust=()=>{dust=document.createElement('canvas');const w=dust.width=Math.round(innerWidth*1.2),h=dust.height=Math.round(innerHeight*1.2),d=dust.getContext('2d');
+    for(let i=0;i<(LOW?900:2200);i++){const m=Math.pow(Math.random(),3),[r,gg,bb]=starCol(),s=.35+m*1.3;d.fillStyle=`rgba(${r},${gg},${bb},${(.12+m*.75).toFixed(2)})`;d.beginPath();d.arc(Math.random()*w,Math.random()*h,s*.6,0,6.283);d.fill()}};
+  mkDust();addEventListener('resize',mkDust);
+  /* ดาวใกล้: ขนาด/สีต่างกัน ดวงสว่างมีแสงฟุ้งและแฉกแสง */
+  const drawStar=(p,X,Y,b)=>{const [r,gg,bb]=p.c,s=(1-p.z)*1.6+.35+p.m*1.6;
+    if(p.m>.82&&p.z<.7){const R=s*3;glow(bx,X,Y,R*2,[[0,`rgba(${r},${gg},${bb},${b*.9})`],[.25,`rgba(${r},${gg},${bb},${b*.25})`],[1,`rgba(${r},${gg},${bb},0)`]]);
+      bx.strokeStyle=`rgba(${r},${gg},${bb},${b*.45})`;bx.lineWidth=.8;bx.beginPath();bx.moveTo(X-R*2.2,Y);bx.lineTo(X+R*2.2,Y);bx.moveTo(X,Y-R*2.2);bx.lineTo(X,Y+R*2.2);bx.stroke()}
+    bx.fillStyle=`rgba(${r},${gg},${bb},${b})`;bx.beginPath();bx.arc(X,Y,s*.6,0,6.283);bx.fill()};
+  const stars=Array.from({length:LOW?220:460},()=>({x:(Math.random()*2-1)*1.6,y:(Math.random()*2-1)*1.6,z:Math.random()*.95+.05,tw:Math.random()*6.28,px:null,py:null,c:starCol(),m:Math.pow(Math.random(),2.2)}));
   const clouds=Array.from({length:LOW?18:30},()=>{const a=Math.random()*6.28,r=Math.random()*1.1;return{x:Math.cos(a)*r,y:Math.sin(a)*r*.7,z:1+Math.random()*.9,puffs:Array.from({length:5},()=>[(Math.random()-.5)*1.4,(Math.random()-.5)*.6,.45+Math.random()*.55]),c:Math.random()<.5?'235,244,255':'214,232,255'}});
   /* ดวงตา = ดวงอาทิตย์ ดาวโคจรรอบ */
   const sun=()=>{const r=eye.getBoundingClientRect();return [r.left+r.width*.508,r.top+r.height*.517,r.width/600]};
@@ -449,7 +498,22 @@
   let TILT=-.16;const W0=.42,TH0=()=>H>W?2.25:2.62; /* ดาวเป้าหมายอยู่ล่างซ้ายตอนยิง */
   const PL=[{f:1,R:.072,c:['#d6f5ff','#3d9be9','#0b2a6b'],atm:'110,200,255',band:1,ring:1,th:t=>TH0()-W0*(t-TS)},
             {f:.62,R:.022,c:['#ffe7a3','#e3a21a','#5a3a05'],atm:'255,200,90',th:t=>1.1-.85*t},
-            {f:1.32,R:.03,c:['#e7d4ff','#8a5fe0','#2b1460'],atm:'190,150,255',th:t=>4.2-.32*t}];
+            {f:1.32,R:.03,c:['#e7d4ff','#8a5fe0','#2b1460'],atm:'190,150,255',th:t=>4.2-.32*t},
+            /* v6: ดาวโลก ดาวอังคาร และดาวแก๊สยักษ์ลายแถบ */
+            {f:.82,R:.036,c:['#a8e0ff','#2a7fd6','#06204f'],atm:'120,190,255',earth:1,th:t=>3.6-.55*t},
+            {f:1.12,R:.02,c:['#ffc2a0','#d0582e','#4a1406'],atm:'255,140,100',shade:1,th:t=>5.6-.4*t},
+            {f:1.48,R:.056,c:['#fbe8c8','#d3a06a','#5a3416'],atm:'255,210,160',band:1,
+             bands:[[-.6,.12,'255,240,220,.35'],[-.3,.14,'150,80,40,.38'],[0,.1,'255,235,210,.3'],[.28,.16,'140,70,35,.34'],[.58,.1,'240,210,180,.3']],th:t=>4.4-.12*t}];
+  /* ดาวโลก: ทวีป น้ำแข็งขั้วโลก และเมฆ หมุนรอบตัวเองช้า ๆ */
+  const EARTH_LAND=[[.02,.35,.3,'64,140,72'],[.08,.05,.22,'86,150,70'],[.12,-.3,.26,'70,128,60'],[.33,.25,.34,'160,135,80'],[.38,-.15,.24,'88,150,72'],[.55,.4,.28,'72,140,70'],[.6,0,.2,'165,140,90'],[.72,-.35,.3,'80,145,68'],[.85,.15,.25,'70,135,65'],[0,-.8,.5,'240,248,255'],[.5,-.8,.5,'240,248,255'],[0,.8,.45,'240,248,255'],[.5,.8,.45,'240,248,255']];
+  const EARTH_CLOUD=[[.05,.15,.22],[.2,-.2,.18],[.4,.45,.2],[.62,-.05,.24],[.8,.3,.2],[.92,-.4,.18]];
+  function earth(c,x,y,r){const T=performance.now()/1000;c.save();c.beginPath();c.arc(x,y,r,0,7);c.clip();
+    const blob=(lon,lat,s,fill,spin)=>{const th=(lon+T*spin)*6.2832,v=Math.cos(th);if(v<=.02)return;const ph=lat*1.2;
+      c.fillStyle=fill;c.beginPath();c.ellipse(x+r*Math.sin(th)*Math.cos(ph),y-r*Math.sin(ph),s*r*v,s*r*.75*Math.cos(ph),0,0,7);c.fill()};
+    EARTH_LAND.forEach(([a,b,s,col],i)=>{const f=`rgba(${col},.92)`;if(Math.abs(b)>.7)return blob(a,b,s*.9,f,.035);
+      blob(a,b,s*1.45,f,.035);blob(a+.04,b-.12*(i%2?1:-1),s,f,.035);blob(a-.035,b+.1,s*.75,f,.035)});
+    EARTH_CLOUD.forEach(([a,b,s])=>blob(a,b,s,'rgba(255,255,255,.38)',.05));
+    c.restore()}
   /* กล้อง 3 มิติ: หมุน (yaw) และก้ม (pitch) เข้าหาตำแหน่งยิง แล้วฉายภาพแบบ perspective */
   const P0S=.5,cam=t=>{const e=ease(cl(Math.min(t,TS)/TS));return{yaw:-.55*(1-e),sp:Math.sin(.74+(.5236-.74)*e)}};
   const proj=(a,f,t,cx,cy)=>{const [rx,ry]=orbitR(),{yaw,sp}=cam(t),cp=Math.sqrt(1-sp*sp);
@@ -462,7 +526,9 @@
     const g=c.createRadialGradient(x+lx*r*.45,y+ly*r*.45,r*.1,x,y,r);g.addColorStop(0,p.c[0]);g.addColorStop(.55,p.c[1]);g.addColorStop(1,p.c[2]);
     const ring=(a0,a1)=>{if(!p.ring)return;c.save();c.translate(x,y);c.rotate(-.35);c.strokeStyle=`rgba(${p.atm},.75)`;c.lineWidth=Math.max(1.5,r*.13);c.beginPath();c.ellipse(0,0,r*1.75,r*.42,0,a0,a1);c.stroke();c.strokeStyle='rgba(230,248,255,.45)';c.lineWidth=Math.max(1,r*.05);c.beginPath();c.ellipse(0,0,r*1.98,r*.5,0,a0,a1);c.stroke();c.restore()};
     ring(Math.PI,Math.PI*2);c.fillStyle=g;c.beginPath();c.arc(x,y,r,0,7);c.fill();
-    if(p.band){c.save();c.beginPath();c.arc(x,y,r,0,7);c.clip();c.translate(x,y);c.rotate(-.35);[[-.45,.16,'210,240,255,.28'],[-.05,.1,'10,40,110,.35'],[.3,.2,'170,225,255,.22'],[.62,.08,'10,40,110,.3']].forEach(([o,h,col])=>{c.fillStyle=`rgba(${col})`;c.beginPath();c.ellipse(0,o*r,r*1.2,h*r,0,0,7);c.fill()});c.restore();
+    if(p.band){c.save();c.beginPath();c.arc(x,y,r,0,7);c.clip();c.translate(x,y);c.rotate(-.35);(p.bands||[[-.45,.16,'210,240,255,.28'],[-.05,.1,'10,40,110,.35'],[.3,.2,'170,225,255,.22'],[.62,.08,'10,40,110,.3']]).forEach(([o,h,col])=>{c.fillStyle=`rgba(${col})`;c.beginPath();c.ellipse(0,o*r,r*1.2,h*r,0,0,7);c.fill()});c.restore()}
+    if(p.earth)earth(c,x,y,r);
+    if(p.band||p.earth||p.shade){
       const sh=c.createRadialGradient(x+lx*r*.5,y+ly*r*.5,r*.2,x,y,r*1.05);sh.addColorStop(0,'rgba(0,0,0,0)');sh.addColorStop(.7,'rgba(0,0,0,0)');sh.addColorStop(1,'rgba(2,6,20,.55)');c.fillStyle=sh;c.beginPath();c.arc(x,y,r,0,7);c.fill()}
     ring(0,Math.PI);c.restore()}
   let T0=0,raf=0,last=0,lx=0,ly=0,trail=[],sparks=[],charge=[],vp=null,tgt=null;
@@ -473,21 +539,23 @@
     const R=Math.max(W,H),m=Math.min(W,H),[cx,cy,k]=sun();
     const fadeIn=cl(t/.6),warp=ease((t-TW)/1.5);
     /* ---------- ฉากหลังอวกาศ ---------- */
-    bx.fillStyle='#02040e';bx.fillRect(0,0,W,H);
+    mx+=(MX-mx)*.05;my+=(MY-my)*.05;
+    if(GL){bx.clearRect(0,0,W,H);GL(t,warp,fadeIn)}else{bx.fillStyle='#02040e';bx.fillRect(0,0,W,H)}
     const P0=PL[0],tf=Math.min(t,TH);let [tx0,ty0,dep0,sc0]=pos(P0,tf,cx,cy);
     if(t>=TH&&!vp)vp=[tx0,ty0];
     const vx=vp?vp[0]:W/2,vy=vp?vp[1]:H/2;
-    bx.save();bx.globalAlpha=fadeIn;const zs=1+warp*2.2;bx.translate(vx,vy);bx.scale(zs,zs);bx.drawImage(neb,-vx,-vy);bx.restore();
+    if(!GL){bx.save();bx.globalAlpha=fadeIn;const zs=1+warp*2.2;bx.translate(vx,vy);bx.scale(zs,zs);bx.drawImage(neb,-vx,-vy);bx.restore()}
+    if(dust){bx.save();bx.globalAlpha=fadeIn*(1-warp);const zd=1+warp*1.5;bx.translate(W/2,H/2);bx.scale(zd,zd);bx.drawImage(dust,-dust.width/2-mx*14,-dust.height/2-my*10);bx.restore()}
     const {yaw:cyw,sp:csp}=cam(t),speed=.015+warp*3.2,F=R*.2;
     /* ดวงตาลอยเข้ามาแบบ 3 มิติ (ลืมตาอยู่แล้ว) แล้วเอียงตามกล้อง */
-    {const e=1-Math.pow(1-cl(t/1.05),3);eye.style.opacity=cl(t/.3);eye.style.transform=`perspective(1100px) translateZ(${(-1600*(1-e)).toFixed(0)}px) rotateY(${(-75*(1-e)+cyw*26).toFixed(2)}deg) rotateX(${(32*(1-e)+(csp-.5)*55).toFixed(2)}deg)`}
+    {const e=1-Math.pow(1-cl(t/1.05),3);eye.style.opacity=cl(t/.3);eye.style.transform=`perspective(1100px) translateZ(${(-1600*(1-e)).toFixed(0)}px) rotateY(${(-75*(1-e)+cyw*26+mx*9).toFixed(2)}deg) rotateX(${(32*(1-e)+(csp-.5)*55-my*7).toFixed(2)}deg)`}
 
     for(const p of stars){p.z-=speed*dt;if(p.z<=.02){p.z=1;p.x=(Math.random()*2-1)*1.6;p.y=(Math.random()*2-1)*1.6;p.px=null}
-      const X=vx+(p.x+cyw*.25)/p.z*F,Y=vy+(p.y-(csp-.5)*.3)/p.z*F;
+      const X=vx+(p.x+cyw*.25)/p.z*F-mx*40*(1-p.z),Y=vy+(p.y-(csp-.5)*.3)/p.z*F-my*28*(1-p.z);
       if(X<-50||X>W+50||Y<-50||Y>H+50){p.z=1;p.px=null;continue}
       const b=cl((1-p.z)*1.3)*fadeIn*(.55+.45*Math.sin(t*3+p.tw));
       if(warp>.05&&p.px!==null){bx.strokeStyle=`rgba(200,230,255,${b})`;bx.lineWidth=1+(1-p.z)*2;bx.beginPath();bx.moveTo(p.px,p.py);bx.lineTo(X,Y);bx.stroke()}
-      else{bx.fillStyle=`rgba(220,236,255,${b})`;const sz=(1-p.z)*2+.4;bx.fillRect(X,Y,sz,sz)}
+      else drawStar(p,X,Y,b);
       p.px=X;p.py=Y}
     /* วงโคจร */
     const oa=fadeIn*cl((t-.3)/1)*(1-cl(warp*3));
@@ -562,7 +630,7 @@
 
 <nav>
   <div class="wrap">
-    <a class="brand" href="index.html"><span class="nlogo"><svg viewBox="0 0 600 300" aria-hidden="true"><path d="M40,160 C130,60 470,50 560,140 C480,250 140,262 40,160Z" fill="#eef4ff"/><circle cx="305" cy="155" r="82" fill="#2a8cf0"/><circle cx="305" cy="155" r="82" fill="none" stroke="#04174a" stroke-width="10"/><circle cx="305" cy="155" r="30" fill="#021033"/><ellipse cx="272" cy="120" rx="22" ry="13" fill="#fff"/><path d="M28,162 C125,52 475,40 572,138" fill="none" stroke="#ffcf4a" stroke-width="22" stroke-linecap="round"/></svg></span><span><b>ตรีเนตร <i>e-Exam</i></b><small>ตาที่ 3 ของอาจารย์</small></span></a>
+    <a class="brand" href="index.html"><span class="nlogo"><img src="trinetra-logo.svg" alt=""></span><span><b>ตรีเนตร <i>e-Exam</i></b><small>ตาที่ 3 ของอาจารย์</small></span></a>
     <div class="menu"><a href="#features">ความสามารถ</a><a href="#how">วิธีใช้งาน</a><a href="#faq">คำถามที่พบบ่อย</a><a href="scan-pdf.html">สแกน PDF</a><a href="grader-intro.html">ระบบตรวจอัตนัย AI</a></div>
     <a class="btn btn-ol nav-cta" href="teacher-login.html">เข้าสู่ระบบอาจารย์</a>
   </div>

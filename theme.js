@@ -3,6 +3,11 @@
   const LOGO = 'trinetra-logo.svg';
   const run = () => {
     const page = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    // 0) ไอคอนบนแท็บเบราว์เซอร์ (หน้าที่ยังไม่มี)
+    if (!document.querySelector('link[rel~="icon"]')) {
+      const ic = document.createElement('link'); ic.rel = 'icon'; ic.type = 'image/png'; ic.href = 'trinetra-icon.png';
+      document.head.appendChild(ic);
+    }
     // 1) เปลี่ยนโลโก้เดิมเป็นโลโก้ตรีเนตร
     document.querySelectorAll('img[src$="logo.png"], img[src$="logo_university.png"], img[src$="trinetra-logo.svg"]').forEach(img => {
       if (/logo_old/.test(img.getAttribute('src'))) return;
