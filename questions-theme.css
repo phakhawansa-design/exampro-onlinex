@@ -1,0 +1,194 @@
+/* ตรีเนตร e-Exam · ธีมหน้า "5. สร้างและแก้ไขข้อสอบ" (admin-questions.html)
+ * ใช้สีเดียวกับแดชบอร์ด: น้ำเงินเข้ม #0b2a7a · ส้ม #ff7a1a · การ์ดขาวขอบมน
+ */
+:root { --qx-navy: #0b2a7a; --qx-navy-2: #1e40af; --qx-ink: #0f172a; --qx-mute: #64748b; --qx-line: #e2e8f0; --qx-orange: #ff7a1a; --qx-orange-2: #f25c05; }
+
+/* ---------- แถบหัว ---------- */
+.qx-head {
+  min-height: 72px; flex-shrink: 0; z-index: 30; position: relative;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 10px 20px; background: #fff; border-bottom: 1px solid var(--qx-line);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, .04);
+}
+.qx-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+
+/* ปุ่มกลับหน้าหลัก: ทึบ สีน้ำเงินเข้ม ใหญ่ เห็นชัด */
+.qx-back {
+  display: inline-flex; align-items: center; gap: 6px; flex: none;
+  padding: 10px 16px 10px 10px; border-radius: 14px; text-decoration: none;
+  background: linear-gradient(135deg, var(--qx-navy), var(--qx-navy-2)); color: #fff;
+  font-weight: 700; font-size: 15px; line-height: 1;
+  box-shadow: 0 6px 16px -6px rgba(11, 42, 122, .55); transition: transform .15s, box-shadow .15s, filter .15s;
+}
+.qx-back svg { width: 20px; height: 20px; transition: transform .15s; }
+.qx-back-ic { font-size: 16px; }
+.qx-back:hover { filter: brightness(1.12); box-shadow: 0 10px 22px -8px rgba(11, 42, 122, .65); }
+.qx-back:hover svg { transform: translateX(-3px); }
+.qx-back:active { transform: scale(.97); }
+.qx-back:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
+
+.qx-title { display: flex; align-items: center; gap: 10px; min-width: 0; padding-left: 14px; border-left: 1px solid var(--qx-line); }
+.qx-title img { width: 38px; height: 38px; border-radius: 10px; flex: none; }
+.qx-title h1 { margin: 0; font-size: 17px; font-weight: 800; color: var(--qx-ink); white-space: nowrap; letter-spacing: -.2px; }
+.qx-title span { display: block; font-size: 12px; color: var(--qx-mute); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px; }
+
+/* กลาง: ขั้นที่ 1 รายวิชา · ขั้นที่ 2 ชื่อชุดข้อสอบ */
+.qx-mid { flex: 1; display: flex; align-items: center; justify-content: center; gap: 10px; min-width: 0; max-width: 760px; }
+.qx-n { width: 22px; height: 22px; flex: none; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 800; background: var(--qx-navy); color: #fff; }
+#course-selector-container {
+  display: flex !important; align-items: center; gap: 8px; min-width: 0; flex: 1 1 52%;
+  padding: 7px 12px 7px 8px !important; border-radius: 14px !important;
+  border: 2px solid #fdba74 !important; background: #fff7ed !important; box-shadow: none !important; transition: .15s;
+}
+#course-selector-container label { font-size: 13px; font-weight: 700; color: #9a3412; flex: none; }
+#course-selector-container select { flex: 1; min-width: 0; background: transparent; border: 0; outline: none; font: inherit; font-size: 14px; font-weight: 700; color: var(--qx-ink); cursor: pointer; text-overflow: ellipsis; }
+#course-selector-container .qx-n { background: var(--qx-orange); }
+/* เลือกรายวิชาแล้ว (สคริปต์เดิมใส่คลาส emerald) */
+#course-selector-container[class*="emerald"] { border-color: #86efac !important; background: #f0fdf4 !important; }
+#course-selector-container[class*="emerald"] label { color: #166534; }
+#course-selector-container[class*="emerald"] .qx-n { background: #16a34a; }
+.qx-name { display: flex; align-items: center; gap: 8px; flex: 1 1 48%; min-width: 0; padding: 4px 6px 4px 8px; border: 2px solid var(--qx-line); border-radius: 14px; background: #fff; transition: .15s; }
+.qx-name:focus-within { border-color: var(--qx-navy); box-shadow: 0 0 0 3px rgba(11, 42, 122, .12); }
+.qx-name input { flex: 1; min-width: 0; border: 0; outline: none; font: inherit; font-size: 14px; font-weight: 600; color: var(--qx-ink); padding: 6px 4px; background: transparent; }
+
+.qx-right { display: flex; align-items: center; gap: 8px; flex: none; }
+.qx-help { display: inline-flex; align-items: center; gap: 6px; padding: 9px 12px; border-radius: 12px; border: 1px solid var(--qx-line); background: #fff; color: #334155; font-size: 13px; font-weight: 600; cursor: pointer; }
+.qx-help:hover { background: #f8fafc; }
+
+/* ปุ่มบันทึก: ส้มเด่น (ปุ่มหลักของหน้า) */
+.qx-save {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+  padding: 10px 18px; border: 0; border-radius: 14px; color: #fff; font-size: 14px; font-weight: 700;
+  background: linear-gradient(135deg, var(--qx-orange), var(--qx-orange-2));
+  box-shadow: 0 8px 18px -8px rgba(242, 92, 5, .6); transition: filter .15s, transform .15s;
+}
+.qx-save:hover { filter: brightness(1.06); }
+.qx-save:active { transform: scale(.97); }
+.qx-save:disabled { opacity: .7; cursor: wait; }
+
+/* ---------- แถบซ้าย: ปุ่มเพิ่มข้อ ---------- */
+.qx-add {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+  padding: 13px; border: 0; border-radius: 16px; color: #fff; font-size: 15px; font-weight: 700;
+  background: linear-gradient(135deg, var(--qx-navy), var(--qx-navy-2)); box-shadow: 0 8px 18px -8px rgba(11, 42, 122, .55); transition: .15s;
+}
+.qx-add:hover { filter: brightness(1.12); }
+.qx-add:active { transform: scale(.98); }
+
+/* ---------- แถบเครื่องมือขวา ---------- */
+.qx-tools { width: 320px; flex-shrink: 0; z-index: 20; display: flex; flex-direction: column; background: #fff; border-left: 1px solid var(--qx-line); }
+.qx-tools.hidden { display: none; }
+.qx-tools-h { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 16px 18px 12px; border-bottom: 1px solid var(--qx-line); }
+.qx-tools-h h2 { margin: 0; font-size: 16px; font-weight: 800; color: var(--qx-ink); }
+.qx-tools-h p { margin: 2px 0 0; font-size: 12px; color: var(--qx-mute); }
+.qx-x { font-size: 18px; color: #94a3b8; padding: 2px 8px; border-radius: 8px; }
+.qx-tools-b { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; background: #f8fafc; }
+.qx-tool { position: relative; background: #fff; border: 1px solid var(--qx-line); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px; transition: .2s; box-shadow: 0 2px 8px rgba(15, 23, 42, .03); }
+.qx-tool:hover { border-color: #cbd5e1; box-shadow: 0 8px 20px rgba(15, 23, 42, .06); }
+.qx-tool-hi { border: 2px solid var(--qx-navy); background: linear-gradient(180deg, #eff6ff, #fff 70%); }
+.qx-badge { position: absolute; top: -9px; right: 12px; font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 99px; background: var(--qx-orange); color: #fff; }
+.qx-tool-h { display: flex; gap: 10px; align-items: center; }
+.qx-tool-ic { width: 40px; height: 40px; flex: none; border-radius: 12px; display: grid; place-items: center; font-size: 18px; }
+.qx-tool-h b { display: block; font-size: 14px; font-weight: 700; color: var(--qx-ink); }
+.qx-tool-h small { display: block; font-size: 12px; color: var(--qx-mute); line-height: 1.4; }
+.qx-tbtn { width: 100%; padding: 10px; border-radius: 12px; font-size: 13.5px; font-weight: 700; cursor: pointer; border: 1.5px solid #c7d2fe; background: #fff; color: var(--qx-navy); transition: .15s; }
+.qx-tbtn:hover { background: #eef2ff; border-color: var(--qx-navy); }
+.qx-tbtn-p { border: 0; color: #fff; background: linear-gradient(135deg, var(--qx-navy), var(--qx-navy-2)); box-shadow: 0 6px 14px -6px rgba(11, 42, 122, .5); }
+.qx-tbtn-p:hover { background: linear-gradient(135deg, #102f8a, #2563eb); }
+.qx-link { font-size: 12px; font-weight: 600; color: #047857; background: none; border: 0; cursor: pointer; padding: 0; text-align: center; }
+.qx-link:hover { text-decoration: underline; }
+.qx-tools-f { padding: 14px; border-top: 1px solid var(--qx-line); background: #fff; }
+.qx-save-lg { width: 100%; padding: 14px; font-size: 15px; border-radius: 16px; }
+.qx-tools-f p { margin: 8px 2px 0; font-size: 11.5px; color: var(--qx-mute); text-align: center; line-height: 1.5; }
+
+/* ปุ่มลอย "แนะนำวิธีใช้งาน" ทับแถบเครื่องมือ — หน้านี้มีปุ่ม "คู่มือ" บนแถบหัวแล้ว */
+#tablock-floating-guide-btn { display: none !important; }
+
+/* ---------- จอแคบ ---------- */
+@media (max-width: 1180px) {
+  .qx-title span { max-width: 160px; }
+  .qx-tools { width: 290px; }
+}
+@media (max-width: 1023px) {
+  .qx-head { flex-wrap: wrap; row-gap: 10px; }
+  .qx-mid { order: 3; flex-basis: 100%; max-width: none; justify-content: flex-start; }
+  .qx-tools { position: fixed; top: 0; right: 0; bottom: 0; width: min(340px, 92vw); box-shadow: -10px 0 30px rgba(15, 23, 42, .2); z-index: 40; }
+}
+/* ===================== มือถือ (กว้างไม่เกิน 767px) =====================
+ * - ทั้งหน้าเลื่อนตามปกติ (เดิมล็อกความสูงเท่าจอ บน iPhone ส่วนล่างโดนแถบเบราว์เซอร์บัง)
+ * - แถบหัวกะทัดรัด ค้างอยู่ด้านบน (ปุ่มกลับ / บันทึก กดได้ตลอด)
+ * - รายการข้อสอบเป็นแถบเลื่อนแนวนอน ช่องแก้ไขข้อสอบอยู่ใต้ เต็มความกว้าง
+ * - ช่องพิมพ์ใช้ตัวอักษร 16px (iPhone จะไม่ซูมหน้าจอเองตอนแตะช่องพิมพ์)
+ */
+@media (max-width: 767px) {
+  html, body { height: auto !important; }
+  body { min-height: 100vh; overflow: auto !important; display: block !important; }
+
+  /* แถบหัว */
+  .qx-head { position: sticky; top: 0; min-height: 0; flex-wrap: wrap; gap: 8px; padding: 8px 10px; }
+  .qx-left { flex: 1; min-width: 0; }
+  .qx-title { display: none; }
+  .qx-back { padding: 8px 12px 8px 6px; font-size: 13.5px; border-radius: 12px; }
+  .qx-back svg { width: 17px; height: 17px; }
+  .qx-back-ic { display: none; }
+  .qx-help { padding: 8px 10px; }
+  .qx-hide-sm { display: none; }
+  .qx-save { padding: 8px 12px; font-size: 13.5px; border-radius: 12px; }
+  .qx-mid { order: 3; flex-basis: 100%; max-width: none; gap: 6px; }
+  #course-selector-container { flex: 1 1 55%; padding: 4px 8px 4px 5px !important; border-radius: 11px !important; gap: 5px; }
+  #course-selector-container label { display: none; }
+  #course-selector-container select { font-size: 16px; font-weight: 600; padding: 3px 0; }
+  .qx-name { flex: 1 1 45%; padding: 2px 4px 2px 5px; border-radius: 11px; gap: 5px; }
+  .qx-name input { font-size: 16px; padding: 5px 2px; }
+  .qx-n { width: 19px; height: 19px; font-size: 11px; }
+
+  /* โครงหลัก */
+  .qx-body { display: block !important; overflow: visible !important; }
+  .qx-body > main { display: block !important; overflow: visible !important; padding: 10px !important; }
+
+  /* รายการข้อสอบ: แถบเลื่อนแนวนอน */
+  .qx-qlist { width: 100% !important; max-height: none !important; border-right: 0 !important; border-bottom: 1px solid var(--qx-line); box-shadow: none !important; }
+  .qx-qlist > div:first-child { padding: 8px 10px !important; }
+  .qx-qlist > div:first-child > div:last-child { display: none !important; } /* ป้ายชื่อวิชา (มีในแถบหัวแล้ว) */
+  .qx-qlist #questions-list-container { display: flex !important; flex-direction: row; gap: 8px; overflow-x: auto !important; overflow-y: hidden !important; padding: 8px 10px !important; scroll-snap-type: x proximity; }
+  .qx-qlist #questions-list-container > * { margin: 0 !important; }
+  .qx-qlist .slide-item { flex: 0 0 140px; padding: 8px 10px !important; scroll-snap-align: start; }
+  .qx-qlist .slide-item:hover { transform: none; }
+  .qx-qlist .slide-item .line-clamp-2 { -webkit-line-clamp: 1; line-clamp: 1; }
+  .qx-qlist .slide-item > div:last-child { margin-top: 5px !important; padding-top: 4px !important; }
+  .qx-qlist .slide-item > div:first-child { margin-bottom: 2px !important; }
+  .qx-qlist > div:last-child { display: flex !important; gap: 8px; padding: 8px 10px !important; border-top: 1px solid #f1f5f9 !important; }
+  .qx-qlist > div:last-child > * { margin: 0 !important; }
+  .qx-qlist > div:last-child > button:nth-of-type(2) { display: none !important; } /* ลบทั้งหมด (มีปุ่มด้านบนแล้ว) */
+  .qx-add { padding: 9px; font-size: 14px; border-radius: 12px; }
+
+  /* แถบ "ข้อที่ / เครื่องมือ" */
+  .qx-mbar { padding-bottom: 8px !important; }
+  .qx-mbar button { padding: 7px 10px !important; font-size: 12.5px !important; }
+
+  /* การ์ดแก้ไขข้อสอบ */
+  .qx-card { padding: 14px !important; border-radius: 18px !important; border-width: 1px !important; }
+  .qx-card > * + * { margin-top: 14px !important; }
+  .qx-card > div:first-child { flex-wrap: wrap; gap: 6px; padding-bottom: 10px !important; }
+  .qx-card > div:first-child span, .qx-card > div:first-child button { font-size: 12.5px !important; padding: 5px 10px !important; border-radius: 10px !important; }
+  .qx-card label { font-size: 13px !important; }
+  #question-text-input { font-size: 16px !important; padding: 10px 12px !important; border-radius: 14px !important; border-width: 1.5px !important; }
+  #question-media-box { padding: 8px !important; border-radius: 14px !important; }
+  #media-empty-state { display: flex; align-items: center; gap: 8px; padding: 0 !important; }
+  #media-empty-state > div:first-child { font-size: 20px !important; margin: 0 !important; }
+  #media-empty-state > div:last-child { display: none; }
+  #media-empty-state > div:nth-child(2) { font-size: 13px !important; }
+  .qx-card label.flex { flex-wrap: wrap; gap: 4px; }
+  .qx-card label.flex > span:last-child { font-size: 11px !important; }
+  #choices-grid-container { gap: 8px !important; }
+  .choice-card { padding: 7px 8px !important; gap: 7px !important; border-radius: 13px !important; border-width: 1.5px !important; }
+  .choice-badge { width: 30px !important; height: 30px !important; font-size: 14px !important; border-radius: 9px !important; }
+  .choice-card input[type="text"] { font-size: 16px !important; min-width: 0; }
+  .choice-card label { padding: 4px !important; }
+  .correct-toggle-btn { padding: 5px 8px !important; font-size: 12px !important; border-radius: 10px !important; white-space: nowrap; }
+  .qx-card > div:last-child { padding-top: 10px !important; }
+  .qx-card > div:last-child button { padding: 8px 12px !important; font-size: 13px !important; }
+  /* หน้าต่าง AI: ช่องพิมพ์ 16px กัน iPhone ซูมเอง */
+  .aig-body textarea, .aig-body input:not([type=file]), .aig-body select { font-size: 16px !important; }
+  .aig-head, .aig-body, .aig-foot { padding-left: 14px !important; padding-right: 14px !important; }
+}

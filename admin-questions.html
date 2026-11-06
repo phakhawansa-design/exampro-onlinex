@@ -124,7 +124,7 @@
     <link rel="stylesheet" href="theme.css">
     <script src="theme.js" defer></script>
     <link rel="stylesheet" href="tailwind.css">
-    <style>/* มือถือ: ให้แถบหัวขึ้นบรรทัดใหม่ ไม่ล้นจอ */@media (max-width: 767px){body > header{height:auto;flex-wrap:wrap;row-gap:8px;padding-top:8px;padding-bottom:8px}body > header > div:nth-of-type(2){order:3;flex-basis:100%;max-width:none;margin:0;justify-content:flex-start;flex-wrap:wrap}body > header > div:nth-of-type(3){white-space:normal}}</style>
+    <link rel="stylesheet" href="questions-theme.css">
 </head>
 <body class="flex flex-col h-screen overflow-hidden select-none bg-slate-100">
 
@@ -132,56 +132,42 @@
     <!-- 1. TOP HEADER BAR                                        -->
     <!-- Trinetra Academic Theme                          -->
     <!-- ======================================================== -->
-    <header class="h-16 bg-white border-b border-slate-200 px-4 md:px-6 flex items-center justify-between shrink-0 shadow-xs z-30">
-        <!-- Left: Back Button & Title with ตรีเนตร logo -->
-        <div class="flex items-center gap-3">
-            <a href="dashboard.html" onclick="return confirmLeaveIfUnsaved(event, 'dashboard.html')" class="inline-flex items-center gap-2 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs sm:text-sm border border-slate-200 transition shadow-xs active:scale-95 shrink-0">
-                <span class="text-base leading-none">🏠</span>
-                <span class="hidden sm:inline">กลับแดชบอร์ด</span>
+    <header class="qx-head">
+        <!-- ซ้าย: ปุ่มกลับหน้าหลัก (เด่นชัด) + ชื่อหน้า -->
+        <div class="qx-left">
+            <a href="dashboard.html" onclick="return confirmLeaveIfUnsaved(event, 'dashboard.html')" class="qx-back" title="กลับไปหน้าแดชบอร์ดหลัก">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+                <span class="qx-back-ic">🏠</span>
+                <span>กลับหน้าหลัก</span>
             </a>
-            <div class="w-8 h-10 bg-white rounded-lg p-0.5 border border-slate-200 flex items-center justify-center shrink-0 shadow-xs hidden sm:flex">
-                <img src="trinetra-logo.svg" alt="ตรีเนตร e-Exam" class="w-full h-full object-contain" />
-            </div>
-            <div>
-                <div class="flex items-center gap-2">
-                    <h1 class="font-bold text-base sm:text-lg text-slate-900 tracking-tight leading-none">
-                        5. สร้างและแก้ไขข้อสอบ
-                    </h1>
-                    <span class="text-[10px] font-bold px-2 py-0.5 bg-blue-100 text-blue-800 border border-blue-200 rounded-lg">CREATOR</span>
+            <div class="qx-title">
+                <img src="trinetra-logo.svg" alt="ตรีเนตร e-Exam">
+                <div>
+                    <h1>5. สร้างและแก้ไขข้อสอบ</h1>
+                    <span id="header-teacher-name">ตรีเนตร e-Exam</span>
                 </div>
-                <span class="text-xs text-slate-500 font-medium" id="header-teacher-name">ตรีเนตร e-Exam</span>
             </div>
         </div>
 
-        <!-- Center: 1. เลือกรายวิชา & ชื่อชุดข้อสอบ -->
-        <div class="flex items-center gap-2 sm:gap-3 flex-1 max-w-2xl mx-4 justify-center">
-            <!-- 1. เลือกรายวิชาที่จะนำข้อสอบไปเก็บไว้ -->
-            <div id="course-selector-container" class="flex items-center gap-1.5 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-300 transition shadow-xs">
-                <label for="top-course-selector" class="text-xs sm:text-sm font-bold text-blue-900 shrink-0 flex items-center gap-1">
-                    <span>📚</span> <span class="hidden md:inline">รายวิชา:</span>
-                </label>
-                <select id="top-course-selector" onchange="onCourseChanged(this.value)" class="bg-transparent text-xs sm:text-sm font-bold text-slate-900 outline-none cursor-pointer max-w-[180px] sm:max-w-[260px] truncate">
+        <!-- กลาง: ขั้นที่ 1 เลือกรายวิชา · ขั้นที่ 2 ตั้งชื่อชุดข้อสอบ -->
+        <div class="qx-mid">
+            <div id="course-selector-container">
+                <span class="qx-n">1</span>
+                <label for="top-course-selector">รายวิชา</label>
+                <select id="top-course-selector" onchange="onCourseChanged(this.value)">
                     <option value="" disabled selected>-- 👈 กรุณาคลิกเลือกรายวิชา --</option>
                 </select>
             </div>
-
-            <!-- ชื่อชุดข้อสอบ -->
-            <div class="relative flex-1 max-w-xs sm:max-w-sm hidden sm:block">
-                <input type="text" id="top-exam-title" 
-                    oninput="markAsDirty()"
-                    placeholder="กรอกชื่อชุดข้อสอบ (เช่น สอบปลายภาค)..." 
-                    class="w-full px-3.5 py-1.5 bg-white border border-slate-300 focus:border-blue-900 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 outline-none transition shadow-xs">
+            <div class="qx-name">
+                <span class="qx-n">2</span>
+                <input type="text" id="top-exam-title" oninput="markAsDirty()" placeholder="ตั้งชื่อชุดข้อสอบ เช่น สอบปลายภาค">
             </div>
         </div>
 
-        <!-- Right: ปุ่มบันทึก -->
-        <div class="flex items-center gap-2 shrink-0 whitespace-nowrap">
-            <button onclick="window.TabLockGuide.open('questions')" class="flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow-xs cursor-pointer">
-                <span>💡</span>
-                <span class="hidden sm:inline">คู่มือ</span>
-            </button>
-            <!-- ปุ่มกดบันทึกเข้าสู่วิชา -->
-            <button onclick="saveQuestionsToCourse()" id="btn-save-course" class="px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-xl text-xs sm:text-sm font-bold shadow-xs transition active:scale-95 flex items-center gap-2 cursor-pointer">
+        <!-- ขวา: คู่มือ + บันทึก -->
+        <div class="qx-right">
+            <button onclick="window.TabLockGuide.open('questions')" class="qx-help" title="คู่มือการใช้งานหน้านี้"><span>💡</span><span class="qx-hide-sm">คู่มือ</span></button>
+            <button onclick="saveQuestionsToCourse()" id="btn-save-course" class="qx-save">
                 <span class="text-base">💾</span>
                 <span>บันทึกข้อสอบ</span>
             </button>
@@ -192,12 +178,12 @@
     <!-- 2. MAIN 3-PANEL LAYOUT (TabLock Style)                   -->
     <!-- Left: Questions List | Center: Question Editor | Right: Tools Panel -->
     <!-- ======================================================== -->
-    <div class="flex-1 flex overflow-hidden relative">
+    <div class="flex-1 flex overflow-hidden relative qx-body">
 
         <!-- ---------------------------------------------------- -->
         <!-- 2.1 LEFT SIDEBAR: รายการข้อสอบ (Question Navigator)  -->
         <!-- ---------------------------------------------------- -->
-        <aside class="w-68 sm:w-76 lg:w-80 bg-white border-r-2 border-slate-200 flex flex-col shrink-0 z-20 shadow-xs">
+        <aside class="qx-qlist w-68 sm:w-76 lg:w-80 bg-white border-r-2 border-slate-200 flex flex-col shrink-0 z-20 shadow-xs">
             <!-- Header -->
             <div class="p-3.5 border-b-2 border-slate-100 bg-slate-50/90 space-y-2">
                 <div class="flex items-center justify-between gap-2">
@@ -222,7 +208,7 @@
 
             <!-- Bottom Actions: + เพิ่มข้อสอบใหม่ & ลบทั้งหมด -->
             <div class="p-3 border-t-2 border-slate-200 bg-white space-y-2">
-                <button onclick="addNewQuestion()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-sm sm:text-base shadow-md shadow-indigo-600/25 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                <button onclick="addNewQuestion()" class="qx-add">
                     <span class="text-lg leading-none font-bold">+</span>
                     <span>เพิ่มข้อสอบใหม่</span>
                 </button>
@@ -241,7 +227,7 @@
         <main class="flex-1 bg-slate-100 overflow-y-auto p-4 md:p-6 lg:p-8 flex flex-col justify-between items-center">
             
             <!-- Mobile Bar: สลับแถบเครื่องมือบนจอเล็ก -->
-            <div class="w-full max-w-4xl flex lg:hidden items-center justify-between pb-3">
+            <div class="qx-mbar w-full max-w-4xl flex lg:hidden items-center justify-between pb-3">
                 <span class="text-sm font-bold text-slate-900">ข้อที่ <span id="mobile-q-index" class="text-indigo-600">1</span></span>
                 <button onclick="toggleSettingsSidebar()" class="px-3.5 py-2 bg-white border-2 border-slate-300 rounded-xl text-xs font-bold text-slate-900 shadow-xs flex items-center gap-1.5">
                     <span>🛠️</span> เครื่องมือสร้างข้อสอบ
@@ -249,7 +235,7 @@
             </div>
 
             <!-- Clean Centered Exam Card (TabLock White Card) -->
-            <div class="w-full max-w-4xl space-y-5 my-auto bg-white rounded-3xl p-5 sm:p-8 shadow-md border-2 border-slate-200/90">
+            <div class="qx-card w-full max-w-4xl space-y-5 my-auto bg-white rounded-3xl p-5 sm:p-8 shadow-md border-2 border-slate-200/90">
                 
                 <!-- TOP: Question Header & Number -->
                 <div class="flex items-center justify-between pb-3 border-b-2 border-slate-100">
@@ -426,87 +412,55 @@
 
         <!-- ---------------------------------------------------- -->
         <!-- 2.3 RIGHT SIDEBAR: เมนูเครื่องมือสร้างข้อสอบ (3 เครื่องมือ) -->
-        <!-- เรียงตามลำดับ: 1. Excel -> 2. AI -> 3. คลังข้อสอบ         -->
+        <!-- เรียงตามลำดับ: 1. Excel -> 2. AI สร้างให้ -> 3. แปลงจาก ChatGPT -> 4. คลังข้อสอบ -->
         <!-- ---------------------------------------------------- -->
-        <aside id="settings-sidebar" class="w-72 sm:w-80 lg:w-84 bg-white border-l-2 border-slate-200 flex flex-col shrink-0 z-20 shadow-xs">
-            <!-- Header -->
-            <div class="p-4 border-b-2 border-slate-200 bg-slate-50 flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                    <span class="text-2xl">🛠️</span>
-                    <div>
-                        <h2 class="font-bold text-base text-slate-900 leading-tight">เครื่องมือช่วยสร้างข้อสอบ</h2>
-                        <p class="text-xs font-bold text-slate-500">เลือกวิธีนำเข้าข้อสอบตามต้องการ</p>
-                    </div>
+        <aside id="settings-sidebar" class="qx-tools">
+            <div class="qx-tools-h">
+                <div>
+                    <h2>เครื่องมือช่วยสร้างข้อสอบ</h2>
+                    <p>เพิ่มข้อสอบได้หลายทาง เลือกวิธีที่สะดวก</p>
                 </div>
-                <button onclick="toggleSettingsSidebar()" class="lg:hidden text-slate-400 hover:text-slate-700 font-bold text-xl p-1">✕</button>
+                <button onclick="toggleSettingsSidebar()" class="qx-x lg:hidden" aria-label="ปิดแถบเครื่องมือ">✕</button>
             </div>
 
-            <!-- Tools Body (Exact Top to Bottom Order as requested) -->
-            <div class="flex-1 overflow-y-auto p-4 space-y-4">
-                
-                <!-- 1. นำเข้าไฟล์ xlsx -->
-                <div class="p-4 bg-emerald-50/90 border-2 border-emerald-300 rounded-2xl shadow-xs space-y-3 transition hover:border-emerald-400">
-                    <div class="flex items-center gap-2.5">
-                        <span class="p-2 bg-emerald-600 text-white rounded-xl font-bold text-lg shadow-xs shrink-0">📊</span>
-                        <div>
-                            <h3 class="font-bold text-sm sm:text-base text-emerald-950">1. นำเข้าไฟล์ xlsx</h3>
-                            <p class="text-xs font-bold text-emerald-800 leading-tight">นำเข้าโจทย์จากตาราง Excel (.xlsx)</p>
-                        </div>
-                    </div>
-                    
-                    <button onclick="triggerExcelImport()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/25 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-                        <span class="text-base">📁</span>
-                        <span>เลือกไฟล์ Excel (.xlsx)</span>
-                    </button>
-
-                    <div class="text-center pt-0.5">
-                        <button onclick="downloadSampleExcel()" class="text-xs text-emerald-800 hover:text-emerald-950 font-bold transition hover:underline inline-flex items-center gap-1 cursor-pointer">
-                            <span>📥</span>
-                            <span>ดาวน์โหลดตัวอย่างไฟล์ .xlsx</span>
-                        </button>
-                    </div>
+            <div class="qx-tools-b">
+                <!-- 1. Excel -->
+                <div class="qx-tool">
+                    <div class="qx-tool-h"><span class="qx-tool-ic" style="background:#ecfdf5;color:#047857">📊</span>
+                        <div><b>นำเข้าจาก Excel</b><small>มีข้อสอบในตาราง .xlsx อยู่แล้ว</small></div></div>
+                    <button onclick="triggerExcelImport()" class="qx-tbtn">📁 เลือกไฟล์ Excel</button>
+                    <button onclick="downloadSampleExcel()" class="qx-link">📥 ดาวน์โหลดไฟล์ตัวอย่าง .xlsx</button>
                 </div>
 
-                <!-- 2. แปลงข้อสอบจาก AI -->
-                <div class="p-4 bg-purple-50/90 border-2 border-purple-300 rounded-2xl shadow-xs space-y-3 transition hover:border-purple-400">
-                    <div class="flex items-center gap-2.5">
-                        <span class="p-2 bg-purple-600 text-white rounded-xl font-bold text-lg shadow-xs shrink-0">🤖</span>
-                        <div>
-                            <h3 class="font-bold text-sm sm:text-base text-purple-950">2. แปลงข้อสอบจาก AI</h3>
-                            <p class="text-xs font-bold text-purple-800 leading-tight">แปลงข้อความจาก ChatGPT / Claude</p>
-                        </div>
-                    </div>
-
-                    <button onclick="openAiModal()" class="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl font-bold text-xs sm:text-sm shadow-md shadow-purple-600/25 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-                        <span class="text-base">✨</span>
-                        <span>เปิดตัวแปลงข้อสอบ AI</span>
-                    </button>
+                <!-- 2. ให้ AI สร้างข้อสอบ -->
+                <div class="qx-tool qx-tool-hi">
+                    <span class="qx-badge">แนะนำ</span>
+                    <div class="qx-tool-h"><span class="qx-tool-ic" style="background:#0b2a7a;color:#fff">✨</span>
+                        <div><b>ให้ AI สร้างข้อสอบ</b><small>ออกจากหัวข้อ หรือแปลงจาก PDF / ภาพถ่าย</small></div></div>
+                    <button onclick="openAiGen()" class="qx-tbtn qx-tbtn-p">🤖 สร้างข้อสอบด้วย AI</button>
                 </div>
 
-                <!-- 3. นำเข้าจากคลังข้อสอบ -->
-                <div class="p-4 bg-sky-50/90 border-2 border-sky-300 rounded-2xl shadow-xs space-y-3 transition hover:border-sky-400">
-                    <div class="flex items-center gap-2.5">
-                        <span class="p-2 bg-sky-600 text-white rounded-xl font-bold text-lg shadow-xs shrink-0">📚</span>
-                        <div>
-                            <h3 class="font-bold text-sm sm:text-base text-sky-950">3. นำเข้าจากคลังข้อสอบ</h3>
-                            <p class="text-xs font-bold text-sky-800 leading-tight">ดึงข้อสอบสำเร็จรูปจากคลังระบบ</p>
-                        </div>
-                    </div>
-
-                    <button onclick="openLibraryModal()" class="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-bold text-xs sm:text-sm shadow-md shadow-sky-600/25 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-                        <span class="text-base">📖</span>
-                        <span>เปิดคลังข้อสอบ</span>
-                    </button>
+                <!-- 3. แปลงข้อความจาก ChatGPT / Claude -->
+                <div class="qx-tool">
+                    <div class="qx-tool-h"><span class="qx-tool-ic" style="background:#f5f3ff;color:#6d28d9">🪄</span>
+                        <div><b>แปลงจาก ChatGPT / Claude</b><small>คัดลอกคำสั่งไปใช้ แล้วนำผลกลับมา</small></div></div>
+                    <button onclick="openAiModal()" class="qx-tbtn">เปิดตัวแปลงข้อสอบ</button>
                 </div>
 
+                <!-- 4. คลังข้อสอบ -->
+                <div class="qx-tool">
+                    <div class="qx-tool-h"><span class="qx-tool-ic" style="background:#eff6ff;color:#1d4ed8">📚</span>
+                        <div><b>นำเข้าจากคลังข้อสอบ</b><small>ดึงข้อสอบสำเร็จรูปจากคลังระบบ</small></div></div>
+                    <button onclick="openLibraryModal()" class="qx-tbtn">📖 เปิดคลังข้อสอบ</button>
+                </div>
             </div>
 
-            <!-- Footer of Right Sidebar: Quick Save Button -->
-            <div class="p-4 border-t-2 border-slate-200 bg-slate-50 space-y-2">
-                <button onclick="saveQuestionsToCourse()" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-2xl font-bold text-sm sm:text-base shadow-lg shadow-emerald-600/25 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+            <div class="qx-tools-f">
+                <button onclick="saveQuestionsToCourse()" class="qx-save qx-save-lg">
                     <span class="text-lg">💾</span>
                     <span>บันทึกข้อสอบเข้าสู่วิชา</span>
                 </button>
+                <p>ข้อสอบจะถูกเก็บในรายวิชาที่เลือก นำไปเปิดห้องสอบได้ที่เมนู 6</p>
             </div>
         </aside>
 
@@ -2028,6 +1982,169 @@
 
         </div>
     </div>
+
+    <!-- ======================================================== -->
+    <!-- ✨ ให้ AI สร้างข้อสอบ (ย้ายมาจากเมนู 6 เดิม)               -->
+    <!-- ข้อสอบที่ได้จะเพิ่มเข้ารายการข้อสอบในหน้านี้ แก้ต่อแล้วกดบันทึก -->
+    <!-- ======================================================== -->
+    <style>
+        .aig-ov{position:fixed;inset:0;z-index:49;background:rgba(2,6,23,.75);display:flex;align-items:center;justify-content:center;padding:12px}
+        .aig-ov.hidden{display:none}
+        .aig-box{background:#fff;width:100%;max-width:760px;max-height:92vh;border-radius:24px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 80px -20px rgba(0,0,0,.5);border:2px solid #c7d2fe}
+        .aig-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:18px 22px;border-bottom:1px solid #eef2f7}
+        .aig-head b{font-size:18px;color:#0f172a}.aig-head small{display:block;margin-top:3px;font-size:12px;color:#64748b}
+        .aig-badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:#f1f5f9;color:#64748b;vertical-align:middle}
+        .aig-x{font-size:20px;color:#94a3b8;padding:2px 8px;border-radius:10px}.aig-x:hover{color:#334155;background:#f1f5f9}
+        .aig-body{padding:16px 22px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+        .aig-body label{display:block;font-size:13px;font-weight:700;color:#334155}
+        .aig-body textarea,.aig-body input:not([type=file]),.aig-body select{display:block;width:100%;margin-top:4px;padding:9px 12px;border:1px solid #cbd5e1;border-radius:12px;font:inherit;font-size:14px;font-weight:500;color:#0f172a;background:#fff;outline:none}
+        .aig-body textarea:focus,.aig-body input:focus,.aig-body select:focus{border-color:#1e3a8a;box-shadow:0 0 0 2px rgba(30,58,138,.15)}
+        .aig-tabs{display:flex;gap:4px;background:#f1f5f9;padding:4px;border-radius:14px;width:fit-content;flex-wrap:wrap}
+        .aig-tabs button{padding:8px 14px;border-radius:10px;font-size:13px;font-weight:700;color:#64748b}
+        .aig-tabs button.on{background:#0b2a7a;color:#fff}
+        .aig-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-width:420px}
+        .aig-note{font-size:12px;color:#64748b;margin:0 0 6px}
+        .aig-warn{padding:10px 12px;border-radius:12px;border:2px dashed #f59e0b;background:#fffbeb;color:#92400e;font-size:13px}
+        .aig-btn{padding:11px 20px;border-radius:12px;font-weight:700;color:#fff;background:#0b2a7a;font-size:14px}
+        .aig-btn:hover{background:#1e3a8a}.aig-btn:disabled{opacity:.6;cursor:wait}
+        .aig-q{border:1px solid #e2e8f0;border-radius:14px;padding:12px 14px;background:#f8fafc}
+        .aig-q p{margin:0 0 6px;font-weight:700;color:#0f172a;font-size:14px}
+        .aig-q ol{margin:0;padding:0;list-style:none;display:grid;gap:3px}
+        .aig-q li{font-size:13px;color:#475569;padding:2px 8px;border-radius:8px}
+        .aig-q li.ok{background:#dcfce7;color:#166534;font-weight:700}
+        .aig-q .rm{float:right;font-size:12px;color:#e11d48;font-weight:700}
+        .aig-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 22px;border-top:1px solid #eef2f7;background:#f8fafc}
+        .aig-foot.hidden,#aig-prev.hidden,#aig-file.hidden,#aig-topic.hidden,#aig-nokey.hidden{display:none}
+    </style>
+    <div id="ai-gen-modal" class="aig-ov hidden" onclick="if(event.target===this)closeAiGen()">
+        <div class="aig-box">
+            <div class="aig-head">
+                <div>
+                    <b>✨ สร้างข้อสอบด้วย AI</b> <span id="aig-badge" class="aig-badge">กำลังตรวจสอบ...</span>
+                    <small>ข้อสอบที่ได้จะเพิ่มเข้ารายการข้อสอบทางซ้าย แก้ไขต่อได้ แล้วกด "บันทึกข้อสอบ" ตามปกติ</small>
+                </div>
+                <button type="button" class="aig-x" onclick="closeAiGen()" aria-label="ปิด">✕</button>
+            </div>
+            <div class="aig-body">
+                <div id="aig-nokey" class="aig-warn hidden">ยังไม่ได้ใส่ <code>ANTHROPIC_API_KEY</code> — โหมด "ออกข้อสอบจากหัวข้อ" จะดึงจากคลังข้อสอบตัวอย่างแทน และโหมด "แปลงจากไฟล์" ยังใช้ไม่ได้</div>
+                <div class="aig-tabs">
+                    <button type="button" data-m="topic" class="on" onclick="aigMode('topic')">✨ ออกข้อสอบจากหัวข้อ</button>
+                    <button type="button" data-m="file" onclick="aigMode('file')">📄 แปลงจากไฟล์ / ข้อความ</button>
+                </div>
+                <div id="aig-topic">
+                    <label>หัวข้อ / ขอบเขตเนื้อหา
+                        <textarea id="aig-topic-in" rows="2" placeholder="เช่น ระบบสุริยะ ชั้น ม.1 เน้นลักษณะของดาวเคราะห์แต่ละดวง"></textarea></label>
+                </div>
+                <div id="aig-file" class="hidden">
+                    <p class="aig-note">แนบข้อสอบเดิม (PDF / ภาพถ่าย) เพื่อแปลงเข้าระบบ หรือแนบเนื้อหาบทเรียนให้ AI ออกข้อสอบจากเนื้อหานั้น · ไฟล์ Word/Excel ให้คัดลอกข้อความมาวางแทน</p>
+                    <input id="aig-f" type="file" accept="application/pdf,image/*">
+                    <textarea id="aig-src" rows="4" placeholder="หรือวางข้อความข้อสอบ / เนื้อหาบทเรียนที่นี่" style="margin-top:8px"></textarea>
+                    <input id="aig-focus" placeholder="เน้นเรื่อง (ไม่บังคับ)" style="margin-top:8px">
+                </div>
+                <div class="aig-grid">
+                    <label>จำนวนข้อ<input id="aig-n" type="number" min="1" max="100" value="10"></label>
+                    <label>ความยาก<select id="aig-diff"><option value="easy">ง่าย</option><option value="medium" selected>ปานกลาง</option><option value="hard">ยาก</option></select></label>
+                </div>
+                <p class="aig-note">ข้อละ 4 ตัวเลือก (ก ข ค ง) ให้ตรงกับหน้าสร้างข้อสอบ</p>
+                <div><button id="aig-go" type="button" class="aig-btn" onclick="aigGenerate()">🤖 สร้างข้อสอบ</button> <span id="aig-msg" style="font-size:13px;margin-left:8px"></span></div>
+                <div id="aig-prev" class="hidden">
+                    <p class="aig-note"><b>ตรวจทานก่อนเพิ่ม</b> · AI อาจผิดพลาดได้ กรุณาตรวจเฉลยทุกข้อ (แก้ไขรายละเอียดได้หลังเพิ่มเข้ารายการ)</p>
+                    <div id="aig-list" style="display:grid;gap:10px"></div>
+                </div>
+            </div>
+            <div id="aig-foot" class="aig-foot hidden">
+                <span id="aig-cnt" style="font-size:13px;font-weight:700;color:#334155"></span>
+                <button type="button" class="aig-btn" onclick="aigInsert()" style="background:#059669">➕ เพิ่มเข้ารายการข้อสอบ</button>
+            </div>
+        </div>
+    </div>
+    <script>
+    (function () {
+        const L = 'abcd', TH = ['ก', 'ข', 'ค', 'ง'];
+        const el = id => document.getElementById(id);
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        let mode = 'topic', items = [], checked = false;
+
+        window.openAiGen = function () {
+            el('ai-gen-modal').classList.remove('hidden');
+            if (checked) return; checked = true;
+            fetch('/api/ai-quiz/status').then(r => r.json()).then(st => {
+                el('aig-badge').textContent = st.aiEnabled ? '🟢 Claude · ' + st.model : '🟡 ยังไม่มี API key';
+                el('aig-badge').style.cssText = st.aiEnabled ? 'background:#ecfdf5;color:#047857' : 'background:#fffbeb;color:#b45309';
+                el('aig-nokey').classList.toggle('hidden', !!st.aiEnabled);
+            }).catch(() => { checked = false; el('aig-badge').textContent = '🔴 เชื่อมต่อเซิร์ฟเวอร์ไม่ได้'; el('aig-badge').style.cssText = 'background:#fef2f2;color:#b91c1c'; });
+        };
+        window.closeAiGen = function () { el('ai-gen-modal').classList.add('hidden'); };
+        window.aigMode = function (m) {
+            mode = m;
+            document.querySelectorAll('#ai-gen-modal .aig-tabs button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
+            el('aig-topic').classList.toggle('hidden', m !== 'topic'); el('aig-file').classList.toggle('hidden', m !== 'file');
+        };
+        const toB64 = f => new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(',')[1]); r.onerror = no; r.readAsDataURL(f); });
+
+        window.aigGenerate = async function () {
+            const body = { numQuestions: Math.max(1, Math.min(100, parseInt(el('aig-n').value, 10) || 10)), choices: 4, difficulty: el('aig-diff').value };
+            if (mode === 'topic') { body.topic = el('aig-topic-in').value.trim(); if (!body.topic) return alert('กรุณาใส่หัวข้อ'); }
+            else {
+                const f = el('aig-f').files[0];
+                if (f) { if (f.size > 30 * 1024 * 1024) return alert('ไฟล์ใหญ่เกิน 30MB'); body.fileBase64 = await toB64(f); body.mime = f.type; }
+                body.sourceText = el('aig-src').value.trim(); body.topic = el('aig-focus').value.trim();
+                if (!f && !body.sourceText) return alert('กรุณาแนบไฟล์หรือวางข้อความ');
+            }
+            el('aig-go').disabled = true; el('aig-msg').innerHTML = '⏳ AI กำลังสร้างข้อสอบ อาจใช้เวลา 10–60 วินาที...';
+            try {
+                const r = await fetch('/api/generate-ai-quiz', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+                const d = await r.json();
+                if (!r.ok || !d.success) throw new Error(d.message || 'สร้างไม่สำเร็จ');
+                items = (d.questions || []).map(q => {
+                    const ch = (q.choices || []).slice(0, 4).map(c => String(c ?? ''));
+                    while (ch.length < 4) ch.push('');
+                    const a = String(q.answer || 'a').toLowerCase();
+                    return { question: String(q.question || ''), choices: ch, answer: L.includes(a) ? a : 'a' };
+                });
+                el('aig-msg').innerHTML = `<span style="color:#047857">✓ ได้ ${items.length} ข้อ${d.source === 'claude' ? '' : ' (จากคลังข้อสอบตัวอย่าง)'}</span>`;
+                render();
+            } catch (e) { el('aig-msg').innerHTML = `<span style="color:#dc2626">${esc(e.message)}</span>`; }
+            el('aig-go').disabled = false;
+        };
+        function render() {
+            el('aig-prev').classList.toggle('hidden', !items.length); el('aig-foot').classList.toggle('hidden', !items.length);
+            el('aig-cnt').textContent = `${items.length} ข้อ พร้อมเพิ่มเข้ารายการ`;
+            el('aig-list').innerHTML = items.map((q, i) => `<div class="aig-q"><button type="button" class="rm" onclick="aigRemove(${i})">ลบข้อนี้</button>
+                <p>${i + 1}. ${esc(q.question)}</p><ol>${q.choices.map((c, k) => `<li class="${q.answer === L[k] ? 'ok' : ''}">${TH[k]}. ${esc(c)}${q.answer === L[k] ? ' ✓' : ''}</li>`).join('')}</ol></div>`).join('');
+        }
+        window.aigRemove = function (i) { items.splice(i, 1); render(); };
+        window.aigInsert = function () {
+            const add = items.filter(q => q.question.trim()).map(q => Object.assign(createEmptyQuestion(), { question: q.question.trim(), choices: q.choices.slice(), answer: q.answer }));
+            if (!add.length) return;
+            // ถ้ายังมีแค่ข้อว่าง 1 ข้อ (เพิ่งเปิดหน้า) ให้แทนที่ข้อว่างนั้น
+            const blank = questions.length === 1 && !String(questions[0].question || '').trim() && (questions[0].choices || []).every(c => !String(c || '').trim());
+            if (blank) questions.splice(0, 1);
+            const start = questions.length;
+            questions.push(...add);
+            activeQuestionIndex = start;
+            markAsDirty(); renderAllQuestionsList(); renderActiveQuestionStage();
+            items = []; render(); el('aig-msg').innerHTML = ''; closeAiGen();
+            alert(`✓ เพิ่ม ${add.length} ข้อเข้ารายการแล้ว\nตรวจทาน/แก้ไขได้เลย แล้วอย่าลืมกด "💾 บันทึกข้อสอบ"`);
+        };
+        // จอแคบ (มือถือ/แท็บเล็ต): แถบเครื่องมือขวาเป็นแผงเลื่อนทับ ซ่อนไว้ก่อน เปิดด้วยปุ่ม "เครื่องมือสร้างข้อสอบ"
+        if (innerWidth < 1024) { const sb = el('settings-sidebar'); if (sb) sb.classList.add('hidden'); }
+        // ลิงก์เดิมของเมนู "สร้างข้อสอบด้วย AI" จะพามาที่หน้านี้พร้อม ?ai=1
+        // รอให้หน้าต่าง "คุณมีรายวิชาหรือยัง?" ที่ขึ้นตอนเปิดหน้า ถูกปิดก่อน แล้วค่อยเปิดเครื่องมือ AI (ไม่ให้ซ้อนกัน)
+        if (/[?&]ai=1\b/.test(location.search)) {
+            const cm = el('course-check-modal');
+            if (!cm) setTimeout(window.openAiGen, 500);
+            else {
+                let seen = false;
+                const t = setInterval(() => {
+                    const open = !cm.classList.contains('opacity-0');
+                    if (open) seen = true;
+                    else if (seen) { clearInterval(t); setTimeout(window.openAiGen, 250); }
+                }, 200);
+            }
+        }
+    })();
+    </script>
 
     <script src="user-guide-system.js"></script>
 </body>

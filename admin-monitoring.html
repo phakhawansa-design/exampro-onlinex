@@ -110,7 +110,7 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
     <link rel="stylesheet" href="theme.css">
-    <script src="theme.js" defer></script>
+    <link rel="stylesheet" href="monitoring-theme.css"><script src="theme.js" defer></script>
     <link rel="stylesheet" href="tailwind.css">
 </head>
 <body class="flex h-screen overflow-hidden">
@@ -166,13 +166,9 @@
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
                             <span>5. สร้างข้อสอบ</span>
                         </a>
-                        <a href="admin-ai-quiz.html" class="nav-link">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" /></svg>
-                            <span>6. สร้างข้อสอบด้วย AI</span>
-                        </a>
                         <a href="admin-rooms.html" class="nav-link">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 21h18M4.5 21V5.25A2.25 2.25 0 0 1 6.75 3h10.5a2.25 2.25 0 0 1 2.25 2.25V21" /></svg>
-                            <span>7. ห้องสอบ</span>
+                            <span>6. ห้องสอบ</span>
                         </a>
                     </div>
                 </div>
@@ -185,19 +181,19 @@
                     <div class="space-y-1 mt-1">
                         <a href="admin-results.html" class="nav-link">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /></svg>
-                            <span>8. ตรวจสอบผลการสอบ</span>
+                            <span>7. ตรวจสอบผลการสอบ</span>
                         </a>
                         <a href="admin-essay.html" class="nav-link">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zM19.5 7.125L16.862 4.487M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
-                            <span>9. ตรวจอัตนัยด้วย AI</span>
+                            <span>8. ตรวจอัตนัยด้วย AI</span>
                         </a>
                         <a href="admin-monitoring.html" class="nav-link active">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" /></svg>
-                            <span>10. ตรวจสอบพฤติกรรมน่าสงสัย</span>
+                            <span>9. ตรวจสอบพฤติกรรมน่าสงสัย</span>
                         </a>
                         <a href="trinetra-report.html" class="nav-link">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                            <span>11. รายงานรวมรายคน</span>
+                            <span>10. รายงานรวมรายคน</span>
                         </a>
                     </div>
                 </div>
@@ -235,7 +231,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="inline-block w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
-                        <h1 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight">10. ตรวจสอบพฤติกรรมน่าสงสัย</h1>
+                        <h1 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight">9. ตรวจสอบพฤติกรรมน่าสงสัย</h1>
                     </div>
                     <p class="text-xs text-slate-500 font-medium">ตรีเนตร e-Exam &middot; ศูนย์สังเกตการณ์แบบเรียลไทม์</p>
                 </div>
@@ -257,53 +253,71 @@
         <!-- Main Workspace -->
         <main class="p-6 md:p-8 flex-grow w-full mx-auto space-y-5 overflow-y-auto">
 
-            <!-- Room Tabs Navigation -->
-            <div class="glass-card p-2 shadow-sm" id="room-tabs-bar">
-                <div class="flex gap-2 overflow-x-auto flex-wrap" id="room-tabs">
-                    <!-- tabs injected here -->
-                    <div class="text-xs text-slate-400 py-2 px-3">กำลังโหลดห้องสอบ...</div>
+            <!-- ① เลือกห้องสอบ -->
+            <div class="mn-tabs-card" id="room-tabs-bar">
+                <div class="mn-tabs-l">🏫 ห้องสอบ</div>
+                <div class="mn-tabs" id="room-tabs">
+                    <div class="mn-muted">กำลังโหลดห้องสอบ...</div>
                 </div>
             </div>
 
-            <!-- All-room summary row -->
-            <div id="room-summary-row" class="grid grid-cols-2 sm:grid-cols-4 gap-3 hidden">
-                <!-- cards injected here -->
-            </div>
-
-            <!-- High Risk Panel -->
-            <div id="high-risk-panel" class="bg-rose-900/10 border border-rose-200 rounded-3xl p-5 shadow-sm text-slate-800 space-y-4 hidden">
-                <div class="flex justify-between items-center border-b border-rose-200 pb-3">
-                    <span class="text-xs font-bold text-rose-700 flex items-center gap-2">
-                        🚨 นักศึกษากลุ่มความเสี่ยงสูง (สลับหน้าจอ ≥ 3 ครั้ง)
-                    </span>
-                    <span class="bg-rose-500/10 border border-rose-500/20 text-rose-600 text-[10px] font-semibold px-2.5 py-1 rounded-lg animate-pulse" id="high-risk-count">0 คน</span>
+            <!-- ② ตัวเลขสรุป -->
+            <div class="mn-kpis">
+                <button type="button" class="mn-kpi mn-kpi-btn" onclick="openActiveStudentsModalFromMonitoring()" title="ดูรายชื่อนักศึกษาที่กำลังทำข้อสอบ">
+                    <span class="mn-ic" style="background:#ecfdf5;color:#047857">🟢</span>
+                    <div><small>กำลังทำข้อสอบ</small><b id="mn-k-active">0</b><em>คน · ดูรายชื่อ →</em></div>
+                </button>
+                <div class="mn-kpi">
+                    <span class="mn-ic" style="background:#eff6ff;color:#1d4ed8">👥</span>
+                    <div><small>นักศึกษาที่ถูกบันทึก</small><b id="mn-k-students">0</b><em>คน</em></div>
                 </div>
-                <div id="high-risk-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                <div class="mn-kpi">
+                    <span class="mn-ic" style="background:#fffbeb;color:#b45309">📋</span>
+                    <div><small>พฤติกรรมทั้งหมด</small><b id="mn-k-events">0</b><em>ครั้ง</em></div>
+                </div>
+                <div class="mn-kpi mn-kpi-risk">
+                    <span class="mn-ic" style="background:#fff1f2;color:#be123c">🚨</span>
+                    <div><small>เสี่ยงสูง (≥ 3 ครั้ง)</small><b id="mn-k-high" style="color:#be123c">0</b><em>คน</em></div>
+                </div>
             </div>
 
-            <!-- Streaming Logs -->
-            <div class="glass-card p-6 shadow-sm space-y-4">
-                <div class="flex flex-wrap justify-between items-center border-b border-slate-200 pb-3 gap-2">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">📋 บันทึกพฤติกรรมสด</span>
-                        <span class="bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 text-[10px] font-bold px-2 py-0.5 rounded-full" id="log-count-badge">0 รายการ</span>
+            <!-- สรุปรายห้อง (เฉพาะแท็บ "ทุกห้องรวม") -->
+            <div id="room-summary-row" class="hidden"></div>
+
+            <!-- ③ กลุ่มเสี่ยงสูง -->
+            <div id="high-risk-panel" class="mn-risk hidden">
+                <div class="mn-risk-h">
+                    <span>🚨 ควรติดตามด่วน · พบพฤติกรรมน่าสงสัย 3 ครั้งขึ้นไป</span>
+                    <span class="mn-risk-n" id="high-risk-count">0 คน</span>
+                </div>
+                <div id="high-risk-list" class="mn-risk-list"></div>
+            </div>
+
+            <!-- ④ บันทึกพฤติกรรม -->
+            <section class="mn-card">
+                <div class="mn-card-h">
+                    <h3>📋 บันทึกพฤติกรรม <span class="mn-badge" id="log-count-badge">0 รายการ</span></h3>
+                    <div class="mn-seg" role="tablist">
+                        <button type="button" id="mn-view-person" class="on" onclick="setLogView('person')">👥 สรุปรายคน</button>
+                        <button type="button" id="mn-view-time" onclick="setLogView('time')">🕒 ไทม์ไลน์</button>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="downloadExcel()" class="flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-3.5 py-1.5 rounded-xl font-bold text-xs transition">
-                            📥 ดาวน์โหลด Excel
-                        </button>
-                        <button onclick="clearCheatLogs()" class="bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/20 px-3.5 py-1.5 rounded-xl font-bold text-xs transition">
-                            🧹 ล้างบันทึกห้องนี้
-                        </button>
+                </div>
+                <div class="mn-tools">
+                    <label class="mn-search"><span>🔍</span><input id="mn-search" type="search" placeholder="ค้นหาชื่อ หรือรหัสนักศึกษา" oninput="renderLogs()"></label>
+                    <label class="mn-chk"><input id="mn-only-high" type="checkbox" onchange="renderLogs()"> เฉพาะเสี่ยงสูง</label>
+                    <div class="mn-legend"><span class="lv-1">● ปกติ (1)</span><span class="lv-2">● เฝ้าระวัง (2)</span><span class="lv-3">● เสี่ยงสูง (3+)</span></div>
+                    <div class="mn-tools-r">
+                        <button onclick="downloadExcel()" class="mn-btn mn-btn-p">📥 ดาวน์โหลด Excel</button>
                     </div>
                 </div>
-                <div id="live-logs-container" class="space-y-3 max-h-[500px] overflow-y-auto pr-2 divide-y divide-slate-100">
-                    <div class="text-center py-16 text-slate-400 font-semibold">
-                        📭 ยังไม่มีข้อมูล
-                    </div>
+                <div id="live-logs-container" class="mn-list">
+                    <div class="mn-empty">📭 ยังไม่มีข้อมูล</div>
                 </div>
-            </div>
-
+                <div class="mn-foot">
+                    <span>สลับหน้าจอไม่ได้แปลว่าทุจริตเสมอ ใช้ประกอบการพิจารณาของอาจารย์ · อัปเดตอัตโนมัติทุก 3 วินาที</span>
+                    <button onclick="clearCheatLogs()" class="mn-danger" title="ลบบันทึกพฤติกรรมทั้งหมดของห้องที่เลือก">🧹 ล้างบันทึกห้องนี้</button>
+                </div>
+            </section>
         </main>
 
         <!-- Footer -->
@@ -401,12 +415,11 @@
                 const count = roomCounts[r.roomId] || 0;
                 const isLive = r.is_published === 1;
                 return `
-                <button onclick="selectRoom('${r.roomId}')" id="tab-${r.roomId}"
-                    class="room-tab flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition ${r.roomId === currentRoomId ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-md shadow-rose-500/20' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}">
-                    ${r.roomId !== 'ALL' ? '🏫' : ''} ${escapeHtml(displayName)}
-                    ${isLive ? '<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="กำลังเปิดสอบ (LIVE)"></span>' : ''}
-                    <span id="active-student-badge-${r.roomId}" class="hidden bg-emerald-100 border border-emerald-300 text-emerald-900 text-[10px] font-bold px-2 py-0.5 rounded-lg shadow-2xs">👨‍🎓 0 คน</span>
-                    ${count > 0 ? `<span class="min-w-[18px] h-[18px] rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center px-1.5 shadow-sm" title="พบพฤติกรรมน่าสงสัย ${count} คน">${count}</span>` : ''}
+                <button onclick="selectRoom('${r.roomId}')" id="tab-${r.roomId}" class="room-tab mn-tab ${r.roomId === currentRoomId ? 'on' : ''}">
+                    ${isLive ? '<span class="mn-live" title="กำลังเปิดสอบ (LIVE)"></span>' : ''}
+                    <span>${escapeHtml(displayName)}</span>
+                    <span id="active-student-badge-${r.roomId}" class="hidden mn-tab-act">0 คน</span>
+                    ${count > 0 ? `<span class="mn-tab-n" title="พบพฤติกรรมน่าสงสัย ${count} คน">${count}</span>` : ''}
                 </button>`;
             }).join('');
 
@@ -439,6 +452,8 @@
                 if (badgeEl) {
                     badgeEl.textContent = `👨‍🎓 กำลังทำข้อสอบ: ${activeCount} คน`;
                 }
+                const kAct = document.getElementById('mn-k-active');
+                if (kAct) kAct.textContent = activeCount;
 
                 // Update tab badges for active student counts per room
                 rooms.forEach(r => {
@@ -459,13 +474,8 @@
             currentRoomId = roomId;
             localStorage.setItem('active_room_id', roomId);
             // update tab UI
-            document.querySelectorAll('.room-tab').forEach(btn => {
-                btn.className = btn.className.replace('bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-md shadow-rose-500/20', 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50');
-            });
-            const active = document.getElementById(`tab-${roomId}`);
-            if (active) {
-                active.className = active.className.replace('bg-white border border-slate-200 text-slate-600 hover:bg-slate-50', 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-md shadow-rose-500/20');
-            }
+            document.querySelectorAll('.room-tab').forEach(btn => btn.classList.toggle('on', btn.id === `tab-${roomId}`));
+            expandedStudents.clear();
             loadCheatLogs();
         }
 
@@ -530,134 +540,164 @@
             const roomList = Object.values(perRoom);
             if (roomList.length === 0) { summaryEl.classList.add('hidden'); return; }
 
-            summaryEl.classList.remove('hidden');
-            const gridClass = roomList.length <= 2 ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-4';
-            summaryEl.className = `grid ${gridClass} gap-3`;
+            summaryEl.className = 'mn-rooms';
 
             summaryEl.innerHTML = roomList.map(r => {
                 const roomName = rooms.find(rm => rm.roomId === r.room)?.roomName || r.room;
-                return `<div class="glass-card p-4 cursor-pointer hover:border-rose-200 transition" onclick="selectRoom('${r.room}')">
-                    <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1 truncate">🏫 ${escapeHtml(roomName)}</div>
-                    <div class="flex items-end justify-between">
-                        <div>
-                            <div class="text-2xl font-semibold text-slate-800">${r.count}</div>
-                            <div class="text-[9px] text-slate-400">พฤติกรรมรวม</div>
-                        </div>
-                        ${r.highRisk > 0
-                            ? `<div class="bg-rose-100 text-rose-600 text-[10px] font-bold px-2 py-1 rounded-lg animate-pulse">⚠️ ${r.highRisk} คนเสี่ยง</div>`
-                            : `<div class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2 py-1 rounded-lg">✅ ปกติ</div>`}
-                    </div>
-                </div>`;
+                const nStu = Object.keys(r.students).length;
+                return `<button type="button" class="mn-room" onclick="selectRoom('${r.room}')" title="ดูเฉพาะห้องนี้">
+                    <div class="mn-room-t">🏫 ${escapeHtml(roomName)}</div>
+                    <div class="mn-room-b"><b>${nStu}</b><span>คน · ${r.count} ครั้ง</span>
+                        ${r.highRisk > 0 ? `<em class="bad">⚠️ เสี่ยง ${r.highRisk} คน</em>` : `<em class="good">✅ ปกติ</em>`}</div>
+                </button>`;
             }).join('');
 
             const total = roomList.reduce((s, r) => s + r.count, 0);
             document.getElementById('global-log-count').textContent = `รวม ${total} รายการ`;
         }
 
-        function renderHighRisk(logs) {
-            const studentStats = {};
-            logs.forEach(log => {
-                if (!log.studentId) return;
-                if (!studentStats[log.studentId]) studentStats[log.studentId] = { studentId: log.studentId, name: log.name, class: log.class, roomId: log.roomId, count: 0 };
-                studentStats[log.studentId].count++;
-            });
-            const highRisk = Object.values(studentStats).filter(s => s.count >= 3);
-            const hrPanel = document.getElementById('high-risk-panel');
-            const hrList = document.getElementById('high-risk-list');
-            const hrCount = document.getElementById('high-risk-count');
+        // ======================================================
+        // บันทึกพฤติกรรม: สรุปรายคน / ไทม์ไลน์ (v2 อ่านง่าย)
+        // ======================================================
+        let lastLogs = [];
+        let logView = 'person';
+        const expandedStudents = new Set();
+        const HIGH = 3;
 
-            if (highRisk.length > 0) {
-                hrCount.textContent = `${highRisk.length} คน`;
-                hrList.innerHTML = highRisk.map(s => `
-                    <div class="bg-rose-50 border border-rose-200 p-4 rounded-2xl flex items-center justify-between gap-3 animate-pulse">
-                        <div class="space-y-1">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <strong class="text-rose-800 text-xs">${escapeHtml(s.name)}</strong>
-                                <span class="text-[9px] text-rose-700 font-mono bg-rose-100 px-2 py-0.5 rounded-full">${escapeHtml(s.studentId)}</span>
-                                ${currentRoomId === 'ALL' ? `<span class="text-[9px] text-rose-600 font-bold bg-rose-100 px-2 py-0.5 rounded-full">🏫 ${escapeHtml(s.roomId)}</span>` : ''}
-                            </div>
-                            <div class="text-[10px] text-rose-600 font-bold">⚠️ สลับหน้าจอสะสม ${s.count} ครั้ง</div>
-                        </div>
-                        <button onclick="sendDirectWarning('${s.studentId}', '${escapeHtml(s.name)}')"
-                            class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-[9px] font-bold tracking-wider transition active:scale-95 shadow-sm flex-shrink-0">
-                            💬 ส่งเตือน
-                        </button>
-                    </div>`).join('');
-                hrPanel.classList.remove('hidden');
-            } else {
-                hrPanel.classList.add('hidden');
-            }
-            return studentStats;
+        // จัดกลุ่มพฤติกรรมตามข้อความ → ไอคอน/สี
+        function classifyAction(a) {
+            a = String(a || '');
+            if (/อีกเครื่อง|หลายเครื่อง|หลายแท็บ|แท็บใหม่/.test(a)) return { k: 'dev', ic: '📱', t: 'เปิดหลายเครื่อง/แท็บ' };
+            if (/เต็มจอ/.test(a)) return { k: 'fs', ic: '🖥️', t: 'ออกจากเต็มจอ' };
+            if (/หาย|หยุดทำงาน|ขาด/.test(a)) return { k: 'away', ic: '⏸️', t: 'หายจากหน้าสอบ' };
+            if (/สลับ|ออกหน้าจอ/.test(a)) return { k: 'sw', ic: '🔀', t: 'สลับหน้าจอ' };
+            if (/เบราว์เซอร์ของ|LINE|Facebook/i.test(a)) return { k: 'app', ic: '📵', t: 'เปิดในแอปแชต' };
+            if (/รายชื่อ/.test(a)) return { k: 'ros', ic: '🚫', t: 'ไม่มีรายชื่อ' };
+            return { k: 'etc', ic: '⚠️', t: 'อื่น ๆ' };
+        }
+        const cleanAction = a => String(a || '').replace(/^[\u{1F300}-\u{1FAFF}☀-➿️\s]+/u, '');
+        const lvOf = n => n >= HIGH ? 3 : n >= 2 ? 2 : 1;
+        const lvText = n => n >= HIGH ? 'เสี่ยงสูง' : n >= 2 ? 'เฝ้าระวัง' : 'ปกติ';
+        const roomNameOf = id => (rooms.find(r => r.roomId === id) || {}).roomName || id;
+        const keyOf = l => `${l.roomId}|${l.studentId || l.name}`;
+
+        function groupStudents(logs) {
+            const m = {};
+            logs.forEach(l => {
+                const k = keyOf(l);
+                if (!m[k]) m[k] = { key: k, studentId: l.studentId, name: l.name, class: l.class, roomId: l.roomId, events: [] };
+                m[k].events.push(l);
+            });
+            return Object.values(m).map(s => {
+                s.events.sort((x, y) => String(y.time).localeCompare(String(x.time)));
+                s.count = s.events.length; s.last = s.events[0];
+                return s;
+            }).sort((x, y) => y.count - x.count || String(y.last.time).localeCompare(String(x.last.time)));
         }
 
-        function renderTimeline(logs) {
+        function renderHighRisk(logs) {
+            const studs = groupStudents(logs);
+            const high = studs.filter(s => s.count >= HIGH);
+            const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+            set('mn-k-students', studs.length); set('mn-k-events', logs.length); set('mn-k-high', high.length);
+            const hrPanel = document.getElementById('high-risk-panel');
+            const hrList = document.getElementById('high-risk-list');
+            document.getElementById('high-risk-count').textContent = `${high.length} คน`;
+            if (!high.length) { hrPanel.classList.add('hidden'); return {}; }
+            hrList.innerHTML = high.map(s => `
+                <div class="mn-hr">
+                    <div class="mn-av lv-3">${escapeHtml((s.name || '?').trim().charAt(0))}</div>
+                    <div class="mn-hr-t">
+                        <b>${escapeHtml(s.name)}</b>
+                        <span>${escapeHtml(s.studentId)}${currentRoomId === 'ALL' ? ' · ' + escapeHtml(roomNameOf(s.roomId)) : ''}</span>
+                        <em>${s.count} ครั้ง · ล่าสุด ${escapeHtml(s.last.time || '')}</em>
+                    </div>
+                    <div class="mn-hr-a">
+                        <button onclick="focusStudent('${escapeHtml(s.key)}')" class="mn-btn">ดูประวัติ</button>
+                        <button onclick="sendDirectWarning('${escapeHtml(s.studentId)}', '${escapeHtml(s.name)}', '${escapeHtml(s.roomId)}')" class="mn-btn mn-btn-warn">💬 ส่งเตือน</button>
+                    </div>
+                </div>`).join('');
+            hrPanel.classList.remove('hidden');
+            return {};
+        }
+
+        function renderTimeline(logs) { lastLogs = Array.isArray(logs) ? logs : []; renderLogs(); }
+
+        function setLogView(v) {
+            logView = v;
+            document.getElementById('mn-view-person').classList.toggle('on', v === 'person');
+            document.getElementById('mn-view-time').classList.toggle('on', v === 'time');
+            renderLogs();
+        }
+        function toggleStudent(k) { expandedStudents.has(k) ? expandedStudents.delete(k) : expandedStudents.add(k); renderLogs(); }
+        function focusStudent(k) {
+            setLogView('person'); expandedStudents.add(k); renderLogs();
+            const el = document.querySelector(`[data-k="${CSS.escape(k)}"]`);
+            if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1400); }
+        }
+
+        function renderLogs() {
             const container = document.getElementById('live-logs-container');
-            if (logs.length === 0) {
-                container.innerHTML = `<div class="text-center py-16 text-slate-400 font-semibold bg-white rounded-2xl border border-slate-200 shadow-sm">📭 ไม่พบพฤติกรรมน่าสงสัยในห้องนี้</div>`;
+            const q = (document.getElementById('mn-search')?.value || '').trim().toLowerCase().replace(/-/g, '');
+            const onlyHigh = document.getElementById('mn-only-high')?.checked;
+            const match = l => !q || (String(l.name || '') + ' ' + String(l.studentId || '')).toLowerCase().replace(/-/g, '').includes(q);
+            let studs = groupStudents(lastLogs);
+            const counts = Object.fromEntries(studs.map(s => [s.key, s.count]));
+            if (!lastLogs.length) { container.innerHTML = '<div class="mn-empty">✅ ยังไม่พบพฤติกรรมน่าสงสัยในห้องนี้</div>'; return; }
+
+            if (logView === 'time') {
+                let list = lastLogs.filter(match);
+                if (onlyHigh) list = list.filter(l => counts[keyOf(l)] >= HIGH);
+                list = [...list].sort((x, y) => String(y.time).localeCompare(String(x.time)));
+                if (!list.length) { container.innerHTML = '<div class="mn-empty">🔍 ไม่พบรายการที่ตรงกับการค้นหา</div>'; return; }
+                container.innerHTML = '<div class="mn-tl">' + list.map(l => {
+                    const c = classifyAction(l.action), n = counts[keyOf(l)] || 1;
+                    return `<div class="mn-tl-row">
+                        <span class="mn-tl-time">${escapeHtml(l.time || '')}</span>
+                        <span class="mn-ev mn-ev-${c.k}" title="${escapeHtml(c.t)}">${c.ic}</span>
+                        <div class="mn-tl-body">
+                            <div class="mn-tl-who"><b>${escapeHtml(l.name)}</b><span>${escapeHtml(l.studentId)}</span>${l.class ? `<span class="mn-cls">${escapeHtml(l.class)}</span>` : ''}${currentRoomId === 'ALL' ? `<span class="mn-room-tag">🏫 ${escapeHtml(roomNameOf(l.roomId))}</span>` : ''}<span class="mn-lv lv-${lvOf(n)}">${lvText(n)}</span></div>
+                            <div class="mn-tl-act">${escapeHtml(cleanAction(l.action))}</div>
+                        </div>
+                    </div>`;
+                }).join('') + '</div>';
                 return;
             }
 
-            const studentStats = {};
-            logs.forEach(log => {
-                if (!studentStats[log.studentId]) studentStats[log.studentId] = { count: 0 };
-                studentStats[log.studentId].count++;
-            });
-
-            container.innerHTML = logs.map(log => {
-                const cleanDate = log.date ? log.date.replace('วัน', '') : '—';
-                const isHigh = studentStats[log.studentId] && studentStats[log.studentId].count >= 3;
-                const cardClass = isHigh
-                    ? 'flex flex-col sm:flex-row items-start sm:items-center justify-between p-4.5 rounded-2xl bg-rose-50/90 border-2 border-rose-300 shadow-md gap-4 transition hover:shadow-lg'
-                    : 'flex flex-col sm:flex-row items-start sm:items-center justify-between p-4.5 rounded-2xl bg-white border border-slate-200/90 shadow-sm gap-4 transition hover:border-slate-300 hover:shadow-md';
-                
-                // คำนวณสีของจุดสถานะตามพฤติกรรม
-                let dotColorClass = 'bg-rose-500 animate-pulse';
-                if (log.action.includes('กลับเข้า') || log.action.includes('กลับมา')) {
-                    dotColorClass = 'bg-amber-500';
-                } else if (log.action.includes('ปกติ') || log.action.includes('ราบรื่น')) {
-                    dotColorClass = 'bg-emerald-500';
-                }
-
-                return `<div class="${cardClass}">
-                    <div class="flex items-start gap-3.5">
-                        <div class="relative shrink-0 w-11 h-11 rounded-full ${isHigh ? 'bg-rose-100 text-rose-700 border-2 border-rose-300' : 'bg-slate-100 text-slate-700 border border-slate-300'} flex items-center justify-center shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                            </svg>
-                            <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${dotColorClass}"></span>
+            studs = studs.filter(s => s.events.some(match));
+            if (onlyHigh) studs = studs.filter(s => s.count >= HIGH);
+            if (!studs.length) { container.innerHTML = '<div class="mn-empty">🔍 ไม่พบนักศึกษาที่ตรงกับการค้นหา</div>'; return; }
+            container.innerHTML = studs.map(s => {
+                const lv = lvOf(s.count), open = expandedStudents.has(s.key), c = classifyAction(s.last.action);
+                const kinds = {}; s.events.forEach(e => { const k = classifyAction(e.action); kinds[k.k] = kinds[k.k] || { ...k, n: 0 }; kinds[k.k].n++; });
+                return `<div class="mn-st lv-${lv} ${open ? 'open' : ''}" data-k="${escapeHtml(s.key)}">
+                    <div class="mn-st-main" onclick="toggleStudent('${escapeHtml(s.key)}')">
+                        <div class="mn-av lv-${lv}">${escapeHtml((s.name || '?').trim().charAt(0))}</div>
+                        <div class="mn-st-who">
+                            <div><b>${escapeHtml(s.name)}</b><span class="mn-lv lv-${lv}">${lvText(s.count)}</span></div>
+                            <div class="mn-st-meta"><span class="mn-id">${escapeHtml(s.studentId)}</span>${s.class ? `<span class="mn-cls">${escapeHtml(s.class)}</span>` : ''}${currentRoomId === 'ALL' ? `<span class="mn-room-tag">🏫 ${escapeHtml(roomNameOf(s.roomId))}</span>` : ''}</div>
+                            <div class="mn-kinds">${Object.values(kinds).map(k => `<span class="mn-kind mn-ev-${k.k}">${k.ic} ${k.t} ${k.n}</span>`).join('')}</div>
                         </div>
-                        <div class="space-y-1.5">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <strong class="text-slate-900 font-bold text-base tracking-tight">${escapeHtml(log.name)}</strong>
-                                <span class="text-xs font-bold text-slate-800 font-mono bg-slate-100 border border-slate-300 px-2.5 py-0.5 rounded-lg shadow-2xs">${escapeHtml(log.studentId)}</span>
-                                <span class="text-xs font-semibold text-cyan-900 bg-cyan-100/90 border border-cyan-300 px-2.5 py-0.5 rounded-lg shadow-2xs">${escapeHtml(log.class || '—')}</span>
-                                ${currentRoomId === 'ALL' ? `<span class="text-xs font-semibold text-violet-900 bg-violet-100/90 border border-violet-300 px-2.5 py-0.5 rounded-lg">🏫 ${escapeHtml(log.roomId)}</span>` : ''}
-                                ${isHigh ? '<span class="text-xs font-bold bg-rose-600 text-white px-2.5 py-0.5 rounded-lg uppercase tracking-wider animate-pulse shadow-sm">⚠️ ความเสี่ยงสูง</span>' : ''}
-                            </div>
-                            <p class="text-rose-700 text-sm font-semibold flex items-center gap-1">${escapeHtml(log.action)}</p>
+                        <div class="mn-st-count"><b>${s.count}</b><span>ครั้ง</span></div>
+                        <div class="mn-st-last"><span>ล่าสุด ${escapeHtml(s.last.time || '')}</span><em>${c.ic} ${escapeHtml(c.t)}</em></div>
+                        <div class="mn-st-act" onclick="event.stopPropagation()">
+                            <button onclick="sendDirectWarning('${escapeHtml(s.studentId)}', '${escapeHtml(s.name)}', '${escapeHtml(s.roomId)}')" class="mn-btn mn-btn-warn">💬 ส่งเตือน</button>
+                            <button onclick="toggleStudent('${escapeHtml(s.key)}')" class="mn-btn mn-more" aria-label="ดูประวัติ">${open ? '▲' : '▼'}</button>
                         </div>
                     </div>
-                    <div class="flex items-center gap-4 self-end sm:self-center shrink-0">
-                        <div class="text-right font-mono">
-                            <div class="text-slate-900 text-sm font-bold">${log.time}</div>
-                            <div class="text-slate-500 text-xs font-bold mt-0.5">${cleanDate}</div>
-                        </div>
-                        <button onclick="sendDirectWarning('${log.studentId}', '${escapeHtml(log.name)}')"
-                            class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white rounded-xl text-xs font-bold transition shadow-md flex items-center gap-1">
-                            💬 ส่งเตือน
-                        </button>
-                    </div>
+                    ${open ? `<ol class="mn-hist">${s.events.map(e => { const k = classifyAction(e.action); return `<li><span class="mn-tl-time">${escapeHtml(e.time || '')}</span><span class="mn-ev mn-ev-${k.k}">${k.ic}</span><span>${escapeHtml(cleanAction(e.action))}</span></li>`; }).join('')}</ol>` : ''}
                 </div>`;
             }).join('');
         }
 
-        async function sendDirectWarning(studentId, name) {
+        async function sendDirectWarning(studentId, name, roomId) {
             const warningMsg = prompt(`💬 ส่งข้อความแจ้งเตือนไปยัง [${name}]:`, 'กรุณาอย่าสลับหน้าจอเด็ดขาด ระบบกำลังบันทึกพฤติกรรม');
             if (warningMsg === null) return;
             const trimmed = warningMsg.trim();
             if (!trimmed) { alert('กรุณากรอกข้อความก่อน'); return; }
 
-            const targetRoom = currentRoomId === 'ALL' ? rooms[0]?.roomId : currentRoomId;
+            // ส่งไปห้องที่นักศึกษาคนนั้นสอบอยู่จริง (เดิมแท็บ "ทุกห้องรวม" ส่งไปห้องแรกในรายการเสมอ)
+            const targetRoom = roomId || (currentRoomId === 'ALL' ? rooms[0]?.roomId : currentRoomId);
             if (!targetRoom) { alert('ไม่พบห้องสอบ'); return; }
 
             try {
@@ -668,7 +708,6 @@
                 alert(res.ok ? '✅ ส่งข้อความแจ้งเตือนสำเร็จ!' : '❌ ล้มเหลวในการส่งข้อความ');
             } catch(err) { alert('เกิดข้อผิดพลาดในการเชื่อมต่อ'); }
         }
-
         async function clearCheatLogs() {
             if (currentRoomId === 'ALL') { alert('กรุณาเลือกห้องสอบก่อนล้างบันทึกครับ'); return; }
             if (!confirm(`⚠️ ยืนยันการล้างบันทึกทุจริตทั้งหมดของห้อง ${currentRoomId}?`)) return;

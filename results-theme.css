@@ -1,0 +1,105 @@
+/* ตรีเนตร e-Exam · ธีมหน้า "7. ตรวจสอบผลการสอบ" (admin-results.html)
+ * สีเดียวกับแดชบอร์ด: น้ำเงินเข้ม #0b2a7a · การ์ดขาว · ตัวอักษรใหญ่อ่านง่าย
+ */
+:root { --rs-navy: #0b2a7a; --rs-navy-2: #1e40af; --rs-ink: #0f172a; --rs-mute: #64748b; --rs-line: #e2e8f0; }
+
+/* ① แบนเนอร์สรุป */
+.rs-hero { position: relative; overflow: hidden; border-radius: 24px; color: #fff; padding: 24px 28px 30px;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+  background: linear-gradient(135deg, #0f172a 0%, #0b2a7a 60%, #172554 100%); box-shadow: 0 10px 25px -5px rgba(15, 23, 42, .25); }
+.rs-hero::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, .08) 1px, transparent 1px); background-size: 24px 24px; }
+.rs-hero > * { position: relative; }
+.rs-chip { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 10px; font-size: 12px; font-weight: 600;
+  background: rgba(30, 58, 138, .6); border: 1px solid rgba(96, 165, 250, .3); color: #bfdbfe; }
+.rs-dot { width: 8px; height: 8px; border-radius: 50%; background: #34d399; }
+.rs-hero h2 { margin: 10px 0 6px; font-size: clamp(20px, 2.2vw, 26px); font-weight: 800; letter-spacing: -.2px; }
+.rs-hero p { margin: 0; font-size: 14px; color: #cbd5e1; }
+.rs-hero-r { display: flex; gap: 10px; flex-wrap: wrap; }
+.rs-big { min-width: 120px; padding: 12px 16px; border-radius: 16px; background: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .18); }
+.rs-big small { display: block; font-size: 12px; color: #bfdbfe; }
+.rs-big b { display: block; font-size: 22px; font-weight: 800; margin-top: 2px; white-space: nowrap; }
+.rs-bar { position: absolute !important; left: 0; right: 0; bottom: 0; height: 6px; background: rgba(255, 255, 255, .12); }
+.rs-bar i { display: block; height: 100%; background: linear-gradient(90deg, #34d399, #22c55e); transition: width .6s ease; }
+
+/* ② การ์ดสถิติ */
+.rs-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.rs-kpi { display: flex; gap: 12px; align-items: center; padding: 16px 18px; background: #fff; border: 1px solid var(--rs-line); border-radius: 18px; box-shadow: 0 2px 10px rgba(15, 23, 42, .03); }
+.rs-ic { width: 44px; height: 44px; flex: none; border-radius: 13px; display: grid; place-items: center; font-size: 20px; }
+.rs-kpi small { display: block; font-size: 12.5px; color: var(--rs-mute); font-weight: 500; }
+.rs-kpi b { display: block; font-size: 22px; font-weight: 800; line-height: 1.2; }
+.rs-kpi em { display: block; font-style: normal; font-size: 11px; color: #94a3b8; }
+
+/* การ์ดทั่วไป */
+.rs-card { background: #fff; border: 1px solid var(--rs-line); border-radius: 20px; box-shadow: 0 2px 10px rgba(15, 23, 42, .03); overflow: hidden; }
+.rs-pad { padding: 18px 20px; }
+.rs-h { margin: 0 0 12px; font-size: 15px; font-weight: 700; color: var(--rs-ink); }
+.rs-card-h { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 16px 20px 0; }
+.rs-card-h h3 { margin: 0; font-size: 17px; font-weight: 800; color: var(--rs-ink); display: flex; align-items: center; gap: 8px; }
+.rs-count { font-size: 12px; font-weight: 600; color: #1d4ed8; background: #eff6ff; padding: 2px 10px; border-radius: 99px; }
+.rs-actions { display: flex; gap: 8px; }
+.rs-btn { padding: 9px 14px; border-radius: 12px; font-size: 13px; font-weight: 700; border: 1px solid var(--rs-line); background: #fff; color: #334155; cursor: pointer; transition: .15s; }
+.rs-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+.rs-btn-p { border: 0; color: #fff; background: linear-gradient(135deg, var(--rs-navy), var(--rs-navy-2)); box-shadow: 0 6px 14px -6px rgba(11, 42, 122, .5); }
+.rs-btn-p:hover { background: linear-gradient(135deg, #102f8a, #2563eb); }
+
+/* แถบค้นหา / กรอง */
+.rs-tools { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 20px; border-bottom: 1px solid var(--rs-line); }
+.rs-search { flex: 1 1 260px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border: 1.5px solid var(--rs-line); border-radius: 12px; background: #f8fafc; transition: .15s; }
+.rs-search:focus-within { border-color: var(--rs-navy); background: #fff; box-shadow: 0 0 0 3px rgba(11, 42, 122, .1); }
+.rs-search input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: inherit; font-size: 14px; padding: 9px 0; }
+.rs-field { display: flex; align-items: center; gap: 6px; padding: 0 4px 0 12px; border: 1.5px solid var(--rs-line); border-radius: 12px; background: #fff; }
+.rs-field span { font-size: 12px; font-weight: 600; color: var(--rs-mute); white-space: nowrap; }
+.rs-field select { border: 0; outline: none; background: transparent; font: inherit; font-size: 13.5px; font-weight: 600; color: var(--rs-ink); padding: 9px 6px; cursor: pointer; }
+
+/* ตารางคะแนน */
+.rs-table-wrap { overflow-x: auto; max-height: 70vh; }
+.rs-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+.rs-table thead th { position: sticky; top: 0; z-index: 1; background: #f8fafc; color: var(--rs-mute); font-size: 12px; font-weight: 700; text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--rs-line); white-space: nowrap; }
+.rs-table td { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+.rs-table tbody tr:hover td { background: #f8fbff; }
+.rs-table .c { text-align: center; }
+.rs-no { color: #94a3b8; font-weight: 700; width: 48px; }
+.rs-name { font-weight: 700; color: var(--rs-ink); }
+.rs-id { font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; color: #1d4ed8; margin-top: 1px; }
+.rs-cls { display: inline-block; padding: 3px 10px; border-radius: 8px; background: #eff6ff; color: #1e40af; font-weight: 700; font-size: 12.5px; white-space: nowrap; }
+.rs-score { display: flex; align-items: baseline; gap: 4px; }
+.rs-score b { font-size: 18px; font-weight: 800; color: var(--rs-ink); }
+.rs-score span { color: var(--rs-mute); font-size: 13px; }
+.rs-score em { margin-left: auto; font-style: normal; font-size: 12px; font-weight: 700; padding: 1px 8px; border-radius: 99px; }
+.rs-meter { margin-top: 5px; height: 6px; border-radius: 99px; background: #eef2f7; overflow: hidden; min-width: 120px; }
+.rs-meter i { display: block; height: 100%; border-radius: inherit; }
+.hi { color: #047857; } .ok { color: #1d4ed8; } .lo { color: #be123c; }
+.rs-score em.hi { background: #ecfdf5; } .rs-score em.ok { background: #eff6ff; } .rs-score em.lo { background: #fff1f2; }
+.rs-meter i.hi { background: #10b981; } .rs-meter i.ok { background: #3b82f6; } .rs-meter i.lo { background: #f43f5e; }
+.rs-pass, .rs-fail { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+.rs-pass { background: #dcfce7; color: #166534; } .rs-fail { background: #ffe4e6; color: #9f1239; }
+.rs-zt b { display: block; font-family: ui-monospace, Consolas, monospace; font-size: 13px; color: #334155; }
+.rs-zt span, .rs-time span { display: block; font-size: 11px; color: #94a3b8; }
+.rs-time b { display: block; font-family: ui-monospace, Consolas, monospace; font-size: 13px; color: #334155; font-weight: 600; }
+.rs-row-act { display: flex; gap: 6px; justify-content: center; }
+.rs-view { padding: 7px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; background: var(--rs-navy); color: #fff; border: 0; cursor: pointer; white-space: nowrap; }
+.rs-view:hover { background: var(--rs-navy-2); }
+.rs-del { width: 34px; border-radius: 10px; border: 1px solid #fecdd3; background: #fff; color: #e11d48; cursor: pointer; }
+.rs-del:hover { background: #fff1f2; }
+.rs-empty { padding: 56px 16px !important; text-align: center; color: var(--rs-mute); }
+
+/* กราฟ */
+.rs-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+
+/* โซนลบข้อมูล */
+.rs-danger { display: flex; align-items: center; justify-content: flex-end; gap: 12px; flex-wrap: wrap; font-size: 13px; color: var(--rs-mute); }
+.rs-danger button { padding: 8px 14px; border-radius: 12px; font-size: 13px; font-weight: 700; border: 1px solid #fecdd3; background: #fff; color: #e11d48; cursor: pointer; }
+.rs-danger button:hover { background: #fff1f2; }
+
+/* ซ่อนปุ่มลบในส่วน Item Analysis (มีในโซนลบด้านบนแล้ว) */
+#item-analysis-box button[onclick="clearResults()"] { display: none; }
+
+@media (max-width: 1100px) { .rs-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 760px) {
+  .rs-hero { padding: 20px 18px 26px; }
+  .rs-big { flex: 1 1 90px; min-width: 0; } .rs-big b { font-size: 18px; }
+  .rs-charts { grid-template-columns: 1fr; }
+  .rs-kpi b { font-size: 18px; }
+  .rs-table { font-size: 13px; } .rs-table td { padding: 10px; }
+}

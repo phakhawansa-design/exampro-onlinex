@@ -2897,17 +2897,13 @@ app.post('/api/submit-exam', (req, res) => {
                 const answersJson = JSON.stringify(answers);
 
                 // 3. บันทึก/อัปเดตผลสอบลงใน exam_results ทันที
-                db.get('SELECT id FROM exam_results WHERE roomId = ? AND (studentId = ? OR REPLACE(studentId, \'-\', \'\') = REPLACE(?, \'-\', \'\'))', [roomId, studentId, studentId], (existErr, existRow) => {
+                db.get('SELECT id, score, maxScore FROM exam_results WHERE roomId = ? AND (studentId = ? OR REPLACE(studentId, \'-\', \'\') = REPLACE(?, \'-\', \'\'))', [roomId, studentId, studentId], (existErr, existRow) => {
                     if (existRow) {
-                        db.run(`
-                            UPDATE exam_results 
-                            SET score = ?, maxScore = ?, time = ?, date = ?, answers_json = ?, class = ?, courseId = ?
-                            WHERE id = ?
-                        `, [score, questions.length, time, date, answersJson, studentClass || '', finalCourseId, existRow.id], (upErr) => {
-                            if (upErr) return res.status(500).json({ message: upErr.message });
-                            console.log(`✅ [ผลสอบอัปเดต] นักศึกษา ${studentId} (${name}) ได้ ${score}/${questions.length} ในห้อง ${roomId}`);
-                            res.json({ success: true, score, maxScore: questions.length, updated: true });
-                        });
+                        // 🔒 ส่งแล้วส่งทับไม่ได้ (เดิมเขียนทับคะแนน → ส่งครั้งแรกดูคะแนนแล้วแก้คำตอบส่งใหม่ได้)
+                        // ตอบกลับด้วยคะแนนเดิม เพื่อให้กรณีเน็ตหลุดแล้วหน้าเว็บส่งซ้ำ ยังไปหน้าสรุปผลได้ตามปกติ
+                        // ถ้าอาจารย์ต้องการให้สอบใหม่ ให้ลบผลของนักศึกษาคนนั้นในหน้า "ตรวจสอบผลการสอบ" ก่อน
+                        console.log(`⛔ [ส่งซ้ำ] นักศึกษา ${studentId} ส่งข้อสอบห้อง ${roomId} ซ้ำ — คงคะแนนเดิม ${existRow.score}/${existRow.maxScore}`);
+                        return res.json({ success: true, score: existRow.score, maxScore: existRow.maxScore, alreadySubmitted: true });
                     } else {
                         db.run(`
                             INSERT INTO exam_results (roomId, studentId, name, class, score, maxScore, time, date, answers_json, courseId)

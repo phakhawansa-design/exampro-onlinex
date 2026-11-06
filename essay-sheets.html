@@ -74,7 +74,7 @@
   <label>ชั้นเรียน <select id="cls"><option value="">ทั้งหมด</option></select></label>
   <label>บรรทัดต่อ 1 คะแนน <input id="lpp" type="number" min="1" max="12" value="3"></label>
   <label><input id="showQ" type="checkbox" checked> พิมพ์โจทย์</label>
-  <button id="print" disabled onclick="window.print()">🖨️ พิมพ์ / บันทึกเป็น PDF</button>
+  <button id="print" disabled onclick="downloadPdf()">⬇️ ดาวน์โหลด PDF / พิมพ์</button>
   <a href="admin-essay.html">← กลับหน้าตรวจอัตนัย</a>
 </div></div>
 <div class="msg" id="msg"></div>
@@ -176,10 +176,17 @@
     let per = 0;
     try { for (const r of list) per = buildStudent(r, host); }
     catch (e) { say(esc(e.message), true); $('#print').disabled = true; return; }
-    say(`พร้อมพิมพ์ <b>${list.length} คน</b> · คนละ ${per} แผ่น · รวม ${list.length * per} หน้า (A4)
-      <br><span style="color:#6b7280;font-size:13px">ตั้งค่าเครื่องพิมพ์: ขนาด A4, ระยะขอบ "ไม่มี/None", ขนาด 100% (ไม่ย่อให้พอดี) — สแกนกลับเข้าระบบเลือกโหมด <b>อ่านรหัสตรีเนตรอัตโนมัติ</b> ระบบจะแยกและจับชื่อให้เอง</span>`);
+    say(`พร้อมแล้ว <b>${list.length} คน</b> · คนละ ${per} แผ่น · รวม ${list.length * per} หน้า (A4) — กด <b>⬇️ ดาวน์โหลด PDF</b> แล้วเลือกปลายทาง <b>"บันทึกเป็น PDF / Save as PDF"</b> (หรือเลือกเครื่องพิมพ์เพื่อพิมพ์ทันที)
+      <br><span style="color:#6b7280;font-size:13px">ตั้งค่า: ขนาด A4, ระยะขอบ "ไม่มี/None", ขนาด 100% (ไม่ย่อให้พอดี) — สแกนกลับเข้าระบบเลือกโหมด <b>อ่านรหัสตรีเนตรอัตโนมัติ</b> ระบบจะแยกและจับชื่อให้เอง</span>`);
     $('#print').disabled = !list.length;
   }
+  // ดาวน์โหลด PDF: ใช้หน้าต่างพิมพ์ของเบราว์เซอร์ (ภาษาไทยและรหัสตรีเนตรคมชัดที่สุด) ตั้งชื่อไฟล์ให้อัตโนมัติ
+  window.downloadPdf = function () {
+    const old = document.title, cls = $('#cls').value;
+    document.title = ['กระดาษคำตอบ', A.title, course.courseCode, cls].filter(Boolean).join('_').replace(/[\\/:*?"<>|]+/g, '-');
+    window.print();
+    setTimeout(() => { document.title = old; }, 1500);
+  };
   $('#cls').addEventListener('change', render); $('#lpp').addEventListener('change', render); $('#showQ').addEventListener('change', render);
   if (document.fonts && document.fonts.ready) await document.fonts.ready;
   render();

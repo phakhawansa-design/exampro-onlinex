@@ -126,7 +126,7 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
     <link rel="stylesheet" href="theme.css">
-    <script src="theme.js" defer></script>
+    <link rel="stylesheet" href="results-theme.css"><script src="theme.js" defer></script>
     <link rel="stylesheet" href="tailwind.css">
 </head>
 <body class="flex h-screen overflow-hidden">
@@ -182,13 +182,9 @@
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
                             <span>5. สร้างข้อสอบ</span>
                         </a>
-                        <a href="admin-ai-quiz.html" class="nav-link">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" /></svg>
-                            <span>6. สร้างข้อสอบด้วย AI</span>
-                        </a>
                         <a href="admin-rooms.html" class="nav-link">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 21h18M4.5 21V5.25A2.25 2.25 0 0 1 6.75 3h10.5a2.25 2.25 0 0 1 2.25 2.25V21" /></svg>
-                            <span>7. ห้องสอบ</span>
+                            <span>6. ห้องสอบ</span>
                         </a>
                     </div>
                 </div>
@@ -201,19 +197,19 @@
                     <div class="space-y-1 mt-1">
                         <a href="admin-results.html" class="nav-link active">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /></svg>
-                            <span>8. ตรวจสอบผลการสอบ</span>
+                            <span>7. ตรวจสอบผลการสอบ</span>
                         </a>
                         <a href="admin-essay.html" class="nav-link">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zM19.5 7.125L16.862 4.487M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
-                            <span>9. ตรวจอัตนัยด้วย AI</span>
+                            <span>8. ตรวจอัตนัยด้วย AI</span>
                         </a>
                         <a href="admin-monitoring.html" class="nav-link">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" /></svg>
-                            <span>10. ตรวจสอบพฤติกรรมน่าสงสัย</span>
+                            <span>9. ตรวจสอบพฤติกรรมน่าสงสัย</span>
                         </a>
                         <a href="trinetra-report.html" class="nav-link">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                            <span>11. รายงานรวมรายคน</span>
+                            <span>10. รายงานรวมรายคน</span>
                         </a>
                     </div>
                 </div>
@@ -250,7 +246,7 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
                 <div>
-                    <h1 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight">8. ตรวจสอบผลการสอบ</h1>
+                    <h1 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight">7. ตรวจสอบผลการสอบ</h1>
                     <p class="text-xs text-slate-500 font-medium">ตรีเนตร e-Exam &middot; ประจำภาคการศึกษาปัจจุบัน</p>
                 </div>
             </div>
@@ -265,7 +261,7 @@
                     <span>💡</span>
                     <span class="hidden sm:inline">คู่มือ</span>
                 </button>
-                <button onclick="exportToExcel()" class="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
+                <button onclick="exportToExcel()" class="flex items-center gap-1.5 px-3.5 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
                     <span>📥</span>
                     <span>ส่งออก Excel</span>
                 </button>
@@ -289,117 +285,94 @@
 
             <!-- 📊 ส่วนแสดงผลข้อมูลคะแนน (จะแสดงเมื่อเลือกวิชาแล้วเท่านั้น) -->
             <div id="results-content-area" class="space-y-6 hidden">
-            <div class="grid grid-cols-2 lg:grid-cols-5 gap-6">
-                <!-- Total -->
-                <div class="bg-white border border-slate-100/80 p-6 rounded-3xl flex flex-col justify-between shadow-sm hover:shadow-md transition">
-                    <span class="text-slate-500 font-semibold text-[10px] uppercase tracking-wider">ส่งกระดาษคำตอบแล้ว</span>
-                    <h3 id="stat-total" class="text-3xl font-bold text-cyan-600 mt-2">0 คน</h3>
+
+            <!-- ① สรุปภาพรวม (แบนเนอร์ธีมแดชบอร์ด) -->
+            <section class="rs-hero">
+                <div class="rs-hero-l">
+                    <div class="rs-chip"><span class="rs-dot"></span>สรุปผลการสอบ</div>
+                    <h2 id="rs-course-name">รายวิชา</h2>
+                    <p id="rs-summary-line">กำลังโหลดข้อมูล...</p>
                 </div>
-                <!-- Max -->
-                <div class="bg-white border border-slate-100/80 p-6 rounded-3xl flex flex-col justify-between shadow-sm hover:shadow-md transition">
-                    <span class="text-slate-500 font-semibold text-[10px] uppercase tracking-wider">คะแนนสูงสุด</span>
-                    <h3 id="stat-max" class="text-3xl font-bold text-emerald-600 mt-2">-</h3>
+                <div class="rs-hero-r">
+                    <div class="rs-big"><small>ส่งแล้ว</small><b id="stat-total">0 คน</b></div>
+                    <div class="rs-big"><small>ผ่านเกณฑ์</small><b id="rs-pass">-</b></div>
+                    <div class="rs-big"><small>เฉลี่ย</small><b id="rs-avg-pct">-</b></div>
                 </div>
-                <!-- Min -->
-                <div class="bg-white border border-slate-100/80 p-6 rounded-3xl flex flex-col justify-between shadow-sm hover:shadow-md transition">
-                    <span class="text-slate-500 font-semibold text-[10px] uppercase tracking-wider">คะแนนต่ำสุด</span>
-                    <h3 id="stat-min" class="text-3xl font-bold text-rose-600 mt-2">-</h3>
-                </div>
-                <!-- Average -->
-                <div class="bg-white border border-slate-100/80 p-6 rounded-3xl flex flex-col justify-between shadow-sm hover:shadow-md transition">
-                    <span class="text-slate-500 font-semibold text-[10px] uppercase tracking-wider">คะแนนเฉลี่ย (Mean)</span>
-                    <h3 id="stat-avg" class="text-3xl font-bold text-amber-500 mt-2">-</h3>
-                </div>
-                <!-- SD -->
-                <div class="bg-white border border-slate-100/80 p-6 rounded-3xl flex flex-col justify-between shadow-sm hover:shadow-md transition">
-                    <span class="text-slate-500 font-semibold text-[10px] uppercase tracking-wider">ส่วนเบี่ยงเบนมาตรฐาน (SD)</span>
-                    <h3 id="stat-sd" class="text-3xl font-bold text-indigo-600 mt-2">-</h3>
-                </div>
+                <div class="rs-bar" title="สัดส่วนผู้ผ่านเกณฑ์"><i id="rs-pass-bar" style="width:0%"></i></div>
+            </section>
+
+            <!-- ② การ์ดสถิติ -->
+            <div class="rs-kpis">
+                <div class="rs-kpi"><span class="rs-ic" style="background:#ecfdf5;color:#047857">🏆</span><div><small>คะแนนสูงสุด</small><b id="stat-max" style="color:#047857">-</b></div></div>
+                <div class="rs-kpi"><span class="rs-ic" style="background:#fff1f2;color:#be123c">📉</span><div><small>คะแนนต่ำสุด</small><b id="stat-min" style="color:#be123c">-</b></div></div>
+                <div class="rs-kpi"><span class="rs-ic" style="background:#fffbeb;color:#b45309">📊</span><div><small>คะแนนเฉลี่ย (Mean)</small><b id="stat-avg" style="color:#b45309">-</b></div></div>
+                <div class="rs-kpi"><span class="rs-ic" style="background:#eef2ff;color:#4338ca">📐</span><div><small>ส่วนเบี่ยงเบนมาตรฐาน (SD)</small><b id="stat-sd" style="color:#4338ca">-</b><em>ยิ่งน้อย คะแนนยิ่งใกล้กัน</em></div></div>
             </div>
 
-            <!-- Controllers Filter Bar (Filter by Class & Sort) -->
-            <div class="glass-card p-5 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                
-                <!-- 🎯 ปุ่มเลือกแยกตามชั้นเรียน (Class Filter) ตามต้องการ -->
-                <div class="flex items-center gap-3 w-full md:w-auto">
-                    <span class="text-xs font-bold text-slate-500 shrink-0">🎯 เลือกชั้นเรียน:</span>
-                    <div class="relative w-full md:w-56">
-                        <select id="class-filter" onchange="filterAndRenderResults()"
-                            class="dark-select">
-                            <option value="ALL">แสดงทั้งหมดทุกชั้นเรียน</option>
-                        </select>
+            <!-- ③ ตารางคะแนนรายคน -->
+            <section class="rs-card">
+                <div class="rs-card-h">
+                    <h3>👥 คะแนนรายคน <span id="rs-shown" class="rs-count"></span></h3>
+                    <div class="rs-actions">
+                        <button onclick="fetchResults()" class="rs-btn">🔄 รีเฟรช</button>
+                        <button onclick="exportToExcel()" class="rs-btn rs-btn-p">📥 ดาวน์โหลด Excel</button>
                     </div>
                 </div>
-
-                <!-- จัดเรียงและกระทำ -->
-                <div class="flex items-center gap-3 w-full md:w-auto flex-wrap sm:flex-nowrap justify-end">
-                    <span class="text-xs font-bold text-slate-500 shrink-0">Sort:</span>
-                    <select id="sort-selector" onchange="filterAndRenderResults()" 
-                        class="dark-select">
-                        <option value="id_asc">รหัสนักศึกษา (น้อย &rarr; มาก)</option>
-                        <option value="id_desc">รหัสนักศึกษา (มาก &rarr; น้อย)</option>
-                        <option value="score_desc">คะแนนสอบ (มาก &rarr; น้อย)</option>
-                        <option value="time_desc">ลำดับการส่ง (ล่าสุดก่อน)</option>
-                    </select>
-                    <button onclick="clearResults()" class="bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 px-3.5 py-2 rounded-xl font-bold text-xs transition whitespace-nowrap active:scale-95 shadow-sm flex items-center gap-1.5 cursor-pointer" title="ลบประวัติการส่งคำตอบและคะแนนทั้งหมดของห้องนี้">
-                        🗑️ ลบประวัติการสอบ
-                    </button>
-                    <button onclick="exportToExcel()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-slate-800 px-3.5 py-2 rounded-xl font-bold text-xs transition whitespace-nowrap active:scale-95 shadow-md">
-                        📥 ดาวน์โหลดรายงาน Excel
-                    </button>
-                    <button onclick="fetchResults()" class="bg-gradient-to-r from-cyan-500 to-indigo-500 hover:from-cyan-600 hover:to-indigo-600 text-slate-800 px-3.5 py-2 rounded-xl font-bold text-xs transition whitespace-nowrap active:scale-95 shadow-md">
-                        🔄 รีเฟรชข้อมูล
-                    </button>
+                <div class="rs-tools">
+                    <label class="rs-search"><span>🔍</span><input id="rs-search" type="search" placeholder="ค้นหาชื่อ หรือรหัสนักศึกษา" oninput="filterAndRenderResults()"></label>
+                    <label class="rs-field"><span>ชั้นเรียน</span>
+                        <select id="class-filter" onchange="filterAndRenderResults()"><option value="ALL">ทุกชั้นเรียน</option></select></label>
+                    <label class="rs-field"><span>เรียงตาม</span>
+                        <select id="sort-selector" onchange="filterAndRenderResults()">
+                            <option value="id_asc">รหัสนักศึกษา (น้อย → มาก)</option>
+                            <option value="id_desc">รหัสนักศึกษา (มาก → น้อย)</option>
+                            <option value="score_desc">คะแนน (มาก → น้อย)</option>
+                            <option value="score_asc">คะแนน (น้อย → มาก)</option>
+                            <option value="time_desc">ส่งล่าสุดก่อน</option>
+                        </select></label>
+                    <label class="rs-field"><span>เกณฑ์ผ่าน</span>
+                        <select id="rs-pass-cut" onchange="savePassCut();calculateStats(rawResultsData);filterAndRenderResults()">
+                            <option value="50">50%</option><option value="60">60%</option><option value="70">70%</option><option value="80">80%</option>
+                        </select></label>
                 </div>
-            </div>
-
-            <!-- Charts Section -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Chart 1: Score Distribution -->
-                <div class="glass-card p-6 shadow-2xl">
-                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">📊 การกระจายช่วงคะแนนสอบ (Score Distribution)</h4>
-                    <div class="h-60 relative">
-                        <canvas id="scoreDistChart"></canvas>
-                    </div>
-                </div>
-                <!-- Chart 2: Class Average Comparison -->
-                <div class="glass-card p-6 shadow-2xl">
-                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">📈 เปรียบเทียบคะแนนเฉลี่ยรายชั้นเรียน (Class Averages)</h4>
-                    <div class="h-60 relative">
-                        <canvas id="classAvgChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Scores Data Table Box -->
-            <div class="glass-card overflow-hidden shadow-2xl">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="bg-transparent/5 text-slate-500 text-[10px] font-bold uppercase tracking-wider border-b border-white/10">
+                <div class="rs-table-wrap">
+                    <table class="rs-table">
+                        <thead>
                             <tr>
-                                <th class="p-4 text-center">ลำดับ</th>
-                                <th class="p-4">รหัสนักศึกษา</th>
-                                <th class="p-4">ชื่อจริง</th>
-                                <th class="p-4">นามสกุล</th>
-                                <th class="p-4 text-center">ชั้นเรียน</th>
-                                <th class="p-4 text-center">คะแนนที่ได้</th>
-                                <th class="p-4 text-center">Z-Score</th>
-                                <th class="p-4 text-center">T-Score</th>
-                                <th class="p-4 text-center">วันที่และเวลาส่ง</th>
-                                <th class="p-4 text-center">จัดการ</th>
+                                <th class="c">#</th>
+                                <th>นักศึกษา</th>
+                                <th class="c">ชั้นเรียน</th>
+                                <th>คะแนน</th>
+                                <th class="c">ผล</th>
+                                <th class="c" title="Z-Score / T-Score เทียบกับกลุ่มที่แสดงอยู่">Z / T</th>
+                                <th class="c">เวลาส่ง</th>
+                                <th class="c">จัดการ</th>
                             </tr>
                         </thead>
-                        <tbody id="results-table-body" class="text-slate-700 text-xs divide-y divide-slate-100 bg-white">
-                            <tr>
-                                <td colspan="10" class="p-16 text-center text-slate-550">
-                                    📭 กำลังโหลดข้อมูลคะแนนสอบของนักศึกษา...
-                                </td>
-                            </tr>
+                        <tbody id="results-table-body">
+                            <tr><td colspan="8" class="rs-empty">📭 กำลังโหลดข้อมูลคะแนนสอบของนักศึกษา...</td></tr>
                         </tbody>
                     </table>
                 </div>
+            </section>
+
+            <!-- ④ กราฟภาพรวม -->
+            <div class="rs-charts">
+                <section class="rs-card rs-pad">
+                    <h3 class="rs-h">🍩 การกระจายช่วงคะแนน</h3>
+                    <div class="h-60 relative"><canvas id="scoreDistChart"></canvas></div>
+                </section>
+                <section class="rs-card rs-pad">
+                    <h3 class="rs-h">📈 คะแนนเฉลี่ยรายชั้นเรียน</h3>
+                    <div class="h-60 relative"><canvas id="classAvgChart"></canvas></div>
+                </section>
             </div>
 
+            <!-- โซนอันตราย: ลบประวัติ (แยกออกมา ไม่ปนกับปุ่มใช้งานประจำ) -->
+            <div class="rs-danger">
+                <span>ต้องการเริ่มเก็บคะแนนใหม่ทั้งห้อง?</span>
+                <button onclick="clearResults()" title="ลบประวัติการส่งคำตอบและคะแนนทั้งหมดของห้องนี้">🗑️ ลบประวัติการสอบทั้งหมด</button>
+            </div>
             <!-- Answer Sheet Review Modal -->
             <div id="answer-sheet-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300 p-4">
                 <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-4xl max-h-[85vh] flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 text-slate-800">
@@ -429,7 +402,7 @@
             <!-- 📊 Item Analysis Table Section -->
             <div id="item-analysis-box" class="glass-card p-8 space-y-6 shadow-2xl hidden select-none">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-200 pb-3">
-                    <h2 class="text-lg font-semibold bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent flex items-center gap-2">
+                    <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
                         📊 ตารางวิเคราะห์คุณภาพข้อสอบรายข้อ (Item Analysis)
                     </h2>
                     <div class="flex items-center gap-2.5 flex-wrap">
@@ -548,6 +521,7 @@
                 }
                 const data = await response.json();
                 rawResultsData = Array.isArray(data) ? data : [];
+                currentRoomId = pickMainRoom(rawResultsData);
                 
                 // คำนวณสถิติ
                 calculateStats(rawResultsData);
@@ -575,13 +549,29 @@
             const safeData = Array.isArray(data) ? data : [];
             const count = safeData.length;
             document.getElementById('stat-total').textContent = `${count} คน`;
+            const csel = document.getElementById('course-selector');
+            const cname = csel && csel.selectedIndex >= 0 ? csel.options[csel.selectedIndex].text : '';
+            const setT = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+            setT('rs-course-name', cname || 'ผลการสอบ');
 
             if (count === 0) {
                 document.getElementById('stat-max').textContent = "-";
                 document.getElementById('stat-min').textContent = "-";
                 document.getElementById('stat-avg').textContent = "-";
                 document.getElementById('stat-sd').textContent = "-";
+                setT('rs-pass', '-'); setT('rs-avg-pct', '-'); setT('rs-summary-line', 'ยังไม่มีนักศึกษาส่งคำตอบในรายวิชานี้');
+                const pb = document.getElementById('rs-pass-bar'); if (pb) pb.style.width = '0%';
                 return;
+            }
+            // สรุปบนแบนเนอร์: ผ่านเกณฑ์ / เฉลี่ยเป็นเปอร์เซ็นต์
+            {
+                const cut = passCut();
+                const pass = safeData.filter(s => pctOf(s) >= cut).length;
+                const avgPct = safeData.reduce((t, s) => t + pctOf(s), 0) / count;
+                setT('rs-pass', `${pass} / ${count} คน`);
+                setT('rs-avg-pct', `${avgPct.toFixed(1)}%`);
+                setT('rs-summary-line', `ส่งคำตอบแล้ว ${count} คน · ผ่านเกณฑ์ ${cut}% จำนวน ${pass} คน (${Math.round(pass / count * 100)}%) · ไม่ผ่าน ${count - pass} คน`);
+                const pb = document.getElementById('rs-pass-bar'); if (pb) pb.style.width = Math.round(pass / count * 100) + '%';
             }
 
             let max = -1;
@@ -634,16 +624,25 @@
             }
         }
 
+        // เกณฑ์ผ่าน (%) จำไว้ในเครื่อง
+        function passCut() { const s = document.getElementById('rs-pass-cut'); return s ? Number(s.value) || 50 : 50; }
+        function savePassCut() { try { localStorage.setItem('results_pass_cut', String(passCut())); } catch (e) {} }
+        (function () { try { const v = localStorage.getItem('results_pass_cut'), s = document.getElementById('rs-pass-cut'); if (v && s && [...s.options].some(o => o.value === v)) s.value = v; } catch (e) {} })();
+        function pctOf(s) { const m = Number(s.maxScore) || 0; return m > 0 ? (Number(s.score) || 0) / m * 100 : 0; }
+
         // กรอง สับเปลี่ยน และวาดตารางผลคะแนน
         function filterAndRenderResults() {
             const classFilterVal = document.getElementById('class-filter').value;
             const sortVal = document.getElementById('sort-selector').value;
+            const q = ((document.getElementById('rs-search') || {}).value || '').trim().toLowerCase().replace(/-/g, '');
 
             // 1. กรองเฉพาะชั้นเรียนที่เลือก (ตามโจทย์แยก TEC3N กับ TEC2N ไม่ปะปนกัน)
             let filteredList = [...rawResultsData];
             if (classFilterVal !== 'ALL') {
                 filteredList = filteredList.filter(student => student.class === classFilterVal);
             }
+            // 1.5 ค้นหาชื่อ / รหัส (ไม่สนขีด)
+            if (q) filteredList = filteredList.filter(s => (String(s.name || '') + ' ' + String(s.studentId || '')).toLowerCase().replace(/-/g, '').includes(q));
 
             // 2. จัดเรียงข้อมูล
             if (sortVal === 'id_asc') {
@@ -652,6 +651,8 @@
                 filteredList.sort((a, b) => b.studentId.localeCompare(a.studentId, undefined, {numeric: true, sensitivity: 'base'}));
             } else if (sortVal === 'score_desc') {
                 filteredList.sort((a, b) => b.score - a.score);
+            } else if (sortVal === 'score_asc') {
+                filteredList.sort((a, b) => a.score - b.score);
             } else if (sortVal === 'time_desc') {
                 filteredList.sort((a, b) => b.time.localeCompare(a.time));
             }
@@ -670,16 +671,15 @@
             // 3. วาดลงตาราง
             const tbody = document.getElementById('results-table-body');
             
+            const shown = document.getElementById('rs-shown');
+            if (shown) shown.textContent = `${filteredList.length} จาก ${rawResultsData.length} คน`;
+
             if (filteredList.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="10" class="p-16 text-center text-slate-500">
-                            📭 ไม่พบข้อมูลผลคะแนนของนักศึกษาในกลุ่มชั้นเรียนที่ท่านกรอง
-                        </td>
-                    </tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="rs-empty">📭 ${q ? 'ไม่พบนักศึกษาที่ตรงกับคำค้นหา' : 'ยังไม่มีผลคะแนนในชั้นเรียนที่เลือก'}</td></tr>`;
                 document.getElementById('item-analysis-box').classList.add('hidden');
                 return;
             }
+            const cut = passCut();
 
             tbody.innerHTML = filteredList.map((student, index) => {
                 // แยกชื่อ - นามสกุล อย่างปลอดภัย
@@ -706,33 +706,25 @@
                 const tDisp = tScore.toFixed(2);
 
                 return `
-                    <tr class="hover:bg-slate-50/80 transition">
-                        <td class="p-4 text-center font-bold text-slate-500">${index + 1}</td>
-                        <td class="p-4 font-mono font-bold text-cyan-600">${escapeHtml(student.studentId)}</td>
-                        <td class="p-4 font-semibold text-slate-800">${escapeHtml(firstname)}</td>
-                        <td class="p-4 text-slate-600">${escapeHtml(lastname)}</td>
-                        <td class="p-4 text-center font-bold text-cyan-700 bg-cyan-50 border border-cyan-100/70 rounded-xl">${escapeHtml(student.class || '-')}</td>
-                        <td class="p-4 text-center">
-                            <span class="bg-emerald-50 border border-emerald-100 text-emerald-700 font-semibold px-3 py-1.5 rounded-xl">
-                                ${student.score} / ${student.maxScore} คะแนน
-                            </span>
+                    <tr>
+                        <td class="c rs-no">${index + 1}</td>
+                        <td>
+                            <div class="rs-name">${escapeHtml(firstname)} ${escapeHtml(lastname)}</div>
+                            <div class="rs-id">${escapeHtml(student.studentId)}</div>
                         </td>
-                        <td class="p-4 text-center font-bold text-slate-700 font-mono">${zDisp}</td>
-                        <td class="p-4 text-center font-bold text-cyan-700 font-mono bg-cyan-50 border border-cyan-100/70">${tDisp}</td>
-                        <td class="p-4 text-center">
-                            <div class="text-slate-800 font-mono font-bold text-xs">${student.time}</div>
-                            <div class="text-slate-500 text-[10px] mt-0.5">${cleanDate}</div>
+                        <td class="c"><span class="rs-cls">${escapeHtml(student.class || '-')}</span></td>
+                        <td>
+                            ${(() => { const pct = pctOf(student), lv = pct >= 80 ? 'hi' : pct >= cut ? 'ok' : 'lo';
+                                return `<div class="rs-score"><b>${student.score}</b><span>/ ${student.maxScore}</span><em class="${lv}">${pct.toFixed(0)}%</em></div>
+                                <div class="rs-meter"><i class="${lv}" style="width:${Math.min(100, pct).toFixed(1)}%"></i></div>`; })()}
                         </td>
-                        <td class="p-4 text-center">
-                            <div class="flex items-center justify-center gap-1.5">
-                                <button onclick="viewAnswerSheet(${student.id})" 
-                                    class="bg-cyan-50 hover:bg-cyan-100 text-cyan-700 border border-cyan-200 px-2.5 py-1.5 rounded-xl text-xs transition duration-300 font-bold shadow-sm flex items-center gap-1">
-                                    👁️ ตรวจข้อสอบ
-                                </button>
-                                <button onclick="deleteStudentResult(${student.id}, '${escapeHtml(student.studentId)}')" 
-                                    class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-2.5 py-1.5 rounded-xl text-xs transition duration-300 font-bold shadow-sm flex items-center gap-1 cursor-pointer" title="ลบประวัติคะแนนของนักศึกษาคนนี้">
-                                    🗑️ ลบประวัติ
-                                </button>
+                        <td class="c">${pctOf(student) >= cut ? '<span class="rs-pass">✓ ผ่าน</span>' : '<span class="rs-fail">ไม่ผ่าน</span>'}</td>
+                        <td class="c rs-zt"><b>${zDisp}</b><span>T ${tDisp}</span></td>
+                        <td class="c rs-time"><b>${student.time}</b><span>${cleanDate}</span></td>
+                        <td class="c">
+                            <div class="rs-row-act">
+                                <button onclick="viewAnswerSheet(${student.id})" class="rs-view" title="ดูกระดาษคำตอบของนักศึกษาคนนี้">👁️ ดูคำตอบ</button>
+                                <button onclick="deleteStudentResult(${student.id}, '${escapeHtml(student.studentId)}')" class="rs-del" title="ลบประวัติคะแนนของนักศึกษาคนนี้" aria-label="ลบประวัติคะแนน">🗑️</button>
                             </div>
                         </td>
                     </tr>
@@ -847,23 +839,36 @@
             });
         }
 
-        // ล้างคะแนน
+        // ห้องสอบของผลคะแนนที่แสดงอยู่ (หน้านี้เลือกตามรายวิชา ผลอาจมาจากหลายห้อง)
+        // เดิมใช้ตัวแปร currentRoomId ที่ไม่เคยประกาศ → วิเคราะห์รายข้อและปุ่มลบประวัติพังทั้งคู่
+        var currentRoomId = '';
+        function pickMainRoom(list) {
+            const c = {};
+            (list || []).forEach(r => { if (r && r.roomId) c[r.roomId] = (c[r.roomId] || 0) + 1; });
+            return Object.keys(c).sort((a, b) => c[b] - c[a])[0] || '';
+        }
+
+        // ล้างคะแนน (ทุกห้องสอบของรายวิชาที่เลือก)
         async function clearResults() {
-            if (!currentRoomId) return;
-            if (!confirm(`⚠️ ยืนยันการลบประวัติคำตอบและคะแนนทั้งหมดของห้องสอบ ${currentRoomId} ใช่หรือไม่?\n(ข้อมูลทั้งหมดจะถูกลบถาวร ไม่สามารถกู้คืนได้)`)) return;
+            const roomIds = [...new Set((rawResultsData || []).map(r => r.roomId).filter(Boolean))];
+            if (!roomIds.length) { alert('ยังไม่มีผลคะแนนให้ลบในรายวิชานี้'); return; }
+            const label = roomIds.length === 1 ? `ห้องสอบ ${roomIds[0]}` : `${roomIds.length} ห้องสอบ (${roomIds.join(', ')})`;
+            if (!confirm(`⚠️ ยืนยันการลบประวัติคำตอบและคะแนนทั้งหมดของ${label} ใช่หรือไม่?\n(ข้อมูลทั้งหมดจะถูกลบถาวร ไม่สามารถกู้คืนได้)`)) return;
 
             try {
-                const response = await fetch('/api/clear-results', {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ roomId: currentRoomId })
-                });
-                if (response.ok) {
-                    alert(`🧹 ล้างประวัติห้องสอบ ${currentRoomId} สำเร็จเรียบร้อยแล้ว`);
-                    fetchResults();
+                let ok = 0;
+                for (const roomId of roomIds) {
+                    const response = await fetch('/api/clear-results', {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ roomId })
+                    });
+                    if (response.ok) ok++;
                 }
-            } catch (err) { 
-                alert("เกิดข้อผิดพลาดในการลบข้อมูล"); 
+                alert(ok === roomIds.length ? `🧹 ล้างประวัติ${label} เรียบร้อยแล้ว` : `ลบสำเร็จ ${ok} จาก ${roomIds.length} ห้อง`);
+                fetchResults();
+            } catch (err) {
+                alert("เกิดข้อผิดพลาดในการลบข้อมูล");
             }
         }
 
@@ -1129,8 +1134,12 @@
             }
 
             try {
+                // วิเคราะห์ได้ทีละห้อง (แต่ละห้องข้อสอบอาจไม่เหมือนกัน) ใช้ห้องที่มีคนสอบมากที่สุดในรายการที่แสดง
+                const itemRoom = pickMainRoom(filteredList);
+                if (!itemRoom) { analysisBox.classList.add('hidden'); return; }
+                filteredList = filteredList.filter(r => r.roomId === itemRoom);
                 // ดึงรายการข้อสอบทั้งหมดของห้องเพื่อรู้ตัวโจทย์และเฉลยที่ถูกต้อง
-                const res = await fetch(`/api/teacher/get-questions?roomId=${currentRoomId}`);
+                const res = await fetch(`/api/teacher/get-questions?roomId=${encodeURIComponent(itemRoom)}`);
                 if (!res.ok) {
                     analysisBox.classList.add('hidden');
                     return;
