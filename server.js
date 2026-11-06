@@ -1255,7 +1255,12 @@ app.post('/api/student/login', (req, res) => {
     const inputHash = hashPassword(inputPassword);
     // 🔐 รหัสผ่านเริ่มต้นที่เดาได้: 1234 หรือ 4 หลักท้ายของรหัสนักศึกษา (บัญชีที่อาจารย์เพิ่มเอง)
     const last4Hash = hashPassword(cleanStudentId.replace(/[^0-9]/g, '').slice(-4) || '1234');
-    const isGuessableHash = h => !h || h === defaultHash || h === last4Hash;
+    // รหัสแบบมีขีดตัวท้าย เช่น 67322110051-6 → นักศึกษาอาจนับ 4 หลักท้ายเป็น 0516 (ไม่นับขีด) หรือ 0051 (ก่อนขีด) รับทั้งสองแบบ
+    const beforeDash = cleanStudentId.includes('-') ? cleanStudentId.slice(0, cleanStudentId.lastIndexOf('-')).replace(/[^0-9]/g, '').slice(-4) : '';
+    const DEFAULT_HASHES = [defaultHash, last4Hash].concat(beforeDash.length === 4 ? [hashPassword(beforeDash)] : []);
+    const isGuessableHash = h => !h || DEFAULT_HASHES.includes(h);
+    // 🔑 ยังไม่เคยเปลี่ยนรหัส: ใช้ได้ทั้ง 1234 และ 4 หลักท้ายของรหัสนักศึกษา (ตรงกับที่หน้าเข้าสอบบอกไว้) แล้วระบบจะบังคับตั้งรหัสใหม่
+    const firstLoginOk = h => isGuessableHash(h) && DEFAULT_HASHES.includes(inputHash);
 
     const checkStudentStatusAndLogin = (studentObj, isDefaultPassword, roomObj) => {
         const status = studentObj.status || 'approved';
@@ -1334,7 +1339,7 @@ app.post('/api/student/login', (req, res) => {
                             const fName = foundInCourse.firstName || 'นักศึกษา';
                             const lName = foundInCourse.lastName || '';
                             const cls = foundInCourse.class || '';
-                            if (inputHash !== defaultHash && inputHash !== last4Hash) return res.status(401).json({ success: false, message: "รหัสผ่านไม่ถูกต้อง (เข้าสู่ระบบครั้งแรกใช้ 1234 หรือ 4 หลักท้ายของรหัสนักศึกษา)" }); // 🔐 ครั้งแรกต้องใช้รหัสเริ่มต้นเท่านั้น
+                            if (!DEFAULT_HASHES.includes(inputHash)) return res.status(401).json({ success: false, message: "รหัสผ่านไม่ถูกต้อง (เข้าสู่ระบบครั้งแรกใช้ 1234 หรือ 4 หลักท้ายของรหัสนักศึกษา)" }); // 🔐 ครั้งแรกต้องใช้รหัสเริ่มต้นเท่านั้น
 
                             db.run(
                                 `INSERT INTO students (studentId, firstName, lastName, class, password_hash, status, created_at, approved_at, approved_by)
@@ -1356,7 +1361,7 @@ app.post('/api/student/login', (req, res) => {
                         }
 
                         // มีบัญชีนักศึกษาอยู่แล้ว -> 🔐 ต้องตรวจรหัสผ่านเสมอ (เดิมเข้าได้โดยไม่ตรวจรหัส ทำให้สอบแทนกันได้)
-                        if (student.password_hash && student.password_hash !== inputHash && !(student.password_hash === defaultHash && inputPassword === '1234')) {
+                        if (student.password_hash && student.password_hash !== inputHash && !firstLoginOk(student.password_hash)) {
                             return res.status(401).json({ success: false, message: "รหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง" });
                         }
                         const isDefault = isGuessableHash(student.password_hash);
@@ -1395,7 +1400,7 @@ app.post('/api/student/login', (req, res) => {
                         const cls = csRow.class || '';
 
                         // สร้างบัญชีในนักศึกษาให้อัตโนมัติโดยใช้รหัสผ่านเริ่มต้น 1234
-                        if (inputHash !== defaultHash && inputHash !== last4Hash) return res.status(401).json({ success: false, message: "รหัสผ่านไม่ถูกต้อง (เข้าสู่ระบบครั้งแรกใช้ 1234 หรือ 4 หลักท้ายของรหัสนักศึกษา)" }); // 🔐 ครั้งแรกต้องใช้รหัสเริ่มต้นเท่านั้น
+                        if (!DEFAULT_HASHES.includes(inputHash)) return res.status(401).json({ success: false, message: "รหัสผ่านไม่ถูกต้อง (เข้าสู่ระบบครั้งแรกใช้ 1234 หรือ 4 หลักท้ายของรหัสนักศึกษา)" }); // 🔐 ครั้งแรกต้องใช้รหัสเริ่มต้นเท่านั้น
                         db.run(
                             `INSERT INTO students (studentId, firstName, lastName, class, password_hash, status, created_at, approved_at, approved_by)
                              VALUES (?, ?, ?, ?, ?, 'approved', ?, ?, 'system_auto')`,
@@ -1420,7 +1425,7 @@ app.post('/api/student/login', (req, res) => {
                 // กรณีมีบัญชีอยู่แล้วในระบบ students
                 if (student.password_hash) {
                     // ตรวจสอบรหัสผ่าน
-                    if (student.password_hash !== inputHash && !(student.password_hash === defaultHash && inputPassword === '1234')) {
+                    if (student.password_hash !== inputHash && !firstLoginOk(student.password_hash)) {
                         return res.status(401).json({ success: false, message: "รหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง" });
                     }
                 }

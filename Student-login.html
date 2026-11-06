@@ -96,7 +96,7 @@
                     <input type="password" id="student-password" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="กรอกรหัสผ่าน">
                     <p class="text-[11px] text-slate-500 font-medium flex items-center gap-1.5 pt-0.5">
                         <span>💡</span>
-                        <span>เข้าสอบครั้งแรกใช้ <strong class="text-indigo-600 font-mono font-bold">1234</strong> หรือ 4 หลักท้ายของรหัสนักศึกษา แล้วระบบจะให้ตั้งรหัสใหม่</span>
+                        <span>เข้าสอบครั้งแรกใช้ <strong class="text-indigo-600 font-mono font-bold">1234</strong> หรือ 4 หลักท้ายของรหัสนักศึกษา<span id="pw-last4-hint"></span> แล้วระบบจะให้ตั้งรหัสใหม่</span>
                     </p>
                 </div>
                 <div class="pt-2">
@@ -1316,5 +1316,6 @@
         window.addEventListener('pagehide', notifyLeaveRoom);
     </script>
     <script src="user-guide-system.js"></script>
+<script>/* 💡 แสดงตัวอย่าง 4 หลักท้ายจากรหัสที่กรอก (ไม่นับขีด) */(function(){var i=document.getElementById('student-id'),h=document.getElementById('pw-last4-hint');if(!i||!h)return;function u(){var d=(i.value||'').replace(/[^0-9]/g,'');h.textContent=d.length>=4?' (ของคุณคือ '+d.slice(-4)+')':'';}i.addEventListener('input',u);u();setTimeout(u,800);})();</script>
 </body>
 </html>
