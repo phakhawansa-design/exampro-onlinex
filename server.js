@@ -934,6 +934,8 @@ app.get('/api/students', (req, res) => {
             LEFT JOIN exam_results er ON (er.studentId = cs.studentId OR REPLACE(er.studentId, '-', '') = REPLACE(cs.studentId, '-', ''))
                                      AND (er.courseId = cs.courseId OR er.roomId IN (SELECT roomId FROM teacher_rooms WHERE courseId = cs.courseId))
             LEFT JOIN cheat_logs cl ON (cl.studentId = cs.studentId OR REPLACE(cl.studentId, '-', '') = REPLACE(cs.studentId, '-', ''))
+                                     -- นับเฉพาะพฤติกรรมในห้องสอบของรายวิชานี้ (เดิมนับทุกห้องตลอดเวลา → ขึ้น "สลับ 97 ครั้ง" ทั้งที่ยังไม่ได้สอบวิชานี้)
+                                     AND cl.roomId IN (SELECT roomId FROM teacher_rooms WHERE courseId = cs.courseId)
             WHERE (cs.courseId = ? OR CAST(cs.courseId AS TEXT) = ?)
             GROUP BY cs.id, cs.studentId, cs.firstName, cs.lastName, cs.class, s.firstName, s.lastName, s.class, s.note, s.status, s.created_at, s.approved_at, c.id, c.courseCode, c.courseName
             ORDER BY cs.studentId ASC
@@ -1080,6 +1082,8 @@ app.delete('/api/students/delete', (req, res) => {
 app.get('/api/students/exam-history', (req, res) => {
     const { studentId, username } = req.query;
     if (!studentId || !username) return res.status(400).json({ message: "ข้อมูลไม่ครบ" });
+    // ?courseId= (ไม่บังคับ) → เฉพาะผลสอบของรายวิชานั้น ให้ตรงกับตัวเลขในตารางหน้า "ประวัตินักศึกษา"
+    const cId = req.query.courseId && req.query.courseId !== 'ALL' ? String(req.query.courseId) : '';
 
     db.all(`
         SELECT er.id, er.roomId, er.score, er.maxScore, er.time, er.date, 
@@ -1096,9 +1100,10 @@ app.get('/api/students/exam-history', (req, res) => {
               OR er.studentId IN (SELECT studentId FROM students WHERE teacherUsername = ?)
               OR er.studentId IN (SELECT cs.studentId FROM course_students cs JOIN courses c ON c.id = cs.courseId WHERE c.teacherUsername = ?)
           )
+          AND (? = '' OR CAST(er.courseId AS TEXT) = ? OR CAST(tr.courseId AS TEXT) = ?)
         GROUP BY er.id, er.roomId, er.score, er.maxScore, er.time, er.date, tr.roomName, tr.exam_title
         ORDER BY er.id DESC
-    `, [studentId, studentId, username, username, username, username], (err, rows) => {
+    `, [studentId, studentId, username, username, username, username, cId, cId, cId], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
         res.json(rows || []);
     });
@@ -1108,6 +1113,7 @@ app.get('/api/students/exam-history', (req, res) => {
 app.get('/api/students/cheat-history', (req, res) => {
     const { studentId, username } = req.query;
     if (!studentId || !username) return res.status(400).json({ message: "ข้อมูลไม่ครบ" });
+    const cId = req.query.courseId && req.query.courseId !== 'ALL' ? String(req.query.courseId) : '';
 
     db.all(`
         SELECT cl.id, cl.roomId, cl.action, cl.time, COALESCE(tr.roomName, cl.roomId) as roomName
@@ -1121,8 +1127,9 @@ app.get('/api/students/cheat-history', (req, res) => {
               OR cl.studentId IN (SELECT studentId FROM students WHERE teacherUsername = ?)
               OR cl.studentId IN (SELECT cs.studentId FROM course_students cs JOIN courses c ON c.id = cs.courseId WHERE c.teacherUsername = ?)
           )
+          AND (? = '' OR CAST(tr.courseId AS TEXT) = ?)
         ORDER BY cl.id DESC
-    `, [studentId, studentId, username, username, username, username], (err, rows) => {
+    `, [studentId, studentId, username, username, username, username, cId, cId], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
         res.json(rows || []);
     });
@@ -2974,8 +2981,15 @@ app.get('/api/exam-results', (req, res) => {
                 OR tr.courseId = ? 
                 OR CAST(tr.courseId AS TEXT) = ?
                 OR tr.courseId IN (SELECT id FROM courses WHERE id = ? OR courseCode = ?)
-                OR er.studentId IN (SELECT studentId FROM course_students WHERE courseId = ? OR CAST(courseId AS TEXT) = ?)
-                OR REPLACE(er.studentId, '-', '') IN (SELECT REPLACE(studentId, '-', '') FROM course_students WHERE courseId = ? OR CAST(courseId AS TEXT) = ?)
+                -- นับจากรายชื่อนักศึกษา เฉพาะผลสอบที่ไม่ได้ผูกกับรายวิชาใดเลย
+                -- (เดิมดึงผลสอบทุกห้อง/ทุกวิชาของนักศึกษาที่มีชื่อในรายวิชานี้ → ผลสอบเก่าหรือของวิชาอื่นมาปน)
+                OR (
+                    (er.courseId IS NULL OR er.courseId = 0) AND (tr.courseId IS NULL OR tr.courseId = 0)
+                    AND (
+                        er.studentId IN (SELECT studentId FROM course_students WHERE courseId = ? OR CAST(courseId AS TEXT) = ?)
+                        OR REPLACE(er.studentId, '-', '') IN (SELECT REPLACE(studentId, '-', '') FROM course_students WHERE courseId = ? OR CAST(courseId AS TEXT) = ?)
+                    )
+                )
         `;
         const params = [
             validId, cCodeStr,

@@ -73,6 +73,9 @@ module.exports = function registerEssayGrader(app, db) {
             // คอลัมน์ติดตามค่าใช้จ่าย API
             db.run('ALTER TABLE essay_submissions ADD COLUMN input_tokens INTEGER DEFAULT 0', () => {});
             db.run('ALTER TABLE essay_submissions ADD COLUMN output_tokens INTEGER DEFAULT 0', () => {});
+            // ความใกล้เคียงกับเฉลย 1-10: ค่าที่ AI ประเมิน และค่าที่อาจารย์แก้เอง
+            db.run('ALTER TABLE essay_grades ADD COLUMN similarity REAL', () => {});
+            db.run('ALTER TABLE essay_grades ADD COLUMN teacher_similarity REAL', () => {});
             if (!err) console.log('📝 Essay Grader พร้อมใช้งาน' + (API_KEY() ? ` (AI: ${MODEL()})` : ' (โหมดทดลอง: ยังไม่ได้ใส่ ANTHROPIC_API_KEY)'));
         });
     });
@@ -209,7 +212,9 @@ module.exports = function registerEssayGrader(app, db) {
             const max = Number(x.maxScore) || rubric.reduce((s, r) => s + r.score, 0);
             if (!String(x.prompt || '').trim()) throw new Error(`ข้อ ${i + 1}: กรุณาใส่โจทย์`);
             if (!max) throw new Error(`ข้อ ${i + 1}: กรุณาใส่คะแนนเต็มหรือ Rubric`);
-            return { no: i + 1, prompt: String(x.prompt).trim(), answerKey: String(x.answerKey || '').trim(), rubric, maxScore: max, note: String(x.note || '').trim() };
+            // lines: จำนวนเส้นตอบในกระดาษคำตอบ (0 = ใช้ค่าตั้งต้นของหน้าพิมพ์)
+            const lines = Math.max(0, Math.min(40, parseInt(x.lines, 10) || 0));
+            return { no: i + 1, prompt: String(x.prompt).trim(), answerKey: String(x.answerKey || '').trim(), rubric, maxScore: max, note: String(x.note || '').trim(), lines };
         });
     }
 
@@ -332,15 +337,21 @@ module.exports = function registerEssayGrader(app, db) {
     // ---------- อาจารย์ยืนยัน/แก้คะแนน ----------
     app.post('/api/essay/grades/:id/confirm', async (req, res) => {
         try {
-            const { username, score, note } = req.body || {};
+            const { username, score, note, similarity } = req.body || {};
             const g = await q.get('SELECT * FROM essay_grades WHERE id = ?', [req.params.id]);
             if (!g || !(await ownSubmission(g.submission_id, username))) return fail(res, new Error('ไม่พบคะแนนนี้'), 404);
             const sc = Number(score);
             if (!Number.isFinite(sc) || sc < 0 || sc > Number(g.max_score)) return fail(res, new Error(`คะแนนต้องอยู่ระหว่าง 0 ถึง ${g.max_score}`), 400);
+            // ความใกล้เคียงที่อาจารย์ให้เอง (1-10) ไม่บังคับ
+            let sim = g.teacher_similarity;
+            if (similarity !== undefined && similarity !== null && String(similarity).trim() !== '') {
+                sim = Number(similarity);
+                if (!Number.isFinite(sim) || sim < 1 || sim > 10) return fail(res, new Error('ความใกล้เคียงต้องอยู่ระหว่าง 1 ถึง 10'), 400);
+            }
             const hist = parse(g.history_json, []);
-            hist.push({ by: username, from: g.final_score ?? g.ai_score, to: sc, note: String(note || ''), at: now() });
-            await q.run("UPDATE essay_grades SET final_score = ?, status = 'confirmed', history_json = ?, updated_at = ? WHERE id = ?",
-                [sc, JSON.stringify(hist), now(), g.id]);
+            hist.push({ by: username, from: g.final_score ?? g.ai_score, to: sc, simFrom: g.teacher_similarity ?? g.similarity, simTo: sim, note: String(note || ''), at: now() });
+            await q.run("UPDATE essay_grades SET final_score = ?, teacher_similarity = ?, status = 'confirmed', history_json = ?, updated_at = ? WHERE id = ?",
+                [sc, sim ?? null, JSON.stringify(hist), now(), g.id]);
             res.json({ success: true });
         } catch (e) { fail(res, e); }
     });
@@ -385,10 +396,13 @@ module.exports = function registerEssayGrader(app, db) {
             const r = results.find(x => Number(x.question) === qq.no) || { transcript: '', score: 0, reasoning: 'AI ไม่พบคำตอบข้อนี้', confidence: 0 };
             const score = Math.max(0, Math.min(qq.maxScore, Number(r.score) || 0));
             const conf = Math.max(0, Math.min(1, Number(r.confidence) || 0));
-            await q.run(`INSERT INTO essay_grades (submission_id, question_no, transcript, ai_score, max_score, matched_json, missing_json, reasoning, confidence, final_score, status, history_json, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            // ความใกล้เคียงกับเฉลย 1-10 (ไม่มีค่า = AI ไม่ได้ประเมิน เช่น โหมดทดลอง)
+            const simRaw = Number(r.similarity);
+            const sim = Number.isFinite(simRaw) && simRaw > 0 ? Math.max(1, Math.min(10, Math.round(simRaw))) : null;
+            await q.run(`INSERT INTO essay_grades (submission_id, question_no, transcript, ai_score, max_score, matched_json, missing_json, reasoning, confidence, similarity, final_score, status, history_json, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [id, qq.no, String(r.transcript || ''), score, qq.maxScore, JSON.stringify(r.matched_points || []), JSON.stringify(r.missing_points || []),
-                 String(r.reasoning || ''), conf, null, conf < THRESHOLD() ? 'review' : 'ai', '[]', now()]);
+                 String(r.reasoning || ''), conf, sim, null, conf < THRESHOLD() ? 'review' : 'ai', '[]', now()]);
         }
         await q.run("UPDATE essay_submissions SET status = 'done', input_tokens = ?, output_tokens = ? WHERE id = ?",
             [usage ? Number(usage.input_tokens) || 0 : 0, usage ? Number(usage.output_tokens) || 0 : 0, id]);
@@ -416,12 +430,16 @@ module.exports = function registerEssayGrader(app, db) {
 1. หาคำตอบของแต่ละข้อในไฟล์ แล้วถอดข้อความลายมือให้ตรงตามที่เขียนจริง (ไม่แก้คำผิด ไม่เติมเอง) ถ้าอ่านไม่ออกให้ใส่ [อ่านไม่ออก]
 2. ให้คะแนนตาม Rubric อย่างเคร่งครัด ไม่ให้คะแนนเกินคะแนนเต็ม ใช้คำพ้องความหมายได้ สะกดผิดเล็กน้อยไม่หักคะแนน เว้นแต่ Rubric ระบุ
 3. ระบุ confidence 0-1 ต่ำลงเมื่อ ลายมืออ่านยาก มีการขีดฆ่า เขียนนอกกรอบ หรือไม่แน่ใจว่าเป็นคำตอบข้อไหน
+4. ประเมิน similarity = ความใกล้เคียงของ "ความหมาย" ในคำตอบนักเรียนกับเฉลย เป็นจำนวนเต็ม 1-10
+   (ถ้าข้อนั้นไม่มีเฉลย ให้เทียบกับ Rubric และสิ่งที่โจทย์ต้องการ)
+   10 = ตรงกับเฉลยครบถ้วน · 7-9 = ใกล้เคียงมาก ขาดรายละเอียดเล็กน้อย · 4-6 = ถูกบางส่วน · 2-3 = เกี่ยวข้องเล็กน้อย · 1 = ไม่ตรงเลย/ไม่ได้ตอบ
+   ใช้คำต่างจากเฉลยได้ถ้าความหมายเดียวกัน ไม่ต้องสนลายมือหรือคำผิดเล็กน้อย และอธิบายสั้น ๆ ใน reasoning
 
 ข้อสอบ:
 ${spec}
 
 ตอบกลับเป็น JSON array เท่านั้น ห้ามมีข้อความอื่น รูปแบบ:
-[{"question":1,"transcript":"...","score":0,"matched_points":["..."],"missing_points":["..."],"reasoning":"...","confidence":0.0}]`;
+[{"question":1,"transcript":"...","score":0,"similarity":1,"matched_points":["..."],"missing_points":["..."],"reasoning":"...","confidence":0.0}]`;
 
         const r = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',

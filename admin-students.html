@@ -659,8 +659,12 @@
                 allStudents = Array.isArray(data) ? data : [];
             }
         } catch(e) {
-            console.warn("API โหลดนักศึกษา offline ใช้ข้อมูลสำรองแทน:", e);
-            if (selectedCourseFilter === 'ALL') allStudents = DEFAULT_STUDENT_LIST;
+            // ไม่ใช้ข้อมูลจำลองแทนอีกแล้ว (เดิมโชว์รายชื่อ/คะแนนปลอมเมื่อโหลดไม่สำเร็จ ทำให้เข้าใจผิด)
+            console.warn("API โหลดนักศึกษาไม่สำเร็จ:", e);
+            allStudents = [];
+            if (tbody) { tbody.innerHTML = `<tr><td colspan="7" class="text-center py-16 text-rose-500 font-bold text-base">❌ โหลดข้อมูลนักศึกษาไม่สำเร็จ ตรวจการเชื่อมต่อแล้วลองใหม่</td></tr>`; }
+            updateStats();
+            return;
         }
 
         updateStats();
@@ -1024,7 +1028,7 @@
         let records = [];
 
         try {
-            const res = await fetch(`/api/students/exam-history?studentId=${encodeURIComponent(currentHistStudentId)}&username=${encodeURIComponent(username)}`);
+            const res = await fetch(`/api/students/exam-history?studentId=${encodeURIComponent(currentHistStudentId)}&username=${encodeURIComponent(username)}&courseId=${encodeURIComponent(selectedCourseFilter || 'ALL')}`);
             if (res.ok) {
                 const data = await res.json();
                 if (Array.isArray(data) && data.length > 0) {
@@ -1033,10 +1037,6 @@
             }
         } catch(e) {
             console.warn("API exam-history offline, fallback to mock data:", e);
-        }
-
-        if (!records || records.length === 0) {
-            records = DEFAULT_STUDENT_EXAMS[currentHistStudentId] || [];
         }
 
         if (!records || records.length === 0) {
@@ -1082,7 +1082,6 @@
                     <span class="${tabSw > 0 ? 'text-rose-600 bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-lg' : 'text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-lg'}">
                         ${tabSw > 0 ? `🚨 สลับหน้าจอ: ${tabSw} ครั้ง` : '✅ ไม่มีการสลับหน้าจอ'}
                     </span>
-                    <span class="text-slate-500 font-semibold">เวลาทำ: ~45 นาที</span>
                 </div>
                 <div class="score-bar"><div class="score-bar-fill" style="width:${pct}%;background:${bar}"></div></div>
             </div>`;
@@ -1097,7 +1096,7 @@
 
         let records = [];
         try {
-            const res = await fetch(`/api/students/cheat-history?studentId=${encodeURIComponent(currentHistStudentId)}&username=${encodeURIComponent(username)}`);
+            const res = await fetch(`/api/students/cheat-history?studentId=${encodeURIComponent(currentHistStudentId)}&username=${encodeURIComponent(username)}&courseId=${encodeURIComponent(selectedCourseFilter || 'ALL')}`);
             if (res.ok) {
                 const data = await res.json();
                 if (Array.isArray(data) && data.length > 0) {
@@ -1106,10 +1105,6 @@
             }
         } catch(e) {
             console.warn("API cheat-history offline, fallback to mock data:", e);
-        }
-
-        if (!records || records.length === 0) {
-            records = DEFAULT_STUDENT_CHEATS[currentHistStudentId] || [];
         }
 
         document.getElementById('hist-cheat-count').textContent = records.length + ' ครั้ง';

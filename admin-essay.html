@@ -479,6 +479,26 @@
         .es-step.next .n{background:#0b2a7a;color:#fff}.es-step.ok .n{background:#16a34a;color:#fff}
         .es-step b{display:block;color:#0f172a;font-weight:700}.es-step em{display:block;font-style:normal;font-size:11px;color:#64748b;margin-top:1px}
         .es-step.next em{color:#1d4ed8;font-weight:700}.es-step.ok em{color:#15803d}
+        /* ความใกล้เคียงกับเฉลย 1-10 */
+        .es-sim{margin-top:10px;padding:10px 12px;border-radius:12px;border:1px solid #e2e8f0;background:#f8fafc}
+        .es-sim-h{display:flex;justify-content:space-between;align-items:baseline;font-size:12.5px;font-weight:700;color:#334155}
+        .es-sim-h b{font-size:22px;font-weight:800;line-height:1}.es-sim-h small{font-size:12px;color:#94a3b8;margin-left:2px}
+        .es-sim-bar{height:8px;border-radius:99px;background:#e2e8f0;overflow:hidden;margin:6px 0 5px}
+        .es-sim-bar i{display:block;height:100%;border-radius:inherit;transition:width .25s}
+        .es-sim-f{display:flex;justify-content:space-between;gap:8px;font-size:11.5px;color:#64748b}.es-sim-l{font-weight:700}
+        .es-sim-hi{background:#f0fdf4;border-color:#bbf7d0}.es-sim-hi .es-sim-bar i{background:#16a34a}.es-sim-hi b,.es-sim-hi .es-sim-l{color:#15803d}
+        .es-sim-mid{background:#fffbeb;border-color:#fde68a}.es-sim-mid .es-sim-bar i{background:#f59e0b}.es-sim-mid b,.es-sim-mid .es-sim-l{color:#b45309}
+        .es-sim-lo{background:#fff1f2;border-color:#fecdd3}.es-sim-lo .es-sim-bar i{background:#e11d48}.es-sim-lo b,.es-sim-lo .es-sim-l{color:#be123c}
+        .es-sim-chip{display:inline-block;margin-top:2px;font-size:11px;font-weight:700;padding:1px 7px;border-radius:99px;border:1px solid transparent;white-space:nowrap}
+        .es-grade-edit{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid #e2e8f0}
+        .es-grade-edit label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:#475569}
+        .es-grade-edit input[type=number]{width:84px;padding:8px 10px;border:1.5px solid #cbd5e1;border-radius:10px;font:inherit;font-size:15px;font-weight:700;color:#0f172a;background:#fff}
+        .es-grade-edit input[type=number]:focus{outline:none;border-color:#0b2a7a;box-shadow:0 0 0 3px rgba(11,42,122,.12)}
+        .es-score-in{display:flex;align-items:center;gap:6px}.es-score-in em{font-style:normal;color:#64748b;font-size:13px}
+        .es-grade-edit > input.dark-input{flex:1;min-width:140px}
+        .es-sim2score{font-size:12px;font-weight:700;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:8px 10px}
+        .es-sim2score:hover{background:#dbeafe}
+        .es-confirm{padding:9px 16px;border-radius:12px;font-size:13px;font-weight:700;color:#fff;background:#0b2a7a}.es-confirm:hover{background:#1e40af}
         @media (max-width:1100px){.es-hero-in{flex-direction:column;align-items:stretch}.es-drop{width:auto}.es-steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
         @media (max-width:640px){.es-hero{padding:22px 18px}.es-kpis{grid-template-columns:1fr}.es-steps{grid-template-columns:1fr}.es-actions .es-btn{flex:1 1 auto;justify-content:center}}
     </style>
@@ -576,8 +596,9 @@
             <div class="text-xs font-semibold text-slate-600 mt-3 mb-1">Rubric (ประเด็นที่ต้องมี และคะแนน)</div>
             <div class="rubs space-y-1.5">${rub.map(rubRow).join('')}</div>
             <button onclick="this.previousElementSibling.insertAdjacentHTML('beforeend', rubRow({}))" class="text-xs text-blue-900 font-semibold mt-1.5">＋ เพิ่มประเด็น</button>
-            <div class="grid sm:grid-cols-[140px_1fr] gap-2 mt-3">
+            <div class="grid sm:grid-cols-[120px_150px_1fr] gap-2 mt-3">
               <label class="text-xs font-semibold text-slate-600">คะแนนเต็ม<input type="number" min="0" step="0.5" class="q-max dark-input mt-1" value="${esc(q.maxScore)}" placeholder="รวม Rubric"></label>
+              <label class="text-xs font-semibold text-slate-600" title="จำนวนเส้นให้นักศึกษาเขียนตอบข้อนี้ในกระดาษคำตอบ เว้นว่าง = ใช้ค่าที่ตั้งในหน้าพิมพ์">เส้นตอบในกระดาษ<input type="number" min="1" max="40" step="1" class="q-lines dark-input mt-1" value="${q.lines ? esc(q.lines) : ''}" placeholder="ตามค่าตั้งต้น"></label>
               <label class="text-xs font-semibold text-slate-600">หมายเหตุการให้คะแนน<input class="q-note dark-input mt-1" value="${esc(q.note)}" placeholder="เช่น สะกดผิดไม่หักคะแนน"></label>
             </div></div>`;
     }
@@ -603,7 +624,7 @@
     async function saveAssignment() {
         const questions = [...document.querySelectorAll('#ed-qs .qb')].map(b => ({
             prompt: b.querySelector('.q-prompt').value, answerKey: b.querySelector('.q-key').value,
-            maxScore: b.querySelector('.q-max').value, note: b.querySelector('.q-note').value,
+            maxScore: b.querySelector('.q-max').value, note: b.querySelector('.q-note').value, lines: b.querySelector('.q-lines') ? b.querySelector('.q-lines').value : '',
             rubric: [...b.querySelectorAll('.rub')].map(r => ({ point: r.querySelector('.r-point').value, score: r.querySelector('.r-score').value }))
         }));
         const courseId = $('#ed-course').value;
@@ -668,7 +689,7 @@
             ${(watchFirst ? byWatch(subs) : subs).map((s, i) => { const [t, c] = subState(s); return `<tr><td>${i + 1}</td>
               <td><b>${esc(s.student_name || s.file_name)}</b><div class="text-xs text-slate-500">${esc(s.student_id)}</div>${watchBadge(s) ? `<div class="mt-1">${watchBadge(s)}</div>` : ''}</td>
               <td><span class="pill-s ${c}">${t}</span>${s.error ? `<div class="text-xs text-red-600 max-w-[220px]">${esc(s.error)}</div>` : ''}</td>
-              ${curData.assignment.questions.map(q => { const g = s.grades.find(x => x.question_no == q.no); return `<td class="${g && g.status === 'review' ? 'text-amber-600 font-bold' : ''}">${g ? (g.final_score ?? g.ai_score) : '–'}</td>`; }).join('')}
+              ${curData.assignment.questions.map(q => { const g = s.grades.find(x => x.question_no == q.no); const sv = g ? (g.teacher_similarity ?? g.similarity) : null; return `<td class="${g && g.status === 'review' ? 'text-amber-600 font-bold' : ''}">${g ? (g.final_score ?? g.ai_score) : '–'}${sv != null ? `<div class="es-sim-chip es-sim-${simLevel(sv)[1]}" title="ความใกล้เคียงกับเฉลย">🎯 ${sv}/10</div>` : ''}</td>`; }).join('')}
               <td class="font-bold">${s.status === 'done' ? total(s) : '–'}</td>
               <td class="whitespace-nowrap">${s.status === 'done' ? `<button onclick="openReview(${s.id})" class="text-blue-900 font-semibold text-xs">ตรวจทาน</button> · ` : ''}
                 <button onclick="renameSub(${s.id})" class="text-slate-500 text-xs">แก้ชื่อ</button> ·
@@ -932,20 +953,53 @@
               ${g.matched.length ? `<div class="text-xs text-emerald-700">✓ ${g.matched.map(esc).join('<br>✓ ')}</div>` : ''}
               ${g.missing.length ? `<div class="text-xs text-red-600 mt-1">✗ ${g.missing.map(esc).join('<br>✗ ')}</div>` : ''}
               <div class="text-xs text-slate-600 mt-2"><b>เหตุผล:</b> ${esc(g.reasoning)}</div>
-              <div class="flex items-center gap-2 mt-2 text-xs"><span>ความมั่นใจ AI</span><div class="flex-1 h-2 bg-slate-100 rounded"><div class="h-2 rounded ${conf < 70 ? 'bg-amber-400' : 'bg-emerald-400'}" style="width:${conf}%"></div></div><b>${conf}%</b></div>
-              <div class="flex flex-wrap items-end gap-2 mt-3 pt-3 border-t">
-                <label class="text-xs font-semibold">คะแนน (AI ให้ ${g.ai_score})<input id="sc-${g.id}" type="number" min="0" max="${g.max_score}" step="0.5" value="${g.final_score ?? g.ai_score}" class="dark-input !w-24 mt-1"></label>
-                <span class="text-sm text-slate-500 pb-2">/ ${g.max_score}</span>
-                <input id="nt-${g.id}" class="dark-input flex-1 min-w-[140px]" placeholder="หมายเหตุ (ไม่บังคับ)">
-                <button onclick="confirmGrade(${g.id})" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-blue-900 hover:bg-blue-800">✓ ยืนยัน</button></div>
-              ${g.history.length ? `<div class="text-[11px] text-slate-400 mt-2">ประวัติ: ${g.history.map(h => `${esc(h.by)} ${h.from}→${h.to} (${new Date(h.at).toLocaleString('th-TH')})`).join(' · ')}</div>` : ''}
+              ${simBlock(g)}
+              <div class="flex items-center gap-2 mt-2 text-xs"><span>ความมั่นใจ AI (อ่านลายมือ)</span><div class="flex-1 h-2 bg-slate-100 rounded"><div class="h-2 rounded ${conf < 70 ? 'bg-amber-400' : 'bg-emerald-400'}" style="width:${conf}%"></div></div><b>${conf}%</b></div>
+              <div class="es-grade-edit">
+                <label>ความใกล้เคียง (1–10)${g.similarity != null ? ` · AI ให้ ${g.similarity}` : ''}
+                  <input id="sm-${g.id}" type="number" min="1" max="10" step="1" value="${g.teacher_similarity ?? g.similarity ?? ''}" placeholder="–" oninput="previewSim(${g.id}, this.value)"></label>
+                <label>คะแนน${g.ai_score != null ? ` · AI ให้ ${g.ai_score}` : ''}
+                  <span class="es-score-in"><input id="sc-${g.id}" type="number" min="0" max="${g.max_score}" step="0.5" value="${g.final_score ?? g.ai_score}"><em>/ ${g.max_score}</em></span></label>
+                <button type="button" class="es-sim2score" onclick="simToScore(${g.id}, ${Number(g.max_score) || 0})" title="แปลงความใกล้เคียงเป็นคะแนน: (ความใกล้เคียง ÷ 10) × คะแนนเต็ม">↳ ใช้ความใกล้เคียงคิดคะแนน</button>
+                <input id="nt-${g.id}" class="dark-input" placeholder="หมายเหตุ (ไม่บังคับ)">
+                <button onclick="confirmGrade(${g.id})" class="es-confirm">✓ ยืนยัน</button>
+              </div>
+              ${g.history.length ? `<div class="text-[11px] text-slate-400 mt-2">ประวัติ: ${g.history.map(h => `${esc(h.by)} คะแนน ${h.from}→${h.to}${h.simTo != null ? ` · ใกล้เคียง ${h.simFrom ?? '–'}→${h.simTo}` : ''} (${new Date(h.at).toLocaleString('th-TH')})`).join(' · ')}</div>` : ''}
             </div>`;
         }).join('') + `<button onclick="confirmAll()" class="w-full py-3 rounded-xl font-bold text-white bg-blue-900 hover:bg-blue-800">✓ ยืนยันทุกข้อตามคะแนนที่แสดง</button>`;
         $('#review').classList.remove('hidden');
     }
     function closeReview() { $('#review').classList.add('hidden'); $('#rv-file').src = 'about:blank'; openAssignment(cur.id); }
+    // ---------- ความใกล้เคียงกับเฉลย (1-10) ----------
+    function simLevel(v) { return v >= 8 ? ['ใกล้เคียงมาก', 'hi'] : v >= 5 ? ['ใกล้เคียงบางส่วน', 'mid'] : v >= 1 ? ['ต่างจากเฉลยมาก', 'lo'] : ['ยังไม่ได้ประเมิน', 'na']; }
+    function simBlock(g) {
+        const v = g.teacher_similarity ?? g.similarity;
+        const [label, lv] = simLevel(Number(v) || 0);
+        const by = g.teacher_similarity != null ? 'อาจารย์' : g.similarity != null ? 'AI' : '';
+        return `<div class="es-sim es-sim-${lv}" id="simbox-${g.id}">
+            <div class="es-sim-h"><span>🎯 ความใกล้เคียงกับเฉลย</span><b><span class="es-sim-v">${v != null ? v : '–'}</span><small>/10</small></b></div>
+            <div class="es-sim-bar"><i style="width:${v != null ? v * 10 : 0}%"></i></div>
+            <div class="es-sim-f"><span class="es-sim-l">${label}</span>${by ? `<span class="es-sim-by">ประเมินโดย ${by}</span>` : '<span class="es-sim-by">ใส่ API key เพื่อให้ AI ประเมิน หรือให้คะแนนเองด้านล่าง</span>'}</div>
+        </div>`;
+    }
+    function previewSim(id, raw) {
+        const box = document.getElementById('simbox-' + id); if (!box) return;
+        const v = Math.max(0, Math.min(10, Math.round(Number(raw) || 0)));
+        const [label, lv] = simLevel(v);
+        box.className = `es-sim es-sim-${lv}`;
+        box.querySelector('.es-sim-v').textContent = v || '–';
+        box.querySelector('.es-sim-bar i').style.width = (v * 10) + '%';
+        box.querySelector('.es-sim-l').textContent = label;
+        box.querySelector('.es-sim-by').textContent = v ? 'อาจารย์กำลังแก้ไข (กดยืนยันเพื่อบันทึก)' : '';
+    }
+    function simToScore(id, max) {
+        const v = Number($('#sm-' + id).value);
+        if (!(v >= 1 && v <= 10)) { alert('ใส่ความใกล้เคียง 1–10 ก่อน'); $('#sm-' + id).focus(); return; }
+        $('#sc-' + id).value = Math.round(v / 10 * max * 2) / 2; // ปัดทีละ 0.5
+    }
+
     async function confirmGrade(id, silent) {
-        try { await api(`/api/essay/grades/${id}/confirm`, { body: { score: $('#sc-' + id).value, note: $('#nt-' + id).value } }); }
+        try { await api(`/api/essay/grades/${id}/confirm`, { body: { score: $('#sc-' + id).value, similarity: $('#sm-' + id) ? $('#sm-' + id).value : '', note: $('#nt-' + id).value } }); }
         catch (e) { alert(e.message); return false; }
         if (!silent) { curData = await api(`/api/essay/submissions?username=${U}&assignmentId=${cur.id}`); openReview(rvSub.id); }
         return true;
@@ -1025,8 +1079,8 @@
         curData.submissions.forEach((s, i) => rows.push([i + 1, s.student_id, s.student_name || s.file_name,
             ...qs.map(q => { const g = s.grades.find(x => x.question_no == q.no); return g ? Number(g.final_score ?? g.ai_score) : ''; }),
             s.status === 'done' ? total(s) : '', subState(s)[0]]));
-        const fb = [['รหัสนักเรียน', 'ชื่อ-สกุล', 'ข้อ', 'คะแนน', 'เต็ม', 'ประเด็นที่ได้', 'ประเด็นที่ขาด', 'เหตุผล', 'ข้อความที่อ่านได้']];
-        curData.submissions.forEach(s => s.grades.forEach(g => fb.push([s.student_id, s.student_name || s.file_name, g.question_no, Number(g.final_score ?? g.ai_score), g.max_score, g.matched.join(' / '), g.missing.join(' / '), g.reasoning, g.transcript])));
+        const fb = [['รหัสนักเรียน', 'ชื่อ-สกุล', 'ข้อ', 'คะแนน', 'เต็ม', 'ประเด็นที่ได้', 'ประเด็นที่ขาด', 'เหตุผล', 'ข้อความที่อ่านได้', 'ความใกล้เคียงกับเฉลย (1-10)']];
+        curData.submissions.forEach(s => s.grades.forEach(g => fb.push([s.student_id, s.student_name || s.file_name, g.question_no, Number(g.final_score ?? g.ai_score), g.max_score, g.matched.join(' / '), g.missing.join(' / '), g.reasoning, g.transcript, g.teacher_similarity ?? g.similarity ?? ''])));
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), 'คะแนน');
         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(fb), 'Feedback รายข้อ');

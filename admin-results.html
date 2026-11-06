@@ -319,6 +319,8 @@
                     </div>
                 </div>
                 <div class="rs-tools">
+                    <label class="rs-field rs-room"><span>📝 ชุดข้อสอบ</span>
+                        <select id="rs-room" onchange="onRoomChange()"><option value="ALL">กำลังโหลด...</option></select></label>
                     <label class="rs-search"><span>🔍</span><input id="rs-search" type="search" placeholder="ค้นหาชื่อ หรือรหัสนักศึกษา" oninput="filterAndRenderResults()"></label>
                     <label class="rs-field"><span>ชั้นเรียน</span>
                         <select id="class-filter" onchange="filterAndRenderResults()"><option value="ALL">ทุกชั้นเรียน</option></select></label>
@@ -508,6 +510,57 @@
             await fetchResults(courseId);
         }
 
+        // ======================================================
+        // ชุดข้อสอบ (ห้องสอบ): ดูผลทีละห้อง ไม่ให้ผลสอบเก่าปนกับห้องใหม่
+        // ======================================================
+        let allCourseResults = [];
+        let teacherRoomsCache = null;
+        const roomTs = id => { const m = String(id || '').match(/_room_([0-9a-z]+)$/i); const n = m ? parseInt(m[1], 36) : NaN; return isNaN(n) ? 0 : n; };
+        function selectedRoom() { const s = document.getElementById('rs-room'); return s ? s.value : 'ALL'; }
+
+        async function buildRoomOptions(courseId) {
+            const sel = document.getElementById('rs-room');
+            if (!sel) return;
+            if (!teacherRoomsCache) {
+                try { const r = await fetch(`/api/teacher/rooms?username=${encodeURIComponent(username)}`); teacherRoomsCache = r.ok ? await r.json() : []; }
+                catch (e) { teacherRoomsCache = []; }
+            }
+            const map = {};
+            (teacherRoomsCache || []).filter(r => String(r.courseId) === String(courseId)).forEach(r => {
+                map[r.roomId] = { id: r.roomId, title: r.exam_title || r.roomName || r.roomId, live: Number(r.is_published) === 1, n: 0, maxId: 0, date: '' };
+            });
+            allCourseResults.forEach(x => {
+                const k = x.roomId || '(ไม่ระบุห้อง)';
+                if (!map[k]) {
+                    const tr = (teacherRoomsCache || []).find(r => r.roomId === x.roomId);
+                    map[k] = { id: k, title: tr ? (tr.exam_title || tr.roomName) : `ห้อง ${k}`, live: false, n: 0, maxId: 0, date: '' };
+                }
+                map[k].n++; if (x.id > map[k].maxId) { map[k].maxId = x.id; map[k].date = String(x.date || '').replace(/^วัน\S*ที่\s*/, ''); }
+            });
+            // ใหม่ก่อน: ห้องที่สร้างล่าสุด / มีผลล่าสุด
+            const list = Object.values(map).sort((a, b) => (roomTs(b.id) - roomTs(a.id)) || (b.maxId - a.maxId));
+            const key = 'results_room_' + courseId;
+            let keep = ''; try { keep = localStorage.getItem(key) || ''; } catch (e) {}
+            sel.innerHTML = list.map(r => `<option value="${escapeHtml(r.id)}">${r.live ? '🟢 ' : ''}${escapeHtml(r.title)} · ${r.n ? r.n + ' คน' + (r.date ? ' · ' + escapeHtml(r.date) : '') : 'ยังไม่มีผู้ส่ง'}</option>`).join('')
+                + (list.length > 1 ? `<option value="ALL">ทุกชุดข้อสอบรวมกัน (${allCourseResults.length} รายการ)</option>` : '');
+            const defaultRoom = (list.find(r => r.live) || list.find(r => r.n) || list[0] || {}).id;
+            sel.value = (keep && [...sel.options].some(o => o.value === keep)) ? keep : (defaultRoom || 'ALL');
+            if (!sel.value && sel.options.length) sel.selectedIndex = 0;
+        }
+
+        function applyRoomFilter() {
+            const room = selectedRoom();
+            rawResultsData = (!room || room === 'ALL') ? [...allCourseResults] : allCourseResults.filter(x => (x.roomId || '(ไม่ระบุห้อง)') === room);
+            currentRoomId = pickMainRoom(rawResultsData) || (room !== 'ALL' ? room : '');
+            calculateStats(rawResultsData);
+            populateClassFilter(rawResultsData);
+            filterAndRenderResults();
+        }
+        function onRoomChange() {
+            try { localStorage.setItem('results_room_' + document.getElementById('course-selector').value, selectedRoom()); } catch (e) {}
+            applyRoomFilter();
+        }
+
         // ดึงคะแนนผลสอบของรายวิชาที่เลือก
         async function fetchResults(courseIdOverride) {
             const courseId = courseIdOverride || document.getElementById('course-selector').value;
@@ -520,17 +573,9 @@
                     throw new Error(errData.message || `HTTP Error ${response.status}`);
                 }
                 const data = await response.json();
-                rawResultsData = Array.isArray(data) ? data : [];
-                currentRoomId = pickMainRoom(rawResultsData);
-                
-                // คำนวณสถิติ
-                calculateStats(rawResultsData);
-                
-                // อัปเดตรายการชั้นเรียนใน Dropdown กรองตามชั้นเรียน
-                populateClassFilter(rawResultsData);
-                
-                // จัดเรียง กรอง และแสดงผล
-                filterAndRenderResults();
+                allCourseResults = Array.isArray(data) ? data : [];
+                await buildRoomOptions(courseId);
+                applyRoomFilter();
             } catch (err) {
                 console.error("fetchResults error:", err);
                 rawResultsData = [];
@@ -552,14 +597,16 @@
             const csel = document.getElementById('course-selector');
             const cname = csel && csel.selectedIndex >= 0 ? csel.options[csel.selectedIndex].text : '';
             const setT = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
-            setT('rs-course-name', cname || 'ผลการสอบ');
+            const rsel = document.getElementById('rs-room');
+            const rname = rsel && rsel.value && rsel.value !== 'ALL' && rsel.selectedIndex >= 0 ? rsel.options[rsel.selectedIndex].text.split(' · ')[0].replace(/^🟢\s*/, '') : '';
+            setT('rs-course-name', (cname || 'ผลการสอบ') + (rname ? ' · ' + rname : ''));
 
             if (count === 0) {
                 document.getElementById('stat-max').textContent = "-";
                 document.getElementById('stat-min').textContent = "-";
                 document.getElementById('stat-avg').textContent = "-";
                 document.getElementById('stat-sd').textContent = "-";
-                setT('rs-pass', '-'); setT('rs-avg-pct', '-'); setT('rs-summary-line', 'ยังไม่มีนักศึกษาส่งคำตอบในรายวิชานี้');
+                setT('rs-pass', '-'); setT('rs-avg-pct', '-'); setT('rs-summary-line', selectedRoom() === 'ALL' ? 'ยังไม่มีนักศึกษาส่งคำตอบในรายวิชานี้' : 'ชุดข้อสอบนี้ยังไม่มีนักศึกษาส่งคำตอบ — ผลจะขึ้นเองเมื่อนักศึกษากดส่ง (กด 🔄 รีเฟรช)');
                 const pb = document.getElementById('rs-pass-bar'); if (pb) pb.style.width = '0%';
                 return;
             }
@@ -675,7 +722,7 @@
             if (shown) shown.textContent = `${filteredList.length} จาก ${rawResultsData.length} คน`;
 
             if (filteredList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="rs-empty">📭 ${q ? 'ไม่พบนักศึกษาที่ตรงกับคำค้นหา' : 'ยังไม่มีผลคะแนนในชั้นเรียนที่เลือก'}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="rs-empty">📭 ${q ? 'ไม่พบนักศึกษาที่ตรงกับคำค้นหา' : (rawResultsData.length ? 'ยังไม่มีผลคะแนนในชั้นเรียนที่เลือก' : 'ชุดข้อสอบนี้ยังไม่มีนักศึกษาส่งคำตอบ')}</td></tr>`;
                 document.getElementById('item-analysis-box').classList.add('hidden');
                 return;
             }

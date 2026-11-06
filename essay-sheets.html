@@ -54,7 +54,7 @@
   .qh b{color:var(--navy)}
   .qh em{font-style:normal;color:#6b7280;font-size:10pt}
   .ans{border:.3mm solid #9ca3af;border-radius:1.5mm;margin-top:1.5mm;padding:0 3mm}
-  .ln{height:8.5mm;border-bottom:.25mm solid var(--line)}
+  .ln{height:var(--lh,8.5mm);border-bottom:.25mm solid var(--line)}
   .ln:last-child{border-bottom:0}
   .ft{display:flex;justify-content:space-between;font-size:8.5pt;color:#6b7280;border-top:.3mm solid #e5e7eb;padding-top:1.5mm;margin-top:2mm}
   @page{size:A4;margin:0}
@@ -72,7 +72,8 @@
 <div class="bar"><div class="in">
   <h1 id="h1">กระดาษคำตอบ<small>กำลังโหลด...</small></h1>
   <label>ชั้นเรียน <select id="cls"><option value="">ทั้งหมด</option></select></label>
-  <label>บรรทัดต่อ 1 คะแนน <input id="lpp" type="number" min="1" max="12" value="3"></label>
+  <label title="จำนวนเส้นให้เขียนตอบต่อ 1 ข้อ (ข้อที่กำหนดจำนวนเส้นไว้ในหน้าสร้างงาน จะใช้ค่าของข้อนั้นแทน)">เส้นตอบต่อข้อ <input id="lpq" type="number" min="1" max="40" value="6"></label>
+  <label>ระยะห่างเส้น <select id="lsp"><option value="7">ชิด</option><option value="8.5" selected>ปกติ</option><option value="10">ห่าง</option></select></label>
   <label><input id="showQ" type="checkbox" checked> พิมพ์โจทย์</label>
   <button id="print" disabled onclick="downloadPdf()">⬇️ ดาวน์โหลด PDF / พิมพ์</button>
   <a href="admin-essay.html">← กลับหน้าตรวจอัตนัย</a>
@@ -133,7 +134,9 @@
 
   // สร้างกระดาษของนักศึกษา 1 คน (ตัดหน้าอัตโนมัติตามความสูงจริง)
   function buildStudent(r, host) {
-    const lpp = Math.max(1, Number($('#lpp').value) || 3), showQ = $('#showQ').checked;
+    // จำนวนเส้นต่อข้อ: ใช้ค่าที่กำหนดรายข้อ (หน้าสร้างงาน) ถ้าไม่มีใช้ค่าตั้งต้นด้านบน
+    // (เดิมคิดจากคะแนนเต็ม × 3 และขั้นต่ำ 5 เส้น → ข้อ 10 คะแนนได้ 30 เส้น เกือบเต็มหน้า)
+    const lpq = Math.max(1, Math.min(40, Number($('#lpq').value) || 6)), showQ = $('#showQ').checked;
     const pages = [];
     const newPage = () => {
       const p = document.createElement('section'); p.className = 'page';
@@ -143,7 +146,7 @@
     const fits = b => b.scrollHeight <= b.clientHeight + 1;
     let body = newPage();
     for (const q of A.questions) {
-      const lines = Math.max(5, Math.round(Number(q.maxScore || 1) * lpp));
+      const lines = Number(q.lines) > 0 ? Math.min(40, Number(q.lines)) : lpq;
       let done = 0, cont = false;
       while (done < lines) {
         const blk = document.createElement('div'); blk.className = 'q';
@@ -187,7 +190,15 @@
     window.print();
     setTimeout(() => { document.title = old; }, 1500);
   };
-  $('#cls').addEventListener('change', render); $('#lpp').addEventListener('change', render); $('#showQ').addEventListener('change', render);
+  // จำค่าที่ตั้งไว้ในเครื่อง + ระยะห่างเส้น
+  try { const v = localStorage.getItem('sheet_lpq'); if (v) $('#lpq').value = v; const s = localStorage.getItem('sheet_lsp'); if (s && [...$('#lsp').options].some(o => o.value === s)) $('#lsp').value = s; } catch (e) {}
+  const applySpacing = () => document.documentElement.style.setProperty('--lh', $('#lsp').value + 'mm');
+  applySpacing();
+  const saveOpts = () => { try { localStorage.setItem('sheet_lpq', $('#lpq').value); localStorage.setItem('sheet_lsp', $('#lsp').value); } catch (e) {} };
+  $('#cls').addEventListener('change', render);
+  $('#lpq').addEventListener('change', () => { saveOpts(); render(); });
+  $('#lsp').addEventListener('change', () => { saveOpts(); applySpacing(); render(); });
+  $('#showQ').addEventListener('change', render);
   if (document.fonts && document.fonts.ready) await document.fonts.ready;
   render();
 })();
