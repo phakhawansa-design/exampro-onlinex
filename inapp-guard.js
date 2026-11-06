@@ -29,6 +29,16 @@
     window.__TRINETRA_INAPP = app;
     var url = location.href;
 
+    // โหมดเบา (<script src="inapp-guard.js" data-soft>) สำหรับหน้าที่ไม่ใช่หน้าสอบ เช่น หน้าแรก:
+    // LINE → ส่งต่อไปเบราว์เซอร์หลักครั้งเดียว แต่ไม่ปิดทับหน้า (อาจารย์ยังดูหน้าเว็บใน LINE ได้)
+    var me = document.currentScript;
+    if (me && me.hasAttribute('data-soft')) {
+        if (app === 'LINE' && !/[?&]openExternalBrowser=1/.test(location.search)) {
+            try { var su = new URL(url); su.searchParams.set('openExternalBrowser', '1'); location.replace(su.toString()); } catch (e) { }
+        }
+        return;
+    }
+
     // LINE: ส่งต่อไปเบราว์เซอร์หลักทันที (ยังปิดทับหน้านี้ไว้ ถ้า LINE ไม่ยอมเปิดให้)
     var lineTried = false;
     if (app === 'LINE' && !/[?&]openExternalBrowser=1/.test(location.search)) {
