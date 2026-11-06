@@ -38,8 +38,17 @@
         lineTried = true;
         try { location.replace(url); } catch (e) { }
     } else if (app === 'LINE') {
-        // มีพารามิเตอร์แล้วแต่ยังอยู่ใน LINE (เช่น LINE รุ่นเก่า) ให้ลิงก์ที่คัดลอกยังคงพารามิเตอร์ไว้
+        // มีพารามิเตอร์แล้วแต่ยังอยู่ใน LINE (เช่น สแกน QR ด้วยกล้องใน LINE, เปิดจากโน้ต/อัลบั้ม หรือ LINE รุ่นเก่า)
+        // LINE อ่านพารามิเตอร์ตอนแตะลิงก์ในแชตเท่านั้น จึงลองเปลี่ยนหน้าอีกครั้ง 1 ครั้ง (กันวนซ้ำด้วย sessionStorage)
         url = location.href;
+        var retried = true;
+        try { retried = sessionStorage.getItem('tn_line_ext') === '1'; if (!retried) sessionStorage.setItem('tn_line_ext', '1'); } catch (e) { }
+        if (!retried) {
+            var u2 = new URL(url);
+            u2.searchParams.set('tnx', Date.now().toString(36));
+            lineTried = true;
+            try { location.replace(u2.toString()); } catch (e) { }
+        }
     }
 
     function chromeIntent(href) {

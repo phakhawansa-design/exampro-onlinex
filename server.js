@@ -186,13 +186,13 @@ if (isPg) {
 } else {
     const dbDir = process.env.DATA_DIR || path.join(__dirname, '.data');
     if (!fs.existsSync(dbDir)) {
-        fs.mkdirSync(dbDir);
+        fs.mkdirSync(dbDir, { recursive: true });
     }
     const dbPath = path.join(dbDir, 'exam_system.db');
 
     db = new sqlite3.Database(dbPath, (err) => {
         if (err) console.error('❌ เชื่อมต่อ SQLite ล้มเหลว:', err.message);
-        else console.log('🟢 เชื่อมต่อฐานข้อมูล SQLite สำเร็จ (ไฟล์: .data/exam_system.db)');
+        else console.log('🟢 เชื่อมต่อฐานข้อมูล SQLite สำเร็จ (ไฟล์: ' + dbPath + ')');
     });
 }
 

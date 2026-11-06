@@ -1069,6 +1069,45 @@
             window.addEventListener('focus', () => {
                 handleTabReturn();
             });
+
+            // ---- ชั้นเสริม: จับการออกจากหน้าสอบที่เบราว์เซอร์ไม่แจ้งเหตุการณ์ ----
+            // เบราว์เซอร์ในแอป (LINE ฯลฯ) และการสลับแอปจาก App Switcher ของ iOS/Android
+            // บางครั้งไม่ส่ง visibilitychange/blur เลย จึงตรวจเพิ่ม 3 ทาง:
+            //  1) เวลากระโดด: แอปถูกพับ/ล็อกจอ สคริปต์หยุดทำงาน พอกลับมาเวลาจะข้ามไปหลายวินาที
+            //  2) document.hasFocus() เปลี่ยนจากมีโฟกัสเป็นไม่มี (บางเบราว์เซอร์ไม่ยิง blur)
+            //  3) เหตุการณ์ freeze/resume ของ Chrome (หน้าเว็บถูกพักการทำงาน)
+            const JUMP_MS = 4000;
+            let lastTick = Date.now();
+            let wasFocused = document.hasFocus() && document.visibilityState === 'visible';
+            // กล่อง alert/confirm/prompt ของระบบเองหยุดสคริปต์ไว้ ไม่นับเป็นการออกจากหน้าสอบ
+            ['alert', 'confirm', 'prompt'].forEach(fn => {
+                const orig = window[fn] && window[fn].bind(window);
+                if (!orig) return;
+                window[fn] = function () {
+                    try { return orig.apply(null, arguments); }
+                    finally { lastTick = Date.now(); window.__fsQuietUntil = Date.now() + 1500; }
+                };
+            });
+            setInterval(() => {
+                if (isExamFinished) return;
+                const now = Date.now(), gap = now - lastTick;
+                lastTick = now;
+                if (gap > JUMP_MS && lastReportedTime < now - gap) {
+                    // ช่วงที่หายไปยังไม่มีการรายงานจากเหตุการณ์อื่น
+                    const sec = Math.round(gap / 1000);
+                    lastLeave = { at: now - gap, what: 'หน้าสอบหยุดทำงาน' };
+                    lastReturn = { at: now, what: lastLeave.what, n: 0, away: sec };
+                    lastReportedTime = now;
+                    tabSwitchCount++;
+                    reportCheat(`⏸️ หน้าสอบหยุดทำงานประมาณ ${sec} วินาที (พับแอป/สลับแอป/ล็อกจอ) (ครั้งที่ ${tabSwitchCount})`);
+                }
+                const focused = document.hasFocus() && document.visibilityState === 'visible';
+                if (wasFocused && !focused) handleTabLeave();
+                else if (!wasFocused && focused) handleTabReturn();
+                wasFocused = focused;
+            }, 1000);
+            document.addEventListener('freeze', () => handleTabLeave());
+            document.addEventListener('resume', () => { lastTick = Date.now(); handleTabReturn(); });
         }
 
         async function submitExam(isAutoSubmit = false) {

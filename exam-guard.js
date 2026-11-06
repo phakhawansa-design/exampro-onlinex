@@ -133,6 +133,15 @@ module.exports = function examGuard(app, db) {
                 message: `❌ เปิดข้อสอบใน ${inAppName(req.headers['user-agent'])} ไม่ได้ เพราะระบบตรวจจับการสลับหน้าจอไม่ได้\nกรุณาคัดลอกลิงก์ไปเปิดใน Safari หรือ Chrome`
             });
         }
+        // (2b) อนุญาตเบราว์เซอร์ในแอปไว้ (ALLOW_INAPP_BROWSER=on) → แจ้งอาจารย์ว่าคนนี้สอบในแอป ตาเฝ้าอาจจับไม่ครบ
+        if (p === '/api/get-questions' && req.method === 'GET' && allowInApp && isInApp(req.headers['user-agent'])
+            && req.authUser && req.authUser.typ === 'student' && req.query.roomId) {
+            const k = keyOf(req.query.roomId, req.authUser.u), now = Date.now();
+            if (!deniedAt.has('inapp|' + k) || now - deniedAt.get('inapp|' + k) > 10 * 60e3) {
+                deniedAt.set('inapp|' + k, now);
+                logCheat(req.query.roomId, req.authUser.u, req.authUser.u, '', `📵 เปิดข้อสอบในเบราว์เซอร์ของ ${inAppName(req.headers['user-agent'])} (ตาเฝ้าอาจตรวจจับการสลับหน้าจอได้ไม่ครบ)`);
+            }
+        }
         // (4) เปิดข้อสอบ = จองเป็นเจ้าของการสอบ ถ้ามีหน้าสอบอื่นของคนเดียวกันยังทำงานอยู่ → ไม่ให้เข้า
         if (p === '/api/get-questions' && req.method === 'GET' && req.authUser && req.authUser.typ === 'student' && req.query.roomId) {
             const sid = cleanSid(req.query.sid), k = keyOf(req.query.roomId, req.authUser.u), now = Date.now(), cur = sessions.get(k);
