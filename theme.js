@@ -1,8 +1,56 @@
 // 🎨 theme.js — ใส่โลโก้ตรีเนตร e-Exam และปรับหน้าตาเล็กน้อย (ไม่แตะการทำงานของหน้า)
 (function () {
   const LOGO = 'trinetra-logo.svg';
+
+  // =====================================================================
+  // 🔀 สวิตช์เปิด/ปิดเมนู (จุดเดียวทั้งระบบ)
+  // ระบบตรวจข้อสอบอัตนัย (เมนู "ตรวจอัตนัยด้วย AI" + หน้ากระดาษคำตอบ) ปิดไว้ระหว่างพัฒนาปรับปรุง
+  // เปิดกลับ: เปลี่ยน false → true แล้วอัปโหลดไฟล์นี้ (โค้ดและข้อมูลเดิมยังอยู่ครบ ไม่ได้ลบ)
+  // =====================================================================
+  const ESSAY_ENABLED = false;
+
+  const pageNow = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+  if (!ESSAY_ENABLED) {
+    // ซ่อนลิงก์ทันที (ก่อนหน้าเว็บแสดง กันเห็นเมนูแวบขึ้นมา)
+    const st = document.createElement('style');
+    st.textContent = 'a[href="admin-essay.html"],a[href^="admin-essay.html?"],a[href="essay-sheets.html"],a[href^="essay-sheets.html?"]{display:none!important}';
+    (document.head || document.documentElement).appendChild(st);
+    // เปิดหน้าตรวจอัตนัยตรง ๆ (เช่น บุ๊กมาร์กไว้) → พากลับแดชบอร์ด
+    if (/^(admin-essay|essay-sheets)\.html$/.test(pageNow)) {
+      location.replace('dashboard.html?notice=essay-off');
+      return;
+    }
+  }
+
   const run = () => {
-    const page = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    const page = pageNow;
+    // 0.5) ปิดเมนูตรวจอัตนัย → เลื่อนเลขเมนูที่ตามมาให้ต่อเนื่อง (9→8, 10→9) ทั้งเมนูข้างและหัวข้อหน้า
+    if (!ESSAY_ENABLED) {
+      const map = {}; let n = 0;
+      document.querySelectorAll('#sidebar a').forEach(a => {
+        if (/admin-essay\.html/.test(a.getAttribute('href') || '')) return;
+        const sp = [...a.querySelectorAll('span')].find(s => /^\s*\d+\.\s/.test(s.textContent));
+        if (!sp) return;
+        const old = parseInt(sp.textContent, 10); n++; map[old] = n;
+        if (old !== n) sp.textContent = sp.textContent.replace(/^(\s*)\d+\./, `$1${n}.`);
+      });
+      document.querySelectorAll('h1').forEach(h => {
+        const walker = document.createTreeWalker(h, NodeFilter.SHOW_TEXT);
+        let t; while ((t = walker.nextNode())) {
+          const m = t.textContent.match(/^(\s*)(\d+)\./);
+          if (m) { if (map[m[2]] && map[m[2]] !== Number(m[2])) t.textContent = t.textContent.replace(/^(\s*)\d+\./, `$1${map[m[2]]}.`); break; }
+          if (t.textContent.trim()) break;
+        }
+      });
+      if (/[?&]notice=essay-off\b/.test(location.search)) {
+        const toast = document.createElement('div');
+        toast.textContent = '🛠️ ระบบตรวจข้อสอบอัตนัยปิดปรับปรุงชั่วคราว';
+        toast.style.cssText = 'position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:99999;background:#0b2a7a;color:#fff;padding:10px 18px;border-radius:12px;font:600 14px Kanit,sans-serif;box-shadow:0 10px 24px rgba(0,0,0,.2)';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+        history.replaceState(null, '', location.pathname);
+      }
+    }
     // 0) ไอคอนบนแท็บเบราว์เซอร์ (หน้าที่ยังไม่มี)
     if (!document.querySelector('link[rel~="icon"]')) {
       const ic = document.createElement('link'); ic.rel = 'icon'; ic.type = 'image/png'; ic.href = 'trinetra-icon.png';
