@@ -9,19 +9,19 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--navy:#0d3b8e;--navy2:#082a6b;--or:#e8663d;--gold:#f6b818;--ink:#14213d;--mut:#5b6b82;--line:#e3e9f3;--bg:#f3f6fb;--card:#fff;--red:#d64045;--amber:#b7791f;--green:#0f8a5f}
+:root{--navy:#1e3a8a;--navy2:#1e40af;--or:#1e3a8a;--gold:#f6b818;--ink:#0f172a;--mut:#64748b;--line:#e5e7eb;--bg:#f8fafc;--card:#fff;--red:#d64045;--amber:#b7791f;--green:#0f8a5f}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:Kanit,"Leelawadee UI",Tahoma,sans-serif;font-size:15px}
 a{color:inherit}
-header{background:linear-gradient(120deg,var(--navy2),var(--navy) 60%,#1450b8);color:#fff;padding:18px 20px 64px}
+header{background:#fff;color:var(--ink);padding:16px 20px;border-bottom:1px solid var(--line)} /* Clean Navy: หัวเรียบพื้นขาว */
 .top{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.nlogo{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:rgba(255,255,255,.12);box-shadow:0 0 0 2px rgba(255,255,255,.8);flex:none}
+.nlogo{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:#fff;border:1px solid var(--line);flex:none}
 .nlogo svg{width:38px;height:19px;overflow:visible}
 .top h1{margin:0;font-size:21px;font-weight:600;line-height:1.25}
-.top h1 small{display:block;font-size:13px;font-weight:400;opacity:.8}
-.back{margin-left:auto;text-decoration:none;font-size:14px;padding:8px 14px;border-radius:99px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25)}
-main{max-width:1240px;margin:-44px auto 40px;padding:0 16px}
-.panel{background:var(--card);border-radius:20px;box-shadow:0 14px 40px -24px rgba(13,59,142,.45);padding:18px}
+.top h1 small{display:block;font-size:13px;font-weight:400;color:var(--mut)}
+.back{margin-left:auto;text-decoration:none;font-size:14px;padding:8px 14px;border-radius:10px;background:#eef2fb;color:var(--navy);border:1px solid #dbe3f4}
+main{max-width:1240px;margin:20px auto 40px;padding:0 16px}
+.panel{background:var(--card);border-radius:14px;border:1px solid var(--line);box-shadow:0 1px 2px rgba(15,23,42,.04);padding:18px}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 select,input[type=search]{font:inherit;font-size:14.5px;padding:10px 12px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);min-width:0}
 #course{flex:1 1 280px;font-weight:500}
@@ -54,7 +54,7 @@ tr.det td{background:#fbfcff;padding:4px 14px 14px}
 .ev .rm{grid-column:1/-1;font-weight:600;color:var(--navy);margin-top:6px}
 .ev time{color:var(--mut);font-variant-numeric:tabular-nums}
 .empty{padding:40px 10px;text-align:center;color:var(--mut)}
-@media(max-width:820px){.cards{grid-template-columns:repeat(2,1fr)}header{padding-bottom:58px}.top h1{font-size:18px}.ev{grid-template-columns:1fr}.ev time{margin-top:6px}}
+@media(max-width:820px){.cards{grid-template-columns:repeat(2,1fr)}header{padding-bottom:16px}.top h1{font-size:18px}.ev{grid-template-columns:1fr}.ev time{margin-top:6px}}
 @media print{header,.tools .btn,.back,#course,.noprint{display:none!important}main{margin:0;padding:0}.panel{box-shadow:none;padding:0}body{background:#fff}tr.det{display:table-row!important}}
 </style>
 </head>

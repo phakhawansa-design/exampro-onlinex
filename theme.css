@@ -245,3 +245,183 @@ body:has(#exam-screen:not(.hidden)) #tablock-floating-guide-btn .tablock-guide-p
   .text-\[9px\] { font-size: 10.5px !important; }
   .text-\[10px\] { font-size: 11px !important; }
 }
+
+/* =====================================================================
+   ✨ ธีม CLEAN NAVY (ชั้นบนสุด ทับธีมเดิมทั้งหมดด้านบน)
+   แนวคิด: พื้นขาว · สีเน้นน้ำเงินสีเดียว · ไม่ไล่เฉด ไม่มีลายหกเหลี่ยม · เงาบาง · เว้นที่ว่าง
+   สีเขียว/แดง/ส้ม ใช้เฉพาะบอกสถานะ (ผ่าน/ไม่ผ่าน/เตือน) เท่านั้น
+   กลับไปธีมเดิม: ลบตั้งแต่บรรทัดนี้ลงไปจนจบไฟล์ (สำรองไว้ที่ .unused-2026-11-06/theme-before-clean.css)
+   ===================================================================== */
+:root {
+  --cn-accent: #1e3a8a;      /* น้ำเงินหลัก (ปุ่ม/ลิงก์/เมนูที่เลือก) */
+  --cn-accent-2: #1e40af;    /* hover */
+  --cn-accent-soft: #eef2fb; /* พื้นไฮไลต์อ่อน */
+  --cn-bg: #f8fafc;          /* พื้นหน้า */
+  --cn-surface: #ffffff;     /* การ์ด */
+  --cn-line: #e5e7eb;        /* เส้นขอบ */
+  --cn-ink: #0f172a;         /* ตัวอักษรหลัก */
+  --cn-mute: #64748b;        /* ตัวอักษรรอง */
+  --cn-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+  /* ให้ธีมเดิมที่อ้างตัวแปรเหล่านี้ เปลี่ยนตามไปด้วย */
+  --rm-navy: var(--cn-accent);
+  --rm-blue: var(--cn-accent-2);
+  --rm-cyan: var(--cn-accent-2);
+  --rm-orange: var(--cn-accent);
+  --rm-orange-2: var(--cn-accent-2);
+  --rm-bg: var(--cn-bg);
+  --rm-ink: var(--cn-ink);
+  --rm-line: var(--cn-line);
+  --rm-shadow: var(--cn-shadow);
+  --rm-hex: none;
+  --rm-hex-w: none;
+}
+
+/* ---------- เมนูข้าง: พื้นขาว ---------- */
+#sidebar {
+  background: var(--cn-surface) !important;
+  border-right: 1px solid var(--cn-line) !important;
+  box-shadow: none !important;
+}
+#sidebar .nav-section-title { color: #94a3b8 !important; }
+#sidebar .nav-link { color: #475569 !important; border-radius: 10px !important; }
+#sidebar .nav-link svg { color: #94a3b8 !important; }
+#sidebar .nav-link:hover { background: #f1f5f9 !important; color: var(--cn-ink) !important; transform: none !important; }
+#sidebar .nav-link.active { background: var(--cn-accent-soft) !important; color: var(--cn-accent) !important; font-weight: 600 !important; box-shadow: none !important; }
+#sidebar .nav-link.active svg { color: var(--cn-accent) !important; }
+#sidebar [class*="text-slate-"], #sidebar [class*="text-gray-"] { color: #475569 !important; }
+#sidebar [class*="border-slate-"] { border-color: var(--cn-line) !important; }
+#sidebar [class*="bg-slate-50"] { background: #f8fafc !important; }
+#sidebar .logo-gradient { -webkit-text-fill-color: var(--cn-accent) !important; color: var(--cn-accent) !important; }
+#sidebar .logo-shield, #sidebar .rm-logo { background: #fff !important; border: 1px solid var(--cn-line) !important; border-radius: 10px !important; }
+#sidebar .text-white { color: var(--cn-ink) !important; }
+
+/* ---------- พื้นที่หลัก / แถบหัว / การ์ด ---------- */
+#main-area { background: var(--cn-bg) !important; }
+#top-header { background: var(--cn-surface) !important; border-bottom: 1px solid var(--cn-line) !important; box-shadow: none !important; }
+#top-header::before { display: none !important; }
+#top-header h1 { color: var(--cn-ink) !important; }
+.glass-card, .academic-card, .rs-card, .rs-kpi, .mn-card, .mn-kpi, .mn-tabs-card, .mn-room, .qx-tool {
+  background: var(--cn-surface) !important;
+  border: 1px solid var(--cn-line) !important;
+  border-radius: 14px !important;
+  box-shadow: var(--cn-shadow) !important;
+}
+.academic-card:hover, .qx-tool:hover, .mn-room:hover { box-shadow: 0 4px 12px rgba(15, 23, 42, .06) !important; }
+#main-area .shadow-2xl, #main-area .shadow-xl, #main-area .shadow-lg, #main-area .shadow-md { box-shadow: var(--cn-shadow) !important; }
+
+/* ---------- ปุ่ม: สีน้ำเงินทึบ (ไม่ไล่เฉด) ---------- */
+.bg-blue-900, .bg-indigo-600, .bg-indigo-700 { background-color: var(--cn-accent) !important; }
+.bg-blue-900:hover, .hover\:bg-blue-800:hover, .hover\:bg-indigo-700:hover { background-color: var(--cn-accent-2) !important; }
+.text-blue-900 { color: var(--cn-accent) !important; }
+#main-area button[class*="bg-gradient-to-"], #main-area a[class*="bg-gradient-to-"],
+body > div button[class*="bg-gradient-to-"] {
+  background-image: none !important; background-color: var(--cn-accent) !important; color: #fff !important; box-shadow: none !important;
+}
+/* หัวข้อตัวอักษรไล่เฉด → สีเข้มธรรมดา */
+[class*="bg-clip-text"] { background: none !important; -webkit-text-fill-color: currentColor !important; color: var(--cn-ink) !important; }
+/* ลดการกะพริบ (เหลือเฉพาะจุดสถานะเล็ก ๆ) */
+#main-area .animate-pulse:not(.rounded-full) { animation: none !important; }
+
+/* ---------- แบนเนอร์ใหญ่สีเข้ม → หัวข้อเรียบบนพื้นขาว ---------- */
+.academic-hero, .es-hero, .rs-hero {
+  background: var(--cn-surface) !important; color: var(--cn-ink) !important;
+  border: 1px solid var(--cn-line) !important; border-radius: 14px !important; box-shadow: var(--cn-shadow) !important;
+}
+.academic-hero::before, .es-hero::before, .es-hero::after, .rs-hero::before { display: none !important; }
+.academic-hero .text-white, .academic-hero h2, .es-hero h2, .rs-hero h2 { color: var(--cn-ink) !important; }
+.academic-hero p, .academic-hero .text-slate-300, .es-hero p, .rs-hero p { color: var(--cn-mute) !important; }
+.academic-hero [class*="bg-blue-900/"], .es-chip, .rs-chip { background: var(--cn-accent-soft) !important; border-color: #dbe3f4 !important; color: var(--cn-accent) !important; }
+.academic-hero [class*="text-blue-200"] { color: var(--cn-accent) !important; }
+/* ปุ่มในแบนเนอร์: ปุ่มแรกทึบ ที่เหลือเป็นปุ่มขอบ */
+.academic-hero a, .es-btn { background: #fff !important; color: #334155 !important; border: 1px solid var(--cn-line) !important; box-shadow: none !important; }
+.academic-hero a:first-child, .es-btn-w { background: var(--cn-accent) !important; color: #fff !important; border-color: var(--cn-accent) !important; }
+/* การ์ดโลโก้ตกแต่งในแบนเนอร์แดชบอร์ด: ไม่จำเป็น */
+.academic-hero > div > div:last-child:has(img) { display: none !important; }
+/* จุดวางไฟล์ในหน้าตรวจอัตนัย */
+.es-drop { background: #f8fafc !important; border-color: #cbd5e1 !important; color: var(--cn-ink) !important; backdrop-filter: none !important; }
+.es-drop small { color: var(--cn-mute) !important; }
+.es-drop-ic { background: var(--cn-accent-soft) !important; box-shadow: none !important; }
+.es-ticks span { background: #f1f5f9 !important; border-color: var(--cn-line) !important; color: #475569 !important; }
+/* แบนเนอร์สรุปผลสอบ */
+.rs-big { background: #f8fafc !important; border-color: var(--cn-line) !important; }
+.rs-big small { color: var(--cn-mute) !important; }
+.rs-big b { color: var(--cn-ink) !important; }
+.rs-bar { background: #eef2f7 !important; }
+
+/* ---------- หน้าสร้างข้อสอบ (5) ---------- */
+.qx-head { box-shadow: none !important; }
+.qx-back { background: var(--cn-accent-soft) !important; color: var(--cn-accent) !important; border: 1px solid #dbe3f4 !important; box-shadow: none !important; }
+.qx-back:hover { background: #e3e9f8 !important; filter: none !important; }
+.qx-save, .qx-add, .qx-tbtn-p { background: var(--cn-accent) !important; box-shadow: none !important; }
+.qx-save:hover, .qx-add:hover, .qx-tbtn-p:hover { background: var(--cn-accent-2) !important; filter: none !important; }
+.qx-tool-hi { border: 1.5px solid var(--cn-accent) !important; background: var(--cn-surface) !important; }
+.qx-badge { background: var(--cn-accent) !important; }
+.qx-tools-b { background: var(--cn-bg) !important; }
+.qx-n { background: var(--cn-accent) !important; }
+
+/* ---------- ปุ่มต่าง ๆ ในหน้าที่ออกแบบใหม่ ---------- */
+.rs-btn-p, .mn-btn-p, .mn-tab.on, .rs-view, .es-confirm { background: var(--cn-accent) !important; box-shadow: none !important; }
+.mn-tab { background: #fff !important; }
+.mn-tab.on { color: #fff !important; }
+.mn-st { border-left-width: 3px !important; }
+
+/* ---------- หน้าเข้าสู่ระบบ / สมัคร / จบการสอบ ---------- */
+body.rm-auth { background: var(--cn-bg) !important; }
+body.rm-auth::before, .rm-hexdeco { display: none !important; }
+body.rm-auth .glass-card { box-shadow: 0 1px 3px rgba(15, 23, 42, .06), 0 8px 24px -12px rgba(15, 23, 42, .12) !important; border: 1px solid var(--cn-line) !important; }
+body.rm-auth .btn-submit, body.rm-auth .btn-admin, body.rm-auth .btn-register { background: var(--cn-accent) !important; box-shadow: none !important; }
+.rm-uni, .rm-uni-s { color: var(--cn-ink) !important; text-shadow: none !important; }
+.rm-uni img, .rm-uni-s img { border: 1px solid var(--cn-line); }
+
+/* ---------- หน้านักศึกษา (เข้าสอบ / ทำข้อสอบ / พอร์ทัล) ---------- */
+body.rm-student { background: var(--cn-bg) !important; }
+body.rm-student::before, body.rm-student:has(#login-screen:not(.hidden))::before, body.rm-student:has(> main):not(:has(#login-screen))::before { display: none !important; }
+body.rm-student #login-screen, body.rm-student .glass { box-shadow: 0 1px 3px rgba(15, 23, 42, .06), 0 8px 24px -12px rgba(15, 23, 42, .12) !important; border: 1px solid var(--cn-line) !important; }
+body.rm-student .btn-primary, body.rm-student #btn-login-submit, body.rm-student #btn-register-submit { background: var(--cn-accent) !important; box-shadow: none !important; }
+body.rm-student #login-screen h1 span { -webkit-text-fill-color: var(--cn-accent) !important; color: var(--cn-accent) !important; }
+body.rm-student header.glass::before { display: none !important; }
+body.rm-student .progress-bar { background: var(--cn-accent) !important; }
+
+/* ---------- Super Admin ---------- */
+body.rm-admin > header { background: var(--cn-surface) !important; border-bottom: 1px solid var(--cn-line) !important; }
+body.rm-admin > header h1, body.rm-admin > header #admin-name-display { color: var(--cn-ink) !important; }
+body.rm-admin > header h1 + p { color: var(--cn-mute) !important; }
+body.rm-admin > header img { border: 1px solid var(--cn-line) !important; }
+body.rm-admin::before { display: none !important; }
+body.rm-admin > main > div:first-child > div { box-shadow: var(--cn-shadow) !important; border-color: var(--cn-line) !important; }
+
+/* ---------- มือถือ ---------- */
+.rm-menu-btn { background: var(--cn-accent) !important; box-shadow: 0 6px 16px -8px rgba(15, 23, 42, .4) !important; }
+
+/* ---------- Clean Navy: เก็บจุดที่ยังหนัก ---------- */
+/* ปุ่มลอย "แนะนำวิธีใช้งาน" */
+#tablock-floating-guide-btn, .tablock-floating-guide-btn {
+  background: #fff !important; background-image: none !important; color: var(--cn-accent) !important;
+  border: 1px solid var(--cn-line) !important; box-shadow: 0 4px 14px -6px rgba(15, 23, 42, .25) !important;
+}
+#tablock-floating-guide-btn * { color: var(--cn-accent) !important; }
+/* กล่องพื้นดำ (การ์ดห้องสอบ / รหัส PIN) → พื้นอ่อน ตัวอักษรเข้ม */
+#main-area .bg-slate-900:not(button):not(.fixed), #main-area [class*="from-slate-900"], #main-area [class*="from-slate-800"] {
+  background: var(--cn-accent-soft) !important; background-image: none !important; color: var(--cn-ink) !important; border: 1px solid #dbe3f4 !important;
+}
+#main-area .bg-slate-900:not(button):not(.fixed) *:not(button):not(a):not(button *):not(a *),
+#main-area [class*="from-slate-900"] *:not(button):not(a):not(button *):not(a *),
+#main-area [class*="from-slate-800"] *:not(button):not(a):not(button *):not(a *) { color: var(--cn-ink) !important; }
+/* ป้าย/ปุ่มไล่เฉดหลากสี → สีทึบ (น้ำเงิน; เขียว/แดง/ส้ม คงความหมายสถานะ) */
+#main-area [class*="bg-gradient-to-"]:is([class*="from-cyan"], [class*="from-pink"], [class*="from-violet"], [class*="from-purple"], [class*="from-indigo-5"], [class*="from-indigo-6"], [class*="from-blue-5"], [class*="from-blue-6"], [class*="from-sky-5"], [class*="from-sky-6"], [class*="from-fuchsia"]) {
+  background-image: none !important; background-color: var(--cn-accent) !important; color: #fff !important; box-shadow: none !important;
+}
+#main-area [class*="bg-gradient-to-"]:is([class*="from-emerald-5"], [class*="from-emerald-6"], [class*="from-green-5"], [class*="from-green-6"], [class*="from-teal-5"], [class*="from-teal-6"]) { background-image: none !important; background-color: #059669 !important; color: #fff !important; box-shadow: none !important; }
+#main-area [class*="bg-gradient-to-"]:is([class*="from-rose-5"], [class*="from-rose-6"], [class*="from-red-5"], [class*="from-red-6"]) { background-image: none !important; background-color: #e11d48 !important; color: #fff !important; box-shadow: none !important; }
+#main-area [class*="bg-gradient-to-"]:is([class*="from-amber-5"], [class*="from-orange-5"], [class*="from-yellow-5"]) { background-image: none !important; background-color: #d97706 !important; color: #fff !important; box-shadow: none !important; }
+/* หน้าเข้าสู่ระบบ Super Admin: ลายสแกนตกแต่ง */
+.scan-overlay { display: none !important; }
+
+/* ---------- Clean Navy: เก็บรอบ 2 ---------- */
+/* หัวข้อตัวอักษรไล่เฉด ห้ามโดนกฎ "ไล่เฉด → สีทึบ" */
+#main-area [class*="bg-clip-text"][class*="bg-gradient-to-"] { background: none !important; background-color: transparent !important; color: var(--cn-ink) !important; -webkit-text-fill-color: var(--cn-ink) !important; }
+/* ไอคอนในเมนูข้างขนาดเท่ากันทุกเมนู (บางหน้าไม่ได้กำหนดขนาด → ไอคอนใหญ่ผิดปกติ) */
+#sidebar .nav-link svg { width: 20px !important; height: 20px !important; flex: none !important; }
+/* ปุ่มสีดำ → น้ำเงิน */
+#main-area button.bg-slate-900, #main-area a.bg-slate-900, #main-area button.bg-slate-800, #main-area a.bg-slate-800 { background-color: var(--cn-accent) !important; color: #fff !important; }
+#main-area button.bg-slate-900:hover, #main-area a.bg-slate-900:hover { background-color: var(--cn-accent-2) !important; }
