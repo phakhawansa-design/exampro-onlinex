@@ -162,9 +162,8 @@
             </div>
         </div>
 
-        <!-- ขวา: คู่มือ + บันทึก -->
+        <!-- ขวา: บันทึก -->
         <div class="qx-right">
-            <button onclick="window.TabLockGuide.open('questions')" class="qx-help" title="คู่มือการใช้งานหน้านี้"><span class="qx-hide-sm">คู่มือ</span></button>
             <button onclick="saveQuestionsToCourse()" id="btn-save-course" class="qx-save">
                 <span>บันทึกข้อสอบ</span>
             </button>
@@ -435,7 +434,7 @@
 
                 <!-- 4. คลังข้อสอบ -->
                 <div class="qx-tool">
-                    <div class="qx-tool-h">                        <div><b>นำเข้าจากคลังข้อสอบ</b><small>ดึงข้อสอบสำเร็จรูปจากคลังระบบ</small></div></div>
+                    <div class="qx-tool-h">                        <div><b>นำเข้าจากคลังข้อสอบ</b><small>ดึงข้อสอบจากชุดที่คุณเคยสร้างไว้</small></div></div>
                     <button onclick="openLibraryModal()" class="qx-tbtn">เปิดคลังข้อสอบ</button>
                 </div>
             </div>
@@ -637,28 +636,13 @@
                 const res = await fetch(`/api/teacher/courses?username=${encodeURIComponent(username)}`);
                 if (res.ok) {
                     const data = await res.json();
-                    if (Array.isArray(data) && data.length > 0) {
-                        courses = data;
-                    }
+                    if (Array.isArray(data)) courses = data;
                 }
             } catch(e) {
-                console.warn("loadTeacherCourses offline, fallback to mock data:", e);
+                console.warn("loadTeacherCourses offline, โหลดรายวิชาไม่สำเร็จ:", e);
             }
 
-            if (!courses || courses.length === 0) {
-                const saved = localStorage.getItem('teacher_courses');
-                if (saved) {
-                    try { courses = JSON.parse(saved); } catch(e){}
-                }
-            }
 
-            if (!courses || courses.length === 0) {
-                courses = [
-                    { id: '749-51-447', courseCode: '749-51-447', courseName: 'ภาษาซีสำหรับการเขียนโปรแกรม (Computer Programming)', studentCount: 45 },
-                    { id: '749-52-101', courseCode: '749-52-101', courseName: 'การรักษาความปลอดภัยระบบเครือข่าย (Network Security)', studentCount: 38 },
-                    { id: '749-53-202', courseCode: '749-53-202', courseName: 'เทคโนโลยีบล็อกเชนและปัญญาประดิษฐ์ (Blockchain & AI)', studentCount: 50 }
-                ];
-            }
 
             // Build options list with unselected default option
             select.innerHTML = '<option value="" disabled selected>-- กรุณาคลิกเลือกรายวิชา --</option>' + 
@@ -1159,6 +1143,25 @@
                 document.getElementById('top-exam-title').value = examTitle;
             }
 
+            // ตรวจข้อสอบก่อนบันทึก: ต้องมีโจทย์ ตัวเลือกอย่างน้อย 2 ตัว และเฉลยต้องชี้ไปที่ตัวเลือกที่มีข้อความ
+            const problems = [];
+            questions.forEach((q, i) => {
+                const ch = q.choices || [], img = q.choices_img || [];
+                const has = k => !!((ch[k] || '').trim() || img[k]);
+                const filled = ch.filter((_, k) => has(k)).length;
+                const ai = choiceKeys.indexOf((q.answer || 'a').toLowerCase());
+                if (!(q.question || '').trim() && !q.question_img) problems.push(`ข้อ ${i + 1}: ยังไม่ได้พิมพ์โจทย์`);
+                else if (filled < 2) problems.push(`ข้อ ${i + 1}: ต้องมีตัวเลือกอย่างน้อย 2 ตัว`);
+                else if (ai < 0 || !has(ai)) problems.push(`ข้อ ${i + 1}: เฉลยเลือกไว้ที่ตัวเลือกที่ว่าง`);
+            });
+            if (!questions.length) problems.push('ยังไม่มีข้อสอบ');
+            if (problems.length) {
+                alert('ยังบันทึกไม่ได้ กรุณาแก้ไขข้อต่อไปนี้ก่อน\n\n' + problems.slice(0, 8).join('\n') + (problems.length > 8 ? `\n...และอีก ${problems.length - 8} ข้อ` : ''));
+                const first = questions.findIndex((q, i) => problems.some(p => p.startsWith(`ข้อ ${i + 1}:`)));
+                if (first >= 0) selectQuestionIndex(first);
+                return;
+            }
+
             const btn = document.getElementById('btn-save-course');
             const oldHtml = btn.innerHTML;
             btn.disabled = true;
@@ -1460,64 +1463,45 @@
                 return;
             }
 
-            // Split into question blocks (by empty lines or numbered questions)
-            const blocks = rawText.split(/\n\s*\n/).filter(b => b.trim().length > 0);
+            // อ่านทีละบรรทัด: "1. โจทย์" = ข้อใหม่, "ก. ..." = ตัวเลือก, "เฉลย: ข" = คำตอบ
+            // (ไม่ต้องเว้นบรรทัดระหว่างข้อ และเลขข้อ 1–4 จะไม่ถูกอ่านเป็นตัวเลือกอีกต่อไป)
+            const LETTER = { 'ก': 0, 'ข': 1, 'ค': 2, 'ง': 3, 'a': 0, 'b': 1, 'c': 2, 'd': 3 };
+            const KEYS = ['a', 'b', 'c', 'd'];
             const newQuestions = [];
+            let cur = null;
+            const filled = q => q.choices.filter(c => c).length;
+            const start = text => { cur = { question: text, choices: ['', '', '', ''], answer: '', numericChoices: 0 }; newQuestions.push(cur); };
 
-            blocks.forEach(block => {
-                const lines = block.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-                if (lines.length === 0) return;
-
-                let qText = '';
-                let choices = ['', '', '', ''];
-                let answer = 'a';
-
-                lines.forEach(line => {
-                    // Answer pattern
-                    if (/^(เฉลย|คำตอบ|answer|ans)[\s:]+/i.test(line)) {
-                        const ansStr = line.replace(/^(เฉลย|คำตอบ|answer|ans)[\s:]+/i, '').trim().toLowerCase();
-                        if (ansStr.includes('ก') || ansStr.includes('a') || ansStr === '1') answer = 'a';
-                        else if (ansStr.includes('ข') || ansStr.includes('b') || ansStr === '2') answer = 'b';
-                        else if (ansStr.includes('ค') || ansStr.includes('c') || ansStr === '3') answer = 'c';
-                        else if (ansStr.includes('ง') || ansStr.includes('d') || ansStr === '4') answer = 'd';
-                    }
-                    // Choice ก / A / 1
-                    else if (/^[กa1][\.\)\s]/i.test(line)) {
-                        choices[0] = line.replace(/^[กa1][\.\)\s]+/i, '').trim();
-                    }
-                    // Choice ข / B / 2
-                    else if (/^[ขb2][\.\)\s]/i.test(line)) {
-                        choices[1] = line.replace(/^[ขb2][\.\)\s]+/i, '').trim();
-                    }
-                    // Choice ค / C / 3
-                    else if (/^[คc3][\.\)\s]/i.test(line)) {
-                        choices[2] = line.replace(/^[คc3][\.\)\s]+/i, '').trim();
-                    }
-                    // Choice ง / D / 4
-                    else if (/^[งd4][\.\)\s]/i.test(line)) {
-                        choices[3] = line.replace(/^[งd4][\.\)\s]+/i, '').trim();
-                    }
-                    // Question text line
-                    else {
-                        const cleanLine = line.replace(/^ข้อ\s*\d+[\.\:\s]*/i, '').replace(/^\d+[\.\:\s]*/, '').trim();
-                        if (cleanLine) {
-                            qText += (qText ? ' ' : '') + cleanLine;
-                        }
-                    }
-                });
-
-                if (qText) {
-                    newQuestions.push({
-                        question: qText,
-                        question_img: '',
-                        choices,
-                        choices_img: ['', '', '', ''],
-                        answer,
-                        timeLimit: 20,
-                        type: 'quiz'
-                    });
+            rawText.replace(/\r/g, '').split('\n').map(l => l.replace(/ /g, ' ').trim()).filter(Boolean).forEach(line => {
+                // เฉลย / คำตอบ / Answer
+                const ans = line.match(/^\**\s*(เฉลย|คำตอบที่ถูก(?:ต้อง)?|คำตอบ|answer|ans)\s*[:：.\-]?\s*\**\s*\(?\s*([กขคงabcdABCD1-4])/i);
+                if (ans) {
+                    if (cur) { const k = ans[2].toLowerCase(); cur.answer = /[1-4]/.test(k) ? KEYS[Number(k) - 1] : KEYS[LETTER[k]]; }
+                    return;
                 }
+                // ตัวเลือกแบบตัวอักษร: ก. / ก) / (ก) / A. / a)
+                const ch = line.match(/^\(?([กขคง])\s*[.)]\s*(.*)$/) || line.match(/^\(?([กขคง])\s+(.+)$/) || line.match(/^\(?([a-dA-D])\s*[.)]\s*(.*)$/);
+                if (ch && cur) { cur.choices[LETTER[ch[1].toLowerCase()]] = ch[2].trim(); return; }
+                // บรรทัดขึ้นต้นด้วยเลข: ข้อใหม่ หรือ ตัวเลือกแบบตัวเลข 1) 2) 3) 4)
+                const num = line.match(/^(?:ข้อ\s*)?(\d+)\s*[.):]\s*(.*)$/);
+                if (num) {
+                    const n = Number(num[1]);
+                    const asChoice = cur && !cur.answer && n >= 1 && n <= 4 && n === cur.numericChoices + 1 && filled(cur) === cur.numericChoices && !/^ข้อ/.test(line);
+                    if (asChoice && cur.question) { cur.choices[n - 1] = num[2].trim(); cur.numericChoices++; return; }
+                    start(num[2].trim());
+                    return;
+                }
+                // ข้อความอื่น: ต่อท้ายโจทย์ ถ้ายังไม่มีตัวเลือก ไม่อย่างนั้นถือเป็นข้อใหม่ (โจทย์ที่ไม่มีเลขข้อ)
+                if (cur && filled(cur) === 0) cur.question += (cur.question ? ' ' : '') + line;
+                else start(line);
             });
+
+            for (let i = newQuestions.length - 1; i >= 0; i--) {
+                const q = newQuestions[i];
+                if (!q.question || filled(q) < 2) { newQuestions.splice(i, 1); continue; }
+                Object.assign(q, { question_img: '', choices_img: ['', '', '', ''], answer: q.answer || 'a', timeLimit: 20, type: 'quiz' });
+                delete q.numericChoices;
+            }
 
             if (newQuestions.length === 0) {
                 alert("ไม่สามารถแปลงข้อความได้ กรุณาตรวจสอบรูปแบบข้อความให้มี ก. ข. ค. ง. และ เฉลย:");
@@ -1552,63 +1536,24 @@
                     sysTemplates = await res.json();
                 }
 
-                let html = `
-                    <div class="space-y-4">
-                        <h4 class="font-bold text-sm text-slate-900 border-b pb-2">ชุดข้อสอบสำเร็จรูปประจำวิชา (พร้อมใช้งาน)</h4>
-                        
-                        <!-- Pre-set Banks -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div onclick="importPresetBank('tech')" class="p-4 rounded-2xl bg-indigo-50 hover:bg-indigo-100 border-2 border-indigo-200 cursor-pointer transition hover:scale-[1.01] space-y-1.5">
-                                <div class="font-bold text-sm text-indigo-950 flex items-center justify-between">
-                                    <span>คอมพิวเตอร์และเทคโนโลยี</span>
-                                    <span class="text-xs bg-indigo-200 text-indigo-900 px-2 py-0.5 rounded-md">5 ข้อ</span>
-                                </div>
-                                <p class="text-xs font-bold text-slate-600">พื้นฐานฮาร์ดแวร์ ซอฟต์แวร์ อินเทอร์เน็ต และความปลอดภัยไซเบอร์</p>
-                            </div>
-
-                            <div onclick="importPresetBank('general')" class="p-4 rounded-2xl bg-emerald-50 hover:bg-emerald-100 border-2 border-emerald-200 cursor-pointer transition hover:scale-[1.01] space-y-1.5">
-                                <div class="font-bold text-sm text-emerald-950 flex items-center justify-between">
-                                    <span>ความรู้ทั่วไปและสังคม</span>
-                                    <span class="text-xs bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded-md">5 ข้อ</span>
-                                </div>
-                                <p class="text-xs font-bold text-slate-600">ความรู้รอบตัว ภูมิศาสตร์ และประวัติศาสตร์ไทยเบื้องต้น</p>
-                            </div>
-
-                            <div onclick="importPresetBank('english')" class="p-4 rounded-2xl bg-purple-50 hover:bg-purple-100 border-2 border-purple-200 cursor-pointer transition hover:scale-[1.01] space-y-1.5">
-                                <div class="font-bold text-sm text-purple-950 flex items-center justify-between">
-                                    <span>ภาษาอังกฤษเพื่อการสื่อสาร</span>
-                                    <span class="text-xs bg-purple-200 text-purple-900 px-2 py-0.5 rounded-md">5 ข้อ</span>
-                                </div>
-                                <p class="text-xs font-bold text-slate-600">Basic Grammar, Conversation and Vocabulary in English</p>
-                            </div>
-
-                            <div onclick="importPresetBank('math')" class="p-4 rounded-2xl bg-amber-50 hover:bg-amber-100 border-2 border-amber-200 cursor-pointer transition hover:scale-[1.01] space-y-1.5">
-                                <div class="font-bold text-sm text-amber-950 flex items-center justify-between">
-                                    <span>คณิตศาสตร์และตรรกศาสตร์</span>
-                                    <span class="text-xs bg-amber-200 text-amber-900 px-2 py-0.5 rounded-md">5 ข้อ</span>
-                                </div>
-                                <p class="text-xs font-bold text-slate-600">โจทย์คำนวณเบื้องต้น ลำดับตัวเลข และตรรกะเหตุผล</p>
-                            </div>
-                        </div>
-                `;
-
-                if (Array.isArray(sysTemplates) && sysTemplates.length > 0) {
+                const mine = Array.isArray(sysTemplates) ? sysTemplates : [];
+                let html = '<div class="space-y-2">';
+                if (mine.length === 0) {
                     html += `
-                        <h4 class="font-bold text-sm text-slate-900 border-b pb-2 pt-4">คลังข้อสอบที่คุณเคยสร้างไว้ในระบบ</h4>
-                        <div class="space-y-2">
-                            ${sysTemplates.map(t => `
-                                <div onclick="importTemplateById('${t.id}')" class="p-3.5 bg-slate-50 hover:bg-white border-2 border-slate-200 hover:border-sky-500 rounded-xl cursor-pointer transition flex items-center justify-between">
-                                    <div>
-                                        <div class="font-bold text-sm text-slate-900">${escapeHtml(t.templateName || 'ชุดข้อสอบ')}</div>
-                                        <div class="text-xs font-bold text-slate-500">สร้างเมื่อ: ${t.createdAt ? new Date(t.createdAt).toLocaleDateString('th-TH') : '-'}</div>
-                                    </div>
-                                    <span class="px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-bold text-xs">ดึงข้อสอบนี้</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
+                        <div class="text-center py-10 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl space-y-1">
+                            <div class="font-bold text-slate-700 text-base">ยังไม่มีชุดข้อสอบ</div>
+                            <div class="text-xs text-slate-500 font-semibold">ชุดข้อสอบที่คุณสร้างและบันทึกไว้จะแสดงที่นี่</div>
+                        </div>`;
+                } else {
+                    html += mine.map(t => `
+                        <div onclick="importTemplateById('${t.id}')" class="p-3.5 bg-slate-50 hover:bg-white border-2 border-slate-200 hover:border-sky-500 rounded-xl cursor-pointer transition flex items-center justify-between gap-3">
+                            <div class="min-w-0">
+                                <div class="font-bold text-sm text-slate-900">${escapeHtml(t.templateName || 'ชุดข้อสอบ')}</div>
+                                <div class="text-xs font-bold text-slate-500">${t.courseCode ? escapeHtml(t.courseCode) + ' · ' : ''}${Number(t.questionCount) || 0} ข้อ${t.created_at ? ' · ' + escapeHtml(String(t.created_at)) : ''}</div>
+                            </div>
+                            <span class="shrink-0 px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-bold text-xs">ดึงข้อสอบนี้</span>
+                        </div>`).join('');
                 }
-
                 html += '</div>';
                 listContainer.innerHTML = html;
             } catch(e) {
@@ -1619,66 +1564,6 @@
 
         function closeLibraryModal() {
             document.getElementById('library-modal').classList.add('hidden');
-        }
-
-        const presetBanks = {
-            tech: [
-                { question: "อุปกรณ์ใดทำหน้าที่เป็นสมองหลักในการประมวลผลของคอมพิวเตอร์?", choices: ["RAM", "CPU", "Hard Disk", "Power Supply"], answer: "b" },
-                { question: "ระบบปฏิบัติการ (OS) ข้อใดเป็น ซอฟต์แวร์โอเพนซอร์ส (Open Source)?", choices: ["Windows 11", "macOS", "Linux", "iOS"], answer: "c" },
-                { question: "โปรโตคอลความปลอดภัยที่ใช้ในการเข้ารหัสเว็บไซต์ที่มีความปลอดภัยสูงคืออะไร?", choices: ["HTTP", "HTTPS", "FTP", "SMTP"], answer: "b" },
-                { question: "หน่วยความจำชนิดใดที่ข้อมูลจะหายไปทันทีเมื่อปิดเครื่องคอมพิวเตอร์?", choices: ["RAM", "ROM", "SSD", "Flash Drive"], answer: "a" },
-                { question: "ภัยคุกคามทางไซเบอร์แบบ Phishing หมายถึงอะไร?", choices: ["การส่งไวรัสทำลายเครื่อง", "การหลอกลวงเพื่อขโมยข้อมูลรหัสผ่าน", "การโจมตีให้ระบบล่ม", "การแฮกเข้า Wi-Fi"], answer: "b" }
-            ],
-            general: [
-                { question: "เมืองหลวงของประเทศไทยคือเมืองใด?", choices: ["เชียงใหม่", "กรุงเทพมหานคร", "ภูเก็ต", "ชลบุรี"], answer: "b" },
-                { question: "แม่น้ำสายที่ยาวที่สุดในโลกคือแม่น้ำสายใด?", choices: ["แม่น้ำเจ้าพระยา", "แม่น้ำแอมะซอน", "แม่น้ำไนล์", "แม่น้ำโขง"], answer: "c" },
-                { question: "วันสำคัญทางศาสนาพุทธข้อใด ตรงกับวันที่พระสงฆ์ครบ 1,250 รูปมาประชุมกันโดยมิได้นัดหมาย?", choices: ["วันมาฆบูชา", "วันวิสาขบูชา", "วันอาสาฬหบูชา", "วันเข้าพรรษา"], answer: "a" },
-                { question: "ธงชาติไทย (ธงไตรรงค์) มีกี่สี?", choices: ["2 สี", "3 สี", "4 สี", "5 สี"], answer: "b" },
-                { question: "ข้อใดคือแม่สีหลักทางทัศนศิลป์?", choices: ["สีแดง", "สีม่วง", "สีเขียว", "สีส้ม"], answer: "a" }
-            ],
-            english: [
-                { question: "Which of the following is a noun?", choices: ["Quickly", "Happiness", "Beautiful", "Run"], answer: "b" },
-                { question: "What is the past tense of 'Go'?", choices: ["Goed", "Gone", "Went", "Going"], answer: "c" },
-                { question: "Complete the sentence: 'She ___ to school every morning.'", choices: ["go", "goes", "went", "going"], answer: "b" },
-                { question: "What is the opposite of 'Difficult'?", choices: ["Hard", "Complex", "Easy", "Short"], answer: "c" },
-                { question: "Choose the correct question format:", choices: ["Where you are going?", "Where are you going?", "Going where you are?", "Where going you are?"], answer: "b" }
-            ],
-            math: [
-                { question: "ผลลัพธ์ของ 15 + (8 × 4) มีค่าเท่ากับเท่าใด?", choices: ["47", "92", "62", "37"], answer: "a" },
-                { question: "ค่า π (พาย) โดยประมาณในทางคณิตศาสตร์มีค่าเท่ากับเท่าใด?", choices: ["2.14", "3.14", "4.14", "5.14"], answer: "b" },
-                { question: "ถ้ารูปสามเหลี่ยมมีฐานยาว 10 ซม. สูง 6 ซม. พื้นที่ของรูปสามเหลี่ยมนี้คือเท่าใด?", choices: ["60 ตร.ซม.", "30 ตร.ซม.", "15 ตร.ซม.", "40 ตร.ซม."], answer: "b" },
-                { question: "ลำดับตัวเลข 2, 4, 8, 16, ... ตัวถัดไปคือตัวเลขใด?", choices: ["20", "24", "32", "64"], answer: "c" },
-                { question: "ร้อยละ 20 ของ 500 มีค่าเท่ากับเท่าใด?", choices: ["50", "100", "150", "200"], answer: "b" }
-            ]
-        };
-
-        function importPresetBank(key) {
-            const list = presetBanks[key];
-            if (!list) return;
-
-            const formatted = list.map(item => ({
-                question: item.question,
-                question_img: '',
-                choices: item.choices,
-                choices_img: ['', '', '', ''],
-                answer: item.answer,
-                timeLimit: 20,
-                type: 'quiz'
-            }));
-
-            if (questions.length === 1 && !questions[0].question.trim()) {
-                questions = formatted;
-            } else {
-                questions = questions.concat(formatted);
-            }
-
-            activeQuestionIndex = questions.length - formatted.length;
-            renderAllQuestionsList();
-            renderActiveQuestionStage();
-            markAsDirty();
-            closeLibraryModal();
-
-            alert(`นำเข้าชุดข้อสอบสำเร็จรูปจำนวน ${formatted.length} ข้อเรียบร้อยแล้ว!`);
         }
 
         async function importTemplateById(templateId) {
@@ -1864,8 +1749,8 @@
             <div class="flex items-center justify-between border-b pb-3 border-slate-100">
                 <div class="flex items-center gap-2">
                     <div>
-                        <h3 class="font-bold text-lg text-slate-900">คลังข้อสอบสำเร็จรูป & แม่แบบ</h3>
-                        <p class="text-xs font-bold text-sky-700">เลือกดึงข้อสอบจากแม่แบบประจำวิชาเข้าสู่แบบทดสอบนี้</p>
+                        <h3 class="font-bold text-lg text-slate-900">คลังข้อสอบของฉัน</h3>
+                        <p class="text-xs font-bold text-sky-700">เลือกชุดข้อสอบที่คุณเคยสร้างไว้ เพื่อดึงเข้ามาในแบบทดสอบนี้</p>
                     </div>
                 </div>
                 <button onclick="closeLibraryModal()" class="text-slate-400 hover:text-slate-700 font-bold text-xl">✕</button>
@@ -1949,170 +1834,11 @@
         </div>
     </div>
 
-    <!-- ======================================================== -->
-    <!-- ให้ AI สร้างข้อสอบ (ย้ายมาจากเมนู 6 เดิม)               -->
-    <!-- ข้อสอบที่ได้จะเพิ่มเข้ารายการข้อสอบในหน้านี้ แก้ต่อแล้วกดบันทึก -->
-    <!-- ======================================================== -->
-    <style>
-        .aig-ov{position:fixed;inset:0;z-index:49;background:rgba(2,6,23,.75);display:flex;align-items:center;justify-content:center;padding:12px}
-        .aig-ov.hidden{display:none}
-        .aig-box{background:#fff;width:100%;max-width:760px;max-height:92vh;border-radius:24px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 80px -20px rgba(0,0,0,.5);border:2px solid #c7d2fe}
-        .aig-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:18px 22px;border-bottom:1px solid #eef2f7}
-        .aig-head b{font-size:18px;color:#0f172a}.aig-head small{display:block;margin-top:3px;font-size:12px;color:#64748b}
-        .aig-badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:#f1f5f9;color:#64748b;vertical-align:middle}
-        .aig-x{font-size:20px;color:#94a3b8;padding:2px 8px;border-radius:10px}.aig-x:hover{color:#334155;background:#f1f5f9}
-        .aig-body{padding:16px 22px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
-        .aig-body label{display:block;font-size:13px;font-weight:700;color:#334155}
-        .aig-body textarea,.aig-body input:not([type=file]),.aig-body select{display:block;width:100%;margin-top:4px;padding:9px 12px;border:1px solid #cbd5e1;border-radius:12px;font:inherit;font-size:14px;font-weight:500;color:#0f172a;background:#fff;outline:none}
-        .aig-body textarea:focus,.aig-body input:focus,.aig-body select:focus{border-color:#1e3a8a;box-shadow:0 0 0 2px rgba(30,58,138,.15)}
-        .aig-tabs{display:flex;gap:4px;background:#f1f5f9;padding:4px;border-radius:14px;width:fit-content;flex-wrap:wrap}
-        .aig-tabs button{padding:8px 14px;border-radius:10px;font-size:13px;font-weight:700;color:#64748b}
-        .aig-tabs button.on{background:#0b2a7a;color:#fff}
-        .aig-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-width:420px}
-        .aig-note{font-size:12px;color:#64748b;margin:0 0 6px}
-        .aig-warn{padding:10px 12px;border-radius:12px;border:2px dashed #f59e0b;background:#fffbeb;color:#92400e;font-size:13px}
-        .aig-btn{padding:11px 20px;border-radius:12px;font-weight:700;color:#fff;background:#0b2a7a;font-size:14px}
-        .aig-btn:hover{background:#1e3a8a}.aig-btn:disabled{opacity:.6;cursor:wait}
-        .aig-q{border:1px solid #e2e8f0;border-radius:14px;padding:12px 14px;background:#f8fafc}
-        .aig-q p{margin:0 0 6px;font-weight:700;color:#0f172a;font-size:14px}
-        .aig-q ol{margin:0;padding:0;list-style:none;display:grid;gap:3px}
-        .aig-q li{font-size:13px;color:#475569;padding:2px 8px;border-radius:8px}
-        .aig-q li.ok{background:#dcfce7;color:#166534;font-weight:700}
-        .aig-q .rm{float:right;font-size:12px;color:#e11d48;font-weight:700}
-        .aig-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 22px;border-top:1px solid #eef2f7;background:#f8fafc}
-        .aig-foot.hidden,#aig-prev.hidden,#aig-file.hidden,#aig-topic.hidden,#aig-nokey.hidden{display:none}
-    </style>
-    <div id="ai-gen-modal" class="aig-ov hidden" onclick="if(event.target===this)closeAiGen()">
-        <div class="aig-box">
-            <div class="aig-head">
-                <div>
-                    <b>สร้างข้อสอบด้วย AI</b> <span id="aig-badge" class="aig-badge">กำลังตรวจสอบ...</span>
-                    <small>ข้อสอบที่ได้จะเพิ่มเข้ารายการข้อสอบทางซ้าย แก้ไขต่อได้ แล้วกด "บันทึกข้อสอบ" ตามปกติ</small>
-                </div>
-                <button type="button" class="aig-x" onclick="closeAiGen()" aria-label="ปิด">✕</button>
-            </div>
-            <div class="aig-body">
-                <div id="aig-nokey" class="aig-warn hidden">ยังไม่ได้ใส่ <code>ANTHROPIC_API_KEY</code> — โหมด "ออกข้อสอบจากหัวข้อ" จะดึงจากคลังข้อสอบตัวอย่างแทน และโหมด "แปลงจากไฟล์" ยังใช้ไม่ได้</div>
-                <div class="aig-tabs">
-                    <button type="button" data-m="topic" class="on" onclick="aigMode('topic')">ออกข้อสอบจากหัวข้อ</button>
-                    <button type="button" data-m="file" onclick="aigMode('file')">แปลงจากไฟล์ / ข้อความ</button>
-                </div>
-                <div id="aig-topic">
-                    <label>หัวข้อ / ขอบเขตเนื้อหา
-                        <textarea id="aig-topic-in" rows="2" placeholder="เช่น ระบบสุริยะ ชั้น ม.1 เน้นลักษณะของดาวเคราะห์แต่ละดวง"></textarea></label>
-                </div>
-                <div id="aig-file" class="hidden">
-                    <p class="aig-note">แนบข้อสอบเดิม (PDF / ภาพถ่าย) เพื่อแปลงเข้าระบบ หรือแนบเนื้อหาบทเรียนให้ AI ออกข้อสอบจากเนื้อหานั้น · ไฟล์ Word/Excel ให้คัดลอกข้อความมาวางแทน</p>
-                    <input id="aig-f" type="file" accept="application/pdf,image/*">
-                    <textarea id="aig-src" rows="4" placeholder="หรือวางข้อความข้อสอบ / เนื้อหาบทเรียนที่นี่" style="margin-top:8px"></textarea>
-                    <input id="aig-focus" placeholder="เน้นเรื่อง (ไม่บังคับ)" style="margin-top:8px">
-                </div>
-                <div class="aig-grid">
-                    <label>จำนวนข้อ<input id="aig-n" type="number" min="1" max="100" value="10"></label>
-                    <label>ความยาก<select id="aig-diff"><option value="easy">ง่าย</option><option value="medium" selected>ปานกลาง</option><option value="hard">ยาก</option></select></label>
-                </div>
-                <p class="aig-note">ข้อละ 4 ตัวเลือก (ก ข ค ง) ให้ตรงกับหน้าสร้างข้อสอบ</p>
-                <div><button id="aig-go" type="button" class="aig-btn" onclick="aigGenerate()">สร้างข้อสอบ</button> <span id="aig-msg" style="font-size:13px;margin-left:8px"></span></div>
-                <div id="aig-prev" class="hidden">
-                    <p class="aig-note"><b>ตรวจทานก่อนเพิ่ม</b> · AI อาจผิดพลาดได้ กรุณาตรวจเฉลยทุกข้อ (แก้ไขรายละเอียดได้หลังเพิ่มเข้ารายการ)</p>
-                    <div id="aig-list" style="display:grid;gap:10px"></div>
-                </div>
-            </div>
-            <div id="aig-foot" class="aig-foot hidden">
-                <span id="aig-cnt" style="font-size:13px;font-weight:700;color:#334155"></span>
-                <button type="button" class="aig-btn" onclick="aigInsert()" style="background:#059669">เพิ่มเข้ารายการข้อสอบ</button>
-            </div>
-        </div>
-    </div>
     <script>
-    (function () {
-        const L = 'abcd', TH = ['ก', 'ข', 'ค', 'ง'];
-        const el = id => document.getElementById(id);
-        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-        let mode = 'topic', items = [], checked = false;
-
-        window.openAiGen = function () {
-            el('ai-gen-modal').classList.remove('hidden');
-            if (checked) return; checked = true;
-            fetch('/api/ai-quiz/status').then(r => r.json()).then(st => {
-                el('aig-badge').textContent = st.aiEnabled ? 'Claude · ' + st.model : 'ยังไม่มี API key';
-                el('aig-badge').style.cssText = st.aiEnabled ? 'background:#ecfdf5;color:#047857' : 'background:#fffbeb;color:#b45309';
-                el('aig-nokey').classList.toggle('hidden', !!st.aiEnabled);
-            }).catch(() => { checked = false; el('aig-badge').textContent = 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้'; el('aig-badge').style.cssText = 'background:#fef2f2;color:#b91c1c'; });
-        };
-        window.closeAiGen = function () { el('ai-gen-modal').classList.add('hidden'); };
-        window.aigMode = function (m) {
-            mode = m;
-            document.querySelectorAll('#ai-gen-modal .aig-tabs button').forEach(b => b.classList.toggle('on', b.dataset.m === m));
-            el('aig-topic').classList.toggle('hidden', m !== 'topic'); el('aig-file').classList.toggle('hidden', m !== 'file');
-        };
-        const toB64 = f => new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(',')[1]); r.onerror = no; r.readAsDataURL(f); });
-
-        window.aigGenerate = async function () {
-            const body = { numQuestions: Math.max(1, Math.min(100, parseInt(el('aig-n').value, 10) || 10)), choices: 4, difficulty: el('aig-diff').value };
-            if (mode === 'topic') { body.topic = el('aig-topic-in').value.trim(); if (!body.topic) return alert('กรุณาใส่หัวข้อ'); }
-            else {
-                const f = el('aig-f').files[0];
-                if (f) { if (f.size > 30 * 1024 * 1024) return alert('ไฟล์ใหญ่เกิน 30MB'); body.fileBase64 = await toB64(f); body.mime = f.type; }
-                body.sourceText = el('aig-src').value.trim(); body.topic = el('aig-focus').value.trim();
-                if (!f && !body.sourceText) return alert('กรุณาแนบไฟล์หรือวางข้อความ');
-            }
-            el('aig-go').disabled = true; el('aig-msg').innerHTML = 'AI กำลังสร้างข้อสอบ อาจใช้เวลา 10–60 วินาที...';
-            try {
-                const r = await fetch('/api/generate-ai-quiz', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-                const d = await r.json();
-                if (!r.ok || !d.success) throw new Error(d.message || 'สร้างไม่สำเร็จ');
-                items = (d.questions || []).map(q => {
-                    const ch = (q.choices || []).slice(0, 4).map(c => String(c ?? ''));
-                    while (ch.length < 4) ch.push('');
-                    const a = String(q.answer || 'a').toLowerCase();
-                    return { question: String(q.question || ''), choices: ch, answer: L.includes(a) ? a : 'a' };
-                });
-                el('aig-msg').innerHTML = `<span style="color:#047857">✓ ได้ ${items.length} ข้อ${d.source === 'claude' ? '' : ' (จากคลังข้อสอบตัวอย่าง)'}</span>`;
-                render();
-            } catch (e) { el('aig-msg').innerHTML = `<span style="color:#dc2626">${esc(e.message)}</span>`; }
-            el('aig-go').disabled = false;
-        };
-        function render() {
-            el('aig-prev').classList.toggle('hidden', !items.length); el('aig-foot').classList.toggle('hidden', !items.length);
-            el('aig-cnt').textContent = `${items.length} ข้อ พร้อมเพิ่มเข้ารายการ`;
-            el('aig-list').innerHTML = items.map((q, i) => `<div class="aig-q"><button type="button" class="rm" onclick="aigRemove(${i})">ลบข้อนี้</button>
-                <p>${i + 1}. ${esc(q.question)}</p><ol>${q.choices.map((c, k) => `<li class="${q.answer === L[k] ? 'ok' : ''}">${TH[k]}. ${esc(c)}${q.answer === L[k] ? ' ✓' : ''}</li>`).join('')}</ol></div>`).join('');
-        }
-        window.aigRemove = function (i) { items.splice(i, 1); render(); };
-        window.aigInsert = function () {
-            const add = items.filter(q => q.question.trim()).map(q => Object.assign(createEmptyQuestion(), { question: q.question.trim(), choices: q.choices.slice(), answer: q.answer }));
-            if (!add.length) return;
-            // ถ้ายังมีแค่ข้อว่าง 1 ข้อ (เพิ่งเปิดหน้า) ให้แทนที่ข้อว่างนั้น
-            const blank = questions.length === 1 && !String(questions[0].question || '').trim() && (questions[0].choices || []).every(c => !String(c || '').trim());
-            if (blank) questions.splice(0, 1);
-            const start = questions.length;
-            questions.push(...add);
-            activeQuestionIndex = start;
-            markAsDirty(); renderAllQuestionsList(); renderActiveQuestionStage();
-            items = []; render(); el('aig-msg').innerHTML = ''; closeAiGen();
-            alert(`✓ เพิ่ม ${add.length} ข้อเข้ารายการแล้ว\nตรวจทาน/แก้ไขได้เลย แล้วอย่าลืมกด "บันทึกข้อสอบ"`);
-        };
         // จอแคบ (มือถือ/แท็บเล็ต): แถบเครื่องมือขวาเป็นแผงเลื่อนทับ ซ่อนไว้ก่อน เปิดด้วยปุ่ม "เครื่องมือสร้างข้อสอบ"
-        if (innerWidth < 1024) { const sb = el('settings-sidebar'); if (sb) sb.classList.add('hidden'); }
-        // ลิงก์เดิมของเมนู "สร้างข้อสอบด้วย AI" จะพามาที่หน้านี้พร้อม ?ai=1
-        // รอให้หน้าต่าง "คุณมีรายวิชาหรือยัง?" ที่ขึ้นตอนเปิดหน้า ถูกปิดก่อน แล้วค่อยเปิดเครื่องมือ AI (ไม่ให้ซ้อนกัน)
-        if (/[?&]ai=1\b/.test(location.search)) {
-            const cm = el('course-check-modal');
-            if (!cm) setTimeout(window.openAiGen, 500);
-            else {
-                let seen = false;
-                const t = setInterval(() => {
-                    const open = !cm.classList.contains('opacity-0');
-                    if (open) seen = true;
-                    else if (seen) { clearInterval(t); setTimeout(window.openAiGen, 250); }
-                }, 200);
-            }
-        }
-    })();
+        if (innerWidth < 1024) { const sb = document.getElementById('settings-sidebar'); if (sb) sb.classList.add('hidden'); }
     </script>
 
-    <script src="user-guide-system.js"></script>
 </body>
 </html>
 

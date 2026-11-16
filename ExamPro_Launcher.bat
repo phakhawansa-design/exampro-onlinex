@@ -19,7 +19,7 @@ echo    🟢 ระบบเปิดสำเร็จแล้ว! กำล�
 echo ====================================================
 
 :: เปิดหน้าเว็บระบบสอบโดยอัตโนมัติบนเบราว์เซอร์หลัก
-start "" "http://localhost:5000/teacher-login.html"
+start "" "http://localhost:5000/login.html"
 start "" "http://localhost:5000/Student-login.html"
 
 exit

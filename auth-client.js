@@ -1,4 +1,32 @@
 // auth-client.js — แนบ token ให้ทุกคำขอ /api อัตโนมัติ และเก็บ token ตอนล็อกอิน
+
+// บัญชีแยกตามแท็บ: เปิดหลายแท็บคนละบัญชีได้ แท็บหนึ่งเข้าสู่ระบบใหม่ จะไม่ทำให้อีกแท็บเปลี่ยนบัญชีตาม
+// (ข้อมูลบัญชีของแต่ละแท็บเก็บใน sessionStorage ของแท็บนั้น แท็บที่เปิดใหม่จะใช้บัญชีที่เข้าสู่ระบบล่าสุด)
+(function () {
+    if (window.__tabAccount) return; window.__tabAccount = true;
+    try {
+        const KEYS = new Set(['auth_token', 'student_auth_token', 'teacher_username', 'teacher_name', 'teacher_role',
+            'teacherUsername', 'teacherName', 'admin_username', 'admin_name', 'currentStudent']);
+        const ls = window.localStorage, ss = window.sessionStorage;
+        const P = Storage.prototype, g = P.getItem, s = P.setItem, r = P.removeItem;
+        const TAG = '__tab:', GONE = '\u0000';
+        // เปิดแท็บ: ล็อกบัญชีของแท็บนี้ไว้ตามที่มีอยู่ตอนนี้
+        KEYS.forEach(k => { if (g.call(ss, TAG + k) === null) { const v = g.call(ls, k); if (v !== null) s.call(ss, TAG + k, v); } });
+        P.getItem = function (k) {
+            if (this === ls && KEYS.has(k)) { const v = g.call(ss, TAG + k); if (v !== null) return v === GONE ? null : v; }
+            return g.call(this, k);
+        };
+        P.setItem = function (k, v) {
+            if (this === ls && KEYS.has(k)) s.call(ss, TAG + k, String(v));
+            return s.call(this, k, v);
+        };
+        P.removeItem = function (k) {
+            if (this === ls && KEYS.has(k)) s.call(ss, TAG + k, GONE);
+            return r.call(this, k);
+        };
+    } catch (e) { /* เบราว์เซอร์ปิด storage: ทำงานแบบเดิม */ }
+})();
+
 (function () {
     if (window.__authClient) return; window.__authClient = true;
     const K_T = 'auth_token', K_S = 'student_auth_token';
@@ -82,7 +110,7 @@
                     if (d && d.mustChangePassword && !window.__authRedirect && !/login|register/i.test(location.pathname)) {
                         window.__authRedirect = true; set(K_T, '');
                         alert('กรุณาเข้าสู่ระบบและตั้งรหัสผ่านใหม่ก่อนใช้งาน');
-                        location.href = 'admin-login.html';
+                        location.href = 'login.html';
                     }
                 }).catch(() => {});
             }

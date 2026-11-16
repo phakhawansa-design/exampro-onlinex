@@ -101,8 +101,6 @@
 .qx-save-lg { width: 100%; padding: 14px; font-size: 15px; border-radius: 16px; }
 .qx-tools-f p { margin: 8px 2px 0; font-size: 11.5px; color: var(--qx-mute); text-align: center; line-height: 1.5; }
 
-/* ปุ่มลอย "แนะนำวิธีใช้งาน" ทับแถบเครื่องมือ — หน้านี้มีปุ่ม "คู่มือ" บนแถบหัวแล้ว */
-#tablock-floating-guide-btn { display: none !important; }
 
 /* ---------- จอแคบ ---------- */
 @media (max-width: 1180px) {

@@ -239,9 +239,6 @@
         <div class="flex items-center gap-2.5 flex-wrap">
             <input type="text" id="search-input" placeholder="ค้นหารหัส / ชื่อ / ชั้น..." onkeyup="filterStudents()"
                 class="w-48 sm:w-60 px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:border-blue-600 transition shadow-xs" />
-            <button onclick="window.TabLockGuide.open('students')" class="flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3.5 py-2 rounded-xl text-xs font-semibold transition shadow-xs cursor-pointer">
-                <span class="hidden sm:inline">คู่มือ</span>
-            </button>
             <button onclick="importStudents()" id="btn-import-students"
                 class="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-xs active:scale-95 cursor-pointer">
                 <span>ดึงจากผลสอบ</span>
@@ -457,86 +454,8 @@
     let currentHistTab = 'exam';
     let currentActiveTab = 'all';
 
-    const DEFAULT_STUDENT_LIST = [
-        {
-            studentId: '6539876445',
-            firstName: 'ภควันต์',
-            lastName: 'แสนเสริม',
-            class: 'TEC3N',
-            note: 'นักศึกษาคอมพิวเตอร์และเทคโนโลยี',
-            status: 'approved',
-            examCount: 3,
-            avgScore: 86.7,
-            cheatCount: 2
-        },
-        {
-            studentId: '6539876001',
-            firstName: 'กวินตรา',
-            lastName: 'สุขสวัสดิ์',
-            class: 'TEC3N',
-            note: 'หัวหน้าห้อง',
-            status: 'approved',
-            examCount: 4,
-            avgScore: 92.5,
-            cheatCount: 0
-        },
-        {
-            studentId: '6539876002',
-            firstName: 'ธนภัทร',
-            lastName: 'วรโชติ',
-            class: 'TEC3N',
-            note: 'นักศึกษาปกติ',
-            status: 'approved',
-            examCount: 2,
-            avgScore: 74.0,
-            cheatCount: 3
-        },
-        {
-            studentId: '6539876003',
-            firstName: 'ชลธิชา',
-            lastName: 'ศรีวิไล',
-            class: 'TEC3N',
-            note: 'นักศึกษาปกติ',
-            status: 'approved',
-            examCount: 3,
-            avgScore: 80.0,
-            cheatCount: 1
-        }
-    ];
 
-    const DEFAULT_STUDENT_EXAMS = {
-        '6539876445': [
-            { roomId: 'ROOM-749', roomName: '[749-51-447] วิชาภาษาซีสำหรับการเขียนโปรแกรม', exam_title: 'สอบปลายภาค ปฏิบัติการเขียนโค้ดภาษาซี', score: 18, maxScore: 20, date: '2026-09-21', time: '14:30 น.', tabSwitches: 1 },
-            { roomId: 'ROOM-752', roomName: '[749-52-101] วิชาการรักษาความปลอดภัยระบบเครือข่าย', exam_title: 'สอบกลางภาค Network & Cyber Security', score: 26, maxScore: 30, date: '2026-09-18', time: '10:00 น.', tabSwitches: 1 },
-            { roomId: 'ROOM-753', roomName: '[749-53-202] วิชาเทคโนโลยีบล็อกเชนและปัญญาประดิษฐ์', exam_title: 'Quiz 1 AI Prompting & Smart Contracts', score: 15, maxScore: 15, date: '2026-09-15', time: '09:15 น.', tabSwitches: 0 }
-        ],
-        '6539876001': [
-            { roomId: 'ROOM-749', roomName: '[749-51-447] วิชาภาษาซีสำหรับการเขียนโปรแกรม', exam_title: 'สอบปลายภาค ปฏิบัติการเขียนโค้ดภาษาซี', score: 19, maxScore: 20, date: '2026-09-21', time: '14:30 น.', tabSwitches: 0 },
-            { roomId: 'ROOM-752', roomName: '[749-52-101] วิชาการรักษาความปลอดภัยระบบเครือข่าย', exam_title: 'สอบกลางภาค Network & Cyber Security', score: 29, maxScore: 30, date: '2026-09-18', time: '10:00 น.', tabSwitches: 0 }
-        ],
-        '6539876002': [
-            { roomId: 'ROOM-749', roomName: '[749-51-447] วิชาภาษาซีสำหรับการเขียนโปรแกรม', exam_title: 'สอบปลายภาค ปฏิบัติการเขียนโค้ดภาษาซี', score: 14, maxScore: 20, date: '2026-09-21', time: '14:30 น.', tabSwitches: 2 },
-            { roomId: 'ROOM-752', roomName: '[749-52-101] วิชาการรักษาความปลอดภัยระบบเครือข่าย', exam_title: 'สอบกลางภาค Network & Cyber Security', score: 20, maxScore: 30, date: '2026-09-18', time: '10:00 น.', tabSwitches: 1 }
-        ],
-        '6539876003': [
-            { roomId: 'ROOM-749', roomName: '[749-51-447] วิชาภาษาซีสำหรับการเขียนโปรแกรม', exam_title: 'สอบปลายภาค ปฏิบัติการเขียนโค้ดภาษาซี', score: 16, maxScore: 20, date: '2026-09-21', time: '14:30 น.', tabSwitches: 1 }
-        ]
-    };
 
-    const DEFAULT_STUDENT_CHEATS = {
-        '6539876445': [
-            { action: 'ตรวจพบการสลับหน้าจอ (Tab Switch Event #1) — ออกจากหน้าสอบไป 8 วินาที', roomName: '[749-51-447] วิชาภาษาซีสำหรับการเขียนโปรแกรม', time: '2026-09-21 14:42:15' },
-            { action: 'ตรวจพบการสลับหน้าจอ (Tab Switch Event #2) — ออกจากหน้าสอบไป 12 วินาที', roomName: '[749-52-101] วิชาการรักษาความปลอดภัยระบบเครือข่าย', time: '2026-09-18 10:24:05' }
-        ],
-        '6539876002': [
-            { action: 'ตรวจพบการสลับหน้าจอ (Tab Switch Event #1)', roomName: '[749-51-447] วิชาภาษาซีสำหรับการเขียนโปรแกรม', time: '2026-09-21 14:35:10' },
-            { action: 'พยายามคัดลอกข้อความ (Clipboard Copy Attempt blocked)', roomName: '[749-51-447] วิชาภาษาซีสำหรับการเขียนโปรแกรม', time: '2026-09-21 14:36:22' },
-            { action: 'ตรวจพบการสลับหน้าจอ (Tab Switch Event #2)', roomName: '[749-52-101] วิชาการรักษาความปลอดภัยระบบเครือข่าย', time: '2026-09-18 10:15:40' }
-        ],
-        '6539876003': [
-            { action: 'ตรวจพบการสลับหน้าจอ (Tab Switch Event #1)', roomName: '[749-51-447] วิชาภาษาซีสำหรับการเขียนโปรแกรม', time: '2026-09-21 14:50:00' }
-        ]
-    };
 
     function escapeHtml(text) {
         if (!text) return '';
@@ -847,7 +766,7 @@
                 ? `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">รออนุมัติ</span>`
                 : `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">ปฏิเสธ</span>`;
 
-            const cheatCount = s.cheatCount !== undefined ? s.cheatCount : (DEFAULT_STUDENT_CHEATS[s.studentId] || []).length;
+            const cheatCount = s.cheatCount !== undefined ? s.cheatCount : 0;
             const cheatBadge = cheatCount > 0
                 ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[11px] font-extrabold bg-rose-100 text-rose-700 border border-rose-200">สลับ ${cheatCount} ครั้ง</span>`
                 : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">ปกติ</span>`;
@@ -965,8 +884,8 @@
         
         const cleanId = String(studentId).replace(/-/g, '');
         const sObj = allStudents.find(s => (String(s.studentId) === String(studentId) || String(s.studentId).replace(/-/g, '') === cleanId) && (!courseId || String(s.courseId) === String(courseId))) || {};
-        const realCheatCount = sObj.cheatCount !== undefined ? sObj.cheatCount : (DEFAULT_STUDENT_CHEATS[studentId] || []).length;
-        const realExamCount = examCount !== undefined ? examCount : (sObj.examCount !== undefined ? sObj.examCount : ((DEFAULT_STUDENT_EXAMS[studentId] || []).length));
+        const realCheatCount = sObj.cheatCount !== undefined ? sObj.cheatCount : 0;
+        const realExamCount = examCount !== undefined ? examCount : (sObj.examCount !== undefined ? sObj.examCount : 0);
 
         document.getElementById('hist-avatar').textContent = name.charAt(0) || '?';
         document.getElementById('hist-name').textContent = name;
@@ -1009,7 +928,7 @@
                 }
             }
         } catch(e) {
-            console.warn("API exam-history offline, fallback to mock data:", e);
+            console.warn("API exam-history offline, โหลดไม่สำเร็จ:", e);
         }
 
         if (!records || records.length === 0) {
@@ -1073,7 +992,7 @@
                 }
             }
         } catch(e) {
-            console.warn("API cheat-history offline, fallback to mock data:", e);
+            console.warn("API cheat-history offline, โหลดไม่สำเร็จ:", e);
         }
 
         document.getElementById('hist-cheat-count').textContent = records.length + ' ครั้ง';
@@ -1129,10 +1048,7 @@
         if (!sidebar) return;
         localStorage.removeItem('sidebar_collapsed');
         sidebar.classList.remove('collapsed');
-        let activePage = window.location.pathname.split('/').pop() || 'dashboard.html';
-        if (activePage === 'admin-questions.html' || activePage === 'admin-excel.html') {
-            activePage = 'admin-portal.html';
-        }
+        const activePage = window.location.pathname.split('/').pop() || 'dashboard.html';
         document.querySelectorAll('nav a').forEach(a => {
             a.className = a.getAttribute('href') === activePage ? 'nav-link active' : 'nav-link';
         });
@@ -1144,6 +1060,5 @@
     }
 
 </script>
-    <script src="user-guide-system.js"></script>
 </body>
 </html>

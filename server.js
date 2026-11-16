@@ -40,7 +40,7 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 // กันไม่ให้ดาวน์โหลดไฟล์ฝั่งเซิร์ฟเวอร์ (ฐานข้อมูล, โค้ด, สคริปต์) ผ่านเว็บ
 app.use((req, res, next) => {
     const p = decodeURIComponent(req.path).toLowerCase();
-    if (/\.(db|db-journal|sqlite|bat|env|log|md)$/.test(p) || /^\/(server|auth|ai-quiz|backup|check_storage|make_pdf|exam-guard|trinetra-link|backup-export)\.js$/.test(p) || /^\/(package(-lock)?\.json|\.npmrc|\.gitignore)$/.test(p) || p.startsWith('/_backup') || p.startsWith('/routes/') || p.startsWith('/node_modules') || p.startsWith('/.')) {
+    if (/\.(db|db-journal|sqlite|bat|env|log|md)$/.test(p) || /^\/(server|auth|backup|check_storage|make_pdf|exam-guard|trinetra-link|backup-export)\.js$/.test(p) || /^\/(package(-lock)?\.json|\.npmrc|\.gitignore)$/.test(p) || p.startsWith('/_backup') || p.startsWith('/routes/') || p.startsWith('/node_modules') || p.startsWith('/.')) {
         return res.status(404).end();
     }
     next();
@@ -230,8 +230,6 @@ app.use((req, res, next) => {
 // ระบบยืนยันตัวตนด้วย token (auth.js) — ต้องลงทะเบียนก่อน API ทั้งหมด
 const { hashTeacherPassword, verifyTeacherPassword } = require('./auth');
 require('./auth').register(app, db, process.env.DATA_DIR || path.join(__dirname, '.data'));
-// สร้าง/แปลงข้อสอบด้วย Claude (ai-quiz.js) — ถ้าไม่มี API key จะใช้คลังข้อสอบเดิม
-try { require('./ai-quiz')(app, db); } catch (e) { console.error('โหลด AI Quiz ไม่สำเร็จ:', e.message); }
 // บันทึกคำตอบระหว่างสอบ + บล็อกเบราว์เซอร์ในแอป + จับสัญญาณขาดหาย (ต้องอยู่ก่อนเส้นทาง API ของการสอบ)
 try { require('./exam-guard')(app, db); } catch (e) { console.error('โหลด Exam Guard ไม่สำเร็จ:', e.message); }
 
@@ -1527,7 +1525,8 @@ app.get('/api/student/my-exam-history', (req, res) => {
         ORDER BY er.id DESC
     `, [cleanId, normId], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
-        res.json(rows || []);
+        // อาจารย์ตั้งไม่ให้นักศึกษาเห็นคะแนน → ไม่ส่งคะแนนออกไปเลย (ไม่ใช่แค่ซ่อนบนหน้าเว็บ)
+        res.json((rows || []).map(r => (Number(r.show_score) === 0 ? { ...r, score: null, maxScore: null } : r)));
     });
 });
 
@@ -2014,7 +2013,8 @@ app.get('/api/teacher/room-realtime-dashboard', (req, res) => {
 
 // ดึงรายการรายวิชาของอาจารย์
 app.get('/api/teacher/courses', (req, res) => {
-    const username = req.query.username || 'admin';
+    const username = String(req.query.username || '');
+    if (!username || username === 'undefined') return res.status(400).json({ message: "กรุณาระบุ username ของอาจารย์" });
 
     const sql = `
         SELECT c.*,
@@ -2036,16 +2036,19 @@ app.get('/api/teacher/courses', (req, res) => {
 // ดึงรายการชุดข้อสอบทั้งหมดที่อยู่ในรายวิชานี้
 app.get('/api/courses/:courseId/exams', (req, res) => {
     const courseId = parseInt(req.params.courseId, 10);
+    const username = String(req.query.username || '');
     if (!courseId) return res.status(400).json({ message: "กรุณาระบุ courseId" });
+    if (!username) return res.status(400).json({ message: "กรุณาระบุ username ของอาจารย์" });
 
+    // เฉพาะชุดข้อสอบของอาจารย์เจ้าของบัญชี (แอดมินเห็นทั้งหมด)
     const sql = `
         SELECT et.id, et.templateName, et.courseId, et.created_at,
                (SELECT COUNT(*) FROM template_questions tq WHERE tq.templateId = et.id) as questionCount
         FROM exam_templates et
-        WHERE et.courseId = ?
+        WHERE et.courseId = ? AND (et.teacherUsername = ? OR ? = 'admin')
         ORDER BY et.id DESC
     `;
-    db.all(sql, [courseId], (err, rows) => {
+    db.all(sql, [courseId, username, username], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
         res.json(rows || []);
     });
@@ -2712,6 +2715,9 @@ app.post('/api/teacher/save-course-exam', (req, res) => {
     if (!username || !courseId || !Array.isArray(questions)) {
         return res.status(400).json({ message: "ข้อมูลไม่ครบถ้วน (username, courseId, questions)" });
     }
+    if (!questions.length || questions.some(q => !q || (!String(q.question || '').trim() && !q.question_img))) {
+        return res.status(400).json({ message: "ชุดข้อสอบต้องมีอย่างน้อย 1 ข้อ และทุกข้อต้องมีโจทย์" });
+    }
 
     const cleanTitle = (examTitle || 'แบบทดสอบประจำวิชา').trim();
     const cleanCourseId = parseInt(courseId, 10);
@@ -2885,6 +2891,12 @@ app.post('/api/submit-exam', (req, res) => {
                 const time = new Date().toLocaleTimeString('th-TH', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit', second: '2-digit' });
                 const answersJson = JSON.stringify(answers);
 
+                // อาจารย์ตั้งไม่ให้นักศึกษาเห็นคะแนน → ตอบกลับโดยไม่มีคะแนน
+                const reply = body => db.get('SELECT show_score FROM teacher_rooms WHERE roomId = ?', [roomId], (e, rm) => {
+                    if (rm && Number(rm.show_score) === 0) { body.score = null; body.maxScore = null; body.scoreHidden = true; }
+                    res.json(body);
+                });
+
                 // 3. บันทึก/อัปเดตผลสอบลงใน exam_results ทันที
                 db.get('SELECT id, score, maxScore FROM exam_results WHERE roomId = ? AND (studentId = ? OR REPLACE(studentId, \'-\', \'\') = REPLACE(?, \'-\', \'\'))', [roomId, studentId, studentId], (existErr, existRow) => {
                     if (existRow) {
@@ -2892,7 +2904,7 @@ app.post('/api/submit-exam', (req, res) => {
                         // ตอบกลับด้วยคะแนนเดิม เพื่อให้กรณีเน็ตหลุดแล้วหน้าเว็บส่งซ้ำ ยังไปหน้าสรุปผลได้ตามปกติ
                         // ถ้าอาจารย์ต้องการให้สอบใหม่ ให้ลบผลของนักศึกษาคนนั้นในหน้า "ตรวจสอบผลการสอบ" ก่อน
                         console.log(`[ส่งซ้ำ] นักศึกษา ${studentId} ส่งข้อสอบห้อง ${roomId} ซ้ำ — คงคะแนนเดิม ${existRow.score}/${existRow.maxScore}`);
-                        return res.json({ success: true, score: existRow.score, maxScore: existRow.maxScore, alreadySubmitted: true });
+                        return reply({ success: true, score: existRow.score, maxScore: existRow.maxScore, alreadySubmitted: true });
                     } else {
                         db.run(`
                             INSERT INTO exam_results (roomId, studentId, name, class, score, maxScore, time, date, answers_json, courseId)
@@ -2900,7 +2912,7 @@ app.post('/api/submit-exam', (req, res) => {
                         `, [roomId, studentId, name, studentClass || '', score, questions.length, time, date, answersJson, finalCourseId], (insErr) => {
                             if (insErr) return res.status(500).json({ message: insErr.message });
                             console.log(`[ผลสอบบันทึกสำเร็จ] นักศึกษา ${studentId} (${name}) ได้ ${score}/${questions.length} ในห้อง ${roomId}`);
-                            res.json({ success: true, score, maxScore: questions.length });
+                            reply({ success: true, score, maxScore: questions.length });
                         });
                     }
                 });
@@ -3561,130 +3573,6 @@ app.get('/api/superadmin/stats', (req, res) => {
 (function (app, ctx) {
     const { db, getWaitingStudents, recordWaitingStudent } = ctx;
 
-// ==========================================
-// AI Quiz Generator (ระบบช่วยคิดโจทย์ด้วย AI จำลอง)
-// ==========================================
-app.post('/api/generate-ai-quiz', (req, res) => {
-    const { topic, difficulty, numQuestions } = req.body;
-    if (!topic) return res.status(400).json({ message: "กรุณาระบุหัวข้อข้อสอบ" });
-
-    const diff = (difficulty || 'medium').toLowerCase();
-    const count = parseInt(numQuestions) || 5;
-
-    // คลังข้อสอบจำลองอัจฉริยะ (Local AI Exam Bank)
-    const examBank = {
-        html: [
-            { question: "แท็กใดใช้ในการสร้างลิงก์เชื่อมโยงเว็บเพจใน HTML?", choices: ["<a>", "<link>", "<href>", "<src>"], answer: "a" },
-            { question: "โครงสร้างหลักภาษา HTML ข้อใดเรียงลำดับความสำคัญได้ถูกต้อง?", choices: ["<html> -> <head> -> <body>", "<html> -> <body> -> <head>", "<head> -> <body> -> <html>", "<body> -> <head> -> <html>"], answer: "a" },
-            { question: "คีย์เวิร์ด DOCTYPE มีวัตถุประสงค์เพื่ออะไร?", choices: ["ประกาศประเภทเอกสารให้เบราว์เซอร์เข้าใจเวอร์ชันของเว็บ", "ใช้ลิงก์ไปยังไฟล์สไตล์ CSS ภายนอก", "กำหนดค่าน้ำหนักรูปภาพบนเว็บ", "ใช้สร้างสัญลักษณ์ลิขสิทธิ์"], answer: "a" },
-            { question: "แท็กใดใช้ระบุหัวข้อของคอลัมน์ในตาราง HTML?", choices: ["<th>", "<td>", "<tr>", "<table-head>"], answer: "a" },
-            { question: "หากต้องการแสดงรูปภาพบนเว็บ HTML ควรใช้แท็กใด?", choices: ["<img>", "<picture>", "<src>", "<image>"], answer: "a" },
-            { question: "แท็กใดใน HTML5 ใช้จัดกลุ่มเมนูลิงก์นำทาง?", choices: ["<nav>", "<header>", "<menu>", "<section>"], answer: "a" },
-            { question: "ข้อใดคือการเขียนกล่องใส่รหัสผ่านในฟอร์ม HTML ที่ถูกต้อง?", choices: ['<input type="password">', '<input type="text">', '<input type="pass">', '<password>'], answer: "a" }
-        ],
-        javascript: [
-            { question: "การประกาศตัวแปรข้อใดช่วยป้องกันการเปลี่ยนค่าใหม่ในภายหลัง (Reassignment)?", choices: ["const", "let", "var", "def"], answer: "a" },
-            { question: "คำสั่งใดใช้ตรวจสอบประเภทข้อมูลของตัวแปรใน JavaScript?", choices: ["typeof", "instanceof", "type", "dataType"], answer: "a" },
-            { question: "คำว่า DOM ในฝั่งพัฒนาเว็บย่อมาจากคำว่าอะไร?", choices: ["Document Object Model", "Data Oriented Module", "Domain Object Matrix", "Digital Output Manager"], answer: "a" },
-            { question: "ผลลัพธ์ของคำสั่ง console.log(typeof []) ใน JavaScript คือข้อใด?", choices: ["'object'", "'array'", "'null'", "'undefined'"], answer: "a" },
-            { question: "คำสั่งใดใช้เพิ่มข้อมูลลงไปต่อท้ายในแถวของ Array?", choices: ["push()", "pop()", "shift()", "unshift()"], answer: "a" },
-            { question: "การเปรียบเทียบค่า 5 === '5' จะได้ผลลัพธ์เป็นอะไร?", choices: ["false", "true", "NaN", "TypeError"], answer: "a" },
-            { question: "ข้อใดไม่ใช่ฟังก์ชันประเภท Asynchronous ใน JavaScript?", choices: ["Math.random()", "setTimeout()", "fetch()", "Promise.resolve()"], answer: "a" }
-        ],
-        python: [
-            { question: "ฟังก์ชันใดใช้สำหรับนับจำนวนข้อมูลในลิสต์ (List) ของ Python?", choices: ["len()", "count()", "size()", "length()"], answer: "a" },
-            { question: "การเขียนคอมเมนต์บรรทัดเดียวใน Python ต้องใช้สัญลักษณ์ใด?", choices: ["#", "//", "/*", "--"], answer: "a" },
-            { question: "ข้อใดจัดเป็นโครงสร้างข้อมูลที่แก้ไขค่าไม่ได้ (Immutable) ใน Python?", choices: ["Tuple", "List", "Dictionary", "Set"], answer: "a" },
-            { question: "คำสั่งแสดงผลออกทางหน้าจอของ Python คือคำสั่งใด?", choices: ["print()", "echo()", "console.log()", "system.out.print()"], answer: "a" },
-            { question: "ไพธอนใช้อะไรในการแบ่งขอบเขตบล็อกโค้ด (Block indentation)?", choices: ["การย่อหน้า (Whitespace/Tab)", "วงเล็บปีกกา {}", "วงเล็บโค้ง ()", "คำสำคัญ end"], answer: "a" }
-        ],
-        math: [
-            { question: "สมการ 2x + 10 = 20 แล้ว x มีค่าเท่าใด?", choices: ["5", "10", "15", "20"], answer: "a" },
-            { question: "รูปสามเหลี่ยมมุมฉากมีด้านตรงข้ามยาว 5 ซม. ด้านประกอบยาว 3 ซม. อีกด้านยาวเท่าใด?", choices: ["4 ซม.", "2 ซม.", "6 ซม.", "8 ซม."], answer: "a" },
-            { question: "ค่าของ Pi (พาย) มีค่าโดยประมาณเท่ากับข้อใด?", choices: ["3.14159", "2.71828", "1.41421", "1.61803"], answer: "a" },
-            { question: "สูตรคำนวณพื้นที่วงกลมคือข้อใด?", choices: ["pi * r^2", "2 * pi * r", "pi * d", "1/2 * b * h"], answer: "a" },
-            { question: "ผลคูณของ 12 x 12 เท่ากับเท่าใด?", choices: ["144", "124", "134", "154"], answer: "a" }
-        ],
-        science: [
-            { question: "กระบวนการใดที่พืชสร้างอาหารโดยอาศัยพลังงานแสงแดด?", choices: ["การสังเคราะห์ด้วยแสง (Photosynthesis)", "การหายใจ (Respiration)", "การคายน้ำ (Transpiration)", "การดูดซึมอาหาร"], answer: "a" },
-            { question: "แก๊สใดมีสัดส่วนปริมาณมากที่สุดในชั้นบรรยากาศของโลก?", choices: ["แก๊สไนโตรเจน (Nitrogen)", "แก๊สออกซิเจน (Oxygen)", "แก๊สคาร์บอนไดออกไซด์", "แก๊สไฮโดรเจน"], answer: "a" },
-            { question: "สูตรโมเลกุลทางเคมีของน้ำบริสุทธิ์คือข้อใด?", choices: ["H2O", "CO2", "NaCl", "O2"], answer: "a" },
-            { question: "อวัยวะใดทำหน้าที่กรองของเสียและผลิตน้ำปัสสาวะในร่างกายมนุษย์?", choices: ["ไต (Kidneys)", "ตับ (Liver)", "หัวใจ (Heart)", "ปอด (Lungs)"], answer: "a" },
-            { question: "ดาวเคราะห์ดวงใดในระบบสุริยะได้ฉายาว่า ดาวแดง?", choices: ["ดาวอังคาร (Mars)", "ดาวพุธ (Mercury)", "ดาวพฤหัสบดี (Jupiter)", "ดาวศุกร์ (Venus)"], answer: "a" }
-        ],
-        english: [
-            { question: "Choose the correct sentence in Present Perfect Tense.", choices: ["I have lived here for two years.", "I lived here for two years.", "I am living here for two years.", "I will live here for two years."], answer: "a" },
-            { question: "What is the synonym of the word 'Happy'?", choices: ["Cheerful", "Sad", "Angry", "Gloomy"], answer: "a" },
-            { question: "Identify the antonym of the word 'Generous'.", choices: ["Stingy", "Kind", "Helpful", "Polite"], answer: "a" },
-            { question: "Which word is an adjective?", choices: ["Beautiful", "Quickly", "Sing", "Happiness"], answer: "a" },
-            { question: "Complete the sentence: 'She ________ to school every day.'", choices: ["goes", "go", "going", "gone"], answer: "a" }
-        ]
-    };
-
-    // ล้างคำค้นหา ค้นหากลุ่มหลัก
-    const cleanTopic = topic.trim().toLowerCase();
-    let selectedGroup = null;
-
-    for (let key in examBank) {
-        if (cleanTopic.includes(key) || key.includes(cleanTopic)) {
-            selectedGroup = examBank[key];
-            break;
-        }
-    }
-
-    let questions = [];
-
-    if (selectedGroup) {
-        // ดึงจากคลังที่มีอยู่ สุ่มสับเปลี่ยน
-        const shuffled = [...selectedGroup].sort(() => 0.5 - Math.random());
-        questions = shuffled.slice(0, count);
-    } else {
-        // เจนโจทย์อัตโนมัติ (Fallback Generator Pattern)
-        const templates = [
-            {
-                q: "ข้อใดคือความหมายหรือนิยามหลักของ '{topic}'?",
-                c: ["เครื่องมือหรือวิทยาการสนับสนุนระบบปฏิบัติการ", "สัญลักษณ์ทางคณิตศาสตร์สถิติ", "มาตรฐานข้อมูลภายนอก", "ระบบคอมไพเลอร์เฉพาะตัว"],
-                a: "a"
-            },
-            {
-                q: "เมื่อนำ '{topic}' ไปประยุกต์ใช้งาน ข้อใดถือเป็นเป้าหมายหลักสูงสุด?",
-                c: ["เพื่อยกระดับความเร็ว ประสิทธิภาพ และความปลอดภัยสูงสุด", "เพื่อความสนุกสนานและบันเทิง", "เพื่อลดสเปคการทำงานของคอมพิวเตอร์ลงครึ่งหนึ่ง", "เพื่อจำกัดสิทธิ์ผู้ใช้ไม่ให้เข้าถึงข้อมูลทั้งหมด"],
-                a: "a"
-            },
-            {
-                q: "ข้อใดไม่ใช่พฤติกรรมการใช้งานหรือคุณลักษณะที่แนะนำสำหรับ '{topic}'?",
-                c: ["การหลีกเลี่ยงการอัปเดตและปล่อยปละละเลยช่องโหว่ความปลอดภัย", "การสตรีมและประมวลผลข้อมูลแบบคู่ขนาน", "การจัดระเบียบโครงสร้างข้อมูลอย่างเป็นระบบระเบียบ", "การทำสถิติเชิงลึกวิจัยข้อมูล"],
-                a: "a"
-            },
-            {
-                q: "ในระดับความรู้ความชำนาญของ '{topic}' ข้อใดจัดว่าสำคัญมากที่สุด?",
-                c: ["การหมั่นฝึกฝนใช้งาน ทำความเข้าใจแก่นแท้โครงสร้างและปฏิบัติตามมาตรฐาน", "การท่องจำคีย์เวิร์ดทั้งหมดโดยไม่ลองเขียนจริง", "การเลือกใช้โปรแกรมราคาสูงโดยไม่ตั้งค่าระบบ", "การลดจำนวนคนตรวจวัดผลลัพธ์"],
-                a: "a"
-            },
-            {
-                q: "ข้อใดถือเป็นข้อได้เปรียบที่เด่นชัดที่สุดในการใช้ '{topic}' เมื่อเทียบกับเทคโนโลยีแบบเดิม?",
-                c: ["ลดอัตราความซ้ำซ้อน มีความยืดหยุ่นสูง และเป็นมิตรกับผู้เริ่มต้น", "ใช้ทรัพยากรหน่วยความจำคอมพิวเตอร์เพิ่มขึ้น 5 เท่าตัว", "ไม่จำเป็นต้องมีความรู้พื้นฐานก่อนใช้งานเลย", "การจำกัดขอบเขตระบบปฏิบัติการให้รองรับเพียงระบบเดียว"],
-                a: "a"
-            }
-        ];
-
-        // วนลูปสุ่มสร้างตามจำนวนข้อที่อาจารย์สั่ง
-        for (let i = 0; i < count; i++) {
-            const temp = templates[i % templates.length];
-            const replacedQ = temp.q.replace(/{topic}/g, topic);
-            
-            // สุ่มกระจายช้อยส์ให้อัจฉริยะขึ้น (หรือฟิกช้อยส์)
-            questions.push({
-                question: replacedQ + ` (ระดับความยาก: ${diff === 'easy' ? 'ง่าย' : diff === 'hard' ? 'ยาก' : 'ปานกลาง'})`,
-                choices: [...temp.c],
-                answer: temp.a
-            });
-        }
-    }
-
-    console.log(`AI Quiz Generator: สร้างข้อสอบหัวข้อ "${topic}" จำนวน ${questions.length} ข้อสำเร็จ`);
-    res.json({ success: true, questions });
-});
 
 // ==========================================
 // API สำหรับแจ้งเตือนนักศึกษาคุมสอบรายคน
@@ -3862,9 +3750,13 @@ app.get('/api/library/get-templates', (req, res) => {
 // 2. ดึงข้อสอบรายข้อในเทมเพลตที่เลือก
 app.get('/api/library/get-template-questions', (req, res) => {
     const { templateId } = req.query;
+    const username = String(req.query.username || '');
     if (!templateId) return res.status(400).json({ message: "กรุณาระบุ templateId" });
+    if (!username) return res.status(400).json({ message: "กรุณาระบุ username ของอาจารย์" });
 
-    db.all('SELECT * FROM template_questions WHERE templateId = ? ORDER BY id ASC', [templateId], (err, rows) => {
+    // เฉพาะชุดข้อสอบของอาจารย์เจ้าของบัญชี (แอดมินเห็นทั้งหมด)
+    db.all(`SELECT tq.* FROM template_questions tq JOIN exam_templates et ON et.id = tq.templateId
+            WHERE tq.templateId = ? AND (et.teacherUsername = ? OR ? = 'admin') ORDER BY tq.id ASC`, [templateId, username, username], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
         res.json(rows);
     });

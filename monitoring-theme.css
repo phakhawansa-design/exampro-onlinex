@@ -146,3 +146,8 @@
   .mn-hist { padding-left: 14px; }
   .mn-list { padding: 8px; max-height: none; }
 }
+
+/* รายชื่อเสี่ยงสูง: ชื่อห้อง/รหัสยาว ไม่ดันการ์ดและปุ่มให้ล้นจอมือถือ */
+.mn-risk-list { grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); }
+.mn-hr { min-width: 0; }
+@media (max-width: 760px) { .mn-risk-list { grid-template-columns: minmax(0, 1fr); } }

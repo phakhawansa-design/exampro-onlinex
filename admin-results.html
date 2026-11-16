@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จัดการผลสอบและคะแนนนักศึกษา - ExamPro</title>
-    <script src="vendor/chart.umd.js"></script><script>window.Chart || document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js@4"><\/script>')</script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="vendor/xlsx.full.min.js"></script><script>window.XLSX || document.write('<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>')</script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -250,9 +250,6 @@
                         <option value="">-- กำลังโหลดรายวิชา... --</option>
                     </select>
                 </div>
-                <button onclick="window.TabLockGuide.open('results')" class="flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow-xs cursor-pointer">
-                    <span class="hidden sm:inline">คู่มือ</span>
-                </button>
                 <button onclick="exportToExcel()" class="flex items-center gap-1.5 px-3.5 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
                     <span>ส่งออก Excel</span>
                 </button>
@@ -1328,6 +1325,5 @@
     }
 
 </script>
-<script src="user-guide-system.js"></script>
 </body>
 </html>

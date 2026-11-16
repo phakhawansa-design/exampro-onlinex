@@ -223,12 +223,7 @@ body.rm-admin > main { position: relative; z-index: 1; }
 body.rm-admin > main > div:first-child > div { box-shadow: 0 22px 50px -24px rgba(11,42,122,.45) !important; border-color: transparent !important; }
 body.rm-admin > footer { border-color: var(--rm-line) !important; }
 
-/* ---------- ปรับตามขนาดจอ: ปุ่มคู่มือ และหัวหน้า Super Admin ---------- */
-@media (max-width: 640px), (max-height: 500px) {
-  #tablock-floating-guide-btn { padding: 0 !important; width: 46px; height: 46px; justify-content: center; gap: 0 !important; bottom: 16px !important; right: 14px !important; }
-  #tablock-floating-guide-btn > span:last-child { display: none; }
-  #tablock-floating-guide-btn .tablock-guide-pulse-dot { position: absolute; top: 2px; right: 2px; }
-}
+/* ---------- ปรับตามขนาดจอ: หัวหน้า Super Admin ---------- */
 @media (max-width: 900px) {
   body.rm-admin > header { flex-wrap: wrap; gap: 12px; padding: 14px 16px !important; position: relative !important; }
   body.rm-admin > header > div:last-child { width: 100%; gap: 8px !important; }
@@ -236,10 +231,6 @@ body.rm-admin > footer { border-color: var(--rm-line) !important; }
   body.rm-admin::before { top: 0; height: 330px; }
   body.rm-admin > main { padding: 16px !important; }
 }
-/* ระหว่างทำข้อสอบ: ปุ่มคู่มือเป็นปุ่มกลมเล็กทุกขนาดจอ ไม่บังตัวเลือก */
-body:has(#exam-screen:not(.hidden)) #tablock-floating-guide-btn { padding: 0 !important; width: 44px; height: 44px; justify-content: center; gap: 0 !important; bottom: 14px !important; right: 12px !important; opacity: .85; }
-body:has(#exam-screen:not(.hidden)) #tablock-floating-guide-btn > span:last-child { display: none; }
-body:has(#exam-screen:not(.hidden)) #tablock-floating-guide-btn .tablock-guide-pulse-dot { position: absolute; top: 2px; right: 2px; }
 /* มือถือ: ตัวหนังสือเล็กมาก ๆ อ่านยาก ขยายขึ้นเล็กน้อย */
 @media (max-width: 640px) {
   .text-\[9px\] { font-size: 10.5px !important; }

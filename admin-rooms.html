@@ -257,9 +257,6 @@
                 <button onclick="refreshAllRoomsData()" title="รีเฟรชข้อมูล" class="p-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer shadow-xs">
                     รีเฟรช
                 </button>
-                <button onclick="window.TabLockGuide.open('rooms')" class="flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition shadow-xs cursor-pointer">
-                    <span class="hidden sm:inline">คู่มือ</span>
-                </button>
                 <button onclick="openCreateRoomModal()" class="flex items-center gap-2 px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-xl text-xs sm:text-sm font-bold shadow-xs transition active:scale-95 cursor-pointer">
                     <span class="text-base font-bold leading-none">+</span>
                     <span>สร้างห้องสอบ</span>
@@ -417,7 +414,7 @@
                         <!-- คำชี้แจง / ประกาศ -->
                         <div class="space-y-1.5 md:col-span-3">
                             <label class="font-bold text-slate-800 text-xs sm:text-sm">คำชี้แจง / ประกาศในห้องสอบ:</label>
-                            <input type="text" id="modal-input-announcement" value="อย่าแอบใช้ AI นะจ้ะ" class="w-full p-3.5 rounded-2xl border-2 border-slate-200 font-bold outline-none focus:border-indigo-600 bg-slate-50 focus:bg-white text-slate-900 text-sm shadow-xs transition">
+                            <input type="text" id="modal-input-announcement" value="" placeholder="เช่น ห้ามเปิดหน้าอื่นระหว่างสอบ (ไม่ใส่ก็ได้)" class="w-full p-3.5 rounded-2xl border-2 border-slate-200 font-bold outline-none focus:border-indigo-600 bg-slate-50 focus:bg-white text-slate-900 text-sm shadow-xs transition">
                         </div>
                     </div>
 
@@ -707,25 +704,6 @@
             }
         });
 
-        const DEFAULT_COURSES = [
-            { id: '749-51-447', courseCode: '749-51-447', courseName: 'ภาษาซีสำหรับการเขียนโปรแกรม (Computer Programming)', semester: 'ภาคเรียนที่ 2/2568', studentCount: 45, examCount: 3, description: 'รายวิชาคอมพิวเตอร์และเทคโนโลยีสารสนเทศ' },
-            { id: '749-52-101', courseCode: '749-52-101', courseName: 'การรักษาความปลอดภัยระบบเครือข่าย (Network Security)', semester: 'ภาคเรียนที่ 2/2568', studentCount: 38, examCount: 2, description: 'วิชาความปลอดภัยไซเบอร์และ ExamPro' },
-            { id: '749-53-202', courseCode: '749-53-202', courseName: 'เทคโนโลยีบล็อกเชนและปัญญาประดิษฐ์ (Blockchain & AI)', semester: 'ภาคเรียนที่ 2/2568', studentCount: 50, examCount: 4, description: 'วิทยาการคอมพิวเตอร์ประยุกต์' }
-        ];
-
-        const DEFAULT_TEMPLATES = {
-            '749-51-447': [
-                { id: 'tpl-101', templateName: 'แบบทดสอบกลางภาค วิชาภาษาซี (Basics & Control Flow)', questionCount: 20, created_at: '2026-09-20' },
-                { id: 'tpl-102', templateName: 'แบบทดสอบปลายภาค การจัดการไฟล์ & Pointers ในภาษาซี', questionCount: 30, created_at: '2026-09-21' }
-            ],
-            '749-52-101': [
-                { id: 'tpl-201', templateName: 'แบบทดสอบ Cyber Security & การป้องกันสลับหน้าจอ', questionCount: 25, created_at: '2026-09-18' }
-            ],
-            '749-53-202': [
-                { id: 'tpl-301', templateName: 'แบบทดสอบ Blockchain Principles & Smart Contracts', questionCount: 15, created_at: '2026-09-15' },
-                { id: 'tpl-302', templateName: 'แบบทดสอบ AI Prompting & Machine Learning Overview', questionCount: 20, created_at: '2026-09-19' }
-            ]
-        };
 
         // 1. โหลดรายวิชาของอาจารย์ และวาดการ์ดวิชาสำหรับเลือกเปิดห้องสอบ
         async function loadTeacherCourses() {
@@ -733,24 +711,13 @@
                 const res = await fetch(`/api/teacher/courses?username=${encodeURIComponent(username)}`);
                 if (res.ok) {
                     const data = await res.json();
-                    if (Array.isArray(data) && data.length > 0) {
-                        courses = data;
-                    }
+                    if (Array.isArray(data)) courses = data;
                 }
             } catch(e) {
-                console.warn("API โหลดรายวิชา offline ใช้ข้อมูลสำรองแทน:", e);
+                console.warn("โหลดรายวิชาไม่สำเร็จ:", e);
             }
 
-            if (!courses || courses.length === 0) {
-                const saved = localStorage.getItem('teacher_courses');
-                if (saved) {
-                    try { courses = JSON.parse(saved); } catch(e){}
-                }
-            }
 
-            if (!courses || courses.length === 0) {
-                courses = DEFAULT_COURSES;
-            }
 
             populateCourseSelectDropdown();
             renderCoursesGrid();
@@ -760,9 +727,6 @@
             const courseSelect = document.getElementById('modal-select-course');
             if (!courseSelect) return;
 
-            if (!courses || courses.length === 0) {
-                courses = DEFAULT_COURSES;
-            }
 
             const countEl = document.getElementById('step1-course-count');
             if (countEl) {
@@ -899,7 +863,7 @@
                     const examPin = room.exam_code || '------';
                     const duration = room.duration || 60;
                     const qCount = room.questionCount || 0;
-                    const announcement = room.announcement || 'อย่าแอบใช้ AI นะจ้ะ';
+                    const announcement = room.announcement || '';
 
                     // กลุ่ม/ชั้นเรียนตามรายวิชาจริง เช่น VC13, TEC3N, ปวส.1/1 (ห้ามนำชื่อวิชาหรือชื่อข้อสอบมาแสดงเด็ดขาด)
                     let classNameStr = room.studentClasses || room.courseClassroom || courseObj?.studentClasses || courseObj?.description || courseObj?.class || '';
@@ -923,7 +887,7 @@
                     <div class="bg-white rounded-3xl p-6 shadow-md hover:shadow-xl border-2 ${isPub ? 'border-emerald-400' : 'border-slate-200'} transition flex flex-col justify-between space-y-4 relative">
                         
                         <!-- Top Bar: Status Badge, Course Badge, Delete Button -->
-                        <div class="flex items-center justify-between gap-2">
+                        <div class="flex items-center justify-between gap-2" style="flex-wrap:wrap">
                             <div>
                                 ${isPub 
                                     ? `<span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 flex items-center gap-1.5 shadow-xs">
@@ -1059,9 +1023,6 @@
             // เปิดโมดอลทันทีทันใดเมื่อผู้ใช้กดปุ่ม (ไม่บล็อก UI)
             document.getElementById('create-room-modal').classList.remove('hidden');
 
-            if (!courses || courses.length === 0) {
-                courses = DEFAULT_COURSES;
-            }
             populateCourseSelectDropdown();
 
             const selectCourse = document.getElementById('modal-select-course');
@@ -1195,6 +1156,11 @@
                 return;
             }
             const courseId = parseInt(courseVal, 10) || courseVal;
+            // ห้องสอบต้องมีชุดข้อสอบ ไม่อย่างนั้นนักศึกษาจะเข้ามาเจอข้อสอบว่าง
+            if (!selectedTemplateId || isNaN(parseInt(selectedTemplateId, 10))) {
+                alert("รายวิชานี้ยังไม่มีชุดข้อสอบ กรุณาสร้างชุดข้อสอบในเมนู \"5. สร้างข้อสอบ\" ก่อน แล้วค่อยเปิดห้องสอบ");
+                return;
+            }
 
             const examTitle = document.getElementById('modal-input-exam-title').value.trim() || 'สอบเก็บคะแนน';
             const duration = parseInt(document.getElementById('modal-input-duration').value, 10) || 60;
@@ -1238,7 +1204,7 @@
                     const tId = parseInt(selectedTemplateId, 10);
                     if (!isNaN(tId)) {
                         try {
-                            await fetch('/api/library/load-template', {
+                            const lRes = await fetch('/api/library/load-template', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
@@ -1246,8 +1212,10 @@
                                     templateId: tId
                                 })
                             });
+                            if (!lRes.ok) throw new Error((await lRes.json().catch(() => ({}))).message || 'HTTP ' + lRes.status);
                         } catch(tplErr) {
                             console.warn("load template error:", tplErr);
+                            alert(`สร้างห้องสอบแล้ว แต่ดึงชุดข้อสอบเข้าห้องไม่สำเร็จ (${tplErr.message || tplErr})\nกรุณาลบห้องนี้แล้วสร้างใหม่อีกครั้ง`);
                         }
                     }
                 }
@@ -1773,6 +1741,5 @@
             initSidebarCollapse();
         }
     </script>
-    <script src="user-guide-system.js"></script>
 </body>
 </html>

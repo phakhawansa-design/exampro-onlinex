@@ -255,9 +255,6 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <button onclick="window.TabLockGuide.open('library')" class="flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition shadow-xs cursor-pointer">
-                    <span class="hidden sm:inline">คู่มือการใช้งาน</span>
-                </button>
                 <a href="admin-questions.html" class="flex items-center gap-2 px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-xl text-xs sm:text-sm font-bold shadow-xs transition active:scale-95 cursor-pointer">
                     <span>สร้างข้อสอบใหม่</span>
                 </a>
@@ -483,6 +480,7 @@
                 const res = await fetch(`/api/library/get-template-questions?templateId=${templateId}`);
                 const questions = await res.json();
                 loadedQuestionsCount = questions.length;
+                window.__editLoadedQuestions = questions; // เก็บรูปภาพโจทย์/ตัวเลือกเดิมไว้ ไม่ให้หายตอนบันทึก
 
                 if (questions.length === 0) {
                     listContainer.innerHTML = '<div class="text-center py-8 text-slate-400 font-semibold">ไม่มีข้อสอบในชุดนี้ครับ</div>';
@@ -564,10 +562,12 @@
             for (let idx = 0; idx < loadedQuestionsCount; idx++) {
                 const questionText = document.getElementById(`edit-q-${idx}-text`).value.trim();
                 const answer = document.getElementById(`edit-q-${idx}-answer`).value;
-                const question_img = document.querySelector(`#edit-modal-questions-list > div:nth-child(${idx + 1})`).getAttribute('data-q-img') || '';
+                const orig = (window.__editLoadedQuestions || [])[idx] || {};
+                const question_img = orig.question_img || '';
 
                 const q = { question: questionText, question_img, answer };
                 const choices = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
+                choices.forEach(key => { q[key + '_img'] = orig[key + '_img'] || ''; });
                 choices.forEach(key => {
                     const inputEl = document.getElementById(`edit-q-${idx}-choice-${key}`);
                     if (inputEl) {
@@ -577,8 +577,12 @@
                     }
                 });
 
-                if (!questionText) {
+                if (!questionText && !question_img) {
                     alert(`กรุณากรอกโจทย์คำถามในข้อที่ ${idx + 1}`);
+                    return;
+                }
+                if (!(q[answer] || '').trim() && !q[answer + '_img']) {
+                    alert(`ข้อที่ ${idx + 1}: เฉลยเลือกไว้ที่ตัวเลือกที่ว่าง กรุณาเลือกเฉลยใหม่`);
                     return;
                 }
                 questions.push(q);
@@ -657,6 +661,5 @@
     }
 
 </script>
-<script src="user-guide-system.js"></script>
 </body>
 </html>

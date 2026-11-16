@@ -43,7 +43,7 @@
     // 3.5) หน้า Super Admin: หัวน้ำเงินแบบหน้าแรก
     if (page === 'super-admin.html') document.body.classList.add('rm-admin');
     // 4) หน้าเข้าสู่ระบบ/สมัครของอาจารย์และแอดมิน
-    if (/^(login|teacher-login|admin-login|register-teacher|finish)\.html$/.test(page)) {
+    if (/^(login|register-teacher|finish)\.html$/.test(page)) {
       document.body.classList.add('rm-auth');
       const wrap = document.querySelector('.content-layer > div');
       if (wrap && !document.querySelector('.rm-uni')) {

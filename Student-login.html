@@ -1128,7 +1128,7 @@
                 if (response.ok) {
                     isExamFinished = true;
                     clearProgress(); exitFullscreenQuietly();
-                    window.location.href = `finish.html?score=${result.score}&maxScore=${result.maxScore}&showScore=${showScoreSetting}&roomId=${currentRoomId}&studentName=${encodeURIComponent(currentStudentName)}&studentId=${currentStudentId}&class=${encodeURIComponent(currentStudentClass)}`;
+                    window.location.href = `finish.html?score=${result.score}&maxScore=${result.maxScore}&showScore=${result.scoreHidden ? 0 : showScoreSetting}&roomId=${currentRoomId}&studentName=${encodeURIComponent(currentStudentName)}&studentId=${currentStudentId}&class=${encodeURIComponent(currentStudentClass)}`;
                 } else {
                     alert(`ล้มเหลวในการส่งข้อสอบ: ${result.message}`);
                     startStudentHeartbeat(); // ส่งไม่สำเร็จ ยังอยู่ในห้องสอบ
@@ -1342,7 +1342,6 @@
         window.addEventListener('beforeunload', notifyLeaveRoom);
         window.addEventListener('pagehide', notifyLeaveRoom);
     </script>
-    <script src="user-guide-system.js"></script>
 <script>/* แสดงตัวอย่าง 4 หลักท้ายจากรหัสที่กรอก (ไม่นับขีด) */(function(){var i=document.getElementById('student-id'),h=document.getElementById('pw-last4-hint');if(!i||!h)return;function u(){var d=(i.value||'').replace(/[^0-9]/g,'');h.textContent=d.length>=4?' (ของคุณคือ '+d.slice(-4)+')':'';}i.addEventListener('input',u);u();setTimeout(u,800);})();</script>
 </body>
 </html>

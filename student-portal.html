@@ -454,10 +454,10 @@
 
                 if (!res.ok || !data.success) {
                     alert(`ปฏิเสธการเข้าสอบ:\n\n${data.message || 'ไม่สามารถเข้าห้องสอบนี้ได้'}`);
+                    // อยู่ที่หน้าหลักนักศึกษาต่อ (ไม่ส่งกลับหน้าเข้าสู่ระบบ ซึ่งจะวนกลับมาเจอข้อความเดิมซ้ำ)
                     const params = new URLSearchParams(window.location.search);
-                    if (params.get('code') || params.get('pin')) {
-                        window.location.href = `Student-login.html?pin=${encodeURIComponent(pinInput)}`;
-                    }
+                    if (params.get('code') || params.get('pin')) history.replaceState(null, '', 'student-portal.html');
+                    document.getElementById('join-exam-pin').value = '';
                     return;
                 }
 
