@@ -5,8 +5,8 @@
     <script src="qr-lite.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ศูนย์ห้องสอบ - ตรีเนตร e-Exam</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
+    <title>ศูนย์ห้องสอบ - ExamPro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         html { font-size: 100%; -webkit-text-size-adjust: 100%; }
 
@@ -22,7 +22,7 @@
             #sidebar.mobile-open { left: 0 !important; }
         }
         * { box-sizing: border-box; }
-        body { font-family: 'Kanit', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        body { font-family: 'Noto Sans Thai Looped', sans-serif; background-color: #f8fafc; color: #1e293b; }
         .glass-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03); }
         
         /* ===== SIDEBAR (CLEAN ACADEMIC THEME) ===== */
@@ -101,7 +101,7 @@
             color: #1e293b; border-radius: 12px;
             padding: 8px 14px; font-size: 13px;
             font-weight: 600;
-            font-family: 'Kanit', sans-serif;
+            font-family: 'Noto Sans Thai Looped', sans-serif;
             outline: none; width: 100%; transition: all 0.2s ease;
             box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
             cursor: pointer;
@@ -135,17 +135,14 @@
 </head>
 <body class="flex h-screen overflow-hidden">
 
-    <!-- 📊 Left Sidebar Navigation -->
+    <!-- Left Sidebar Navigation -->
     <!-- ===== SIDEBAR ===== -->
     <aside id="sidebar">
         <div class="sidebar-inner p-4 space-y-4 flex-1 overflow-y-auto">
-            <!-- Logo Header (ตรีเนตร e-Exam) -->
+            <!-- Logo Header (ExamPro) -->
             <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
-                <div class="w-10 h-12 bg-white rounded-lg p-1 border border-slate-200 flex items-center justify-center shrink-0 shadow-xs">
-                    <img src="trinetra-logo.svg" alt="ตรีเนตร e-Exam" class="w-full h-full object-contain" />
-                </div>
                 <div class="leading-tight">
-                    <div class="font-bold text-base tracking-tight text-slate-900">ตรีเนตร <span class="text-blue-700 font-extrabold">e-Exam</span></div>
+                    <div class="font-bold text-base tracking-tight text-slate-900">Exam<span class="text-blue-700 font-extrabold">Pro</span></div>
                     <div class="text-[10px] text-amber-700 font-bold uppercase tracking-wider">ตาที่ 3 ของอาจารย์</div>
                 </div>
             </div>
@@ -234,14 +231,14 @@
                     </div>
                 </div>
             </div>
-            <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2 px-3 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 border border-slate-200 hover:border-rose-200 transition">
+            <a href="login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2 px-3 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 border border-slate-200 hover:border-rose-200 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H2.25" /></svg>
                 <span>ออกจากระบบ</span>
             </a>
         </div>
     </aside>
 
-    <!-- 💻 Main Display Area -->
+    <!-- Main Display Area -->
     <div id="main-area">
         
         <!-- Header -->
@@ -257,15 +254,15 @@
                             0 ห้องสอบ
                         </span>
                     </div>
-                    <p class="text-xs text-slate-500 font-medium">ตรีเนตร e-Exam &middot; ประจำภาคการศึกษาปัจจุบัน</p>
+                    <p class="text-xs text-slate-500 font-medium">ExamPro &middot; ประจำภาคการศึกษาปัจจุบัน</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
                 <button onclick="refreshAllRoomsData()" title="รีเฟรชข้อมูล" class="p-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer shadow-xs">
-                    🔄 รีเฟรช
+                    รีเฟรช
                 </button>
                 <button onclick="window.TabLockGuide.open('rooms')" class="flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition shadow-xs cursor-pointer">
-                    <span>💡</span>
+                    <span></span>
                     <span class="hidden sm:inline">คู่มือ</span>
                 </button>
                 <button onclick="openCreateRoomModal()" class="flex items-center gap-2 px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-xl text-xs sm:text-sm font-bold shadow-xs transition active:scale-95 cursor-pointer">
@@ -283,7 +280,7 @@
                 <div id="hero-create-banner" class="p-6 sm:p-8 bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 rounded-2xl text-white shadow-md text-center space-y-4 relative overflow-hidden my-2 border border-blue-800">
                     <div class="relative z-10 flex flex-col items-center justify-center space-y-3 max-w-2xl mx-auto">
                         <div class="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-3xl shadow-inner">
-                            🏫
+                            
                         </div>
 
                         <div class="space-y-1 text-center">
@@ -299,7 +296,7 @@
                         <button onclick="openCreateRoomModal()" class="px-8 py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-sm sm:text-base font-bold shadow-lg hover:shadow-xl transition-all duration-200 active:scale-95 flex items-center justify-center gap-2.5 cursor-pointer border border-amber-300">
                             <span class="text-xl leading-none font-extrabold">+</span>
                             <span>สร้างและเปิดห้องสอบใหม่ทันที</span>
-                            <span>➔</span>
+                            <span></span>
                         </button>
                     </div>
                 </div>
@@ -309,7 +306,7 @@
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2.5">
                             <div class="w-8 h-8 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-sm">
-                                🏫
+                                
                             </div>
                             <div>
                                 <h3 class="text-base font-bold text-slate-900">รายการห้องสอบที่เปิดใช้งานอยู่</h3>
@@ -326,7 +323,7 @@
                     <!-- Empty State (Shown when no active rooms) -->
                     <div id="rooms-empty-state" class="flex flex-col items-center justify-center p-8 sm:p-12 bg-white rounded-2xl border border-dashed border-slate-300 text-center space-y-3 max-w-2xl mx-auto my-6 shadow-xs relative overflow-hidden group">
                         <div class="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-2xl shadow-xs">
-                            🏫
+                            
                         </div>
                         <div class="space-y-1.5">
                             <h4 class="text-base font-bold text-slate-800">ยังไม่มีห้องสอบที่กำลังเปิดใช้งาน</h4>
@@ -343,7 +340,7 @@
         <!-- Footer -->
         <footer class="border-t border-slate-200 bg-white py-3.5 px-8 text-center shrink-0">
             <p class="text-xs text-slate-500 font-medium">
-                &copy; 2026 ตรีเนตร e-Exam &middot; ตาที่ 3 ของอาจารย์ &middot; ทีม TEC Hope
+                &copy; 2026 ExamPro &middot; ตาที่ 3 ของอาจารย์ &middot; ทีม TEC Hope
             </p>
         </footer>
     </div>
@@ -358,7 +355,7 @@
             <div class="px-6 sm:px-8 py-5 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border-b border-slate-200 flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 text-white flex items-center justify-center text-2xl shadow-md shadow-indigo-600/20 shrink-0">
-                        🚀
+                        
                     </div>
                     <div>
                         <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
@@ -394,9 +391,9 @@
                     </div>
 
                     <div id="modal-course-info-banner" class="hidden p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm text-slate-800 font-bold flex flex-wrap items-center justify-between gap-3 shadow-xs">
-                        <span class="flex items-center gap-1.5">📚 รหัสวิชา: <b id="banner-course-code" class="text-blue-900 font-extrabold text-base">-</b></span>
-                        <span class="flex items-center gap-1.5">🏫 กลุ่ม/ชั้นเรียน: <b id="banner-course-class" class="text-slate-800 font-extrabold text-base">-</b></span>
-                        <span class="flex items-center gap-1.5">👥 นักศึกษาในรายวิชา: <b id="banner-course-students" class="text-blue-900 font-extrabold text-base">0</b> คน</span>
+                        <span class="flex items-center gap-1.5">รหัสวิชา: <b id="banner-course-code" class="text-blue-900 font-extrabold text-base">-</b></span>
+                        <span class="flex items-center gap-1.5">กลุ่ม/ชั้นเรียน: <b id="banner-course-class" class="text-slate-800 font-extrabold text-base">-</b></span>
+                        <span class="flex items-center gap-1.5">นักศึกษาในรายวิชา: <b id="banner-course-students" class="text-blue-900 font-extrabold text-base">0</b> คน</span>
                     </div>
                 </div>
 
@@ -425,19 +422,19 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <!-- ชื่อการสอบ -->
                         <div class="space-y-1.5 md:col-span-2">
-                            <label class="font-bold text-slate-800 text-xs sm:text-sm">🏷️ ชื่อการสอบ / หัวข้อห้องสอบ:</label>
+                            <label class="font-bold text-slate-800 text-xs sm:text-sm">ชื่อการสอบ / หัวข้อห้องสอบ:</label>
                             <input type="text" id="modal-input-exam-title" class="w-full p-3.5 rounded-2xl border-2 border-slate-200 font-bold outline-none focus:border-indigo-600 bg-slate-50 focus:bg-white text-slate-900 text-sm shadow-xs transition" placeholder="เช่น สอบปลายภาค ภาคเรียนที่ 2/2568">
                         </div>
 
                         <!-- ระยะเวลาทำข้อสอบ -->
                         <div class="space-y-1.5">
-                            <label class="font-bold text-slate-800 text-xs sm:text-sm">⏱️ เวลาทำข้อสอบรวม (นาที):</label>
+                            <label class="font-bold text-slate-800 text-xs sm:text-sm">เวลาทำข้อสอบรวม (นาที):</label>
                             <input type="number" id="modal-input-duration" value="60" min="0" max="600" class="w-full p-3.5 rounded-2xl border-2 border-slate-200 font-bold outline-none focus:border-indigo-600 bg-slate-50 focus:bg-white text-slate-900 text-sm shadow-xs transition" placeholder="เช่น 60 (ใส่ 0 หากไม่จำกัด)">
                         </div>
 
                         <!-- คำชี้แจง / ประกาศ -->
                         <div class="space-y-1.5 md:col-span-3">
-                            <label class="font-bold text-slate-800 text-xs sm:text-sm">📢 คำชี้แจง / ประกาศในห้องสอบ:</label>
+                            <label class="font-bold text-slate-800 text-xs sm:text-sm">คำชี้แจง / ประกาศในห้องสอบ:</label>
                             <input type="text" id="modal-input-announcement" value="อย่าแอบใช้ AI นะจ้ะ" class="w-full p-3.5 rounded-2xl border-2 border-slate-200 font-bold outline-none focus:border-indigo-600 bg-slate-50 focus:bg-white text-slate-900 text-sm shadow-xs transition">
                         </div>
                     </div>
@@ -446,15 +443,15 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-slate-200 text-xs sm:text-sm">
                         <label class="flex items-center gap-2.5 p-3 hover:bg-indigo-50/50 rounded-2xl cursor-pointer border-2 border-slate-200 transition">
                             <input type="checkbox" id="modal-chk-randomize" checked class="w-5 h-5 text-indigo-600 rounded-lg cursor-pointer">
-                            <span class="font-bold text-slate-800">🔀 สุ่มข้อสอบ & ตัวเลือก (ก-ง)</span>
+                            <span class="font-bold text-slate-800">สุ่มข้อสอบ & ตัวเลือก (ก-ง)</span>
                         </label>
                         <label class="flex items-center gap-2.5 p-3 hover:bg-indigo-50/50 rounded-2xl cursor-pointer border-2 border-slate-200 transition">
                             <input type="checkbox" id="modal-chk-show-score" checked class="w-5 h-5 text-indigo-600 rounded-lg cursor-pointer">
-                            <span class="font-bold text-slate-800">👁️ แสดงคะแนนหลังส่งทันที</span>
+                            <span class="font-bold text-slate-800">แสดงคะแนนหลังส่งทันที</span>
                         </label>
                         <label class="flex items-center gap-2.5 p-3 hover:bg-indigo-50/50 rounded-2xl cursor-pointer border-2 border-slate-200 transition">
                             <input type="checkbox" id="modal-chk-tablock" checked class="w-5 h-5 text-indigo-600 rounded-lg cursor-pointer">
-                            <span class="font-bold text-slate-800">🛡️ เปิดระบบตาเฝ้า (ตรวจจับสลับหน้าจอ)</span>
+                            <span class="font-bold text-slate-800">เปิดระบบตาเฝ้า (ตรวจจับสลับหน้าจอ)</span>
                         </label>
                     </div>
                 </div>
@@ -463,13 +460,13 @@
 
             <!-- Modal Footer -->
             <div class="px-6 sm:px-8 py-5 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 shrink-0">
-                <span class="text-xs font-bold text-slate-500">✨ ตรวจสอบความถูกต้องก่อนเปิดห้องสอบ</span>
+                <span class="text-xs font-bold text-slate-500">ตรวจสอบความถูกต้องก่อนเปิดห้องสอบ</span>
                 <div class="flex items-center gap-3">
                     <button onclick="closeCreateRoomModal()" class="px-5 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-extrabold rounded-2xl text-xs sm:text-sm transition cursor-pointer">
                         ยกเลิก
                     </button>
                     <button id="btn-modal-create-confirm" onclick="handleCreateRoomConfirm()" class="px-7 py-3.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold rounded-2xl text-sm sm:text-base shadow-lg shadow-emerald-600/25 transition active:scale-95 flex items-center gap-2 cursor-pointer">
-                        <span>🚀</span>
+                        <span></span>
                         <span>สร้างและเปิดห้องรอสอบทันที (รับ PIN & QR)</span>
                     </button>
                 </div>
@@ -487,11 +484,11 @@
             <!-- Header -->
             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div class="flex items-center gap-2.5">
-                    <span id="pub-modal-icon" class="text-2xl">⏳</span>
+                    <span id="pub-modal-icon" class="text-2xl"></span>
                     <div>
                         <div class="flex items-center gap-2">
                             <h3 id="pub-modal-title" class="font-bold text-slate-800 text-base">ห้องรอสอบ (Waiting Lounge)</h3>
-                            <span id="pub-modal-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">⏳ รอกดเริ่มสอบ</span>
+                            <span id="pub-modal-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">รอกดเริ่มสอบ</span>
                         </div>
                         <p id="pub-modal-room-info" class="text-[11px] text-slate-500 font-bold">ห้องสอบ...</p>
                     </div>
@@ -515,7 +512,7 @@
                 <div class="w-40 h-40 bg-white p-2 rounded-xl border border-slate-200 shadow-xs flex items-center justify-center">
                     <img id="pub-modal-qrcode" src="" alt="QR Code" class="w-full h-full object-contain">
                 </div>
-                <p class="text-[11px] font-bold text-slate-600">📷 สแกนด้วยกล้องมือถือ/แท็บเล็ตเพื่อเข้าห้องรอสอบทันที</p>
+                <p class="text-[11px] font-bold text-slate-600">สแกนด้วยกล้องมือถือ/แท็บเล็ตเพื่อเข้าห้องรอสอบทันที</p>
             </div>
 
             <!-- Real-time Waiting Students Count -->
@@ -538,11 +535,11 @@
             <!-- Start / Stop Exam Buttons -->
             <div class="space-y-2 pt-1">
                 <button id="btn-lounge-start-exam" onclick="startExamFromLounge()" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-600/30 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-                    <span>🚀</span>
+                    <span></span>
                     <span>เริ่มการสอบทันที (เผยแพร่ให้นักศึกษาทำพร้อมกัน)</span>
                 </button>
                 <button id="btn-lounge-stop-exam" onclick="stopExamFromLounge()" class="hidden w-full py-3 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-                    <span>🛑</span>
+                    <span></span>
                     <span>หยุดเผยแพร่ / ปิดการสอบห้องนี้</span>
                 </button>
             </div>
@@ -550,13 +547,13 @@
             <!-- Utility Buttons -->
             <div class="flex items-center gap-2 pt-1 flex-wrap sm:flex-nowrap">
                 <button onclick="toggleProjectorMode()" class="flex-1 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
-                    <span>📺</span> ฉายจอโปรเจกเตอร์
+                    <span></span> ฉายจอโปรเจกเตอร์
                 </button>
                 <button onclick="openMonitoringFromModal()" class="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
-                    <span>🛡️</span> ตรวจจับพฤติกรรมสด
+                    <span></span> ตรวจจับพฤติกรรมสด
                 </button>
                 <button onclick="copyPublishLink()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition active:scale-95 cursor-pointer">
-                    📋 คัดลอกลิงก์
+                    คัดลอกลิงก์
                 </button>
             </div>
             <input type="hidden" id="pub-modal-link">
@@ -573,7 +570,7 @@
             <!-- Header -->
             <div class="px-7 py-5 bg-gradient-to-r from-slate-50 via-indigo-50/40 to-purple-50/30 border-b border-slate-200 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <span class="text-indigo-600 text-2xl p-2 bg-white rounded-2xl shadow-xs border border-slate-100">📊</span>
+                    <span class="text-indigo-600 text-2xl p-2 bg-white rounded-2xl shadow-xs border border-slate-100"></span>
                     <div>
                         <div class="flex items-center gap-2">
                             <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">แดชบอร์ดสรุปผลสอบสด (Real-time Exam Dashboard)</h3>
@@ -593,23 +590,23 @@
             <!-- Top Summary stats bar (5 cards) -->
             <div class="p-4 border-b border-slate-200 bg-slate-50/60 grid grid-cols-2 sm:grid-cols-5 gap-3 text-center font-bold">
                 <div class="p-3 bg-white rounded-2xl border border-indigo-200/80 shadow-xs">
-                    <div class="text-[11px] sm:text-xs text-slate-500 font-bold">👥 ทั้งหมดในวิชา</div>
+                    <div class="text-[11px] sm:text-xs text-slate-500 font-bold">ทั้งหมดในวิชา</div>
                     <div id="students-modal-enrolled" class="text-lg sm:text-2xl font-black text-indigo-700 mt-0.5">0</div>
                 </div>
                 <div class="p-3 bg-white rounded-2xl border border-cyan-200/80 shadow-xs">
-                    <div class="text-[11px] sm:text-xs text-cyan-600 font-bold">🟢 กำลังทำข้อสอบ</div>
+                    <div class="text-[11px] sm:text-xs text-cyan-600 font-bold">กำลังทำข้อสอบ</div>
                     <div id="students-modal-active" class="text-lg sm:text-2xl font-black text-cyan-600 mt-0.5">0</div>
                 </div>
                 <div class="p-3 bg-white rounded-2xl border border-emerald-200/80 shadow-xs">
-                    <div class="text-[11px] sm:text-xs text-emerald-600 font-bold">✅ ส่งข้อสอบแล้ว</div>
+                    <div class="text-[11px] sm:text-xs text-emerald-600 font-bold">ส่งข้อสอบแล้ว</div>
                     <div id="students-modal-submitted" class="text-lg sm:text-2xl font-black text-emerald-700 mt-0.5">0</div>
                 </div>
                 <div class="p-3 bg-white rounded-2xl border border-rose-200/80 shadow-xs">
-                    <div class="text-[11px] sm:text-xs text-rose-600 font-bold">🔴 ยังไม่เข้าสอบ</div>
+                    <div class="text-[11px] sm:text-xs text-rose-600 font-bold">ยังไม่เข้าสอบ</div>
                     <div id="students-modal-not-joined" class="text-lg sm:text-2xl font-black text-rose-700 mt-0.5">0</div>
                 </div>
                 <div class="p-3 bg-white rounded-2xl border border-amber-200/80 shadow-xs col-span-2 sm:col-span-1">
-                    <div class="text-[11px] sm:text-xs text-amber-600 font-bold">🎯 คะแนนเฉลี่ย</div>
+                    <div class="text-[11px] sm:text-xs text-amber-600 font-bold">คะแนนเฉลี่ย</div>
                     <div id="students-modal-avg-score" class="text-lg sm:text-2xl font-black text-amber-600 mt-0.5">-</div>
                 </div>
             </div>
@@ -617,13 +614,13 @@
             <!-- Dashboard Sub Tabs -->
             <div class="px-6 py-2.5 bg-slate-100/80 border-b border-slate-200 flex items-center gap-2 text-xs sm:text-sm font-bold flex-wrap">
                 <button type="button" onclick="switchDashboardTab('roster')" id="dtab-btn-roster" class="px-4 py-2 bg-indigo-600 text-white rounded-xl shadow-xs cursor-pointer font-bold transition flex items-center gap-1.5">
-                    <span>👥</span> <span>รายชื่อและสถานะสด</span>
+                    <span></span> <span>รายชื่อและสถานะสด</span>
                 </button>
                 <button type="button" onclick="switchDashboardTab('histogram')" id="dtab-btn-histogram" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl cursor-pointer font-bold transition flex items-center gap-1.5">
-                    <span>📊</span> <span>การกระจายคะแนน (Histogram)</span>
+                    <span></span> <span>การกระจายคะแนน (Histogram)</span>
                 </button>
                 <button type="button" onclick="switchDashboardTab('wrong_questions')" id="dtab-btn-wrong-questions" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl cursor-pointer font-bold transition flex items-center gap-1.5">
-                    <span>⚠️</span> <span>ข้อที่นักศึกษาตอบผิดเยอะที่สุด</span>
+                    <span></span> <span>ข้อที่นักศึกษาตอบผิดเยอะที่สุด</span>
                 </button>
             </div>
 
@@ -632,9 +629,9 @@
                 <div class="px-7 py-2.5 bg-white border-b border-slate-200 flex items-center gap-2 text-xs font-bold">
                     <span class="text-slate-400">กรองสถานะ:</span>
                     <button onclick="filterLiveModalStudents('all')" id="tab-live-all" class="px-3 py-1.5 bg-indigo-600 text-white rounded-lg transition shadow-xs cursor-pointer font-bold">ทั้งหมด</button>
-                    <button onclick="filterLiveModalStudents('active')" id="tab-live-active" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition cursor-pointer font-bold">🟢 กำลังทำ</button>
-                    <button onclick="filterLiveModalStudents('submitted')" id="tab-live-submitted" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition cursor-pointer font-bold">✅ ส่งแล้ว</button>
-                    <button onclick="filterLiveModalStudents('not_joined')" id="tab-live-not-joined" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition cursor-pointer font-bold">🔴 ยังไม่เข้า</button>
+                    <button onclick="filterLiveModalStudents('active')" id="tab-live-active" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition cursor-pointer font-bold">กำลังทำ</button>
+                    <button onclick="filterLiveModalStudents('submitted')" id="tab-live-submitted" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition cursor-pointer font-bold">ส่งแล้ว</button>
+                    <button onclick="filterLiveModalStudents('not_joined')" id="tab-live-not-joined" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition cursor-pointer font-bold">ยังไม่เข้า</button>
                 </div>
                 <div id="students-modal-list" class="p-6 overflow-y-auto space-y-3 text-sm max-h-[50vh]"></div>
             </div>
@@ -644,7 +641,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
                         <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                            <span>📈</span> <span>ช่วงคะแนนสอบของนักศึกษา</span>
+                            <span></span> <span>ช่วงคะแนนสอบของนักศึกษา</span>
                         </h4>
                         <div id="histogram-bars-container" class="space-y-3 pt-2">
                             <!-- Injected dynamically -->
@@ -652,7 +649,7 @@
                     </div>
                     <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 flex flex-col justify-between">
                         <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                            <span>🎯</span> <span>สรุปภาพรวมคะแนน</span>
+                            <span></span> <span>สรุปภาพรวมคะแนน</span>
                         </h4>
                         <div class="grid grid-cols-3 gap-3 text-center my-auto">
                             <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs">
@@ -676,7 +673,7 @@
             <!-- Content Area 3: Top Wrong Questions Analysis -->
             <div id="dtab-view-wrong-questions" class="p-6 overflow-y-auto space-y-3 max-h-[55vh] hidden">
                 <div class="text-xs text-slate-500 font-medium pb-2 border-b border-slate-200">
-                    💡 เรียงลำดับข้อสอบที่มีอัตราการตอบผิดมากที่สุด เพื่อให้อาจารย์สามารถทบทวนหรืออธิบายเพิ่มเติมแก่นักศึกษาได้
+                    เรียงลำดับข้อสอบที่มีอัตราการตอบผิดมากที่สุด เพื่อให้อาจารย์สามารถทบทวนหรืออธิบายเพิ่มเติมแก่นักศึกษาได้
                 </div>
                 <div id="top-wrong-questions-list" class="space-y-3">
                     <!-- Injected dynamically -->
@@ -734,7 +731,7 @@
 
         const DEFAULT_COURSES = [
             { id: '749-51-447', courseCode: '749-51-447', courseName: 'ภาษาซีสำหรับการเขียนโปรแกรม (Computer Programming)', semester: 'ภาคเรียนที่ 2/2568', studentCount: 45, examCount: 3, description: 'รายวิชาคอมพิวเตอร์และเทคโนโลยีสารสนเทศ' },
-            { id: '749-52-101', courseCode: '749-52-101', courseName: 'การรักษาความปลอดภัยระบบเครือข่าย (Network Security)', semester: 'ภาคเรียนที่ 2/2568', studentCount: 38, examCount: 2, description: 'วิชาความปลอดภัยไซเบอร์และ ตรีเนตร e-Exam' },
+            { id: '749-52-101', courseCode: '749-52-101', courseName: 'การรักษาความปลอดภัยระบบเครือข่าย (Network Security)', semester: 'ภาคเรียนที่ 2/2568', studentCount: 38, examCount: 2, description: 'วิชาความปลอดภัยไซเบอร์และ ExamPro' },
             { id: '749-53-202', courseCode: '749-53-202', courseName: 'เทคโนโลยีบล็อกเชนและปัญญาประดิษฐ์ (Blockchain & AI)', semester: 'ภาคเรียนที่ 2/2568', studentCount: 50, examCount: 4, description: 'วิทยาการคอมพิวเตอร์ประยุกต์' }
         ];
 
@@ -814,7 +811,7 @@
             if (!courses || courses.length === 0) {
                 container.innerHTML = `
                     <div class="col-span-full p-8 text-center bg-white border border-slate-200 rounded-3xl space-y-3 shadow-xs">
-                        <span class="text-3xl">📚</span>
+                        <span class="text-3xl"></span>
                         <div class="font-bold text-slate-800 text-sm">ยังไม่มีรายวิชาในระบบ</div>
                         <p class="text-xs text-slate-400">กรุณาสร้างรายวิชาในเมนู "จัดการรายวิชา" ก่อนเปิดห้องสอบ</p>
                         <a href="admin-courses.html" class="inline-block px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-sm transition active:scale-95">
@@ -843,13 +840,13 @@
                             <p class="text-xs text-slate-400 font-medium line-clamp-1 mt-0.5">${escapeHtml(c.description || 'ไม่มีคำอธิบาย')}</p>
                         </div>
                         <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs font-bold">
-                            <span class="text-slate-600">👥 นักศึกษา: <b class="text-cyan-600">${c.studentCount || 0} คน</b></span>
-                            <span class="text-slate-600">📝 ชุดข้อสอบ: <b class="text-indigo-600">${c.examCount || 0} ชุด</b></span>
+                            <span class="text-slate-600">นักศึกษา: <b class="text-cyan-600">${c.studentCount || 0} คน</b></span>
+                            <span class="text-slate-600">ชุดข้อสอบ: <b class="text-indigo-600">${c.examCount || 0} ชุด</b></span>
                         </div>
                     </div>
 
                     <button class="w-full py-2.5 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 group-hover:from-indigo-500 group-hover:to-purple-500 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-600/20 transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
-                        <span>🚀</span>
+                        <span></span>
                         <span>เลือกวิชานี้เพื่อเปิดห้องสอบ</span>
                     </button>
                 </div>
@@ -959,7 +956,7 @@
                                        </span>`
                                     : `<span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 flex items-center gap-1.5 shadow-xs">
                                          <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                                         <span>⏳ ห้องรอสอบ (รอกดเริ่ม)</span>
+                                         <span>ห้องรอสอบ (รอกดเริ่ม)</span>
                                        </span>`
                                 }
                             </div>
@@ -969,7 +966,7 @@
                                     ${escapeHtml(room.roomId)}
                                 </span>
                                 <button onclick="deleteRoom('${room.roomId}')" title="ลบ/ปิดห้องสอบนี้" class="p-1.5 hover:bg-rose-50 text-slate-300 hover:text-rose-600 rounded-lg text-xs font-bold transition active:scale-95 cursor-pointer">
-                                    🗑️
+                                    
                                 </button>
                             </div>
                         </div>
@@ -978,11 +975,11 @@
                         <div>
                             <div class="flex items-center gap-2 flex-wrap mb-1">
                                 <div class="text-xs font-bold text-indigo-600 uppercase tracking-wider truncate">
-                                    📚 ${escapeHtml(courseNameStr)}
+                                    ${escapeHtml(courseNameStr)}
                                 </div>
                                 ${classNameStr ? `
                                     <span class="text-[11px] font-extrabold text-purple-700 bg-purple-100 border border-purple-200 px-2.5 py-0.5 rounded-lg flex items-center gap-1 shadow-2xs">
-                                        <span>🏫</span> <span>ห้อง/กลุ่ม: ${escapeHtml(classNameStr)}</span>
+                                        <span></span> <span>ห้อง/กลุ่ม: ${escapeHtml(classNameStr)}</span>
                                     </span>
                                 ` : ''}
                             </div>
@@ -1000,22 +997,22 @@
                                 </div>
                             </div>
                             <div class="px-3 py-1 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold flex items-center gap-1">
-                                <span>📋</span> <span>คัดลอก</span>
+                                <span></span> <span>คัดลอก</span>
                             </div>
                         </div>
 
                         <!-- Stat Counters in Grid (Includes Class / Section) -->
                         <div class="grid grid-cols-3 gap-2 text-xs">
                             <div class="p-2.5 bg-slate-50 border border-slate-100 rounded-xl flex flex-col justify-center">
-                                <span class="text-[10px] text-slate-400 font-bold">⏱️ เวลาสอบ</span>
+                                <span class="text-[10px] text-slate-400 font-bold">เวลาสอบ</span>
                                 <span class="text-xs sm:text-sm font-bold text-slate-800">${duration} นาที</span>
                             </div>
                             <div class="p-2.5 bg-slate-50 border border-slate-100 rounded-xl flex flex-col justify-center">
-                                <span class="text-[10px] text-slate-400 font-bold">📝 จำนวนข้อสอบ</span>
+                                <span class="text-[10px] text-slate-400 font-bold">จำนวนข้อสอบ</span>
                                 <span class="text-xs sm:text-sm font-bold text-slate-800">${qCount} ข้อ</span>
                             </div>
                             <div class="p-2.5 bg-purple-50/70 border border-purple-100 rounded-xl flex flex-col justify-center">
-                                <span class="text-[10px] text-purple-600 font-bold">🏫 กลุ่ม/ชั้นเรียน</span>
+                                <span class="text-[10px] text-purple-600 font-bold">กลุ่ม/ชั้นเรียน</span>
                                 <span class="text-xs font-extrabold text-purple-900 truncate" title="${escapeHtml(classNameStr)}">${escapeHtml(classNameStr)}</span>
                             </div>
                         </div>
@@ -1023,7 +1020,7 @@
                         <!-- Announcement Box -->
                         ${announcement ? `
                             <div class="p-2.5 bg-rose-50/70 border border-rose-100 rounded-xl text-[11px] font-bold text-rose-700 flex items-start gap-1.5">
-                                <span class="shrink-0">📢</span>
+                                <span class="shrink-0"></span>
                                 <span class="truncate">${escapeHtml(announcement)}</span>
                             </div>
                         ` : ''}
@@ -1032,29 +1029,29 @@
                         <div class="space-y-2 pt-2 border-t border-slate-100">
                             <!-- Button 1: ฉายจอ PIN & QR Code -->
                             <button onclick="openWaitingLoungeModal('${room.roomId}')" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold shadow-sm transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-                                <span>📱</span>
+                                <span></span>
                                 <span>ฉายจอ PIN & QR Code (ห้องรอสอบ)</span>
                             </button>
 
                             <!-- Button 2: ตรวจสอบพฤติกรรมน่าสงสัย -->
                             <a href="admin-monitoring.html?room=${encodeURIComponent(room.roomId)}" class="w-full py-2.5 bg-gradient-to-r from-rose-500 via-pink-600 to-amber-500 hover:from-rose-600 hover:to-amber-600 text-white rounded-xl text-xs font-bold shadow-md transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
                                 <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
-                                <span>🛡️ ตรวจสอบพฤติกรรมน่าสงสัย</span>
+                                <span>ตรวจสอบพฤติกรรมน่าสงสัย</span>
                             </a>
 
                             <!-- Button 3 & 4: Start / Stop Exam & ดูรายชื่อ -->
                             <div class="grid grid-cols-2 gap-2">
                                 ${isPub ? `
                                     <button onclick="togglePublishExam('${room.roomId}', false)" class="py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold shadow-sm transition active:scale-95 flex items-center justify-center gap-1 cursor-pointer">
-                                        <span>🛑</span> <span>หยุดสอบ</span>
+                                        <span></span> <span>หยุดสอบ</span>
                                     </button>
                                 ` : `
                                     <button onclick="togglePublishExam('${room.roomId}', true)" class="py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-bold shadow-sm transition active:scale-95 flex items-center justify-center gap-1 cursor-pointer">
-                                        <span>🚀</span> <span>เริ่มสอบทันที</span>
+                                        <span></span> <span>เริ่มสอบทันที</span>
                                     </button>
                                 `}
                                 <button onclick="openLiveStudentsModal('${room.roomId}')" class="py-2.5 bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-bold transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs">
-                                    <span>📊</span> <span>แดชบอร์ดสด</span>
+                                    <span></span> <span>แดชบอร์ดสด</span>
                                 </button>
                             </div>
                         </div>
@@ -1070,7 +1067,7 @@
             html += `
                 <div onclick="openCreateRoomModal()" class="rounded-3xl p-6 border-2 border-dashed border-indigo-300 hover:border-indigo-500 bg-indigo-50/40 hover:bg-indigo-50 transition cursor-pointer flex flex-col items-center justify-center text-center space-y-3 min-h-[350px] group">
                     <div class="w-16 h-16 rounded-2xl bg-white border border-indigo-200 flex items-center justify-center text-3xl group-hover:scale-110 group-hover:shadow-md transition">
-                        ➕
+                        
                     </div>
                     <div class="space-y-1">
                         <h4 class="text-base font-bold text-indigo-900">เปิดห้องสอบเพิ่ม</h4>
@@ -1165,7 +1162,7 @@
             if (!templates || templates.length === 0) {
                 listContainer.innerHTML = `
                     <div class="col-span-full p-4 bg-slate-50 border border-dashed border-slate-200 rounded-2xl text-center text-slate-400">
-                        <div class="text-2xl mb-1">📭</div>
+                        <div class="text-2xl mb-1"></div>
                         <div class="font-bold text-xs">ยังไม่มีชุดข้อสอบในวิชานี้</div>
                         <div class="text-[11px] mt-1 text-slate-400">คุณสามารถสร้างห้องสอบเปล่า แล้วไปเพิ่มข้อสอบทีหลังได้</div>
                     </div>
@@ -1185,14 +1182,14 @@
                 <div id="modal-tpl-${tpl.id}" onclick="selectModalTemplate(${tpl.id}, '${escapeHtml(tpl.templateName)}')" class="template-card-item p-3.5 border-2 ${idx === 0 ? 'border-indigo-600 bg-indigo-50/40 selected' : 'border-slate-200 bg-white'} rounded-2xl flex items-center justify-between gap-2 shadow-2xs hover:border-indigo-400 transition cursor-pointer">
                     <div class="space-y-0.5 min-w-0">
                         <div class="font-bold text-slate-900 text-xs sm:text-sm truncate">
-                            📝 ${escapeHtml(tpl.templateName)}
+                            ${escapeHtml(tpl.templateName)}
                         </div>
                         <div class="text-[10px] text-slate-400 flex items-center gap-2">
-                            <span>🕒 ${escapeHtml(tpl.created_at || 'เพิ่งสร้าง')}</span>
+                            <span>${escapeHtml(tpl.created_at || 'เพิ่งสร้าง')}</span>
                         </div>
                     </div>
                     <div class="card-radio text-base font-bold shrink-0">
-                        ${idx === 0 ? '🟢' : '⚪'}
+                        ${idx === 0 ? '' : ''}
                     </div>
                 </div>
             `).join('');
@@ -1204,14 +1201,14 @@
                 el.classList.remove('border-indigo-600', 'bg-indigo-50/40', 'selected');
                 el.classList.add('border-slate-200', 'bg-white');
                 const r = el.querySelector('.card-radio');
-                if (r) r.textContent = '⚪';
+                if (r) r.textContent = '';
             });
             const c = document.getElementById(`modal-tpl-${tplId}`);
             if (c) {
                 c.classList.remove('border-slate-200', 'bg-white');
                 c.classList.add('border-indigo-600', 'bg-indigo-50/40', 'selected');
                 const r = c.querySelector('.card-radio');
-                if (r) r.textContent = '🟢';
+                if (r) r.textContent = '';
             }
 
             const titleInput = document.getElementById('modal-input-exam-title');
@@ -1238,7 +1235,7 @@
 
             const btn = document.getElementById('btn-modal-create-confirm');
             btn.disabled = true;
-            btn.innerHTML = '⏳ กำลังสร้างห้องสอบ...';
+            btn.innerHTML = 'กำลังสร้างห้องสอบ...';
 
             try {
                 // 1. สร้างห้องสอบใหม่ในฐานข้อมูล (ส่งชื่อกลุ่ม/ห้องเรียนตามรายวิชาจริง ไม่ใช่ชื่อข้อสอบ)
@@ -1261,7 +1258,7 @@
                 });
                 const cData = await cRes.json();
                 if (!cRes.ok || !cData.success) {
-                    alert(`❌ ไม่สามารถสร้างห้องสอบได้: ${cData.message || 'เกิดข้อผิดพลาดในการสร้างห้องสอบ'}`);
+                    alert(`ไม่สามารถสร้างห้องสอบได้: ${cData.message || 'เกิดข้อผิดพลาดในการสร้างห้องสอบ'}`);
                     return;
                 }
 
@@ -1302,10 +1299,10 @@
 
             } catch(e) {
                 console.error("สร้างห้องสอบล้มเหลว:", e);
-                alert(`❌ เกิดข้อผิดพลาดในการสร้างห้องสอบ: ${e.message || e}`);
+                alert(`เกิดข้อผิดพลาดในการสร้างห้องสอบ: ${e.message || e}`);
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '<span>🚀</span> <span>สร้างและเปิดห้องรอสอบทันที (รับ PIN & QR)</span>';
+                btn.innerHTML = '<span></span> <span>สร้างและเปิดห้องรอสอบทันที (รับ PIN & QR)</span>';
             }
         }
 
@@ -1334,20 +1331,20 @@
                 const stopBtn = document.getElementById('btn-lounge-stop-exam');
 
                 if (roomData.is_published === 1) {
-                    if (icon) icon.textContent = '🟢';
+                    if (icon) icon.textContent = '';
                     if (title) title.textContent = 'การสอบกำลังดำเนินการอยู่ (LIVE)';
                     if (badge) {
                         badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700';
-                        badge.textContent = '🟢 กำลังเปิดสอบ';
+                        badge.textContent = 'กำลังเปิดสอบ';
                     }
                     if (startBtn) startBtn.classList.add('hidden');
                     if (stopBtn) stopBtn.classList.remove('hidden');
                 } else {
-                    if (icon) icon.textContent = '⏳';
+                    if (icon) icon.textContent = '';
                     if (title) title.textContent = 'ห้องรอสอบ (Waiting Lounge)';
                     if (badge) {
                         badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700';
-                        badge.textContent = '⏳ รอกดเริ่มสอบ';
+                        badge.textContent = 'รอกดเริ่มสอบ';
                     }
                     if (startBtn) startBtn.classList.remove('hidden');
                     if (stopBtn) stopBtn.classList.add('hidden');
@@ -1410,7 +1407,7 @@
                 return;
             }
 
-            const actionText = "🚀 ยืนยันเริ่มการสอบทันที? (นักศึกษาจะสามารถเริ่มทำข้อสอบได้พร้อมกัน)";
+            const actionText = "ยืนยันเริ่มการสอบทันที? (นักศึกษาจะสามารถเริ่มทำข้อสอบได้พร้อมกัน)";
             if (!confirm(actionText)) return;
 
             try {
@@ -1426,7 +1423,7 @@
                         openWaitingLoungeModal(roomId);
                     }
                 } else {
-                    alert(`❌ ไม่สามารถดำเนินการได้: ${data.message || 'เกิดข้อผิดพลาด'}`);
+                    alert(`ไม่สามารถดำเนินการได้: ${data.message || 'เกิดข้อผิดพลาด'}`);
                 }
             } catch(e) {
                 console.error(e);
@@ -1447,7 +1444,7 @@
 
         // 8. ลบห้องสอบ
         async function deleteRoom(roomId) {
-            if (!confirm(`🗑️ ยืนยันลบ/ปิดห้องสอบ ${roomId} นี้?`)) return;
+            if (!confirm(`ยืนยันลบ/ปิดห้องสอบ ${roomId} นี้?`)) return;
 
             try {
                 const res = await fetch('/api/teacher/room', {
@@ -1600,13 +1597,13 @@
                 let badgeHtml = '';
                 let borderClass = 'border-slate-200 bg-white';
                 if (isSub) {
-                    badgeHtml = `<span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-emerald-600 text-white shadow-xs">✅ ส่งข้อสอบแล้ว</span>`;
+                    badgeHtml = `<span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-emerald-600 text-white shadow-xs">ส่งข้อสอบแล้ว</span>`;
                     borderClass = 'border-emerald-200 bg-emerald-50/20';
                 } else if (isActive) {
                     badgeHtml = `<span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shadow-xs flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> กำลังสอบ</span>`;
                     borderClass = 'border-cyan-200 bg-cyan-50/20';
                 } else {
-                    badgeHtml = `<span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-rose-100 text-rose-700 border border-rose-300">🔴 ยังไม่เข้าสอบ</span>`;
+                    badgeHtml = `<span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-rose-100 text-rose-700 border border-rose-300">ยังไม่เข้าสอบ</span>`;
                     borderClass = 'border-slate-200 bg-slate-50/50';
                 }
 
@@ -1652,7 +1649,7 @@
             if (!summary || summary.totalSubmitted === 0) {
                 container.innerHTML = `
                     <div class="text-center py-8 text-slate-400 font-bold">
-                        <div class="text-3xl mb-1">⏳</div>
+                        <div class="text-3xl mb-1"></div>
                         <div>ยังไม่มีนักศึกษาส่งกระดาษคำตอบ</div>
                         <div class="text-[11px] text-slate-400 mt-1 font-normal">กราฟแท่งจะแสดงทันทีเมื่อมีนักศึกษาส่งข้อสอบ</div>
                     </div>
@@ -1692,7 +1689,7 @@
             if (!questions || questions.length === 0 || questions.every(q => q.wrongCount === 0)) {
                 container.innerHTML = `
                     <div class="text-center py-8 text-slate-400 font-bold">
-                        <div class="text-3xl mb-1">🎉</div>
+                        <div class="text-3xl mb-1"></div>
                         <div class="text-slate-600">ยังไม่มีประวัติการตอบผิด หรือยังไม่มีใครส่งข้อสอบ</div>
                         <div class="text-[11px] text-slate-400 mt-1 font-normal">เมื่อมีนักศึกษาส่งคำตอบ ระบบจะวิเคราะห์ข้อสอบที่ตอบผิดบ่อยให้อัตโนมัติ</div>
                     </div>
@@ -1742,7 +1739,7 @@
         function copyCustomPin(pin) {
             if (!pin || pin === '------') return;
             navigator.clipboard.writeText(pin).then(() => {
-                alert(`📋 คัดลอกรหัส PIN: ${pin} เรียบร้อยแล้ว`);
+                alert(`คัดลอกรหัส PIN: ${pin} เรียบร้อยแล้ว`);
             });
         }
 
@@ -1753,7 +1750,7 @@
         function copyPublishLink() {
             const link = document.getElementById('pub-modal-link').value;
             navigator.clipboard.writeText(link).then(() => {
-                alert("📋 คัดลอกลิงก์เรียบร้อยแล้ว!");
+                alert("คัดลอกลิงก์เรียบร้อยแล้ว!");
             });
         }
 

@@ -5,9 +5,9 @@
     <script src="trinetra-mark.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ตรวจอัตนัยด้วย AI - ตรีเนตร e-Exam</title>
+    <title>ตรวจอัตนัยด้วย AI - ExamPro</title>
     <script src="vendor/xlsx.full.min.js"></script><script>window.XLSX || document.write('<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>')</script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         html { font-size: 100%; -webkit-text-size-adjust: 100%; }
 
@@ -25,7 +25,7 @@
 
         * { box-sizing: border-box; }
         body {
-            font-family: 'Kanit', sans-serif;
+            font-family: 'Noto Sans Thai Looped', sans-serif;
             background-color: #f8fafc;
             color: #1e293b;
         }
@@ -112,7 +112,7 @@
             color: #1e293b; border-radius: 12px;
             padding: 8px 14px; font-size: 13px;
             font-weight: 600;
-            font-family: 'Kanit', sans-serif;
+            font-family: 'Noto Sans Thai Looped', sans-serif;
             outline: none; width: 100%; transition: all 0.2s ease;
             box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
             cursor: pointer;
@@ -124,7 +124,7 @@
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        textarea.dark-input { background:#fff; border:1px solid #cbd5e1; color:#1e293b; border-radius:12px; padding:8px 14px; font-size:13px; font-weight:500; font-family:'Kanit',sans-serif; outline:none; width:100%; }
+        textarea.dark-input { background:#fff; border:1px solid #cbd5e1; color:#1e293b; border-radius:12px; padding:8px 14px; font-size:13px; font-weight:500; font-family:'Noto Sans Thai Looped', sans-serif; outline:none; width:100%; }
         textarea.dark-input:focus { border-color:#0b2a7a; box-shadow:0 0 0 3px rgba(11,42,122,.15); }
     </style>
     <link rel="stylesheet" href="theme.css">
@@ -136,13 +136,10 @@
     <!-- ===== SIDEBAR ===== -->
     <aside id="sidebar">
         <div class="sidebar-inner p-4 space-y-4 flex-1 overflow-y-auto">
-            <!-- Logo Header (ตรีเนตร e-Exam) -->
+            <!-- Logo Header (ExamPro) -->
             <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
-                <div class="w-10 h-12 bg-white rounded-lg p-1 border border-slate-200 flex items-center justify-center shrink-0 shadow-xs">
-                    <img src="trinetra-logo.svg" alt="ตรีเนตร e-Exam" class="w-full h-full object-contain" />
-                </div>
                 <div class="leading-tight">
-                    <div class="font-bold text-base tracking-tight text-slate-900">ตรีเนตร <span class="text-blue-700 font-extrabold">e-Exam</span></div>
+                    <div class="font-bold text-base tracking-tight text-slate-900">Exam<span class="text-blue-700 font-extrabold">Pro</span></div>
                     <div class="text-[10px] text-amber-700 font-bold uppercase tracking-wider">ตาที่ 3 ของอาจารย์</div>
                 </div>
             </div>
@@ -231,7 +228,7 @@
                     </div>
                 </div>
             </div>
-            <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2 px-3 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 border border-slate-200 hover:border-rose-200 transition">
+            <a href="login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2 px-3 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 border border-slate-200 hover:border-rose-200 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H2.25" /></svg>
                 <span>ออกจากระบบ</span>
             </a>
@@ -248,15 +245,15 @@
                 </button>
                 <div>
                     <h1 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">8. ตรวจอัตนัยด้วย AI <span id="ai-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">กำลังตรวจสอบ...</span></h1>
-                    <p class="text-xs text-slate-500 font-medium">ตรีเนตร e-Exam &middot; อ่านลายมือ ให้คะแนนตาม Rubric อาจารย์ยืนยันคะแนนสุดท้าย</p>
+                    <p class="text-xs text-slate-500 font-medium">ExamPro &middot; อ่านลายมือ ให้คะแนนตาม Rubric อาจารย์ยืนยันคะแนนสุดท้าย</p>
                 </div>
             </div>
             <div class="flex items-center gap-3 flex-wrap sm:flex-nowrap">
                 <a href="grader-intro.html" target="_blank" class="flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow-xs">
-                    <span>💡</span><span class="hidden sm:inline">ระบบนี้ทำงานอย่างไร</span>
+                    <span></span><span class="hidden sm:inline">ระบบนี้ทำงานอย่างไร</span>
                 </a>
                 <button onclick="openImport()" class="flex items-center gap-1.5 px-4 py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-xl text-sm font-bold shadow-md transition active:scale-95">
-                    <span>📄</span><span>นำเข้า PDF สแกน</span>
+                    <span></span><span>นำเข้า PDF สแกน</span>
                 </button>
                 <button onclick="openEditor()" class="flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-blue-900 border border-blue-900/30 rounded-xl text-xs font-bold transition active:scale-95">
                     <span>＋</span><span>สร้างงานใหม่</span>
@@ -271,45 +268,45 @@
             </div>
 
 
-            <!-- ⭐ HERO: ธีมเดียวกับแดชบอร์ด (น้ำเงินเข้ม) + จุดวางไฟล์ PDF -->
+            <!-- HERO: ธีมเดียวกับแดชบอร์ด (น้ำเงินเข้ม) + จุดวางไฟล์ PDF -->
             <section id="hero-drop" class="es-hero mb-6">
                 <div class="es-hero-in">
                     <div class="es-hero-txt">
-                        <div class="es-chip"><span class="es-dot"></span>ตาอ่าน · ตรวจหลังสอบ (ตรีเนตร e-Exam · ตาที่ 3 ของอาจารย์)</div>
+                        <div class="es-chip"><span class="es-dot"></span>ตาอ่าน · ตรวจหลังสอบ (ExamPro · ตาที่ 3 ของอาจารย์)</div>
                         <h2>ตรวจกระดาษคำตอบอัตนัยด้วย AI</h2>
                         <p>สร้างงานพร้อมโจทย์และเฉลย พิมพ์กระดาษคำตอบรายคน แล้วสแกนกลับเข้ามา AI อ่านลายมือ ให้คะแนนตาม Rubric และอาจารย์ยืนยันคะแนนสุดท้าย</p>
                         <div class="es-actions">
-                            <label class="es-btn es-btn-w"><span>📥</span><span>นำเข้า PDF สแกน</span>
+                            <label class="es-btn es-btn-w"><span></span><span>นำเข้า PDF สแกน</span>
                                 <input id="hero-file" type="file" accept="application/pdf,image/*" multiple hidden></label>
                             <button type="button" onclick="openEditor()" class="es-btn es-btn-b"><span>＋</span><span>สร้างงานใหม่</span></button>
-                            <a href="grader-intro.html" target="_blank" class="es-btn es-btn-d"><span>💡</span><span>ระบบนี้ทำงานอย่างไร</span></a>
+                            <a href="grader-intro.html" target="_blank" class="es-btn es-btn-d"><span></span><span>ระบบนี้ทำงานอย่างไร</span></a>
                         </div>
                     </div>
                     <label class="es-drop" title="ลากไฟล์มาวาง หรือคลิกเพื่อเลือกไฟล์">
                         <input type="file" accept="application/pdf,image/*" multiple hidden onchange="const f=[...this.files];this.value='';if(f.length)openImport(f)">
-                        <div class="es-drop-ic">📄</div>
+                        <div class="es-drop-ic"></div>
                         <b>ลากไฟล์ PDF มาวางที่นี่</b>
                         <small>PDF หรือรูปถ่าย · ไฟล์เดียวทั้งห้องก็ได้</small>
                         <div class="es-ticks"><span>✓ แยกรายคนอัตโนมัติ</span><span>✓ ปรับภาพให้คมชัด</span><span>✓ AI เริ่มตรวจทันที</span></div>
                     </label>
                 </div>
-                <div id="hero-over" class="hidden es-over"><div>⬇️</div>ปล่อยไฟล์ตรงนี้เพื่อนำเข้า</div>
+                <div id="hero-over" class="hidden es-over"><div></div>ปล่อยไฟล์ตรงนี้เพื่อนำเข้า</div>
             </section>
 
             <!-- KPI: การ์ดสถิติแบบแดชบอร์ด -->
             <div class="es-kpis mb-6">
                 <div class="glass-card es-kpi">
-                    <div class="es-kpi-h"><span class="es-ic" style="background:#eff6ff;color:#1d4ed8">✅</span><span class="es-tag" style="background:#eff6ff;color:#1d4ed8">ตรวจแล้ว</span></div>
+                    <div class="es-kpi-h"><span class="es-ic" style="background:#eff6ff;color:#1d4ed8"></span><span class="es-tag" style="background:#eff6ff;color:#1d4ed8">ตรวจแล้ว</span></div>
                     <small>กระดาษคำตอบที่ AI ตรวจแล้ว</small>
                     <div class="es-num"><span id="st-done">0</span><i>ฉบับ</i></div>
                 </div>
                 <button type="button" onclick="gotoReview()" class="glass-card es-kpi es-kpi-btn">
-                    <div class="es-kpi-h"><span class="es-ic" style="background:#fff7ed;color:#c2410c">🔎</span><span class="es-tag" style="background:#fff7ed;color:#c2410c">รอตรวจทาน</span></div>
+                    <div class="es-kpi-h"><span class="es-ic" style="background:#fff7ed;color:#c2410c"></span><span class="es-tag" style="background:#fff7ed;color:#c2410c">รอตรวจทาน</span></div>
                     <small>ให้อาจารย์ตรวจทานก่อนยืนยัน</small>
                     <div class="es-num"><span id="st-review" style="color:#ea580c">0</span><i>ฉบับ →</i></div>
                 </button>
                 <div class="glass-card es-kpi">
-                    <div class="es-kpi-h"><span class="es-ic" style="background:#f5f3ff;color:#6d28d9">🤖</span><span class="es-tag" style="background:#f5f3ff;color:#6d28d9">ค่า AI</span></div>
+                    <div class="es-kpi-h"><span class="es-ic" style="background:#f5f3ff;color:#6d28d9"></span><span class="es-tag" style="background:#f5f3ff;color:#6d28d9">ค่า AI</span></div>
                     <small>ค่าใช้จ่าย AI เดือนนี้ (ประมาณ)</small>
                     <div class="es-num"><span id="st-cost">–</span></div>
                 </div>
@@ -317,20 +314,20 @@
 
             <!-- ขั้นตอนการทำงาน -->
             <div class="glass-card es-steps-card mb-6">
-                <div class="es-sec"><span>🧭</span> ขั้นตอนการทำงาน</div>
+                <div class="es-sec"><span></span> ขั้นตอนการทำงาน</div>
                 <ol id="steps" class="es-steps"></ol>
             </div>
             <div class="grid lg:grid-cols-[300px_1fr] gap-6">
                 <!-- Assignment list -->
                 <section class="glass-card p-4 h-fit">
-                    <div class="flex items-center justify-between mb-3"><h2 class="font-bold text-slate-800 flex items-center gap-1.5"><span>📚</span> งาน / ข้อสอบอัตนัย</h2><button onclick="openEditor()" class="text-xs font-bold text-blue-900 hover:underline">＋ งานใหม่</button></div>
+                    <div class="flex items-center justify-between mb-3"><h2 class="font-bold text-slate-800 flex items-center gap-1.5"><span></span> งาน / ข้อสอบอัตนัย</h2><button onclick="openEditor()" class="text-xs font-bold text-blue-900 hover:underline">＋ งานใหม่</button></div>
                     <div id="a-list" class="space-y-2 text-sm"></div>
                 </section>
 
                 <!-- Detail -->
                 <section id="detail" class="glass-card p-5 md:p-6 min-h-[420px]">
                     <div class="text-center text-slate-500 py-24">
-                        <div class="text-5xl mb-3">👈</div>
+                        <div class="text-5xl mb-3"></div>
                         <b class="text-slate-700">เลือกงานทางซ้ายเพื่อดูผลคะแนน</b><br>
                         <span class="text-xs">หรือลากไฟล์ PDF ไปวางที่แบนเนอร์ด้านบนเพื่อเริ่มตรวจ</span>
                     </div>
@@ -347,7 +344,7 @@
     <div id="import" class="hidden fixed inset-0 z-[10000] bg-slate-900/40 backdrop-blur-sm overflow-y-auto p-4">
         <div class="bg-white rounded-2xl max-w-2xl mx-auto my-6 p-6 shadow-2xl">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-bold text-slate-800">📄 นำเข้าไฟล์ PDF สแกนกระดาษคำตอบ</h2>
+                <h2 class="text-lg font-bold text-slate-800">นำเข้าไฟล์ PDF สแกนกระดาษคำตอบ</h2>
                 <button onclick="closeImport()" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">×</button>
             </div>
             <label class="block text-sm font-semibold text-slate-700 mb-3">1. เลือกงาน / ข้อสอบที่จะตรวจ
@@ -356,7 +353,7 @@
             <div class="text-sm font-semibold text-slate-700 mb-1">2. รูปแบบไฟล์</div>
             <div class="space-y-2 mb-4 text-sm">
                 <label class="flex gap-2 items-start p-3 rounded-xl border border-amber-300 bg-amber-50/50 cursor-pointer"><input type="radio" name="im-mode" value="mark" class="mt-1">
-                    <span><b>อ่านรหัสตรีเนตรอัตโนมัติ</b> <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-white">แนะนำ</span><br><span class="text-xs text-slate-500">ใช้กับกระดาษที่พิมพ์จากปุ่ม "🖨️ พิมพ์กระดาษคำตอบ" สแกนทั้งห้องรวมเป็นไฟล์เดียว (หรือหลายไฟล์ก็ได้ ลำดับหน้าสลับกันได้) ระบบอ่านรหัสมุมขวาบน แยกแผ่นและใส่ชื่อ-รหัสนักศึกษาให้เอง</span></span></label>
+                    <span><b>อ่านรหัส ExamPro อัตโนมัติ</b> <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-white">แนะนำ</span><br><span class="text-xs text-slate-500">ใช้กับกระดาษที่พิมพ์จากปุ่ม "พิมพ์กระดาษคำตอบ" สแกนทั้งห้องรวมเป็นไฟล์เดียว (หรือหลายไฟล์ก็ได้ ลำดับหน้าสลับกันได้) ระบบอ่านรหัสมุมขวาบน แยกแผ่นและใส่ชื่อ-รหัสนักศึกษาให้เอง</span></span></label>
                 <label class="flex gap-2 items-start p-3 rounded-xl border border-slate-200 cursor-pointer"><input type="radio" name="im-mode" value="one" checked class="mt-1">
                     <span><b>1 ไฟล์ = นักเรียน 1 คน</b><br><span class="text-xs text-slate-500">ใช้ชื่อไฟล์เป็นชื่อนักเรียน เช่น 6501_สมชาย.pdf (เลือกหลายไฟล์พร้อมกันได้)</span></span></label>
                 <label class="flex gap-2 items-start p-3 rounded-xl border border-slate-200 cursor-pointer"><input type="radio" name="im-mode" value="split" class="mt-1">
@@ -369,13 +366,13 @@
                 <button onclick="startPending()" class="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-bold shadow-md">▶ เริ่มนำเข้าและตรวจ</button>
             </div>
             <div id="im-drop" class="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center">
-                <div class="text-4xl mb-2">📥</div>
+                <div class="text-4xl mb-2"></div>
                 <p class="font-semibold text-slate-700">ลากไฟล์ PDF มาวาง หรือ <label class="text-blue-900 underline cursor-pointer">เลือกไฟล์<input id="im-file" type="file" accept="application/pdf,image/*" multiple hidden></label></p>
                 <p class="text-xs text-slate-500 mt-1">PDF หรือภาพ ไม่เกิน 30MB ต่อไฟล์</p>
             </div>
             <label class="flex items-center gap-2 text-sm mt-3"><input id="im-enhance" type="checkbox" checked> ปรับภาพให้คมชัดก่อนส่ง (เฉพาะไฟล์ภาพ: ทำเป็นขาวดำ ลบเงา เพิ่มความต่าง)</label>
             <div id="im-msg" class="text-sm mt-3"></div>
-            <p class="text-[11px] text-slate-500 mt-4 p-3 bg-slate-50 rounded-xl leading-relaxed">🔒 <b>ข้อมูลส่วนบุคคล (PDPA):</b> ภาพกระดาษคำตอบจะถูกส่งไปประมวลผลที่ Claude API ของ Anthropic เพื่ออ่านลายมือและให้คะแนน และเก็บไว้ในเซิร์ฟเวอร์ของระบบนี้<span id="im-ret"></span> กรุณาแจ้งนักเรียนก่อนใช้งาน และหลีกเลี่ยงการสแกนข้อมูลที่ไม่จำเป็น เช่น เลขบัตรประชาชน</p>
+            <p class="text-[11px] text-slate-500 mt-4 p-3 bg-slate-50 rounded-xl leading-relaxed"><b>ข้อมูลส่วนบุคคล (PDPA):</b> ภาพกระดาษคำตอบจะถูกส่งไปประมวลผลที่ Claude API ของ Anthropic เพื่ออ่านลายมือและให้คะแนน และเก็บไว้ในเซิร์ฟเวอร์ของระบบนี้<span id="im-ret"></span> กรุณาแจ้งนักเรียนก่อนใช้งาน และหลีกเลี่ยงการสแกนข้อมูลที่ไม่จำเป็น เช่น เลขบัตรประชาชน</p>
         </div>
     </div>
 
@@ -523,13 +520,13 @@
     }
 
     let assignments = [], courses = [], cur = null, curData = null, tab = 'upload', poll = null, roster = [];
-    // 👁️ ประวัติตาเฝ้าของนักศึกษาในรายวิชาเดียวกัน (ใช้จัดลำดับคิวตรวจและแสดงในตารางผล)
+    // ประวัติตาเฝ้าของนักศึกษาในรายวิชาเดียวกัน (ใช้จัดลำดับคิวตรวจและแสดงในตารางผล)
     let watchMap = {}, watchFirst = false;
     const normId = id => String(id || '').replace(/[^0-9a-zA-Z]/g, '').toLowerCase();
     const watchOf = s => watchMap[normId(s.student_id)] || null;
     const watchBadge = s => { const w = watchOf(s); if (!w || !w.total) return '';
         const parts = [w.switch ? `สลับจอ ${w.switch}` : '', w.fs ? `ออกเต็มจอ ${w.fs}` : '', w.gap ? `หายจากจอ ${w.gap}` : '', w.multi ? `หลายเครื่อง ${w.multi}` : '', w.answer ? `ตอบ/แก้หลังกลับมา ${w.answer}` : ''].filter(Boolean).join(' · ');
-        return `<span class="pill-s bg-red-50 text-red-700" title="${esc(w.events.map(e => '[' + e.room + ' ' + e.time + '] ' + e.action).join('\n'))}">👁️ ตาเฝ้า ${w.total} ครั้ง${parts ? ' (' + parts + ')' : ''}</span>`; };
+        return `<span class="pill-s bg-red-50 text-red-700" title="${esc(w.events.map(e => '[' + e.room + ' ' + e.time + '] ' + e.action).join('\n'))}">ตาเฝ้า ${w.total} ครั้ง${parts ? ' (' + parts + ')' : ''}</span>`; };
     const byWatch = list => list.slice().sort((a, b) => ((watchOf(b) || {}).total || 0) - ((watchOf(a) || {}).total || 0));
 
     // ---------- init ----------
@@ -538,10 +535,10 @@
             const st = await api('/api/essay/status');
             if ($('#im-ret')) $('#im-ret').textContent = st.retentionDays ? ` ไฟล์ภาพจะถูกลบอัตโนมัติหลัง ${st.retentionDays} วัน (คะแนนยังอยู่)` : '';
             loadUsage();
-            $('#ai-badge').textContent = st.aiEnabled ? '🟢 AI พร้อม · ' + st.model : '🟡 โหมดทดลอง';
+            $('#ai-badge').textContent = st.aiEnabled ? 'AI พร้อม · ' + st.model : 'โหมดทดลอง';
             $('#ai-badge').className = 'text-[10px] font-bold px-2 py-0.5 rounded-full ' + (st.aiEnabled ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700');
             $('#demo-warn').classList.toggle('hidden', st.aiEnabled);
-        } catch (e) { $('#ai-badge').textContent = '🔴 เชื่อมต่อเซิร์ฟเวอร์ไม่ได้'; showConnWarn(); }
+        } catch (e) { $('#ai-badge').textContent = 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้'; showConnWarn(); }
         try { courses = await api('/api/teacher/courses?username=' + U); } catch (e) { courses = []; }
         $('#ed-course').innerHTML = '<option value="0">— กรุณาเลือกรายวิชา —</option>' + courses.map(c => `<option value="${c.id}">${esc(c.courseCode)} ${esc(c.courseName)}</option>`).join('');
         await loadList();
@@ -676,7 +673,7 @@
               <label class="text-sm font-semibold text-slate-700">ชื่อ-สกุล<input id="u-name" class="dark-input mt-1" placeholder="ไม่บังคับ (ถ้าเว้นว่างจะใช้ชื่อไฟล์)"></label>
             </div>
             <datalist id="roster">${roster.map(r => `<option value="${esc(r.studentId)}">${esc((r.prefix || '') + r.firstName + ' ' + r.lastName)}</option>`).join('')}</datalist>
-            <div id="drop"><div class="text-4xl mb-2">📄</div>
+            <div id="drop"><div class="text-4xl mb-2"></div>
               <p class="font-semibold text-slate-700">ลากไฟล์มาวาง หรือ <label class="text-blue-900 underline cursor-pointer">เลือกไฟล์<input id="u-file" type="file" accept="application/pdf,image/*" multiple hidden></label></p>
               <p class="text-xs text-slate-500 mt-1">PDF หรือภาพ (1 ไฟล์ = นักเรียน 1 คน) ไม่เกิน 30MB · เลือกหลายไฟล์ได้ จะใช้ชื่อไฟล์เป็นชื่อนักเรียน</p></div>
             <div id="u-msg" class="text-sm mt-3"></div>`;
@@ -689,14 +686,14 @@
             ${(watchFirst ? byWatch(subs) : subs).map((s, i) => { const [t, c] = subState(s); return `<tr><td>${i + 1}</td>
               <td><b>${esc(s.student_name || s.file_name)}</b><div class="text-xs text-slate-500">${esc(s.student_id)}</div>${watchBadge(s) ? `<div class="mt-1">${watchBadge(s)}</div>` : ''}</td>
               <td><span class="pill-s ${c}">${t}</span>${s.error ? `<div class="text-xs text-red-600 max-w-[220px]">${esc(s.error)}</div>` : ''}</td>
-              ${curData.assignment.questions.map(q => { const g = s.grades.find(x => x.question_no == q.no); const sv = g ? (g.teacher_similarity ?? g.similarity) : null; return `<td class="${g && g.status === 'review' ? 'text-amber-600 font-bold' : ''}">${g ? (g.final_score ?? g.ai_score) : '–'}${sv != null ? `<div class="es-sim-chip es-sim-${simLevel(sv)[1]}" title="ความใกล้เคียงกับเฉลย">🎯 ${sv}/10</div>` : ''}</td>`; }).join('')}
+              ${curData.assignment.questions.map(q => { const g = s.grades.find(x => x.question_no == q.no); const sv = g ? (g.teacher_similarity ?? g.similarity) : null; return `<td class="${g && g.status === 'review' ? 'text-amber-600 font-bold' : ''}">${g ? (g.final_score ?? g.ai_score) : '–'}${sv != null ? `<div class="es-sim-chip es-sim-${simLevel(sv)[1]}" title="ความใกล้เคียงกับเฉลย">${sv}/10</div>` : ''}</td>`; }).join('')}
               <td class="font-bold">${s.status === 'done' ? total(s) : '–'}</td>
               <td class="whitespace-nowrap">${s.status === 'done' ? `<button onclick="openReview(${s.id})" class="text-blue-900 font-semibold text-xs">ตรวจทาน</button> · ` : ''}
                 <button onclick="renameSub(${s.id})" class="text-slate-500 text-xs">แก้ชื่อ</button> ·
                 <button onclick="regrade(${s.id})" class="text-slate-500 text-xs">ตรวจใหม่</button> ·
                 <button onclick="delSub(${s.id})" class="text-red-500 text-xs">ลบ</button></td></tr>`; }).join('')}
             </tbody></table></div>` : '<p class="text-slate-500">ยังไม่มีไฟล์ อัปโหลดที่แท็บ "อัปโหลดกระดาษคำตอบ"</p>';
-        else body = reviewN ? (Object.keys(watchMap).length ? '<p class="text-xs text-slate-500 mb-2">👁️ เรียงคนที่มีประวัติตาเฝ้า (สลับหน้าจอ/ออกจากหน้าสอบ) ในวิชานี้ขึ้นก่อน เพื่อให้ตรวจละเอียดเป็นลำดับแรก</p>' : '') + byWatch(subs.filter(s => s.grades.some(g => g.status === 'review'))).map(s => `
+        else body = reviewN ? (Object.keys(watchMap).length ? '<p class="text-xs text-slate-500 mb-2">เรียงคนที่มีประวัติตาเฝ้า (สลับหน้าจอ/ออกจากหน้าสอบ) ในวิชานี้ขึ้นก่อน เพื่อให้ตรวจละเอียดเป็นลำดับแรก</p>' : '') + byWatch(subs.filter(s => s.grades.some(g => g.status === 'review'))).map(s => `
             <div class="flex justify-between items-center border border-amber-200 bg-amber-50/50 rounded-xl p-3 mb-2">
               <div><b>${esc(s.student_name || s.file_name)}</b> <span class="text-xs text-slate-500">${esc(s.student_id)}</span> ${watchBadge(s)}
                 <div class="text-xs text-amber-700">ข้อ ${s.grades.filter(g => g.status === 'review').map(g => g.question_no).join(', ')} · AI ไม่มั่นใจ</div></div>
@@ -708,11 +705,11 @@
               <div><h2 class="text-xl font-bold text-slate-800">${esc(cur.title)}</h2>
                 <p class="text-xs text-slate-500">${curData.assignment.questions.length} ข้อ · คะแนนเต็ม ${maxTotal()} · ${subs.length} ไฟล์</p></div>
               <div class="flex flex-wrap gap-2 text-xs font-semibold">
-                <button onclick="openEditor(cur)" class="px-3 py-2 rounded-xl bg-slate-100">✏️ แก้ไขงาน</button>
-                <button onclick="printSheets()" class="px-3 py-2 rounded-xl bg-amber-50 text-amber-800">📄 กระดาษคำตอบรายคน (PDF)</button>
-                <button onclick="exportXlsx()" class="px-3 py-2 rounded-xl bg-emerald-50 text-emerald-700">📊 ส่งออก Excel</button>
-                ${cur.course_id ? `<button onclick="exportCourse(${cur.course_id})" class="px-3 py-2 rounded-xl bg-indigo-50 text-indigo-700">📚 คะแนนรวมรายวิชา (ปรนัย+อัตนัย)</button>` : ''}
-                ${cur.course_id ? `<a href="trinetra-report.html?courseId=${cur.course_id}" class="px-3 py-2 rounded-xl bg-blue-900 text-white">👁️ รายงานรวมรายคน (ตาเฝ้า+ตาอ่าน)</a>` : ''}
+                <button onclick="openEditor(cur)" class="px-3 py-2 rounded-xl bg-slate-100">แก้ไขงาน</button>
+                <button onclick="printSheets()" class="px-3 py-2 rounded-xl bg-amber-50 text-amber-800">กระดาษคำตอบรายคน (PDF)</button>
+                <button onclick="exportXlsx()" class="px-3 py-2 rounded-xl bg-emerald-50 text-emerald-700">ส่งออก Excel</button>
+                ${cur.course_id ? `<button onclick="exportCourse(${cur.course_id})" class="px-3 py-2 rounded-xl bg-indigo-50 text-indigo-700">คะแนนรวมรายวิชา (ปรนัย+อัตนัย)</button>` : ''}
+                ${cur.course_id ? `<a href="trinetra-report.html?courseId=${cur.course_id}" class="px-3 py-2 rounded-xl bg-blue-900 text-white">รายงานรวมรายคน (ตาเฝ้า+ตาอ่าน)</a>` : ''}
                 <button onclick="delAssignment()" class="px-3 py-2 rounded-xl bg-red-50 text-red-600">ลบงาน</button></div></div>
             <div class="flex flex-wrap gap-1 mb-5 bg-slate-50 p-1 rounded-2xl w-fit">
               <button class="tab-btn ${tab === 'upload' ? 'on' : ''}" onclick="setTab('upload')">1. อัปโหลดกระดาษคำตอบ</button>
@@ -772,7 +769,7 @@
         $('#im-file').addEventListener('change', ev => { importFiles([...ev.target.files]); ev.target.value = ''; });
     })();
     let pdfLibP = null;
-    // 📦 ใช้ไฟล์ในโปรเจกต์ก่อน (vendor/) ถ้าไม่มีค่อยโหลดจากอินเทอร์เน็ต
+    // ใช้ไฟล์ในโปรเจกต์ก่อน (vendor/) ถ้าไม่มีค่อยโหลดจากอินเทอร์เน็ต
     const loadScript = src => new Promise((ok, no) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); });
     const loadPdfLib = () => pdfLibP || (pdfLibP = loadScript('vendor/pdf-lib.min.js')
         .catch(() => loadScript('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js'))
@@ -789,7 +786,7 @@
         try {
             for (const f of files) {
                 if (split && f.type === 'application/pdf') {
-                    msg.innerHTML = `⏳ กำลังแยกหน้า ${esc(f.name)}...`;
+                    msg.innerHTML = `กำลังแยกหน้า ${esc(f.name)}...`;
                     const { PDFDocument } = await loadPdfLib();
                     const src = await PDFDocument.load(await f.arrayBuffer(), { ignoreEncryption: true });
                     const n = src.getPageCount();
@@ -808,7 +805,7 @@
         } catch (e) { msg.innerHTML = `<span class="text-red-600">${esc(e.message)}</span>`; return; }
         let ok = 0;
         for (const [i, j] of jobs.entries()) {
-            msg.innerHTML = `⏳ กำลังอัปโหลด ${i + 1}/${jobs.length}: ${esc(j.fileName)}`;
+            msg.innerHTML = `กำลังอัปโหลด ${i + 1}/${jobs.length}: ${esc(j.fileName)}`;
             try { await api('/api/essay/submissions', { body: { assignmentId: aid, fileName: j.fileName, mime: j.mime, dataBase64: j.data, studentId: j.sid || '', studentName: j.name } }); ok++; }
             catch (e) { msg.innerHTML += `<div class="text-red-600">${esc(j.fileName)}: ${esc(e.message)}</div>`; }
         }
@@ -817,10 +814,10 @@
     }
 
 
-    // ---------- พิมพ์กระดาษคำตอบ + อ่านรหัสตรีเนตร ----------
+    // ---------- พิมพ์กระดาษคำตอบ + อ่านรหัส ExamPro ----------
     function printSheets() {
         if (!cur) return;
-        if (!cur.course_id) return alert('งานนี้ยังไม่ได้ผูกกับรายวิชา\nกด "✏️ แก้ไขงาน" แล้วเลือกรายวิชาก่อน ระบบจะดึงรายชื่อนักศึกษามาพิมพ์บนกระดาษให้');
+        if (!cur.course_id) return alert('งานนี้ยังไม่ได้ผูกกับรายวิชา\nกด "แก้ไขงาน" แล้วเลือกรายวิชาก่อน ระบบจะดึงรายชื่อนักศึกษามาพิมพ์บนกระดาษให้');
         openSheets(cur.id);
     }
     // เปิดหน้ากระดาษคำตอบรายคน (แท็บใหม่ ถ้าเบราว์เซอร์บล็อกป๊อปอัปจะเปิดในแท็บนี้แทน)
@@ -838,7 +835,7 @@
     const canvasJpeg = cv => new Promise(ok => cv.toBlob(b => b.arrayBuffer().then(x => ok(new Uint8Array(x))), 'image/jpeg', 0.85));
     async function importByMark(files, aid, msg) {
         const a = assignments.find(x => x.id == aid);
-        if (!a || !a.course_id) { msg.innerHTML = '<span class="text-red-600">งานนี้ยังไม่ได้ผูกกับรายวิชา จึงจับชื่อนักศึกษาไม่ได้ กด "✏️ แก้ไขงาน" เลือกรายวิชาก่อน หรือใช้โหมดอื่น</span>'; return; }
+        if (!a || !a.course_id) { msg.innerHTML = '<span class="text-red-600">งานนี้ยังไม่ได้ผูกกับรายวิชา จึงจับชื่อนักศึกษาไม่ได้ กด "แก้ไขงาน" เลือกรายวิชาก่อน หรือใช้โหมดอื่น</span>'; return; }
         if (!window.TrinetraMark) { msg.innerHTML = '<span class="text-red-600">ไม่พบไฟล์ trinetra-mark.js บนเซิร์ฟเวอร์</span>'; return; }
         let ros = [], items = [];
         const docs = [];   // PDFLib document ต่อไฟล์ (ใช้คัดลอกหน้า)
@@ -851,7 +848,7 @@
                     docs[fi] = await PDFDocument.load(bytes.slice(), { ignoreEncryption: true });
                     const pdf = await pdfjs.getDocument({ data: bytes.slice() }).promise;
                     for (let p = 1; p <= pdf.numPages; p++) {
-                        msg.innerHTML = `⏳ กำลังอ่านรหัส ${esc(f.name)} หน้า ${p}/${pdf.numPages}...`;
+                        msg.innerHTML = `กำลังอ่านรหัส ${esc(f.name)} หน้า ${p}/${pdf.numPages}...`;
                         const pg = await pdf.getPage(p), vp0 = pg.getViewport({ scale: 1 });
                         const vp = pg.getViewport({ scale: Math.min(2.2, 1400 / Math.min(vp0.width, vp0.height)) });
                         const cv = document.createElement('canvas'); cv.width = Math.round(vp.width); cv.height = Math.round(vp.height);
@@ -860,7 +857,7 @@
                         items.push({ file: f.name, fi, pi: p - 1, label: `${f.name} หน้า ${p}`, code: TrinetraMark.decodeCanvas(cv) });
                     }
                 } else if (/^image\//.test(f.type)) {
-                    msg.innerHTML = `⏳ กำลังอ่านรหัส ${esc(f.name)}...`;
+                    msg.innerHTML = `กำลังอ่านรหัส ${esc(f.name)}...`;
                     const img = new Image(); img.src = URL.createObjectURL(f); await img.decode();
                     const k = Math.min(1, 2400 / Math.max(img.naturalWidth, img.naturalHeight));
                     const cv = document.createElement('canvas'); cv.width = Math.round(img.naturalWidth * k); cv.height = Math.round(img.naturalHeight * k);
@@ -896,14 +893,14 @@
             if (sizeErr) throw new Error(`${sizeErr.fileName}: ไฟล์ใหญ่เกิน 30MB`);
             let ok = 0;
             for (const [i, j] of jobs.entries()) {
-                msg.innerHTML = `⏳ กำลังอัปโหลด ${i + 1}/${jobs.length}: ${esc(j.name)}`;
+                msg.innerHTML = `กำลังอัปโหลด ${i + 1}/${jobs.length}: ${esc(j.name)}`;
                 try { await api('/api/essay/submissions', { body: { assignmentId: aid, fileName: j.fileName, mime: j.mime, dataBase64: j.data, studentId: j.sid, studentName: j.name } }); ok++; }
                 catch (e) { msg.innerHTML += `<div class="text-red-600">${esc(j.name)}: ${esc(e.message)}</div>`; }
             }
             const bad = unknown.length + other.length;
             msg.innerHTML = `<div class="text-emerald-700">✓ อ่านรหัสได้ ${items.length - bad}/${items.length} หน้า · แยกได้ ${groups.size} คน · อัปโหลด ${ok}/${jobs.length} ไฟล์ AI กำลังตรวจ</div>` +
-                (bad ? `<div class="text-amber-700 mt-1">⚠️ ${bad} หน้าอ่านรหัสไม่ได้หรือเป็นของงานอื่น ถูกนำเข้าแยกเป็น "ไม่พบรหัส" ให้กด <b>แก้ชื่อ</b> ในแท็บผลคะแนน</div>` : '') +
-                (jobs.some(j => j.note === 'มีแผ่นซ้ำ') ? '<div class="text-amber-700 mt-1">⚠️ บางคนมีแผ่นเดียวกันสแกนซ้ำ ตรวจไฟล์ของคนนั้นอีกครั้ง</div>' : '');
+                (bad ? `<div class="text-amber-700 mt-1">${bad} หน้าอ่านรหัสไม่ได้หรือเป็นของงานอื่น ถูกนำเข้าแยกเป็น "ไม่พบรหัส" ให้กด <b>แก้ชื่อ</b> ในแท็บผลคะแนน</div>` : '') +
+                (jobs.some(j => j.note === 'มีแผ่นซ้ำ') ? '<div class="text-amber-700 mt-1">บางคนมีแผ่นเดียวกันสแกนซ้ำ ตรวจไฟล์ของคนนั้นอีกครั้ง</div>' : '');
             if (ok) { tab = 'results'; await loadList(aid); setTimeout(() => { if (!bad) closeImport(); }, 1800); }
         } catch (e) { msg.innerHTML = `<span class="text-red-600">${esc(e.message)}</span>`; }
     }
@@ -912,7 +909,7 @@
         const msg = $('#u-msg'); let okN = 0;
         const single = files.length === 1;
         for (const f of files) {
-            msg.innerHTML = `⏳ กำลังอัปโหลด ${esc(f.name)}...`;
+            msg.innerHTML = `กำลังอัปโหลด ${esc(f.name)}...`;
             try {
                 if (f.size > 30 * 1024 * 1024) throw new Error('ไฟล์ใหญ่เกิน 30MB');
                 await api('/api/essay/submissions', { body: {
@@ -977,7 +974,7 @@
         const [label, lv] = simLevel(Number(v) || 0);
         const by = g.teacher_similarity != null ? 'อาจารย์' : g.similarity != null ? 'AI' : '';
         return `<div class="es-sim es-sim-${lv}" id="simbox-${g.id}">
-            <div class="es-sim-h"><span>🎯 ความใกล้เคียงกับเฉลย</span><b><span class="es-sim-v">${v != null ? v : '–'}</span><small>/10</small></b></div>
+            <div class="es-sim-h"><span>ความใกล้เคียงกับเฉลย</span><b><span class="es-sim-v">${v != null ? v : '–'}</span><small>/10</small></b></div>
             <div class="es-sim-bar"><i style="width:${v != null ? v * 10 : 0}%"></i></div>
             <div class="es-sim-f"><span class="es-sim-l">${label}</span>${by ? `<span class="es-sim-by">ประเมินโดย ${by}</span>` : '<span class="es-sim-by">ใส่ API key เพื่อให้ AI ประเมิน หรือให้คะแนนเองด้านล่าง</span>'}</div>
         </div>`;

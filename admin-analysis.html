@@ -4,8 +4,8 @@
     <script src="auth-client.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>รายงานปัญหาจากนักศึกษา - ตรีเนตร e-Exam</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
+    <title>รายงานปัญหาจากนักศึกษา - ExamPro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         html { font-size: 100%; -webkit-text-size-adjust: 100%; }
 
@@ -23,7 +23,7 @@
 
         * { box-sizing: border-box; }
         body {
-            font-family: 'Kanit', 'Inter', sans-serif;
+            font-family: 'Noto Sans Thai Looped', sans-serif;
             background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #eef4ff 100%);
             background-attachment: fixed;
             color: #334155;
@@ -42,7 +42,7 @@
             flex-shrink: 0;
             transition: width 0.25s ease-in-out;
             box-shadow: 2px 0 12px rgba(15, 23, 42, 0.03);
-            font-family: 'Kanit', sans-serif;
+            font-family: 'Noto Sans Thai Looped', sans-serif;
         }
         #sidebar::before {
             content: '';
@@ -85,7 +85,7 @@
             letter-spacing: 0.04em;
             color: #475569;
             text-transform: uppercase;
-            font-family: 'Kanit', sans-serif;
+            font-family: 'Noto Sans Thai Looped', sans-serif;
         }
         .nav-link {
             display: flex; align-items: center; gap: 12px;
@@ -94,7 +94,7 @@
             color: #1e293b; text-decoration: none;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1.5px solid transparent;
-            font-family: 'Kanit', sans-serif;
+            font-family: 'Noto Sans Thai Looped', sans-serif;
         }
         .nav-link svg {
             width: 24px;
@@ -152,7 +152,7 @@
             color: #1e293b; border-radius: 12px;
             padding: 8px 14px; font-size: 13px;
             font-weight: 600;
-            font-family: 'Kanit', sans-serif;
+            font-family: 'Noto Sans Thai Looped', sans-serif;
             outline: none; width: 100%; transition: all 0.2s ease;
             box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
             cursor: pointer;
@@ -183,16 +183,13 @@
     <div class="fixed w-[550px] h-[550px] bg-pink-500/4 blur-[130px] rounded-full -bottom-20 -right-20 pointer-events-none"></div>
     <div class="fixed inset-0 bg-[radial-gradient(ellipse_at_center,rgba(47,107,236,0.02)_0%,transparent_70%)] pointer-events-none"></div>
 
-    <!-- 📊 Left Sidebar Navigation -->
+    <!-- Left Sidebar Navigation -->
     <aside id="sidebar">
     <div class="sidebar-inner p-4 sm:p-5 space-y-4 flex-1 overflow-y-auto">
         <!-- Logo Header -->
         <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
-            <div class="logo-shield bg-white p-1.5 border border-slate-200 shadow-sm rounded-xl flex items-center justify-center">
-                <img src="trinetra-logo.svg" alt="ตรีเนตร e-Exam" class="w-8 h-8 object-cover rounded-lg" />
-            </div>
             <div class="logo-text leading-tight">
-                <div class="font-bold text-lg tracking-tight text-slate-900">ตรีเนตร <span class="logo-gradient">e-Exam</span></div>
+                <div class="font-bold text-lg tracking-tight text-slate-900">Exam<span class="logo-gradient">Pro</span></div>
                 <div class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">ตาที่ 3 ของอาจารย์</div>
             </div>
         </div>
@@ -284,14 +281,14 @@
                 </div>
             </div>
         </div>
-        <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-red-200 transition-colors">
+        <a href="login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-red-200 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H2.25" /></svg>
             <span class="logout-btn-text">ออกจากระบบ</span>
         </a>
     </div>
 </aside>
 
-    <!-- 💻 Main Display Area -->
+    <!-- Main Display Area -->
     <div id="main-area">
         
         <!-- Header -->
@@ -299,7 +296,7 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
                 <div class="header-card flex items-center gap-3">
                     <a href="dashboard.html" class="md:hidden text-xs text-slate-500 hover:text-slate-800 font-bold">&larr; กลับ</a>
-                    <h1 class="text-base md:text-lg font-bold text-slate-900">🚨 รายงานปัญหาและข้อเสนอแนะจากนักศึกษา</h1>
+                    <h1 class="text-base md:text-lg font-bold text-slate-900">รายงานปัญหาและข้อเสนอแนะจากนักศึกษา</h1>
                 </div>
 
                 <!-- Room Selector Dropdown Frame -->
@@ -311,7 +308,7 @@
                     </select>
                     <button onclick="fetchReports()" 
                         class="bg-gradient-to-r from-cyan-500 to-indigo-500 hover:from-cyan-600 hover:to-indigo-600 text-white px-3.5 py-2 rounded-xl font-bold text-xs transition active:scale-95 shadow-sm whitespace-nowrap">
-                        🔄 รีเฟรช
+                        รีเฟรช
                     </button>
                 </div>
             </div>
@@ -322,7 +319,7 @@
             
             <!-- Analysis Summary Banner -->
             <div class="glass-card p-6 shadow-2xl flex items-start gap-4">
-                <span class="text-3xl p-3.5 bg-rose-500/10 border border-rose-500/20 text-rose-450 rounded-2xl shrink-0">📢</span>
+                <span class="text-3xl p-3.5 bg-rose-500/10 border border-rose-500/20 text-rose-450 rounded-2xl shrink-0"></span>
                 <div class="space-y-1">
                     <h3 class="text-slate-800 font-semibold text-base">ศูนย์แจ้งรายงานปัญหาหลังการทำข้อสอบ</h3>
                     <p class="text-slate-500 text-xs leading-relaxed">
@@ -334,21 +331,21 @@
             <!-- Stats Tiles -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 <div class="bg-white border border-slate-200 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-                    <span class="text-2xl p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-450">🚨</span>
+                    <span class="text-2xl p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-450"></span>
                     <div>
                         <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">เรื่องร้องเรียนทั้งหมด</div>
                         <div class="text-sm font-semibold text-rose-600 mt-0.5" id="stats-total">0 รายงาน</div>
                     </div>
                 </div>
                 <div class="bg-white border border-slate-200 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-                    <span class="text-2xl p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-450">⏳</span>
+                    <span class="text-2xl p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-450"></span>
                     <div>
                         <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">รอดำเนินการคัดกรอง</div>
                         <div class="text-sm font-semibold text-amber-600 mt-0.5" id="stats-pending">0 รายงาน</div>
                     </div>
                 </div>
                 <div class="bg-white border border-slate-200 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-                    <span class="text-2xl p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-450">🟢</span>
+                    <span class="text-2xl p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-450"></span>
                     <div>
                         <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">สถานะกล่องรับเรื่อง</div>
                         <div class="text-sm font-semibold text-emerald-600 mt-0.5">เชื่อมต่อระบบแล้ว</div>
@@ -359,13 +356,13 @@
             <!-- Analysis List Container -->
             <div class="glass-card p-6 shadow-2xl space-y-6">
                 <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    📋 ประวัติรายการร้องเรียนปัญหาจากนักศึกษา
+                    ประวัติรายการร้องเรียนปัญหาจากนักศึกษา
                 </h4>
                 
                 <!-- Reports List Container -->
                 <div id="reports-container" class="space-y-6 divide-y divide-white/5 max-h-[600px] overflow-y-auto pr-2">
                     <div class="text-center py-16 text-slate-450 font-semibold select-none">
-                        📭 ยังไม่มีการรายงานข้อผิดพลาดใดๆ จากนักศึกษาในขณะนี้
+                        ยังไม่มีการรายงานข้อผิดพลาดใดๆ จากนักศึกษาในขณะนี้
                     </div>
                 </div>
             </div>
@@ -374,7 +371,7 @@
 
         <!-- Footer -->
         <footer class="border-t border-slate-200 py-5 text-center text-slate-500 text-[10px]">
-            <p>&copy; 2026 ระบบรับแจ้งปัญหาการสอบ ตรีเนตร e-Exam. สงวนลิขสิทธิ์ทั้งหมด.</p>
+            <p>&copy; 2026 ระบบรับแจ้งปัญหาการสอบ ExamPro. สงวนลิขสิทธิ์ทั้งหมด.</p>
         </footer>
     </div>
 
@@ -438,7 +435,7 @@
                 if (data.length === 0) {
                     container.innerHTML = `
                         <div class="text-center py-16 text-slate-450 font-semibold select-none">
-                            📭 ยังไม่มีการรายงานข้อผิดพลาดใดๆ จากนักศึกษาในขณะนี้
+                            ยังไม่มีการรายงานข้อผิดพลาดใดๆ จากนักศึกษาในขณะนี้
                         </div>`;
                     return;
                 }
@@ -462,16 +459,16 @@
                                     | ชั้นเรียน: <strong class="text-cyan-600 font-bold">${escapeHtml(item.class || '-')}</strong>
                                 </div>
                                 <div class="p-4 bg-rose-50 border border-rose-100 rounded-2xl text-xs text-rose-800 leading-relaxed shadow-sm">
-                                    📢 "${escapeHtml(item.issue)}"
+                                    "${escapeHtml(item.issue)}"
                                 </div>
                                 <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-2">
-                                    🕒 วันเวลาที่แจ้ง: ${item.time} | ${cleanDate}
+                                    วันเวลาที่แจ้ง: ${item.time} | ${cleanDate}
                                 </div>
                             </div>
                             <div class="shrink-0 pt-2 md:pt-0">
                                 <button onclick="deleteReport(${item.id}, '${escapeHtml(item.studentId)}')"
                                     class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm active:scale-[0.98]">
-                                    🗑️ ลบออก
+                                    ลบออก
                                 </button>
                             </div>
                         </div>
@@ -480,13 +477,13 @@
 
             } catch (err) {
                 console.error(err);
-                container.innerHTML = '<div class="text-center py-16 text-rose-500 font-bold">❌ เกิดข้อผิดพลาดในการดึงข้อมูลรายงาน</div>';
+                container.innerHTML = '<div class="text-center py-16 text-rose-500 font-bold">เกิดข้อผิดพลาดในการดึงข้อมูลรายงาน</div>';
             }
         }
 
         // ลบข้อความการแจ้งเตือน
         async function deleteReport(id, studentId) {
-            if (!confirm(`⚠️ ยืนยันการลบการแจ้งเรื่องปัญหานี้ออกจากระบบใช่หรือไม่?\n(กรุณาแก้ไขปัญหาในคลังข้อสอบก่อนกดตกลง)`)) return;
+            if (!confirm(`ยืนยันการลบการแจ้งเรื่องปัญหานี้ออกจากระบบใช่หรือไม่?\n(กรุณาแก้ไขปัญหาในคลังข้อสอบก่อนกดตกลง)`)) return;
 
             try {
                 const response = await fetch('/api/delete-student-report', {

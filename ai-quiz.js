@@ -1,5 +1,5 @@
 // =====================================================================
-// 🤖 สร้าง / แปลงข้อสอบปรนัยด้วย Claude (ai-quiz.js)
+// สร้าง / แปลงข้อสอบปรนัยด้วย Claude (ai-quiz.js)
 // - POST /api/generate-ai-quiz  { topic, difficulty, numQuestions, choices, fileBase64?, mime?, sourceText? }
 //   ถ้าใส่ไฟล์ (PDF/ภาพ) หรือข้อความ จะ "แปลง" ข้อสอบที่มีอยู่ หรือออกข้อสอบจากเนื้อหานั้น
 //   ถ้าไม่มี ANTHROPIC_API_KEY จะส่งต่อให้คลังข้อสอบจำลองเดิมใน server.js
@@ -67,10 +67,10 @@ module.exports = function registerAiQuiz(app) {
                     return { question: String(q.question), choices, answer: ans };
                 });
             if (!questions.length) throw new Error('AI ไม่ได้สร้างข้อสอบที่ใช้ได้');
-            console.log(`🤖 Claude สร้างข้อสอบ ${questions.length} ข้อ`);
+            console.log(`Claude สร้างข้อสอบ ${questions.length} ข้อ`);
             res.json({ success: true, source: 'claude', questions, usage: body.usage || null });
         } catch (e) {
-            console.error('❌ AI Quiz:', e.message);
+            console.error('AI Quiz:', e.message);
             res.status(500).json({ success: false, message: e.message });
         }
     });

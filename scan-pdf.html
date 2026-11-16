@@ -3,16 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="icon" type="image/png" href="trinetra-icon.png">
-<title>ตรีเนตร e-Exam · สแกน PDF เป็นข้อความ (Demo)</title>
+<title>ExamPro · สแกน PDF เป็นข้อความ (Demo)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--navy:#0d3b8e;--navy2:#082a6b;--gold:#f6b818;--gold2:#ffcf4a;--ink:#0f1b33;--mute:#5b6781;--line:#dfe5f0;--bg:#f3f6fb;--card:#fff;--ok:#16a34a;--warn:#d97706;--err:#dc2626}
 *{box-sizing:border-box}
 html,body{margin:0}
-body{font-family:Prompt,"Leelawadee UI",Tahoma,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.55}
-h1,h2,h3{font-family:Kanit,Prompt,sans-serif;margin:0}
+body{font-family:'Noto Sans Thai Looped', "Leelawadee UI",Tahoma,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.55}
+h1,h2,h3{font-family:'Noto Sans Thai Looped', sans-serif;margin:0}
 button,input,select,textarea{font:inherit;color:inherit}
 svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
 
@@ -21,7 +20,7 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .top::after{content:"";position:absolute;right:-90px;top:-120px;width:340px;height:340px;border-radius:50%;background:var(--gold);opacity:.18}
 .bar{max-width:1240px;margin:0 auto;padding:16px 20px;display:flex;align-items:center;gap:14px;position:relative;z-index:1}
 .logo{width:46px;height:48px;object-fit:contain;background:#fff;border-radius:12px;padding:4px}
-.brand b{font-family:Kanit,sans-serif;font-size:24px;letter-spacing:.3px;display:block;line-height:1.1}
+.brand b{font-family:'Noto Sans Thai Looped', sans-serif;font-size:24px;letter-spacing:.3px;display:block;line-height:1.1}
 .brand small{opacity:.8;font-size:13px}
 .tag{margin-left:auto;background:var(--gold);color:var(--navy2);font-weight:600;font-size:13px;padding:6px 12px;border-radius:999px;white-space:nowrap}
 .hero{max-width:1240px;margin:0 auto;padding:8px 20px 30px;position:relative;z-index:1}
@@ -94,7 +93,7 @@ main{max-width:1240px;margin:-14px auto 40px;padding:0 20px;position:relative;z-
 .pages{display:grid;gap:16px;padding:20px}
 .pg{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff}
 .pg .ph{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f7f9fd;border-bottom:1px solid var(--line);flex-wrap:wrap}
-.pg .ph b{font-family:Kanit,sans-serif;font-size:15.5px;color:var(--navy)}
+.pg .ph b{font-family:'Noto Sans Thai Looped', sans-serif;font-size:15.5px;color:var(--navy)}
 .st{font-size:12.5px;font-weight:600;border-radius:999px;padding:2px 10px;background:#eef2fa;color:var(--mute)}
 .st.run{background:#dbeafe;color:#1d4ed8}
 .st.done{background:#dcfce7;color:#166534}
@@ -104,7 +103,7 @@ main{max-width:1240px;margin:-14px auto 40px;padding:0 20px;position:relative;z-
 .pg .img{background:#eef1f7;padding:12px;display:flex;align-items:flex-start;justify-content:center;border-right:1px solid var(--line);max-height:560px;overflow:auto}
 .pg .img canvas{max-width:100%;height:auto;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.12);border-radius:4px;cursor:zoom-in}
 .pg .txt{display:flex;flex-direction:column}
-.pg textarea{flex:1;min-height:300px;border:0;resize:vertical;padding:14px 16px;font-size:15.5px;line-height:1.75;font-family:Sarabun,Prompt,"Leelawadee UI",Tahoma,sans-serif;background:#fff}
+.pg textarea{flex:1;min-height:300px;border:0;resize:vertical;padding:14px 16px;font-size:15.5px;line-height:1.75;font-family:'Noto Sans Thai Looped', "Leelawadee UI",Tahoma,sans-serif;background:#fff}
 .pg .meta{font-size:12.5px;color:var(--mute);padding:8px 16px;border-top:1px solid var(--line);display:flex;gap:14px;flex-wrap:wrap}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--navy2);color:#fff;padding:10px 18px;border-radius:12px;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:50;max-width:calc(100% - 32px)}
 .toast.show{opacity:1;transform:translateX(-50%)}
@@ -142,12 +141,11 @@ footer{text-align:center;color:var(--mute);font-size:13px;padding:0 20px 30px}
 
 <header class="top">
   <div class="bar">
-    <img class="logo" alt="ตรีเนตร e-Exam" src="trinetra-logo.svg" style="padding:0;background:none">
-    <div class="brand"><b>ตรีเนตร e-Exam</b><small>ตาที่ 3 ของอาจารย์</small></div>
+    <div class="brand"><b>ExamPro</b><small>ตาที่ 3 ของอาจารย์</small></div>
     <a class="tag" href="index.html" style="text-decoration:none">← กลับหน้าแรก</a>
   </div>
   <div class="hero">
-    <h1>นำเข้า PDF กระดาษคำตอบ แล้ว<em>ให้ตรีเนตรอ่าน</em>ออกมาเป็นข้อความ</h1>
+    <h1>นำเข้า PDF กระดาษคำตอบ แล้ว<em>ให้ ExamPro อ่าน</em>ออกมาเป็นข้อความ</h1>
     <p>ทำงานในเบราว์เซอร์ทั้งหมด ไฟล์ไม่ถูกอัปโหลดไปที่ไหน ยกเว้นเมื่อเลือกโหมด Claude AI ภาพแต่ละหน้าจะถูกส่งไปให้ AI อ่าน</p>
   </div>
 </header>
@@ -216,7 +214,7 @@ footer{text-align:center;color:var(--mute);font-size:13px;padding:0 20px 30px}
     <div class="pages" id="pages"></div>
   </section>
 </main>
-<footer>© 2026 ตรีเนตร e-Exam · ทีม TEC Hope — เวอร์ชันทดลอง</footer>
+<footer>© 2026 ExamPro · ทีม TEC Hope — เวอร์ชันทดลอง</footer>
 <div class="toast" id="toast"></div>
 <div class="zoom" id="zoom"><img alt=""></div>
 

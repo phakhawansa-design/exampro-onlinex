@@ -4,8 +4,8 @@
     <script src="auth-client.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>คลังข้อสอบ - ตรีเนตร e-Exam</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
+    <title>คลังข้อสอบ - ExamPro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         html { font-size: 100%; -webkit-text-size-adjust: 100%; }
 
@@ -24,7 +24,7 @@
         * { box-sizing: border-box; }
         * { box-sizing: border-box; }
         body {
-            font-family: 'Kanit', sans-serif;
+            font-family: 'Noto Sans Thai Looped', sans-serif;
             background-color: #f8fafc;
             color: #1e293b;
         }
@@ -123,7 +123,7 @@
             color: #1e293b; border-radius: 12px;
             padding: 8px 14px; font-size: 13px;
             font-weight: 600;
-            font-family: 'Kanit', sans-serif;
+            font-family: 'Noto Sans Thai Looped', sans-serif;
             outline: none; width: 100%; transition: all 0.2s ease;
             box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
             cursor: pointer;
@@ -145,13 +145,10 @@
 <!-- ===== SIDEBAR ===== -->
 <aside id="sidebar">
     <div class="sidebar-inner p-4 space-y-4 flex-1 overflow-y-auto">
-        <!-- Logo Header (ตรีเนตร e-Exam) -->
+        <!-- Logo Header (ExamPro) -->
         <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
-            <div class="w-10 h-12 bg-white rounded-lg p-1 border border-slate-200 flex items-center justify-center shrink-0 shadow-xs">
-                <img src="trinetra-logo.svg" alt="ตรีเนตร e-Exam" class="w-full h-full object-contain" />
-            </div>
             <div class="leading-tight">
-                <div class="font-bold text-base tracking-tight text-slate-900">ตรีเนตร <span class="text-blue-700 font-extrabold">e-Exam</span></div>
+                <div class="font-bold text-base tracking-tight text-slate-900">Exam<span class="text-blue-700 font-extrabold">Pro</span></div>
                 <div class="text-[10px] text-amber-700 font-bold uppercase tracking-wider">ตาที่ 3 ของอาจารย์</div>
             </div>
         </div>
@@ -240,14 +237,14 @@
                 </div>
             </div>
         </div>
-        <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2 px-3 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 border border-slate-200 hover:border-rose-200 transition">
+        <a href="login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2 px-3 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 border border-slate-200 hover:border-rose-200 transition">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H2.25" /></svg>
             <span>ออกจากระบบ</span>
         </a>
     </div>
 </aside>
 
-    <!-- 💻 Main Display Area -->
+    <!-- Main Display Area -->
     <div id="main-area">
         
         <!-- Header -->
@@ -258,16 +255,16 @@
                 </button>
                 <div>
                     <h1 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight">4. คลังข้อสอบ</h1>
-                    <p class="text-xs text-slate-500 font-medium">ตรีเนตร e-Exam &middot; ประจำภาคการศึกษาปัจจุบัน</p>
+                    <p class="text-xs text-slate-500 font-medium">ExamPro &middot; ประจำภาคการศึกษาปัจจุบัน</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
                 <button onclick="window.TabLockGuide.open('library')" class="flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition shadow-xs cursor-pointer">
-                    <span>💡</span>
+                    <span></span>
                     <span class="hidden sm:inline">คู่มือการใช้งาน</span>
                 </button>
                 <a href="admin-questions.html" class="flex items-center gap-2 px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-xl text-xs sm:text-sm font-bold shadow-xs transition active:scale-95 cursor-pointer">
-                    <span>➕</span>
+                    <span></span>
                     <span>สร้างข้อสอบใหม่</span>
                 </a>
             </div>
@@ -279,7 +276,7 @@
             <!-- Library Header Control panel -->
             <div class="glass-card p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white">
                 <div class="space-y-1">
-                    <h2 class="text-lg md:text-xl font-bold text-slate-800">📚 คลังข้อสอบวิชาการ</h2>
+                    <h2 class="text-lg md:text-xl font-bold text-slate-800">คลังข้อสอบวิชาการ</h2>
                     <p class="text-xs md:text-sm text-slate-600 font-medium leading-relaxed">ชุดข้อสอบทั้งหมดที่สร้างหรือนำเข้าในระบบจะถูกจัดเก็บรวบรวมไว้ที่นี่ สามารถนำไปใช้งานกับห้องสอบต่างๆ หรือแก้ไขโจทย์ได้ตลอดเวลา</p>
                 </div>
             </div>
@@ -292,17 +289,17 @@
         <!-- Footer -->
         <footer class="border-t border-slate-200 bg-white py-3.5 px-8 text-center">
             <p class="text-xs text-slate-500 font-medium">
-                &copy; 2026 ตรีเนตร e-Exam &middot; ตาที่ 3 ของอาจารย์ &middot; ทีม TEC Hope
+                &copy; 2026 ExamPro &middot; ตาที่ 3 ของอาจารย์ &middot; ทีม TEC Hope
             </p>
         </footer>
     </div>
 
-    <!-- ✏️ Modal แก้ไขข้อสอบในคลังข้อสอบ -->
+    <!-- Modal แก้ไขข้อสอบในคลังข้อสอบ -->
     <div id="edit-template-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4 select-none">
         <div class="w-full max-w-4xl bg-white border border-slate-200 p-8 rounded-3xl shadow-2xl space-y-6 text-slate-800 flex flex-col max-h-[90vh]">
             <div class="flex justify-between items-center border-b border-slate-100 pb-4">
                 <div class="flex items-center gap-2">
-                    <span class="text-2xl">✏️</span>
+                    <span class="text-2xl"></span>
                     <div>
                         <h3 class="text-base font-semibold text-slate-850">แก้ไขชุดข้อสอบในคลังข้อสอบ</h3>
                         <p class="text-[10px] text-slate-500 font-semibold mt-0.5">คุณกำลังทำการแก้ไขรายละเอียดโจทย์ ตัวเลือก และเฉลยภายในคลังข้อสอบโดยตรง</p>
@@ -327,7 +324,7 @@
                     ยกเลิก
                 </button>
                 <button onclick="saveTemplateEdits()" class="px-5 py-2.5 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white text-xs font-bold rounded-xl transition duration-200 shadow-md">
-                    💾 บันทึกการเปลี่ยนแปลงในคลัง
+                    บันทึกการเปลี่ยนแปลงในคลัง
                 </button>
             </div>
         </div>
@@ -361,7 +358,7 @@
                 if (templates.length === 0) {
                     listContainer.innerHTML = `
                         <div class="col-span-full text-center py-12 text-slate-400 border-2 border-dashed border-slate-200 rounded-3xl bg-slate-50/50 shadow-inner">
-                            📭 ยังไม่มีข้อสอบบันทึกอยู่ในคลังข้อสอบของคุณ<br>
+                            ยังไม่มีข้อสอบบันทึกอยู่ในคลังข้อสอบของคุณ<br>
                             <span class="text-[10px] text-slate-500 font-medium mt-1.5 block">เมื่อคุณสร้างหรือนำเข้าข้อสอบในวิชาใดก็ตาม ระบบจะจัดเก็บข้อมูลลงคลังนี้ให้โดยอัตโนมัติ</span>
                         </div>`;
                     return;
@@ -369,7 +366,7 @@
 
                 listContainer.innerHTML = templates.map(t => {
                     const ownerBadge = (username === 'admin' && t.teacherUsername)
-                        ? `<span class="bg-violet-50 border border-violet-200 text-violet-700 font-bold text-xs px-3 py-1 rounded-xl">👤 ${t.teacherUsername}</span>`
+                        ? `<span class="bg-violet-50 border border-violet-200 text-violet-700 font-bold text-xs px-3 py-1 rounded-xl">${t.teacherUsername}</span>`
                         : '';
                     return `
                         <div class="bg-white border-2 border-slate-200 hover:border-indigo-400 rounded-3xl p-6 md:p-7 shadow-sm space-y-4 hover:shadow-md transition-all duration-300 flex flex-col justify-between" id="tpl-card-${t.id}">
@@ -383,22 +380,22 @@
                                         ${ownerBadge}
                                     </div>
                                 </div>
-                                <p class="text-xs md:text-sm text-slate-500 font-semibold">📅 อัปเดตล่าสุด: ${t.created_at}</p>
+                                <p class="text-xs md:text-sm text-slate-500 font-semibold">อัปเดตล่าสุด: ${t.created_at}</p>
                             </div>
 
                             <!-- ปุ่มสั่งการ -->
                             <div class="flex flex-wrap gap-2.5 pt-3 border-t border-slate-100">
                                 <button onclick="openEditTemplateModal(${t.id}, '${escapeHtml(t.templateName)}')"
                                     class="flex-1 min-w-[130px] bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white font-semibold py-2.5 px-4 rounded-xl text-xs md:text-sm transition duration-200 active:scale-95 shadow-md shadow-cyan-600/10 cursor-pointer">
-                                    ✏️ แก้ไขข้อสอบในคลัง
+                                    แก้ไขข้อสอบในคลัง
                                 </button>
                                 <button onclick="togglePreviewTemplate(${t.id}, this)"
                                     class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold px-4 py-2.5 rounded-xl text-xs md:text-sm transition duration-200 active:scale-95 cursor-pointer">
-                                    👁️ ดูข้อสอบ
+                                    ดูข้อสอบ
                                 </button>
                                 <button onclick="deleteLibraryTemplate(${t.id})"
                                     class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold px-4 py-2.5 rounded-xl text-xs md:text-sm transition duration-200 active:scale-95 cursor-pointer">
-                                    🗑️ ลบ
+                                    ลบ
                                 </button>
                             </div>
 
@@ -423,12 +420,12 @@
 
             if (!previewBox.classList.contains('hidden')) {
                 previewBox.classList.add('hidden');
-                btn.textContent = '👁️ ดูข้อสอบ';
+                btn.textContent = 'ดูข้อสอบ';
                 return;
             }
 
             previewBox.classList.remove('hidden');
-            btn.textContent = '🙈 ซ่อนข้อสอบ';
+            btn.textContent = 'ซ่อนข้อสอบ';
             previewBox.innerHTML = '<div class="text-[10px] text-slate-400 font-bold animate-pulse">กำลังโหลดตัวอย่างข้อสอบ...</div>';
 
             try {
@@ -476,7 +473,7 @@
         }
 
         // ==========================================
-        // ✏️ ระบบแก้ไขข้อสอบในคลังสะสม
+        // ระบบแก้ไขข้อสอบในคลังสะสม
         // ==========================================
         let currentEditTemplateId = null;
         let loadedQuestionsCount = 0;
@@ -537,7 +534,7 @@
                                 </div>
                                 ${q.question_img ? `
                                     <div class="flex items-center gap-2">
-                                        <span class="text-[9px] text-slate-450 font-bold">🖼️ ภาพโจทย์:</span>
+                                        <span class="text-[9px] text-slate-450 font-bold">ภาพโจทย์:</span>
                                         <img src="${q.question_img}" class="h-10 rounded border border-slate-200 object-contain">
                                     </div>
                                 ` : ''}
@@ -566,7 +563,7 @@
 
             const templateName = document.getElementById('edit-modal-template-name').value.trim();
             if (!templateName) {
-                alert("⚠️ กรุณากรอกชื่อชุดข้อสอบด้วยครับ");
+                alert("กรุณากรอกชื่อชุดข้อสอบด้วยครับ");
                 return;
             }
 
@@ -588,7 +585,7 @@
                 });
 
                 if (!questionText) {
-                    alert(`⚠️ กรุณากรอกโจทย์คำถามในข้อที่ ${idx + 1}`);
+                    alert(`กรุณากรอกโจทย์คำถามในข้อที่ ${idx + 1}`);
                     return;
                 }
                 questions.push(q);
@@ -606,22 +603,22 @@
                 });
 
                 if (res.ok) {
-                    alert("💾 บันทึกการแก้ไขข้อสอบในคลังเรียบร้อยแล้ว!");
+                    alert("บันทึกการแก้ไขข้อสอบในคลังเรียบร้อยแล้ว!");
                     closeEditTemplateModal();
                     loadLibraryTemplates();
                 } else {
                     const errData = await res.json();
-                    alert("❌ บันทึกไม่สำเร็จ: " + errData.message);
+                    alert("บันทึกไม่สำเร็จ: " + errData.message);
                 }
             } catch (err) {
                 console.error(err);
-                alert("❌ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
             }
         }
 
         // ลบเทมเพลตออกจากคลัง
         async function deleteLibraryTemplate(templateId) {
-            const confirmDel = confirm("⚠️ คุณยืนยันที่จะลบชุดข้อสอบนี้ออกจากคลังข้อสอบส่วนตัวของคุณอย่างถาวรใช่หรือไม่?");
+            const confirmDel = confirm("คุณยืนยันที่จะลบชุดข้อสอบนี้ออกจากคลังข้อสอบส่วนตัวของคุณอย่างถาวรใช่หรือไม่?");
             if (!confirmDel) return;
 
             try {
@@ -631,11 +628,11 @@
                     body: JSON.stringify({ templateId })
                 });
                 if (res.ok) {
-                    alert("🗑️ ลบชุดข้อสอบออกจากคลังสำเร็จแล้ว");
+                    alert("ลบชุดข้อสอบออกจากคลังสำเร็จแล้ว");
                     loadLibraryTemplates();
                 } else {
                     const errData = await res.json();
-                    alert("❌ ไม่สามารถลบได้: " + errData.message);
+                    alert("ไม่สามารถลบได้: " + errData.message);
                 }
             } catch(err) {
                 console.error(err);

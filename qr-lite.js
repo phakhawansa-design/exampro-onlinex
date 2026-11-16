@@ -1,4 +1,4 @@
-/* ตรีเนตร e-Exam · ตัวสร้าง QR Code ในเว็บ (ไม่ส่งลิงก์ห้องสอบไปเว็บภายนอก)
+/* ExamPro · ตัวสร้าง QR Code ในเว็บ (ไม่ส่งลิงก์ห้องสอบไปเว็บภายนอก)
  * รองรับโหมด byte (UTF-8) ระดับแก้ผิด L/M/Q/H รุ่น 1–40 ตามมาตรฐาน ISO/IEC 18004
  * ใช้งาน: TrinetraQR.svgDataUrl(text, { size: 250, ecl: 'M' }) หรือ TrinetraQR.matrix(text)
  */

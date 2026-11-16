@@ -4,9 +4,9 @@
     <script src="auth-client.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>การใช้พื้นที่จัดเก็บข้อมูล - ตรีเนตร e-Exam</title>
-    <meta name="description" content="ภาพรวมการใช้พื้นที่จัดเก็บข้อมูลของอาจารย์แต่ละท่านในระบบ ตรีเนตร e-Exam">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
+    <title>การใช้พื้นที่จัดเก็บข้อมูล - ExamPro</title>
+    <meta name="description" content="ภาพรวมการใช้พื้นที่จัดเก็บข้อมูลของอาจารย์แต่ละท่านในระบบ ExamPro">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         html { font-size: 100%; -webkit-text-size-adjust: 100%; }
 
@@ -23,7 +23,7 @@
         }
 
         * { box-sizing: border-box; }
-        body { font-family: 'Kanit', 'Inter', sans-serif; background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #eef4ff 100%); background-attachment: fixed; color: #334155; }
+        body { font-family: 'Noto Sans Thai Looped', sans-serif; background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #eef4ff 100%); background-attachment: fixed; color: #334155; }
         /* ===== SIDEBAR (STANDARDIZED UX/UI FOR TEACHERS - REGULAR WEIGHT) ===== */
         #sidebar {
             background: #ffffff;
@@ -38,7 +38,7 @@
             flex-shrink: 0;
             transition: width 0.25s ease-in-out;
             box-shadow: 2px 0 12px rgba(15, 23, 42, 0.03);
-            font-family: 'Kanit', sans-serif;
+            font-family: 'Noto Sans Thai Looped', sans-serif;
         }
         #sidebar::before {
             content: '';
@@ -81,7 +81,7 @@
             letter-spacing: 0.04em;
             color: #475569;
             text-transform: uppercase;
-            font-family: 'Kanit', sans-serif;
+            font-family: 'Noto Sans Thai Looped', sans-serif;
         }
         .nav-link {
             display: flex; align-items: center; gap: 12px;
@@ -90,7 +90,7 @@
             color: #1e293b; text-decoration: none;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1.5px solid transparent;
-            font-family: 'Kanit', sans-serif;
+            font-family: 'Noto Sans Thai Looped', sans-serif;
         }
         .nav-link svg {
             width: 24px;
@@ -157,11 +157,8 @@
     <div class="sidebar-inner p-4 sm:p-5 space-y-4 flex-1 overflow-y-auto">
         <!-- Logo Header -->
         <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
-            <div class="logo-shield bg-white p-1.5 border border-slate-200 shadow-sm rounded-xl flex items-center justify-center">
-                <img src="trinetra-logo.svg" alt="ตรีเนตร e-Exam" class="w-8 h-8 object-cover rounded-lg" />
-            </div>
             <div class="logo-text leading-tight">
-                <div class="font-bold text-lg tracking-tight text-slate-900">ตรีเนตร <span class="logo-gradient">e-Exam</span></div>
+                <div class="font-bold text-lg tracking-tight text-slate-900">Exam<span class="logo-gradient">Pro</span></div>
                 <div class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">ตาที่ 3 ของอาจารย์</div>
             </div>
         </div>
@@ -253,7 +250,7 @@
                 </div>
             </div>
         </div>
-        <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-red-200 transition-colors">
+        <a href="login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-red-200 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H2.25" /></svg>
             <span class="logout-btn-text">ออกจากระบบ</span>
         </a>
@@ -264,7 +261,7 @@
 <div id="main-area">
     <header id="top-header">
         <div class="flex justify-between items-center w-full">
-            <h1 class="text-xl md:text-2xl font-bold text-slate-900">🗄️ การใช้พื้นที่จัดเก็บข้อมูล (Storage Overview)</h1>
+            <h1 class="text-xl md:text-2xl font-bold text-slate-900">การใช้พื้นที่จัดเก็บข้อมูล (Storage Overview)</h1>
             <div class="flex items-center gap-3">
                 <button id="refresh-btn" onclick="loadStorageStats()"
                     class="flex items-center gap-1.5 text-xs md:text-sm font-semibold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 hover:border-slate-300 px-3.5 py-2 rounded-xl transition-all">
@@ -272,7 +269,7 @@
                     รีเฟรช
                 </button>
                 <a href="dashboard.html" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500 via-rose-500 to-sky-500 hover:from-pink-600 hover:to-sky-600 text-white font-black rounded-2xl text-xs sm:text-sm transition-all duration-200 shadow-md shadow-pink-500/25 active:scale-95 border border-white/20">
-                    <span>🏠</span>
+                    <span></span>
                     <span>กลับแดชบอร์ดหลัก</span>
                 </a>
             </div>
@@ -312,7 +309,7 @@
 
         <!-- Empty State -->
         <div id="empty-state" class="glass-card p-10 flex-col items-center justify-center gap-4 hidden">
-            <div class="text-5xl">🗄️</div>
+            <div class="text-5xl"></div>
             <p class="text-sm font-semibold text-slate-500">ยังไม่มีข้อมูลอาจารย์ในระบบ</p>
         </div>
 
@@ -361,9 +358,9 @@
     }
 
     function getRankBadge(rank) {
-        if (rank === 1) return { bg: 'bg-yellow-100', text: 'text-yellow-700', icon: '🥇' };
-        if (rank === 2) return { bg: 'bg-slate-100', text: 'text-slate-600', icon: '🥈' };
-        if (rank === 3) return { bg: 'bg-orange-100', text: 'text-orange-600', icon: '🥉' };
+        if (rank === 1) return { bg: 'bg-yellow-100', text: 'text-yellow-700', icon: '' };
+        if (rank === 2) return { bg: 'bg-slate-100', text: 'text-slate-600', icon: '' };
+        if (rank === 3) return { bg: 'bg-orange-100', text: 'text-orange-600', icon: '' };
         return { bg: 'bg-slate-50', text: 'text-slate-500', icon: rank };
     }
 
@@ -410,7 +407,7 @@
                 const createdDate = t.created_at ? new Date(t.created_at).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
                 const statusBadge = t.status === 'approved'
                     ? '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded-full">✓ อนุมัติแล้ว</span>'
-                    : '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full">⏳ รอการอนุมัติ</span>';
+                    : '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full">รอการอนุมัติ</span>';
 
                 const card = document.createElement('div');
                 card.className = 'glass-card p-5 fade-in cursor-pointer hover:shadow-lg transition-all duration-300';
@@ -434,10 +431,10 @@
 
                             <!-- Stats chips row -->
                             <div class="flex flex-wrap gap-2">
-                                <span class="stat-chip">🏫 ${t.roomCount || 0} ห้องสอบ</span>
-                                <span class="stat-chip">📝 ${(t.questionCount || 0).toLocaleString()} ข้อสอบ</span>
-                                <span class="stat-chip">📊 ${(t.resultCount || 0).toLocaleString()} ผลสอบ</span>
-                                <span class="stat-chip">📚 ${t.templateCount || 0} เทมเพลต</span>
+                                <span class="stat-chip">${t.roomCount || 0} ห้องสอบ</span>
+                                <span class="stat-chip">${(t.questionCount || 0).toLocaleString()} ข้อสอบ</span>
+                                <span class="stat-chip">${(t.resultCount || 0).toLocaleString()} ผลสอบ</span>
+                                <span class="stat-chip">${t.templateCount || 0} เทมเพลต</span>
                             </div>
 
                             <!-- Storage bar -->
@@ -474,7 +471,7 @@
 
         } catch (e) {
             document.getElementById('loading-state').innerHTML = `
-                <div class="text-rose-500 text-2xl">⚠️</div>
+                <div class="text-rose-500 text-2xl"></div>
                 <p class="text-sm font-semibold text-rose-500">ไม่สามารถโหลดข้อมูลได้: ${e.message}</p>
                 <button onclick="loadStorageStats()" class="text-xs bg-rose-50 text-rose-600 px-4 py-2 rounded-xl font-bold">ลองใหม่</button>
             `;
@@ -489,16 +486,16 @@
 
         const sections = [
             {
-                title: '📦 ข้อมูลการใช้พื้นที่',
+                title: 'ข้อมูลการใช้พื้นที่',
                 rows: [
                     { label: 'ข้อสอบในห้องสอบ', value: formatBytes(t.questionBytes || 0), sub: `${(t.questionCount || 0).toLocaleString()} ข้อ` },
                     { label: 'ผลการสอบ', value: formatBytes(t.resultBytes || 0), sub: `${(t.resultCount || 0).toLocaleString()} รายการ` },
                     { label: 'เทมเพลตคลังข้อสอบ', value: formatBytes(t.templateBytes || 0), sub: `${t.templateCount || 0} เทมเพลต / ${(t.templateQuestionCount || 0).toLocaleString()} ข้อ` },
-                    { label: '🔢 รวมทั้งหมด', value: `<span class="font-bold text-base text-violet-600">${formatBytes(t.totalBytes || 0)}</span>`, sub: '' },
+                    { label: 'รวมทั้งหมด', value: `<span class="font-bold text-base text-violet-600">${formatBytes(t.totalBytes || 0)}</span>`, sub: '' },
                 ]
             },
             {
-                title: '📋 สถิติข้อมูล',
+                title: 'สถิติข้อมูล',
                 rows: [
                     { label: 'จำนวนห้องสอบ', value: `${t.roomCount || 0} ห้อง`, sub: '' },
                     { label: 'ข้อสอบในระบบ', value: `${(t.questionCount || 0).toLocaleString()} ข้อ`, sub: '' },

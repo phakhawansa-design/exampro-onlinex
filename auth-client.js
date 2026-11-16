@@ -1,4 +1,4 @@
-// 🔐 auth-client.js — แนบ token ให้ทุกคำขอ /api อัตโนมัติ และเก็บ token ตอนล็อกอิน
+// auth-client.js — แนบ token ให้ทุกคำขอ /api อัตโนมัติ และเก็บ token ตอนล็อกอิน
 (function () {
     if (window.__authClient) return; window.__authClient = true;
     const K_T = 'auth_token', K_S = 'student_auth_token';
@@ -14,8 +14,8 @@
         return new Promise(done => {
             const d = document.createElement('div');
             d.id = 'tn-forcepw';
-            d.innerHTML = '<div style="width:100%;max-width:400px;background:#fff;border-radius:20px;padding:24px 22px;box-shadow:0 30px 70px -20px rgba(0,0,0,.55);font-family:Kanit,Prompt,\'Leelawadee UI\',Tahoma,sans-serif;color:#0f1d3a">' +
-                '<div style="width:54px;height:54px;border-radius:16px;background:#fff4e5;color:#e8663d;display:grid;place-items:center;margin:0 auto 10px;font-size:28px">🔐</div>' +
+            d.innerHTML = '<div style="width:100%;max-width:400px;background:#fff;border-radius:20px;padding:24px 22px;box-shadow:0 30px 70px -20px rgba(0,0,0,.55);font-family:Noto Sans Thai Looped, \'Leelawadee UI\', Tahoma, sans-serif;color:#0f1d3a">' +
+                '<div style="width:54px;height:54px;border-radius:16px;background:#fff4e5;color:#e8663d;display:grid;place-items:center;margin:0 auto 10px;font-size:28px"></div>' +
                 '<h3 style="margin:0 0 6px;text-align:center;font-size:20px;color:#0d3b8e">ตั้งรหัสผ่านใหม่ก่อนใช้งาน</h3>' +
                 '<p style="margin:0 0 14px;text-align:center;font-size:14px;line-height:1.6;color:#4a5872">บัญชีนี้ยังใช้รหัสผ่านเริ่มต้น (admin123) ซึ่งใครก็เดาได้ กรุณาตั้งรหัสใหม่อย่างน้อย 8 ตัวอักษร</p>' +
                 '<input type="password" id="tn-fp1" placeholder="รหัสผ่านใหม่" autocomplete="new-password" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid #d6deea;border-radius:12px;font:inherit;font-size:15px;margin-bottom:10px">' +
@@ -57,10 +57,10 @@
         }
         const res = await orig(input, init);
         if (isApi) {
-            if (/\/api\/((teacher|superadmin|student)\/login|student\/register|student\/change-password|teacher\/change-own-password)/.test(url) && res.ok) {
+            if (/\/api\/((teacher\/|superadmin\/|student\/)?login|student\/register|student\/change-password|teacher\/change-own-password)/.test(url) && res.ok) {
                 let d = null;
                 try { d = await res.clone().json(); if (d && d.token) { set(d.student ? K_S : K_T, d.token); try { sessionStorage.removeItem('__authReload'); } catch (e) {} } } catch (e) {}
-                // 🔐 แอดมินยังใช้รหัสเริ่มต้น → ต้องตั้งรหัสใหม่ก่อน หน้าเดิมจึงจะไปต่อได้
+                // แอดมินยังใช้รหัสเริ่มต้น → ต้องตั้งรหัสใหม่ก่อน หน้าเดิมจึงจะไปต่อได้
                 if (d && d.success && d.mustChangePassword && !d.student) {
                     let oldPw = ''; try { oldPw = JSON.parse(init.body).password || ''; } catch (e) {}
                     await forceTeacherPw(oldPw);
@@ -92,7 +92,7 @@
                         window.__authRedirect = true;
                         set(K_T, '');
                         alert('เซสชันหมดอายุหรือยังไม่ได้เข้าสู่ระบบ กรุณาเข้าสู่ระบบใหม่');
-                        location.href = get('admin_username') && /super-admin/.test(location.pathname) ? 'admin-login.html' : 'teacher-login.html';
+                        location.href = 'login.html';
                     }
                 }).catch(() => {});
             }

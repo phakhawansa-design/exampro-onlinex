@@ -10,14 +10,14 @@
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>สมัครบัญชีอาจารย์ - ตรีเนตร e-Exam</title>
-  <meta name="description" content="สร้างบัญชีอาจารย์ใหม่สำหรับ ตรีเนตร e-Exam" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
+  <title>สมัครบัญชีอาจารย์ - ExamPro</title>
+  <meta name="description" content="สร้างบัญชีอาจารย์ใหม่สำหรับ ExamPro" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     html { font-size: 100%; -webkit-text-size-adjust: 100%; }
     body {
       margin: 0;
-      font-family: 'Kanit', 'Inter', sans-serif;
+      font-family: 'Noto Sans Thai Looped', sans-serif;
       background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #eef4ff 100%);
       color: #334155;
       min-height: 100vh;
@@ -79,7 +79,7 @@
       border-radius: 12px;
       padding: 12px 14px 12px 42px;
       width: 100%;
-      font-family: 'Kanit', sans-serif;
+      font-family: 'Noto Sans Thai Looped', sans-serif;
       font-size: 0.9rem;
       outline: none;
       transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
@@ -182,12 +182,9 @@
 
         <!-- Header -->
         <div class="flex flex-col items-center text-center mb-6 sm:mb-7">
-          <div class="shield-badge mb-3 sm:mb-4 overflow-hidden bg-white p-2 flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl shadow-sm">
-            <img src="trinetra-logo.svg" alt="ตรีเนตร e-Exam" class="w-full h-full object-cover rounded-xl" />
-          </div>
-          <div class="text-xs font-bold tracking-[0.3em] text-orange-500 uppercase mb-1">TRINETRA e-EXAM</div>
+          <div class="text-xs font-bold tracking-[0.3em] text-orange-500 uppercase mb-1">EXAMPRO</div>
           <h1 class="text-xl sm:text-2xl font-bold text-slate-800 mb-1">สร้างบัญชีอาจารย์ใหม่</h1>
-          <p class="text-slate-500 text-xs sm:text-sm">กรอกข้อมูลเพื่อสมัครใช้งานตรีเนตร e-Exam</p>
+          <p class="text-slate-500 text-xs sm:text-sm">กรอกข้อมูลเพื่อสมัครใช้งาน ExamPro</p>
 
           <!-- Step dots -->
           <div class="flex gap-2 mt-3">
@@ -311,7 +308,7 @@
         <!-- Back to login -->
         <div class="text-center">
           <span class="text-slate-500 text-sm">มีบัญชีอยู่แล้ว? </span>
-          <a href="teacher-login.html" class="link-primary text-sm font-semibold">เข้าสู่ระบบ</a>
+          <a href="login.html" class="link-primary text-sm font-semibold">เข้าสู่ระบบ</a>
         </div>
         <div class="text-center mt-2">
           <a href="index.html" class="back-link justify-center">
@@ -324,7 +321,7 @@
       </div>
 
       <!-- Footer -->
-      <p class="text-center text-slate-400 text-xs mt-6 tracking-wider">ตรีเนตร e-Exam</p>
+      <p class="text-center text-slate-400 text-xs mt-6 tracking-wider">ExamPro</p>
     </div>
   </div>
 
@@ -365,7 +362,7 @@
         });
         const data = await res.json();
         if (data.success) {
-          showMsg('✅ สมัครสำเร็จ! กรุณารอผู้ดูแลระบบอนุมัติก่อนเข้าใช้งาน', true);
+          showMsg('สมัครสำเร็จ! กรุณารอผู้ดูแลระบบอนุมัติก่อนเข้าใช้งาน', true);
           btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> สมัครสำเร็จแล้ว`;
         } else {
           showMsg(data.message || 'เกิดข้อผิดพลาด', false);

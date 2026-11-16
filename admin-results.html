@@ -4,10 +4,10 @@
     <script src="auth-client.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>จัดการผลสอบและคะแนนนักศึกษา - ตรีเนตร e-Exam</title>
+    <title>จัดการผลสอบและคะแนนนักศึกษา - ExamPro</title>
     <script src="vendor/chart.umd.js"></script><script>window.Chart || document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js@4"><\/script>')</script>
     <script src="vendor/xlsx.full.min.js"></script><script>window.XLSX || document.write('<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>')</script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         html { font-size: 100%; -webkit-text-size-adjust: 100%; }
 
@@ -25,7 +25,7 @@
 
         * { box-sizing: border-box; }
         body {
-            font-family: 'Kanit', sans-serif;
+            font-family: 'Noto Sans Thai Looped', sans-serif;
             background-color: #f8fafc;
             color: #1e293b;
         }
@@ -112,7 +112,7 @@
             color: #1e293b; border-radius: 12px;
             padding: 8px 14px; font-size: 13px;
             font-weight: 600;
-            font-family: 'Kanit', sans-serif;
+            font-family: 'Noto Sans Thai Looped', sans-serif;
             outline: none; width: 100%; transition: all 0.2s ease;
             box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
             cursor: pointer;
@@ -134,13 +134,10 @@
     <!-- ===== SIDEBAR ===== -->
     <aside id="sidebar">
         <div class="sidebar-inner p-4 space-y-4 flex-1 overflow-y-auto">
-            <!-- Logo Header (ตรีเนตร e-Exam) -->
+            <!-- Logo Header (ExamPro) -->
             <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
-                <div class="w-10 h-12 bg-white rounded-lg p-1 border border-slate-200 flex items-center justify-center shrink-0 shadow-xs">
-                    <img src="trinetra-logo.svg" alt="ตรีเนตร e-Exam" class="w-full h-full object-contain" />
-                </div>
                 <div class="leading-tight">
-                    <div class="font-bold text-base tracking-tight text-slate-900">ตรีเนตร <span class="text-blue-700 font-extrabold">e-Exam</span></div>
+                    <div class="font-bold text-base tracking-tight text-slate-900">Exam<span class="text-blue-700 font-extrabold">Pro</span></div>
                     <div class="text-[10px] text-amber-700 font-bold uppercase tracking-wider">ตาที่ 3 ของอาจารย์</div>
                 </div>
             </div>
@@ -229,14 +226,14 @@
                     </div>
                 </div>
             </div>
-            <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2 px-3 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 border border-slate-200 hover:border-rose-200 transition">
+            <a href="login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2 px-3 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 border border-slate-200 hover:border-rose-200 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H2.25" /></svg>
                 <span>ออกจากระบบ</span>
             </a>
         </div>
     </aside>
 
-    <!-- 💻 Main Display Area -->
+    <!-- Main Display Area -->
     <div id="main-area">
         
         <!-- Header -->
@@ -247,7 +244,7 @@
                 </button>
                 <div>
                     <h1 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight">7. ตรวจสอบผลการสอบ</h1>
-                    <p class="text-xs text-slate-500 font-medium">ตรีเนตร e-Exam &middot; ประจำภาคการศึกษาปัจจุบัน</p>
+                    <p class="text-xs text-slate-500 font-medium">ExamPro &middot; ประจำภาคการศึกษาปัจจุบัน</p>
                 </div>
             </div>
             <div class="flex items-center gap-3 flex-wrap sm:flex-nowrap">
@@ -258,11 +255,11 @@
                     </select>
                 </div>
                 <button onclick="window.TabLockGuide.open('results')" class="flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow-xs cursor-pointer">
-                    <span>💡</span>
+                    <span></span>
                     <span class="hidden sm:inline">คู่มือ</span>
                 </button>
                 <button onclick="exportToExcel()" class="flex items-center gap-1.5 px-3.5 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
-                    <span>📥</span>
+                    <span></span>
                     <span>ส่งออก Excel</span>
                 </button>
         </header>
@@ -270,10 +267,10 @@
         <!-- Main Workspace -->
         <main class="p-6 md:p-8 flex-grow space-y-6 max-w-[1400px] w-full mx-auto overflow-y-auto">
             
-            <!-- 📘 Card แสดงเมื่อยังไม่ได้เลือกรายวิชา -->
+            <!-- Card แสดงเมื่อยังไม่ได้เลือกรายวิชา -->
             <div id="no-course-card" class="glass-card p-10 sm:p-14 text-center space-y-4 max-w-xl mx-auto shadow-2xl my-8 border-2 border-indigo-200/60 bg-gradient-to-b from-white via-indigo-50/30 to-white">
                 <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-indigo-100 text-indigo-600 text-4xl shadow-inner animate-pulse">
-                    📘
+                    
                 </div>
                 <div class="space-y-2">
                     <h3 class="text-xl sm:text-2xl font-bold text-slate-800">กรุณาเลือกรายวิชาเพื่อดูผลการสอบ</h3>
@@ -283,7 +280,7 @@
                 </div>
             </div>
 
-            <!-- 📊 ส่วนแสดงผลข้อมูลคะแนน (จะแสดงเมื่อเลือกวิชาแล้วเท่านั้น) -->
+            <!-- ส่วนแสดงผลข้อมูลคะแนน (จะแสดงเมื่อเลือกวิชาแล้วเท่านั้น) -->
             <div id="results-content-area" class="space-y-6 hidden">
 
             <!-- ① สรุปภาพรวม (แบนเนอร์ธีมแดชบอร์ด) -->
@@ -303,25 +300,25 @@
 
             <!-- ② การ์ดสถิติ -->
             <div class="rs-kpis">
-                <div class="rs-kpi"><span class="rs-ic" style="background:#ecfdf5;color:#047857">🏆</span><div><small>คะแนนสูงสุด</small><b id="stat-max" style="color:#047857">-</b></div></div>
-                <div class="rs-kpi"><span class="rs-ic" style="background:#fff1f2;color:#be123c">📉</span><div><small>คะแนนต่ำสุด</small><b id="stat-min" style="color:#be123c">-</b></div></div>
-                <div class="rs-kpi"><span class="rs-ic" style="background:#fffbeb;color:#b45309">📊</span><div><small>คะแนนเฉลี่ย (Mean)</small><b id="stat-avg" style="color:#b45309">-</b></div></div>
-                <div class="rs-kpi"><span class="rs-ic" style="background:#eef2ff;color:#4338ca">📐</span><div><small>ส่วนเบี่ยงเบนมาตรฐาน (SD)</small><b id="stat-sd" style="color:#4338ca">-</b><em>ยิ่งน้อย คะแนนยิ่งใกล้กัน</em></div></div>
+                <div class="rs-kpi"><span class="rs-ic" style="background:#ecfdf5;color:#047857"></span><div><small>คะแนนสูงสุด</small><b id="stat-max" style="color:#047857">-</b></div></div>
+                <div class="rs-kpi"><span class="rs-ic" style="background:#fff1f2;color:#be123c"></span><div><small>คะแนนต่ำสุด</small><b id="stat-min" style="color:#be123c">-</b></div></div>
+                <div class="rs-kpi"><span class="rs-ic" style="background:#fffbeb;color:#b45309"></span><div><small>คะแนนเฉลี่ย (Mean)</small><b id="stat-avg" style="color:#b45309">-</b></div></div>
+                <div class="rs-kpi"><span class="rs-ic" style="background:#eef2ff;color:#4338ca"></span><div><small>ส่วนเบี่ยงเบนมาตรฐาน (SD)</small><b id="stat-sd" style="color:#4338ca">-</b><em>ยิ่งน้อย คะแนนยิ่งใกล้กัน</em></div></div>
             </div>
 
             <!-- ③ ตารางคะแนนรายคน -->
             <section class="rs-card">
                 <div class="rs-card-h">
-                    <h3>👥 คะแนนรายคน <span id="rs-shown" class="rs-count"></span></h3>
+                    <h3>คะแนนรายคน <span id="rs-shown" class="rs-count"></span></h3>
                     <div class="rs-actions">
-                        <button onclick="fetchResults()" class="rs-btn">🔄 รีเฟรช</button>
-                        <button onclick="exportToExcel()" class="rs-btn rs-btn-p">📥 ดาวน์โหลด Excel</button>
+                        <button onclick="fetchResults()" class="rs-btn">รีเฟรช</button>
+                        <button onclick="exportToExcel()" class="rs-btn rs-btn-p">ดาวน์โหลด Excel</button>
                     </div>
                 </div>
                 <div class="rs-tools">
-                    <label class="rs-field rs-room"><span>📝 ชุดข้อสอบ</span>
+                    <label class="rs-field rs-room"><span>ชุดข้อสอบ</span>
                         <select id="rs-room" onchange="onRoomChange()"><option value="ALL">กำลังโหลด...</option></select></label>
-                    <label class="rs-search"><span>🔍</span><input id="rs-search" type="search" placeholder="ค้นหาชื่อ หรือรหัสนักศึกษา" oninput="filterAndRenderResults()"></label>
+                    <label class="rs-search"><span></span><input id="rs-search" type="search" placeholder="ค้นหาชื่อ หรือรหัสนักศึกษา" oninput="filterAndRenderResults()"></label>
                     <label class="rs-field"><span>ชั้นเรียน</span>
                         <select id="class-filter" onchange="filterAndRenderResults()"><option value="ALL">ทุกชั้นเรียน</option></select></label>
                     <label class="rs-field"><span>เรียงตาม</span>
@@ -352,7 +349,7 @@
                             </tr>
                         </thead>
                         <tbody id="results-table-body">
-                            <tr><td colspan="8" class="rs-empty">📭 กำลังโหลดข้อมูลคะแนนสอบของนักศึกษา...</td></tr>
+                            <tr><td colspan="8" class="rs-empty">กำลังโหลดข้อมูลคะแนนสอบของนักศึกษา...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -361,11 +358,11 @@
             <!-- ④ กราฟภาพรวม -->
             <div class="rs-charts">
                 <section class="rs-card rs-pad">
-                    <h3 class="rs-h">🍩 การกระจายช่วงคะแนน</h3>
+                    <h3 class="rs-h">การกระจายช่วงคะแนน</h3>
                     <div class="h-60 relative"><canvas id="scoreDistChart"></canvas></div>
                 </section>
                 <section class="rs-card rs-pad">
-                    <h3 class="rs-h">📈 คะแนนเฉลี่ยรายชั้นเรียน</h3>
+                    <h3 class="rs-h">คะแนนเฉลี่ยรายชั้นเรียน</h3>
                     <div class="h-60 relative"><canvas id="classAvgChart"></canvas></div>
                 </section>
             </div>
@@ -373,7 +370,7 @@
             <!-- โซนอันตราย: ลบประวัติ (แยกออกมา ไม่ปนกับปุ่มใช้งานประจำ) -->
             <div class="rs-danger">
                 <span>ต้องการเริ่มเก็บคะแนนใหม่ทั้งห้อง?</span>
-                <button onclick="clearResults()" title="ลบประวัติการส่งคำตอบและคะแนนทั้งหมดของห้องนี้">🗑️ ลบประวัติการสอบทั้งหมด</button>
+                <button onclick="clearResults()" title="ลบประวัติการส่งคำตอบและคะแนนทั้งหมดของห้องนี้">ลบประวัติการสอบทั้งหมด</button>
             </div>
             <!-- Answer Sheet Review Modal -->
             <div id="answer-sheet-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300 p-4">
@@ -401,16 +398,16 @@
                 </div>
             </div>
 
-            <!-- 📊 Item Analysis Table Section -->
+            <!-- Item Analysis Table Section -->
             <div id="item-analysis-box" class="glass-card p-8 space-y-6 shadow-2xl hidden select-none">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-200 pb-3">
                     <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                        📊 ตารางวิเคราะห์คุณภาพข้อสอบรายข้อ (Item Analysis)
+                        ตารางวิเคราะห์คุณภาพข้อสอบรายข้อ (Item Analysis)
                     </h2>
                     <div class="flex items-center gap-2.5 flex-wrap">
                         <span class="bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 font-semibold text-xs px-3.5 py-1.5 rounded-xl">คำนวณอัตโนมัติ (Classical Test Theory)</span>
                         <button onclick="clearResults()" class="bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 px-3.5 py-1.5 rounded-xl font-bold text-xs transition active:scale-95 shadow-sm flex items-center gap-1.5 cursor-pointer" title="ลบประวัติคำตอบและคะแนนสอบทั้งหมดเพื่อเริ่มใหม่">
-                            🗑️ ลบประวัติการสอบ
+                            ลบประวัติการสอบ
                         </button>
                     </div>
                 </div>
@@ -437,7 +434,7 @@
         <!-- Footer -->
         <footer class="border-t border-slate-200 bg-white py-3.5 px-8 text-center shrink-0">
             <p class="text-xs text-slate-500 font-medium">
-                &copy; 2026 ตรีเนตร e-Exam &middot; ตาที่ 3 ของอาจารย์ &middot; ทีม TEC Hope
+                &copy; 2026 ExamPro &middot; ตาที่ 3 ของอาจารย์ &middot; ทีม TEC Hope
             </p>
         </footer>
     </div>
@@ -541,7 +538,7 @@
             const list = Object.values(map).sort((a, b) => (roomTs(b.id) - roomTs(a.id)) || (b.maxId - a.maxId));
             const key = 'results_room_' + courseId;
             let keep = ''; try { keep = localStorage.getItem(key) || ''; } catch (e) {}
-            sel.innerHTML = list.map(r => `<option value="${escapeHtml(r.id)}">${r.live ? '🟢 ' : ''}${escapeHtml(r.title)} · ${r.n ? r.n + ' คน' + (r.date ? ' · ' + escapeHtml(r.date) : '') : 'ยังไม่มีผู้ส่ง'}</option>`).join('')
+            sel.innerHTML = list.map(r => `<option value="${escapeHtml(r.id)}">${r.live ? '' : ''}${escapeHtml(r.title)} · ${r.n ? r.n + ' คน' + (r.date ? ' · ' + escapeHtml(r.date) : '') : 'ยังไม่มีผู้ส่ง'}</option>`).join('')
                 + (list.length > 1 ? `<option value="ALL">ทุกชุดข้อสอบรวมกัน (${allCourseResults.length} รายการ)</option>` : '');
             const defaultRoom = (list.find(r => r.live) || list.find(r => r.n) || list[0] || {}).id;
             sel.value = (keep && [...sel.options].some(o => o.value === keep)) ? keep : (defaultRoom || 'ALL');
@@ -583,7 +580,7 @@
                 document.getElementById('results-table-body').innerHTML = `
                     <tr>
                         <td colspan="10" class="p-16 text-center text-rose-500 font-bold">
-                            ❌ ไม่สามารถเชื่อมต่อระบบหลังบ้านได้ (${escapeHtml(err.message || 'เกิดข้อผิดพลาดในการโหลดผลสอบ')})
+                            ไม่สามารถเชื่อมต่อระบบหลังบ้านได้ (${escapeHtml(err.message || 'เกิดข้อผิดพลาดในการโหลดผลสอบ')})
                         </td>
                     </tr>`;
             }
@@ -598,7 +595,7 @@
             const cname = csel && csel.selectedIndex >= 0 ? csel.options[csel.selectedIndex].text : '';
             const setT = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
             const rsel = document.getElementById('rs-room');
-            const rname = rsel && rsel.value && rsel.value !== 'ALL' && rsel.selectedIndex >= 0 ? rsel.options[rsel.selectedIndex].text.split(' · ')[0].replace(/^🟢\s*/, '') : '';
+            const rname = rsel && rsel.value && rsel.value !== 'ALL' && rsel.selectedIndex >= 0 ? rsel.options[rsel.selectedIndex].text.split(' · ')[0].replace(/^\s*/, '') : '';
             setT('rs-course-name', (cname || 'ผลการสอบ') + (rname ? ' · ' + rname : ''));
 
             if (count === 0) {
@@ -606,7 +603,7 @@
                 document.getElementById('stat-min').textContent = "-";
                 document.getElementById('stat-avg').textContent = "-";
                 document.getElementById('stat-sd').textContent = "-";
-                setT('rs-pass', '-'); setT('rs-avg-pct', '-'); setT('rs-summary-line', selectedRoom() === 'ALL' ? 'ยังไม่มีนักศึกษาส่งคำตอบในรายวิชานี้' : 'ชุดข้อสอบนี้ยังไม่มีนักศึกษาส่งคำตอบ — ผลจะขึ้นเองเมื่อนักศึกษากดส่ง (กด 🔄 รีเฟรช)');
+                setT('rs-pass', '-'); setT('rs-avg-pct', '-'); setT('rs-summary-line', selectedRoom() === 'ALL' ? 'ยังไม่มีนักศึกษาส่งคำตอบในรายวิชานี้' : 'ชุดข้อสอบนี้ยังไม่มีนักศึกษาส่งคำตอบ — ผลจะขึ้นเองเมื่อนักศึกษากดส่ง (กด รีเฟรช)');
                 const pb = document.getElementById('rs-pass-bar'); if (pb) pb.style.width = '0%';
                 return;
             }
@@ -722,7 +719,7 @@
             if (shown) shown.textContent = `${filteredList.length} จาก ${rawResultsData.length} คน`;
 
             if (filteredList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="rs-empty">📭 ${q ? 'ไม่พบนักศึกษาที่ตรงกับคำค้นหา' : (rawResultsData.length ? 'ยังไม่มีผลคะแนนในชั้นเรียนที่เลือก' : 'ชุดข้อสอบนี้ยังไม่มีนักศึกษาส่งคำตอบ')}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="rs-empty">${q ? 'ไม่พบนักศึกษาที่ตรงกับคำค้นหา' : (rawResultsData.length ? 'ยังไม่มีผลคะแนนในชั้นเรียนที่เลือก' : 'ชุดข้อสอบนี้ยังไม่มีนักศึกษาส่งคำตอบ')}</td></tr>`;
                 document.getElementById('item-analysis-box').classList.add('hidden');
                 return;
             }
@@ -770,8 +767,8 @@
                         <td class="c rs-time"><b>${student.time}</b><span>${cleanDate}</span></td>
                         <td class="c">
                             <div class="rs-row-act">
-                                <button onclick="viewAnswerSheet(${student.id})" class="rs-view" title="ดูกระดาษคำตอบของนักศึกษาคนนี้">👁️ ดูคำตอบ</button>
-                                <button onclick="deleteStudentResult(${student.id}, '${escapeHtml(student.studentId)}')" class="rs-del" title="ลบประวัติคะแนนของนักศึกษาคนนี้" aria-label="ลบประวัติคะแนน">🗑️</button>
+                                <button onclick="viewAnswerSheet(${student.id})" class="rs-view" title="ดูกระดาษคำตอบของนักศึกษาคนนี้">ดูคำตอบ</button>
+                                <button onclick="deleteStudentResult(${student.id}, '${escapeHtml(student.studentId)}')" class="rs-del" title="ลบประวัติคะแนนของนักศึกษาคนนี้" aria-label="ลบประวัติคะแนน"></button>
                             </div>
                         </td>
                     </tr>
@@ -786,7 +783,7 @@
         }
 
         // ==========================================
-        // 📊 ฟังก์ชันวาดแผนภูมิสถิติ (Chart.js)
+        // ฟังก์ชันวาดแผนภูมิสถิติ (Chart.js)
         // ==========================================
         let scoreDistChartInstance = null;
         let classAvgChartInstance = null;
@@ -831,7 +828,7 @@
                         legend: {
                             position: 'bottom',
                             labels: {
-                                font: { family: 'Kanit', size: 10 },
+                                font: { family: 'Noto Sans Thai Looped', size: 10 },
                                 boxWidth: 10
                             }
                         }
@@ -875,11 +872,11 @@
                         y: {
                             beginAtZero: true,
                             grid: { drawBorder: false, color: 'rgba(0,0,0,0.05)' },
-                            ticks: { font: { family: 'Kanit', size: 10 } }
+                            ticks: { font: { family: 'Noto Sans Thai Looped', size: 10 } }
                         },
                         x: {
                             grid: { display: false },
-                            ticks: { font: { family: 'Kanit', size: 10 } }
+                            ticks: { font: { family: 'Noto Sans Thai Looped', size: 10 } }
                         }
                     }
                 }
@@ -900,7 +897,7 @@
             const roomIds = [...new Set((rawResultsData || []).map(r => r.roomId).filter(Boolean))];
             if (!roomIds.length) { alert('ยังไม่มีผลคะแนนให้ลบในรายวิชานี้'); return; }
             const label = roomIds.length === 1 ? `ห้องสอบ ${roomIds[0]}` : `${roomIds.length} ห้องสอบ (${roomIds.join(', ')})`;
-            if (!confirm(`⚠️ ยืนยันการลบประวัติคำตอบและคะแนนทั้งหมดของ${label} ใช่หรือไม่?\n(ข้อมูลทั้งหมดจะถูกลบถาวร ไม่สามารถกู้คืนได้)`)) return;
+            if (!confirm(`ยืนยันการลบประวัติคำตอบและคะแนนทั้งหมดของ${label} ใช่หรือไม่?\n(ข้อมูลทั้งหมดจะถูกลบถาวร ไม่สามารถกู้คืนได้)`)) return;
 
             try {
                 let ok = 0;
@@ -912,7 +909,7 @@
                     });
                     if (response.ok) ok++;
                 }
-                alert(ok === roomIds.length ? `🧹 ล้างประวัติ${label} เรียบร้อยแล้ว` : `ลบสำเร็จ ${ok} จาก ${roomIds.length} ห้อง`);
+                alert(ok === roomIds.length ? `ล้างประวัติ${label} เรียบร้อยแล้ว` : `ลบสำเร็จ ${ok} จาก ${roomIds.length} ห้อง`);
                 fetchResults();
             } catch (err) {
                 alert("เกิดข้อผิดพลาดในการลบข้อมูล");
@@ -921,7 +918,7 @@
 
         // ลบผลคะแนนของนักศึกษาเฉพาะคน
         async function deleteStudentResult(id, studentId) {
-            if (!confirm(`⚠️ ยืนยันการลบผลคะแนนสอบของนักศึกษารหัส ${studentId} ใช่หรือไม่?\n(เมื่อลบแล้วนักศึกษาจะสามารถล็อกอินมาส่งข้อสอบได้ใหม่)`)) return;
+            if (!confirm(`ยืนยันการลบผลคะแนนสอบของนักศึกษารหัส ${studentId} ใช่หรือไม่?\n(เมื่อลบแล้วนักศึกษาจะสามารถล็อกอินมาส่งข้อสอบได้ใหม่)`)) return;
 
             try {
                 const response = await fetch('/api/delete-student-result', {
@@ -931,7 +928,7 @@
                 });
                 
                 if (response.ok) {
-                    alert(`🧹 ลบผลคะแนนสอบของรหัส ${studentId} สำเร็จแล้ว`);
+                    alert(`ลบผลคะแนนสอบของรหัส ${studentId} สำเร็จแล้ว`);
                     fetchResults();
                 } else {
                     alert("ลบไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
@@ -1166,11 +1163,11 @@
                 }).join('');
             } catch(err) {
                 console.error(err);
-                contentEl.innerHTML = '<div class="text-center py-8 text-rose-500 font-bold">❌ เกิดข้อผิดพลาดในการโหลดกระดาษคำตอบ</div>';
+                contentEl.innerHTML = '<div class="text-center py-8 text-rose-500 font-bold">เกิดข้อผิดพลาดในการโหลดกระดาษคำตอบ</div>';
             }
         }
 
-        // 📊 ฟังก์ชันคำนวณและวาดตารางวิเคราะห์คุณภาพข้อสอบ (Item Analysis)
+        // ฟังก์ชันคำนวณและวาดตารางวิเคราะห์คุณภาพข้อสอบ (Item Analysis)
         async function runItemAnalysis(filteredList) {
             const analysisBox = document.getElementById('item-analysis-box');
             const analysisBody = document.getElementById('item-analysis-body');
@@ -1280,13 +1277,13 @@
                     // บทวิเคราะห์สรุป
                     let recommendation = '';
                     if (r < 0) {
-                        recommendation = `<div class="text-rose-600 font-semibold flex items-center gap-1 animate-pulse">⚠️ ดัชนีติดลบ! เฉลยคีย์ผิดพลาด?</div>`;
+                        recommendation = `<div class="text-rose-600 font-semibold flex items-center gap-1 animate-pulse">ดัชนีติดลบ! เฉลยคีย์ผิดพลาด?</div>`;
                     } else if (p < 0.2 && r < 0.15) {
                         recommendation = `<div class="text-rose-600 font-semibold">ยากเกินไป หรือมีข้อบกพร่อง</div>`;
                     } else if (p > 0.85 && r < 0.15) {
                         recommendation = `<div class="text-slate-500">ง่ายเกินไป ขาดอำนาจจำแนก</div>`;
                     } else if (p >= 0.3 && p < 0.8 && r >= 0.25) {
-                        recommendation = `<div class="text-emerald-700 font-bold">✅ ข้อสอบคุณภาพยอดเยี่ยม</div>`;
+                        recommendation = `<div class="text-emerald-700 font-bold">ข้อสอบคุณภาพยอดเยี่ยม</div>`;
                     } else {
                         recommendation = `<div class="text-slate-500">พอใช้ได้ ควรปรับปรุงช้อยส์ลวง</div>`;
                     }

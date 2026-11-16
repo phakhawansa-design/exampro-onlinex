@@ -1,5 +1,5 @@
 // =====================================================================
-// 📝 ระบบตรวจข้อสอบอัตนัยลายมือด้วย AI (Essay Grader)
+// ระบบตรวจข้อสอบอัตนัยลายมือด้วย AI (Essay Grader)
 // ---------------------------------------------------------------------
 // โมดูลแยกจาก server.js ทั้งหมด: สร้างตารางใหม่ของตัวเอง (essay_*)
 // ไม่แก้ไขตารางหรือ API เดิมของระบบสอบ
@@ -76,7 +76,7 @@ module.exports = function registerEssayGrader(app, db) {
             // ความใกล้เคียงกับเฉลย 1-10: ค่าที่ AI ประเมิน และค่าที่อาจารย์แก้เอง
             db.run('ALTER TABLE essay_grades ADD COLUMN similarity REAL', () => {});
             db.run('ALTER TABLE essay_grades ADD COLUMN teacher_similarity REAL', () => {});
-            if (!err) console.log('📝 Essay Grader พร้อมใช้งาน' + (API_KEY() ? ` (AI: ${MODEL()})` : ' (โหมดทดลอง: ยังไม่ได้ใส่ ANTHROPIC_API_KEY)'));
+            if (!err) console.log('Essay Grader พร้อมใช้งาน' + (API_KEY() ? ` (AI: ${MODEL()})` : ' (โหมดทดลอง: ยังไม่ได้ใส่ ANTHROPIC_API_KEY)'));
         });
     });
 
@@ -119,7 +119,7 @@ module.exports = function registerEssayGrader(app, db) {
             try { fs.unlinkSync(path.join(UPLOAD_DIR, path.basename(s.file_path))); } catch (e) {}
             await q.run("UPDATE essay_submissions SET file_path = '' WHERE id = ?", [s.id]).catch(() => {});
         }
-        if (old.length) console.log(`🧹 PDPA: ลบไฟล์กระดาษคำตอบที่เก่ากว่า ${days} วัน ${old.length} ไฟล์ (คะแนนยังอยู่)`);
+        if (old.length) console.log(`PDPA: ลบไฟล์กระดาษคำตอบที่เก่ากว่า ${days} วัน ${old.length} ไฟล์ (คะแนนยังอยู่)`);
     }
     setTimeout(purgeOldFiles, 15000);
     setInterval(purgeOldFiles, 12 * 3600e3).unref();
@@ -367,7 +367,7 @@ module.exports = function registerEssayGrader(app, db) {
             const id = queue.shift();
             try { await gradeSubmission(id); }
             catch (e) {
-                console.error('❌ Essay grading error:', e.message);
+                console.error('Essay grading error:', e.message);
                 await q.run("UPDATE essay_submissions SET status = 'error', error = ? WHERE id = ?", [e.message.slice(0, 500), id]).catch(() => {});
             }
         }

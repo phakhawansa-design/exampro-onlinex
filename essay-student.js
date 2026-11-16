@@ -1,11 +1,11 @@
-// 📝 แสดงผลตรวจอัตนัยให้นักเรียนในแท็บ "ประวัติ" ของ student-portal.html
+// แสดงผลตรวจอัตนัยให้นักเรียนในแท็บ "ประวัติ" ของ student-portal.html
 (function () {
     const host = document.getElementById('tab-content-history');
     if (!host) return;
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const box = document.createElement('div');
     box.className = 'glass-card p-5 sm:p-6 shadow-xl space-y-4';
-    box.innerHTML = '<h3 class="text-lg font-bold text-slate-800">📝 ผลตรวจข้อสอบอัตนัย</h3><div id="essay-fb" class="text-sm text-slate-500">กำลังโหลด...</div>';
+    box.innerHTML = '<h3 class="text-lg font-bold text-slate-800">ผลตรวจข้อสอบอัตนัย</h3><div id="essay-fb" class="text-sm text-slate-500">กำลังโหลด...</div>';
     host.appendChild(box);
     const out = box.querySelector('#essay-fb');
     const tok = (window.AuthClient && AuthClient.studentToken()) || '';

@@ -9,6 +9,21 @@ const crypto = require('crypto');
 function hashPassword(str) {
     return crypto.createHash('sha256').update(str || '').digest('hex');
 }
+// ผู้เรียกใช้ API ฝั่งอาจารย์: ใช้ตัวตนจาก token เสมอ (ไม่เชื่อ username ที่หน้าเว็บส่งมา) — อาจารย์เห็นได้เฉพาะข้อมูลของตัวเอง
+function viewer(req) {
+    const u = req.authUser;
+    if (u && u.typ === 'teacher') return { admin: u.role === 'admin', user: u.u, adm: u.role === 'admin' ? 1 : 0 };
+    const n = String((req.query && req.query.username) || (req.body && req.body.username) || '');
+    return { admin: n === 'admin', user: n, adm: n === 'admin' ? 1 : 0 };
+}
+const MY_ROOMS = 'SELECT roomId FROM teacher_rooms WHERE teacherUsername = ?';
+// กฎรหัสผ่านนักศึกษา (ตรงกับหน้าเว็บ): อย่างน้อย 6 ตัว ห้ามเป็น 1234 และห้ามเป็นรหัสนักศึกษา
+const STUDENT_PW_RULE_MSG = 'รหัสผ่านต้องยาวอย่างน้อย 6 ตัวอักษร และห้ามเป็น 1234 หรือรหัสนักศึกษา';
+function weakStudentPw(pw, studentId) {
+    pw = String(pw || '').trim();
+    const sid = String(studentId || '').trim();
+    return pw.length < 6 || pw === '1234' || pw === sid || pw === sid.replace(/[^0-9a-zA-Z]/g, '');
+}
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -22,7 +37,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.text({ type: 'text/plain' }));
 app.use('/images', express.static(path.join(__dirname, 'images')));
-// 🔒 กันไม่ให้ดาวน์โหลดไฟล์ฝั่งเซิร์ฟเวอร์ (ฐานข้อมูล, โค้ด, สคริปต์) ผ่านเว็บ
+// กันไม่ให้ดาวน์โหลดไฟล์ฝั่งเซิร์ฟเวอร์ (ฐานข้อมูล, โค้ด, สคริปต์) ผ่านเว็บ
 app.use((req, res, next) => {
     const p = decodeURIComponent(req.path).toLowerCase();
     if (/\.(db|db-journal|sqlite|bat|env|log|md)$/.test(p) || /^\/(server|auth|essay-grader|ai-quiz|backup|check_storage|make_pdf|exam-guard|trinetra-link|backup-export)\.js$/.test(p) || /^\/(package(-lock)?\.json|\.npmrc|\.gitignore)$/.test(p) || p.startsWith('/_backup') || p.startsWith('/routes/') || p.startsWith('/node_modules') || p.startsWith('/.')) {
@@ -75,24 +90,24 @@ function convertToPg(sql) {
 }
 
 if (isPg) {
-    console.log('🐘 กำลังเชื่อมต่อฐานข้อมูล Neon PostgreSQL...');
+    console.log('กำลังเชื่อมต่อฐานข้อมูล Neon PostgreSQL...');
     let connStr = process.env.DATABASE_URL;
     if (connStr) {
         connStr = connStr.replace(/sslmode=(require|prefer|verify-ca)/gi, 'sslmode=verify-full');
     }
-    // 🔢 PostgreSQL คืนผล COUNT()/SUM() (bigint) และ numeric เป็นตัวอักษร เช่น "5" ต่างจาก SQLite ที่เป็นตัวเลข
+    // PostgreSQL คืนผล COUNT()/SUM() (bigint) และ numeric เป็นตัวอักษร เช่น "5" ต่างจาก SQLite ที่เป็นตัวเลข
     //    แปลงเป็นตัวเลขให้เหมือนกัน (เดิมบน Neon ตัวเลขบางช่องต่อกันเป็นข้อความ หรือเทียบ === 0 ไม่ผ่าน)
     try {
         const { types } = require('pg');
         types.setTypeParser(20, v => { const n = Number(v); return Number.isSafeInteger(n) ? n : v; });
         types.setTypeParser(1700, v => Number(v));
-    } catch (e) { console.error('⚠️ ตั้งค่าการแปลงตัวเลขของ PostgreSQL ไม่สำเร็จ:', e.message); }
+    } catch (e) { console.error('ตั้งค่าการแปลงตัวเลขของ PostgreSQL ไม่สำเร็จ:', e.message); }
     const pool = new Pool({
         connectionString: connStr,
         ssl: { rejectUnauthorized: false }
     });
 
-    // 🔄 PostgreSQL คืน column names เป็นตัวพิมพ์เล็กทั้งหมด (roomid แทน roomId)
+    // PostgreSQL คืน column names เป็นตัวพิมพ์เล็กทั้งหมด (roomid แทน roomId)
     // ฟังก์ชันนี้แปลงกลับเป็น camelCase ให้ตรงกับ Frontend
     const colMap = {
         roomid: 'roomId', roomname: 'roomName', teacherusername: 'teacherUsername',
@@ -180,8 +195,8 @@ if (isPg) {
     };
 
     pool.query('SELECT NOW()')
-        .then(() => console.log('🟢 เชื่อมต่อฐานข้อมูล Neon PostgreSQL สำเร็จ! (Cloud DB Active)'))
-        .catch(err => console.error('❌ เชื่อมต่อ Neon PostgreSQL ล้มเหลว:', err.message));
+        .then(() => console.log('เชื่อมต่อฐานข้อมูล Neon PostgreSQL สำเร็จ! (Cloud DB Active)'))
+        .catch(err => console.error('เชื่อมต่อ Neon PostgreSQL ล้มเหลว:', err.message));
 
 } else {
     const dbDir = process.env.DATA_DIR || path.join(__dirname, '.data');
@@ -191,20 +206,36 @@ if (isPg) {
     const dbPath = path.join(dbDir, 'exam_system.db');
 
     db = new sqlite3.Database(dbPath, (err) => {
-        if (err) console.error('❌ เชื่อมต่อ SQLite ล้มเหลว:', err.message);
-        else console.log('🟢 เชื่อมต่อฐานข้อมูล SQLite สำเร็จ (ไฟล์: ' + dbPath + ')');
+        if (err) console.error('เชื่อมต่อ SQLite ล้มเหลว:', err.message);
+        else console.log('เชื่อมต่อฐานข้อมูล SQLite สำเร็จ (ไฟล์: ' + dbPath + ')');
     });
 }
 
-// 🔐 ระบบยืนยันตัวตนด้วย token (auth.js) — ต้องลงทะเบียนก่อน API ทั้งหมด
+// เข้าสู่ระบบช่องเดียว (login.html): ตรวจว่าเป็นบัญชีอาจารย์/แอดมินก่อน ถ้าไม่ใช่ถือเป็นนักศึกษา
+// ส่งต่อไปยัง API เดิม (/api/teacher/login หรือ /api/student/login) จึงได้ระบบล็อกเมื่อใส่รหัสผิด token และบังคับเปลี่ยนรหัสครบเหมือนเดิม
+app.use((req, res, next) => {
+    if (req.method !== 'POST' || req.path !== '/api/login') return next();
+    const body = req.body || {};
+    const id = String(body.username || body.id || '').trim();
+    const password = String(body.password || '');
+    if (!id || !password) return res.status(400).json({ success: false, message: 'กรุณากรอกรหัสนักศึกษา/ชื่อผู้ใช้ และรหัสผ่าน' });
+    db.get('SELECT id FROM teachers WHERE username = ?', [id], (err, t) => {
+        if (err) return res.status(500).json({ success: false, message: err.message });
+        if (t) { req.body = { username: id, password }; req.url = '/api/teacher/login'; }
+        else { req.body = { studentId: id, password }; req.url = '/api/student/login'; }
+        next();
+    });
+});
+
+// ระบบยืนยันตัวตนด้วย token (auth.js) — ต้องลงทะเบียนก่อน API ทั้งหมด
 const { hashTeacherPassword, verifyTeacherPassword } = require('./auth');
 require('./auth').register(app, db, process.env.DATA_DIR || path.join(__dirname, '.data'));
-// 🤖 สร้าง/แปลงข้อสอบด้วย Claude (ai-quiz.js) — ถ้าไม่มี API key จะใช้คลังข้อสอบเดิม
-try { require('./ai-quiz')(app, db); } catch (e) { console.error('⚠️ โหลด AI Quiz ไม่สำเร็จ:', e.message); }
-// 🛡️ บันทึกคำตอบระหว่างสอบ + บล็อกเบราว์เซอร์ในแอป + จับสัญญาณขาดหาย (ต้องอยู่ก่อนเส้นทาง API ของการสอบ)
-try { require('./exam-guard')(app, db); } catch (e) { console.error('⚠️ โหลด Exam Guard ไม่สำเร็จ:', e.message); }
+// สร้าง/แปลงข้อสอบด้วย Claude (ai-quiz.js) — ถ้าไม่มี API key จะใช้คลังข้อสอบเดิม
+try { require('./ai-quiz')(app, db); } catch (e) { console.error('โหลด AI Quiz ไม่สำเร็จ:', e.message); }
+// บันทึกคำตอบระหว่างสอบ + บล็อกเบราว์เซอร์ในแอป + จับสัญญาณขาดหาย (ต้องอยู่ก่อนเส้นทาง API ของการสอบ)
+try { require('./exam-guard')(app, db); } catch (e) { console.error('โหลด Exam Guard ไม่สำเร็จ:', e.message); }
 
-// 🛠️ สร้างตารางข้อมูลทั้งหมด และทำการ Migration ตารางเดิมอย่างปลอดภัย
+// สร้างตารางข้อมูลทั้งหมด และทำการ Migration ตารางเดิมอย่างปลอดภัย
 db.serialize(() => {
     // 1. ตารางอาจารย์
     db.run(`CREATE TABLE IF NOT EXISTS teachers (
@@ -358,7 +389,7 @@ db.serialize(() => {
     )`);
 
     // ==========================================
-    // ⚙️ ระบบ Auto-Migrations (เพิ่มคอลัมน์ใหม่สำหรับตารางเดิมที่มีอยู่แล้ว)
+    // ระบบ Auto-Migrations (เพิ่มคอลัมน์ใหม่สำหรับตารางเดิมที่มีอยู่แล้ว)
     // ==========================================
     
     // ผูกห้องสอบกับรายวิชา (courseId)
@@ -476,30 +507,30 @@ db.serialize(() => {
         if (!err) console.log("✔ Added column 'approved_by' to students table");
     });
 
-    // 🛡️ Seed บัญชี Super Admin เริ่มต้น: ใช้ ADMIN_PASSWORD จาก .env ถ้ามี ไม่งั้นใช้ admin123 แล้วบังคับเปลี่ยนตอนเข้าสู่ระบบครั้งแรก
+    // Seed บัญชี Super Admin เริ่มต้น: ใช้ ADMIN_PASSWORD จาก .env ถ้ามี ไม่งั้นใช้ admin123 แล้วบังคับเปลี่ยนตอนเข้าสู่ระบบครั้งแรก
     const seedAdminPw = (process.env.ADMIN_PASSWORD || '').trim() || 'admin123';
     db.run(`INSERT OR IGNORE INTO teachers (username, password, name, status, role, created_at) VALUES (?, ?, ?, ?, ?, ?)`,
         ['admin', hashTeacherPassword(seedAdminPw), 'ผู้ดูแลระบบ (Super Admin)', 'approved', 'admin', new Date().toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })],
         function (err) {
             if (err || !this || !this.changes) return;
             console.log(seedAdminPw === 'admin123'
-                ? '🛡️ สร้างบัญชี Super Admin แล้ว (admin / admin123) ระบบจะบังคับตั้งรหัสใหม่ตอนเข้าสู่ระบบครั้งแรก'
-                : '🛡️ สร้างบัญชี Super Admin แล้ว (admin / รหัสจาก ADMIN_PASSWORD)');
+                ? 'สร้างบัญชี Super Admin แล้ว (admin / admin123) ระบบจะบังคับตั้งรหัสใหม่ตอนเข้าสู่ระบบครั้งแรก'
+                : 'สร้างบัญชี Super Admin แล้ว (admin / รหัสจาก ADMIN_PASSWORD)');
         }
     );
-    // 📱 สุ่มสร้างรหัส PIN 6 หลักสำหรับห้องสอบที่ยังไม่มีรหัส PIN ให้ทันที
+    // สุ่มสร้างรหัส PIN 6 หลักสำหรับห้องสอบที่ยังไม่มีรหัส PIN ให้ทันที
     db.all("SELECT id, roomId FROM teacher_rooms WHERE exam_code IS NULL OR exam_code = ''", [], (err, rows) => {
         if (!err && rows && rows.length > 0) {
             rows.forEach(r => {
                 const autoPin = Math.floor(100000 + Math.random() * 900000).toString();
                 db.run("UPDATE teacher_rooms SET exam_code = ? WHERE id = ?", [autoPin, r.id]);
             });
-            console.log(`📱 สุ่มสร้างรหัส PIN 6 หลักให้ห้องสอบเริ่มต้น ${rows.length} ห้องเรียบร้อย`);
+            console.log(`สุ่มสร้างรหัส PIN 6 หลักให้ห้องสอบเริ่มต้น ${rows.length} ห้องเรียบร้อย`);
         }
     });
 });
 
-// ⏳ ระบบจัดการนักศึกษาที่อยู่ในห้องสอบ / รอสอบแบบเรียลไทม์ (Real-time Live Room Tracker)
+// ระบบจัดการนักศึกษาที่อยู่ในห้องสอบ / รอสอบแบบเรียลไทม์ (Real-time Live Room Tracker)
 const activeRoomTracker = new Map(); // roomId -> Map(studentId -> { studentId, name, class, state, lastSeen })
 
 function recordStudentActive(roomId, studentId, name, studentClass, state = 'in_exam') {
@@ -589,7 +620,7 @@ function saveQuestionsToTemplateHelper(templateId, questions, res) {
 }
 
 // ==========================================
-// 📚 ระบบคลังข้อสอบสะสม (My Exam Library) & 💾 ข้อมูลพื้นที่จัดเก็บ (Storage stats)
+// ระบบคลังข้อสอบสะสม (My Exam Library) & ข้อมูลพื้นที่จัดเก็บ (Storage stats)
 // ==========================================
 
 function syncRoomToLibrary(roomId) {
@@ -660,25 +691,32 @@ function copyRoomQuestionsToTemplate(roomId, templateId) {
     });
 }
 
-// 🧩 เส้นทาง API หลัก (รวมไว้ในไฟล์นี้ไฟล์เดียว เพื่อให้อัปโหลดขึ้น GitHub แล้วไม่ขาดไฟล์) ลงทะเบียนตามลำดับเดิม หลังประกาศฟังก์ชันช่วยทั้งหมด
+// เส้นทาง API หลัก (รวมไว้ในไฟล์นี้ไฟล์เดียว เพื่อให้อัปโหลดขึ้น GitHub แล้วไม่ขาดไฟล์) ลงทะเบียนตามลำดับเดิม หลังประกาศฟังก์ชันช่วยทั้งหมด
 const routeCtx = { db, getActiveRoomStudentMap, getActiveRoomStudents, getWaitingStudents, hashPassword, hashTeacherPassword, recordStudentActive, recordWaitingStudent, removeStudentActive, saveQuestionsToTemplateHelper, syncRoomToLibrary, verifyTeacherPassword, waitingStudentsTracker };
 // =====================================================================
-// 🧩 01-teachers-rooms.js — อาจารย์: สมัคร/เข้าสู่ระบบ ห้องสอบ 10 ห้อง และรายชื่อห้องรอสอบ
+// 01-teachers-rooms.js — อาจารย์: สมัคร/เข้าสู่ระบบ ห้องสอบ 10 ห้อง และรายชื่อห้องรอสอบ
 // (โค้ดเดิม ไม่เปลี่ยนการทำงาน)
 // =====================================================================
 (function (app, ctx) {
     const { db, getWaitingStudents, hashTeacherPassword, verifyTeacherPassword } = ctx;
 
 // ==========================================
-// 🔐 ระบบจัดการบัญชีอาจารย์ (Authentication)
+// ระบบจัดการบัญชีอาจารย์ (Authentication)
 // ==========================================
 
-// 🛠️ API สำหรับสร้างไอดีอาจารย์ (สถานะเริ่มต้น = pending รอ Admin อนุมัติ)
+// API สำหรับสร้างไอดีอาจารย์ (สถานะเริ่มต้น = pending รอ Admin อนุมัติ)
 app.post('/api/admin/create-teacher', (req, res) => {
     const { username, password, name, phone } = req.body;
     if (!username || !password || !name || !phone) return res.status(400).json({ message: "กรุณากรอกข้อมูลให้ครบถ้วน" });
 
     const created_at = new Date().toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    // หน้าเข้าสู่ระบบใช้ช่องเดียวกัน → ห้ามตั้ง username ซ้ำกับรหัสนักศึกษา (ไม่งั้นนักศึกษาคนนั้นจะเข้าระบบไม่ได้)
+    const uname = String(username).trim(), unameNorm = uname.replace(/[^0-9a-zA-Z]/g, '');
+    db.get(`SELECT studentId FROM students WHERE studentId = ? OR REPLACE(studentId, '-', '') = ?
+            UNION SELECT studentId FROM course_students WHERE studentId = ? OR REPLACE(studentId, '-', '') = ? LIMIT 1`,
+        [uname, unameNorm, uname, unameNorm], (sErr, clash) => {
+    if (clash) return res.status(400).json({ message: "Username นี้ตรงกับรหัสนักศึกษาในระบบ กรุณาใช้ชื่อผู้ใช้อื่น" });
 
     db.run('INSERT INTO teachers (username, password, name, phone, status, role, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)', 
         [username, hashTeacherPassword(password), name, phone, 'pending', 'teacher', created_at], function(err) {
@@ -694,17 +732,18 @@ app.post('/api/admin/create-teacher', (req, res) => {
         }
         stmt.finalize();
 
-        console.log(`👤 สร้างบัญชีอาจารย์ (รอตรวจ): ${username} (${name})`);
+        console.log(`สร้างบัญชีอาจารย์ (รอตรวจ): ${username} (${name})`);
         res.json({ success: true, message: `สร้างบัญชีสำเร็จ! กรุณารอผู้ดูแลระบบ (Admin) ตรวจสอบและอนุมัติก่อนเข้าใช้งานครับ` });
+    });
     });
 });
 
-// 🔑 API สำหรับให้อาจารย์ล็อกอินเข้าสู่ระบบ (ตรวจสอบสถานะ approved ก่อน)
+// API สำหรับให้อาจารย์ล็อกอินเข้าสู่ระบบ (ตรวจสอบสถานะ approved ก่อน)
 app.post('/api/teacher/login', (req, res) => {
     const { username, password } = req.body;
     db.get('SELECT * FROM teachers WHERE username = ?', [username], (err, found) => {
         if (err) return res.status(500).json({ message: err.message });
-        // 🔐 ตรวจรหัสผ่านแบบเข้ารหัส (รหัสเดิมที่ยังไม่เข้ารหัสจะถูกอัปเกรดอัตโนมัติเมื่อล็อกอินสำเร็จ)
+        // ตรวจรหัสผ่านแบบเข้ารหัส (รหัสเดิมที่ยังไม่เข้ารหัสจะถูกอัปเกรดอัตโนมัติเมื่อล็อกอินสำเร็จ)
         let teacher = null;
         if (found) {
             const v = verifyTeacherPassword(found.password, password);
@@ -720,10 +759,10 @@ app.post('/api/teacher/login', (req, res) => {
         // ตรวจสอบสถานะการอนุมัติ
         const status = teacher.status || 'approved';
         if (status === 'pending') {
-            return res.status(403).json({ success: false, message: "⏳ บัญชีของคุณยังอยู่ระหว่างรอการอนุมัติจากผู้ดูแลระบบ (Admin) กรุณารอสักครู่ครับ" });
+            return res.status(403).json({ success: false, message: "บัญชีของคุณยังอยู่ระหว่างรอการอนุมัติจากผู้ดูแลระบบ (Admin) กรุณารอสักครู่ครับ" });
         }
         if (status === 'rejected') {
-            return res.status(403).json({ success: false, message: "❌ บัญชีของคุณถูกปฏิเสธโดยผู้ดูแลระบบ กรุณาติดต่อ Admin เพื่อสอบถามครับ" });
+            return res.status(403).json({ success: false, message: "บัญชีของคุณถูกปฏิเสธโดยผู้ดูแลระบบ กรุณาติดต่อ Admin เพื่อสอบถามครับ" });
         }
 
         // ตรวจสอบ role - ถ้าเป็น admin ให้ไปหน้า Super Admin
@@ -738,7 +777,7 @@ app.post('/api/teacher/login', (req, res) => {
                         stmt.run(username, `${username}_r${i}`, `ห้องสอบที่ ${i}`);
                     }
                     stmt.finalize();
-                    console.log(`🎁 เจนห้องสอบเริ่มต้น 10 ห้องให้ผู้ใช้ ${username} สำเร็จ`);
+                    console.log(`เจนห้องสอบเริ่มต้น 10 ห้องให้ผู้ใช้ ${username} สำเร็จ`);
                 }
             });
         }
@@ -747,7 +786,7 @@ app.post('/api/teacher/login', (req, res) => {
     });
 });
 
-// 🏠 API สำหรับดึงห้องสอบของอาจารย์ (หรือดึงทุกห้องในระบบหากเป็น admin)
+// API สำหรับดึงห้องสอบของอาจารย์ (หรือดึงทุกห้องในระบบหากเป็น admin)
 app.get('/api/teacher/rooms', (req, res) => {
     const username = req.query.username;
     if (!username || username === 'undefined') return res.status(400).json({ message: "กรุณาระบุ username ของอาจารย์" });
@@ -800,7 +839,7 @@ app.get('/api/teacher/rooms', (req, res) => {
     });
 });
 
-// ➕ API สร้างห้องสอบใหม่ พร้อมรหัส PIN 6 หลักและเปิดห้องรอสอบทันที
+// API สร้างห้องสอบใหม่ พร้อมรหัส PIN 6 หลักและเปิดห้องรอสอบทันที
 app.post('/api/teacher/create-room', (req, res) => {
     const { username, roomName, examTitle, courseId, duration, announcement, showScore, randomize } = req.body;
     if (!username) return res.status(400).json({ message: "กรุณาระบุ username ของอาจารย์" });
@@ -831,7 +870,7 @@ app.post('/api/teacher/create-room', (req, res) => {
     ], function(err) {
         if (err) return res.status(500).json({ message: "ไม่สามารถสร้างห้องสอบได้: " + err.message });
 
-        console.log(`🎉 [ห้องสอบใหม่] อาจารย์ ${username} สร้างห้อง "${cleanRoomName}" (ID: ${roomId}, PIN: ${examPin})`);
+        console.log(`[ห้องสอบใหม่] อาจารย์ ${username} สร้างห้อง "${cleanRoomName}" (ID: ${roomId}, PIN: ${examPin})`);
 
         res.json({
             success: true,
@@ -858,7 +897,7 @@ app.post('/api/teacher/create-room', (req, res) => {
 });
 
 
-// 👥 ดึงรายชื่อและจำนวนนักศึกษาที่กำลังรอสอบอยู่ในห้อง (Real-time Waiting Counter)
+// ดึงรายชื่อและจำนวนนักศึกษาที่กำลังรอสอบอยู่ในห้อง (Real-time Waiting Counter)
 app.get('/api/teacher/waiting-students', (req, res) => {
     const roomId = req.query.roomId;
     if (!roomId) return res.status(400).json({ message: "กรุณาระบุ roomId" });
@@ -880,7 +919,7 @@ app.get('/api/teacher/waiting-students', (req, res) => {
     });
 });
 
-// 🏠 API บังคับสร้างห้องสอบเริ่มต้น 10 ห้องสำหรับอาจารย์
+// API บังคับสร้างห้องสอบเริ่มต้น 10 ห้องสำหรับอาจารย์
 app.post('/api/teacher/create-rooms', (req, res) => {
     const { username } = req.body;
     if (!username) return res.status(400).json({ message: "กรุณาระบุ username" });
@@ -896,87 +935,52 @@ app.post('/api/teacher/create-rooms', (req, res) => {
 })(app, routeCtx);
 
 // =====================================================================
-// 🧩 02-student-records.js — ประวัตินักศึกษา (หน้า admin-students)
+// 02-student-records.js — ประวัตินักศึกษา (หน้า admin-students)
 // (โค้ดเดิม ไม่เปลี่ยนการทำงาน)
 // =====================================================================
 (function (app, ctx) {
     const { db } = ctx;
 
 // ==========================================
-// 👨‍🎓 Student Management APIs (ระบบจัดการประวัตินักศึกษา)
+// Student Management APIs (ระบบจัดการประวัตินักศึกษา)
 // ==========================================
 
 // ดึงรายชื่อนักศึกษาพร้อมสถิติการสอบ (รองรับแยกตามรายวิชา courseId)
 app.get('/api/students', (req, res) => {
-    const username = req.query.username || 'admin';
+    const v = viewer(req);
     const courseId = req.query.courseId;
-
-    if (courseId && courseId !== 'ALL') {
-        const sql = `
-            SELECT 
-                cs.studentId, 
-                COALESCE(cs.firstName, s.firstName, 'นักศึกษา') as firstName, 
-                COALESCE(cs.lastName, s.lastName, '') as lastName, 
-                COALESCE(cs.class, s.class, '') as class, 
-                s.note, 
-                COALESCE(s.status, 'approved') as status,
-                s.created_at,
-                s.approved_at,
-                c.id as courseId,
-                c.courseCode,
-                c.courseName,
-                COUNT(DISTINCT er.id) as examCount,
-                AVG(CASE WHEN er.maxScore > 0 THEN (CAST(er.score AS FLOAT) / er.maxScore) * 100 ELSE NULL END) as avgScore,
-                COUNT(DISTINCT cl.id) as cheatCount
-            FROM course_students cs
-            JOIN courses c ON c.id = cs.courseId
-            LEFT JOIN students s ON (s.studentId = cs.studentId OR REPLACE(s.studentId, '-', '') = REPLACE(cs.studentId, '-', ''))
-            LEFT JOIN exam_results er ON (er.studentId = cs.studentId OR REPLACE(er.studentId, '-', '') = REPLACE(cs.studentId, '-', ''))
-                                     AND (er.courseId = cs.courseId OR er.roomId IN (SELECT roomId FROM teacher_rooms WHERE courseId = cs.courseId))
-            LEFT JOIN cheat_logs cl ON (cl.studentId = cs.studentId OR REPLACE(cl.studentId, '-', '') = REPLACE(cs.studentId, '-', ''))
-                                     -- นับเฉพาะพฤติกรรมในห้องสอบของรายวิชานี้ (เดิมนับทุกห้องตลอดเวลา → ขึ้น "สลับ 97 ครั้ง" ทั้งที่ยังไม่ได้สอบวิชานี้)
-                                     AND cl.roomId IN (SELECT roomId FROM teacher_rooms WHERE courseId = cs.courseId)
-            WHERE (cs.courseId = ? OR CAST(cs.courseId AS TEXT) = ?)
-            GROUP BY cs.id, cs.studentId, cs.firstName, cs.lastName, cs.class, s.firstName, s.lastName, s.class, s.note, s.status, s.created_at, s.approved_at, c.id, c.courseCode, c.courseName
-            ORDER BY cs.studentId ASC
-        `;
-        db.all(sql, [courseId, String(courseId)], (err, rows) => {
-            if (err) return res.status(500).json({ message: err.message });
-            res.json(rows || []);
-        });
-        return;
-    }
-
+    const one = courseId && courseId !== 'ALL';
+    // แยกแถวตามรายวิชาเสมอ: จำนวนสอบ/คะแนน/จำนวนครั้งสลับหน้าจอ นับเฉพาะห้องสอบของรายวิชานั้น ไม่รวมข้ามวิชา
     const sql = `
         SELECT 
-            s.studentId, 
-            s.firstName, 
-            s.lastName, 
-            s.class, 
+            cs.studentId, 
+            COALESCE(cs.firstName, s.firstName, 'นักศึกษา') as firstName, 
+            COALESCE(cs.lastName, s.lastName, '') as lastName, 
+            COALESCE(cs.class, s.class, '') as class, 
             s.note, 
             COALESCE(s.status, 'approved') as status,
             s.created_at,
             s.approved_at,
+            c.id as courseId,
+            c.courseCode,
+            c.courseName,
             COUNT(DISTINCT er.id) as examCount,
             AVG(CASE WHEN er.maxScore > 0 THEN (CAST(er.score AS FLOAT) / er.maxScore) * 100 ELSE NULL END) as avgScore,
-            COUNT(DISTINCT cl.id) as cheatCount,
-            (
-                SELECT GROUP_CONCAT(DISTINCT c.courseCode || ' ' || c.courseName)
-                FROM course_students cs2
-                JOIN courses c ON c.id = cs2.courseId
-                WHERE cs2.studentId = s.studentId OR REPLACE(cs2.studentId, '-', '') = REPLACE(s.studentId, '-', '')
-            ) as enrolledCourses
-        FROM students s
-        LEFT JOIN exam_results er ON er.studentId = s.studentId OR REPLACE(er.studentId, '-', '') = REPLACE(s.studentId, '-', '')
-        LEFT JOIN cheat_logs cl ON cl.studentId = s.studentId OR REPLACE(cl.studentId, '-', '') = REPLACE(s.studentId, '-', '')
-        WHERE (? = 'admin' OR s.teacherUsername = ?
-               OR s.studentId IN (SELECT cs3.studentId FROM course_students cs3 JOIN courses c3 ON c3.id = cs3.courseId WHERE c3.teacherUsername = ?))
-        GROUP BY s.id, s.studentId, s.firstName, s.lastName, s.class, s.note, s.status, s.created_at, s.approved_at
-        ORDER BY s.studentId ASC
+            COUNT(DISTINCT cl.id) as cheatCount
+        FROM course_students cs
+        JOIN courses c ON c.id = cs.courseId
+        LEFT JOIN students s ON (s.studentId = cs.studentId OR REPLACE(s.studentId, '-', '') = REPLACE(cs.studentId, '-', ''))
+        LEFT JOIN exam_results er ON (er.studentId = cs.studentId OR REPLACE(er.studentId, '-', '') = REPLACE(cs.studentId, '-', ''))
+                                 AND er.roomId IN (SELECT roomId FROM teacher_rooms WHERE courseId = cs.courseId)
+        LEFT JOIN cheat_logs cl ON (cl.studentId = cs.studentId OR REPLACE(cl.studentId, '-', '') = REPLACE(cs.studentId, '-', ''))
+                                 AND cl.roomId IN (SELECT roomId FROM teacher_rooms WHERE courseId = cs.courseId)
+        WHERE ${one ? '(cs.courseId = ? OR CAST(cs.courseId AS TEXT) = ?)' : '(? = 1 OR c.teacherUsername = ?)'}
+          AND (? = 1 OR c.teacherUsername = ?)
+        GROUP BY cs.id, cs.studentId, cs.firstName, cs.lastName, cs.class, s.firstName, s.lastName, s.class, s.note, s.status, s.created_at, s.approved_at, c.id, c.courseCode, c.courseName
+        ORDER BY cs.studentId ASC, c.courseCode ASC
     `;
-
-    // 🔐 อาจารย์เห็นเฉพาะนักศึกษาในรายวิชาของตัวเอง (แอดมินเห็นทั้งหมด)
-    db.all(sql, [username, username, username], (err, rows) => {
+    const params = (one ? [courseId, String(courseId)] : [v.adm, v.user]).concat([v.adm, v.user]);
+    db.all(sql, params, (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
         res.json(rows || []);
     });
@@ -1093,17 +1097,11 @@ app.get('/api/students/exam-history', (req, res) => {
         LEFT JOIN teacher_rooms tr ON tr.roomId = er.roomId
         LEFT JOIN cheat_logs cl ON cl.roomId = er.roomId AND (cl.studentId = er.studentId OR REPLACE(cl.studentId, '-', '') = REPLACE(er.studentId, '-', ''))
         WHERE (er.studentId = ? OR REPLACE(er.studentId, '-', '') = REPLACE(?, '-', ''))
-          AND (
-              tr.teacherUsername = ? 
-              OR tr.teacherUsername IS NULL 
-              OR ? = 'admin' 
-              OR er.studentId IN (SELECT studentId FROM students WHERE teacherUsername = ?)
-              OR er.studentId IN (SELECT cs.studentId FROM course_students cs JOIN courses c ON c.id = cs.courseId WHERE c.teacherUsername = ?)
-          )
+          AND (? = 1 OR tr.teacherUsername = ?)
           AND (? = '' OR CAST(er.courseId AS TEXT) = ? OR CAST(tr.courseId AS TEXT) = ?)
         GROUP BY er.id, er.roomId, er.score, er.maxScore, er.time, er.date, tr.roomName, tr.exam_title
         ORDER BY er.id DESC
-    `, [studentId, studentId, username, username, username, username, cId, cId, cId], (err, rows) => {
+    `, [studentId, studentId, viewer(req).adm, viewer(req).user, cId, cId, cId], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
         res.json(rows || []);
     });
@@ -1120,16 +1118,10 @@ app.get('/api/students/cheat-history', (req, res) => {
         FROM cheat_logs cl
         LEFT JOIN teacher_rooms tr ON tr.roomId = cl.roomId
         WHERE (cl.studentId = ? OR REPLACE(cl.studentId, '-', '') = REPLACE(?, '-', ''))
-          AND (
-              tr.teacherUsername = ? 
-              OR tr.teacherUsername IS NULL 
-              OR ? = 'admin' 
-              OR cl.studentId IN (SELECT studentId FROM students WHERE teacherUsername = ?)
-              OR cl.studentId IN (SELECT cs.studentId FROM course_students cs JOIN courses c ON c.id = cs.courseId WHERE c.teacherUsername = ?)
-          )
+          AND (? = 1 OR tr.teacherUsername = ?)
           AND (? = '' OR CAST(tr.courseId AS TEXT) = ?)
         ORDER BY cl.id DESC
-    `, [studentId, studentId, username, username, username, username, cId, cId], (err, rows) => {
+    `, [studentId, studentId, viewer(req).adm, viewer(req).user, cId, cId], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
         res.json(rows || []);
     });
@@ -1137,14 +1129,14 @@ app.get('/api/students/cheat-history', (req, res) => {
 })(app, routeCtx);
 
 // =====================================================================
-// 🧩 03-student-account.js — นักศึกษา: สมัคร เข้าสู่ระบบ เปลี่ยนรหัส ตรวจสิทธิ์เข้าสอบ heartbeat
+// 03-student-account.js — นักศึกษา: สมัคร เข้าสู่ระบบ เปลี่ยนรหัส ตรวจสิทธิ์เข้าสอบ heartbeat
 // (โค้ดเดิม ไม่เปลี่ยนการทำงาน)
 // =====================================================================
 (function (app, ctx) {
     const { db, hashPassword, recordStudentActive, removeStudentActive } = ctx;
 
 // ==========================================
-// 👨‍🎓 ระบบสมัครและอนุมัติบัญชีนักศึกษา (Student Registration & Admin Approval)
+// ระบบสมัครและอนุมัติบัญชีนักศึกษา (Student Registration & Admin Approval)
 // ==========================================
 
 // 1. นักศึกษาสมัครสมาชิกใหม่ (สถานะเริ่มต้น: approved ใช้งานได้ทันที ไม่ต้องรอแอดมินอนุมัติ)
@@ -1158,13 +1150,16 @@ app.post('/api/student/register', (req, res) => {
     const cleanFirstName = firstName.trim();
     const cleanLastName = (lastName || '').trim();
     const cleanClass = (cls || '').trim();
+    if (weakStudentPw(password, cleanStudentId)) {
+        return res.status(400).json({ success: false, message: STUDENT_PW_RULE_MSG });
+    }
 
-    // 🇹🇭 ตรวจสอบว่าชื่อและนามสกุลเป็นภาษาไทยเท่านั้น
+    // ตรวจสอบว่าชื่อและนามสกุลเป็นภาษาไทยเท่านั้น
     const thaiRegex = /^[\u0E00-\u0E7F\s.]+$/;
     if (!thaiRegex.test(cleanFirstName) || (cleanLastName && !thaiRegex.test(cleanLastName))) {
         return res.status(400).json({ 
             success: false, 
-            message: "⚠️ ชื่อและนามสกุลต้องเป็นภาษาไทยเท่านั้นครับ (ไม่อนุญาตให้ใช้ภาษาอื่นหรืออักขระพิเศษ)" 
+            message: "ชื่อและนามสกุลต้องเป็นภาษาไทยเท่านั้นครับ (ไม่อนุญาตให้ใช้ภาษาอื่นหรืออักขระพิเศษ)" 
         });
     }
 
@@ -1205,7 +1200,7 @@ app.post('/api/student/register', (req, res) => {
 
                         return res.json({
                             success: true,
-                            message: "🎉 ยืนยันการลงทะเบียนสำเร็จ! บัญชีของคุณเปิดใช้งานเรียบร้อย สามารถเข้าสู่ระบบได้ทันทีครับ",
+                            message: "ยืนยันการลงทะเบียนสำเร็จ! บัญชีของคุณเปิดใช้งานเรียบร้อย สามารถเข้าสู่ระบบได้ทันทีครับ",
                             student: {
                                 studentId: cleanStudentId,
                                 firstName: cleanFirstName,
@@ -1233,7 +1228,7 @@ app.post('/api/student/register', (req, res) => {
                 if (insertErr) return res.status(500).json({ success: false, message: insertErr.message });
                 res.json({
                     success: true,
-                    message: "🎉 สมัครสมาชิกสำเร็จ! บัญชีของคุณเปิดใช้งานเรียบร้อย สามารถเข้าสู่ระบบได้ทันทีครับ",
+                    message: "สมัครสมาชิกสำเร็จ! บัญชีของคุณเปิดใช้งานเรียบร้อย สามารถเข้าสู่ระบบได้ทันทีครับ",
                     student: {
                         studentId: cleanStudentId,
                         firstName: cleanFirstName,
@@ -1260,13 +1255,13 @@ app.post('/api/student/login', (req, res) => {
     const inputPassword = (password || '1234').trim();
     const defaultHash = hashPassword('1234');
     const inputHash = hashPassword(inputPassword);
-    // 🔐 รหัสผ่านเริ่มต้นที่เดาได้: 1234 หรือ 4 หลักท้ายของรหัสนักศึกษา (บัญชีที่อาจารย์เพิ่มเอง)
+    // รหัสผ่านเริ่มต้นที่เดาได้: 1234 หรือ 4 หลักท้ายของรหัสนักศึกษา (บัญชีที่อาจารย์เพิ่มเอง)
     const last4Hash = hashPassword(cleanStudentId.replace(/[^0-9]/g, '').slice(-4) || '1234');
     // รหัสแบบมีขีดตัวท้าย เช่น 67322110051-6 → นักศึกษาอาจนับ 4 หลักท้ายเป็น 0516 (ไม่นับขีด) หรือ 0051 (ก่อนขีด) รับทั้งสองแบบ
     const beforeDash = cleanStudentId.includes('-') ? cleanStudentId.slice(0, cleanStudentId.lastIndexOf('-')).replace(/[^0-9]/g, '').slice(-4) : '';
     const DEFAULT_HASHES = [defaultHash, last4Hash].concat(beforeDash.length === 4 ? [hashPassword(beforeDash)] : []);
     const isGuessableHash = h => !h || DEFAULT_HASHES.includes(h);
-    // 🔑 ยังไม่เคยเปลี่ยนรหัส: ใช้ได้ทั้ง 1234 และ 4 หลักท้ายของรหัสนักศึกษา (ตรงกับที่หน้าเข้าสอบบอกไว้) แล้วระบบจะบังคับตั้งรหัสใหม่
+    // ยังไม่เคยเปลี่ยนรหัส: ใช้ได้ทั้ง 1234 และ 4 หลักท้ายของรหัสนักศึกษา (ตรงกับที่หน้าเข้าสอบบอกไว้) แล้วระบบจะบังคับตั้งรหัสใหม่
     const firstLoginOk = h => isGuessableHash(h) && DEFAULT_HASHES.includes(inputHash);
 
     const checkStudentStatusAndLogin = (studentObj, isDefaultPassword, roomObj) => {
@@ -1275,7 +1270,7 @@ app.post('/api/student/login', (req, res) => {
             return res.status(403).json({ 
                 success: false, 
                 isRejected: true,
-                message: "❌ บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ (Admin)" 
+                message: "บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ (Admin)" 
             });
         }
 
@@ -1318,7 +1313,7 @@ app.post('/api/student/login', (req, res) => {
 
         // ถ้ามีการส่ง examCode หรือ roomId มา และพบห้องสอบ
         if (room && room.courseId && room.courseId > 0) {
-            // 🔒 ตรวจสอบว่ารหัสนักศึกษาอยู่ในรายชื่อของวิชานี้หรือไม่
+            // ตรวจสอบว่ารหัสนักศึกษาอยู่ในรายชื่อของวิชานี้หรือไม่
             db.all('SELECT * FROM course_students WHERE courseId = ? OR CAST(courseId AS TEXT) = ?', [room.courseId, String(room.courseId)], (csListErr, enrolledList) => {
                 if (csListErr) return res.status(500).json({ success: false, message: csListErr.message });
 
@@ -1332,7 +1327,7 @@ app.post('/api/student/login', (req, res) => {
                         return res.status(403).json({
                             success: false,
                             accessDenied: true,
-                            message: `❌ ขออภัย รหัสนักศึกษา (${cleanStudentId}) ไม่มีรายชื่ออยู่ในบัญชีผู้มีสิทธิ์สอบรายวิชา "${room.courseName || room.courseCode || 'วิชานี้'}" จึงไม่สามารถเข้าห้องสอบได้`
+                            message: `ขออภัย รหัสนักศึกษา (${cleanStudentId}) ไม่มีรายชื่ออยู่ในบัญชีผู้มีสิทธิ์สอบรายวิชา "${room.courseName || room.courseCode || 'วิชานี้'}" จึงไม่สามารถเข้าห้องสอบได้`
                         });
                     }
 
@@ -1346,7 +1341,7 @@ app.post('/api/student/login', (req, res) => {
                             const fName = foundInCourse.firstName || 'นักศึกษา';
                             const lName = foundInCourse.lastName || '';
                             const cls = foundInCourse.class || '';
-                            if (!DEFAULT_HASHES.includes(inputHash)) return res.status(401).json({ success: false, message: "รหัสผ่านไม่ถูกต้อง (เข้าสู่ระบบครั้งแรกใช้ 1234 หรือ 4 หลักท้ายของรหัสนักศึกษา)" }); // 🔐 ครั้งแรกต้องใช้รหัสเริ่มต้นเท่านั้น
+                            if (!DEFAULT_HASHES.includes(inputHash)) return res.status(401).json({ success: false, message: "รหัสผ่านไม่ถูกต้อง (เข้าสู่ระบบครั้งแรกใช้ 1234 หรือ 4 หลักท้ายของรหัสนักศึกษา)" }); // ครั้งแรกต้องใช้รหัสเริ่มต้นเท่านั้น
 
                             db.run(
                                 `INSERT INTO students (studentId, firstName, lastName, class, password_hash, status, created_at, approved_at, approved_by)
@@ -1354,7 +1349,7 @@ app.post('/api/student/login', (req, res) => {
                                 [cleanStudentId, fName, lName, cls, defaultHash, now, now],
                                 function(insErr) {
                                     if (insErr) return res.status(500).json({ success: false, message: insErr.message });
-                                    console.log(`✨ [สร้างบัญชีนักศึกษาจากรายชื่อวิชา] ${cleanStudentId} (${fName}) เข้าสู่ระบบห้อง ${room.roomId}`);
+                                    console.log(`[สร้างบัญชีนักศึกษาจากรายชื่อวิชา] ${cleanStudentId} (${fName}) เข้าสู่ระบบห้อง ${room.roomId}`);
                                     checkStudentStatusAndLogin({
                                         studentId: cleanStudentId,
                                         firstName: fName,
@@ -1367,7 +1362,7 @@ app.post('/api/student/login', (req, res) => {
                             return;
                         }
 
-                        // มีบัญชีนักศึกษาอยู่แล้ว -> 🔐 ต้องตรวจรหัสผ่านเสมอ (เดิมเข้าได้โดยไม่ตรวจรหัส ทำให้สอบแทนกันได้)
+                        // มีบัญชีนักศึกษาอยู่แล้ว -> ต้องตรวจรหัสผ่านเสมอ (เดิมเข้าได้โดยไม่ตรวจรหัส ทำให้สอบแทนกันได้)
                         if (student.password_hash && student.password_hash !== inputHash && !firstLoginOk(student.password_hash)) {
                             return res.status(401).json({ success: false, message: "รหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง" });
                         }
@@ -1407,14 +1402,14 @@ app.post('/api/student/login', (req, res) => {
                         const cls = csRow.class || '';
 
                         // สร้างบัญชีในนักศึกษาให้อัตโนมัติโดยใช้รหัสผ่านเริ่มต้น 1234
-                        if (!DEFAULT_HASHES.includes(inputHash)) return res.status(401).json({ success: false, message: "รหัสผ่านไม่ถูกต้อง (เข้าสู่ระบบครั้งแรกใช้ 1234 หรือ 4 หลักท้ายของรหัสนักศึกษา)" }); // 🔐 ครั้งแรกต้องใช้รหัสเริ่มต้นเท่านั้น
+                        if (!DEFAULT_HASHES.includes(inputHash)) return res.status(401).json({ success: false, message: "รหัสผ่านไม่ถูกต้อง (เข้าสู่ระบบครั้งแรกใช้ 1234 หรือ 4 หลักท้ายของรหัสนักศึกษา)" }); // ครั้งแรกต้องใช้รหัสเริ่มต้นเท่านั้น
                         db.run(
                             `INSERT INTO students (studentId, firstName, lastName, class, password_hash, status, created_at, approved_at, approved_by)
                              VALUES (?, ?, ?, ?, ?, 'approved', ?, ?, 'system_auto')`,
                             [cleanStudentId, fName, lName, cls, defaultHash, now, now],
                             function(insErr) {
                                 if (insErr) return res.status(500).json({ success: false, message: insErr.message });
-                                console.log(`✨ [สร้างบัญชีอัตโนมัติ] นักศึกษา ${cleanStudentId} (${fName}) จากรายชื่อวิชาเข้าสู่ระบบแล้ว`);
+                                console.log(`[สร้างบัญชีอัตโนมัติ] นักศึกษา ${cleanStudentId} (${fName}) จากรายชื่อวิชาเข้าสู่ระบบแล้ว`);
                                 
                                 checkStudentStatusAndLogin({
                                     studentId: cleanStudentId,
@@ -1451,8 +1446,8 @@ app.post('/api/student/change-password', (req, res) => {
         return res.status(400).json({ success: false, message: "กรุณาระบุรหัสนักศึกษาและรหัสผ่านใหม่" });
     }
 
-    if (newPassword.trim().length < 4) {
-        return res.status(400).json({ success: false, message: "รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 4 ตัวอักษร" });
+    if (weakStudentPw(newPassword, studentId)) {
+        return res.status(400).json({ success: false, message: STUDENT_PW_RULE_MSG });
     }
 
     const cleanStudentId = studentId.trim();
@@ -1463,8 +1458,8 @@ app.post('/api/student/change-password', (req, res) => {
         [newHash, cleanStudentId],
         function(err) {
             if (err) return res.status(500).json({ success: false, message: err.message });
-            console.log(`🔐 [เปลี่ยนรหัสผ่านสำเร็จ] นักศึกษา ${cleanStudentId} ตั้งรหัสผ่านใหม่เรียบร้อยแล้ว`);
-            res.json({ success: true, message: "🎉 เปลี่ยนรหัสผ่านใหม่เรียบร้อยแล้ว!" });
+            console.log(`[เปลี่ยนรหัสผ่านสำเร็จ] นักศึกษา ${cleanStudentId} ตั้งรหัสผ่านใหม่เรียบร้อยแล้ว`);
+            res.json({ success: true, message: "เปลี่ยนรหัสผ่านใหม่เรียบร้อยแล้ว!" });
         }
     );
 });
@@ -1480,16 +1475,19 @@ app.post('/api/student/update-profile', (req, res) => {
     const cleanLastName = (lastName || '').trim();
     const cleanClass = (cls || '').trim();
 
-    // 🇹🇭 ตรวจสอบภาษาไทย
+    // ตรวจสอบภาษาไทย
     const thaiRegex = /^[\u0E00-\u0E7F\s.]+$/;
     if (!thaiRegex.test(cleanFirstName) || (cleanLastName && !thaiRegex.test(cleanLastName))) {
         return res.status(400).json({ 
             success: false, 
-            message: "⚠️ ชื่อและนามสกุลต้องเป็นภาษาไทยเท่านั้นครับ" 
+            message: "ชื่อและนามสกุลต้องเป็นภาษาไทยเท่านั้นครับ" 
         });
     }
 
-    if (newPassword && newPassword.trim().length >= 4) {
+    if (newPassword && weakStudentPw(newPassword, studentId)) {
+        return res.status(400).json({ success: false, message: STUDENT_PW_RULE_MSG });
+    }
+    if (newPassword && newPassword.trim()) {
         const hash = hashPassword(newPassword.trim());
         db.run('UPDATE students SET firstName = ?, lastName = ?, class = ?, password_hash = ? WHERE studentId = ?',
             [cleanFirstName, cleanLastName, cleanClass, hash, studentId.trim()], (err) => {
@@ -1529,6 +1527,14 @@ app.get('/api/student/my-exam-history', (req, res) => {
 });
 
 // 2.3 ตรวจสอบสิทธิ์และดึงข้อมูลก่อนเข้าห้องสอบ / เข้าห้องรอสอบ (Gatekeeper & Pre-exam Check)
+// สอบได้ครั้งเดียว: ส่งคำตอบห้องนี้แล้ว → เข้าสอบซ้ำไม่ได้ (อาจารย์ลบผลของคนนั้นในหน้าผลสอบ หรือเผยแพร่ใหม่แบบล้างผล เพื่อให้สอบใหม่ได้)
+const ALREADY_SUBMITTED_MSG = 'คุณส่งคำตอบข้อสอบนี้ไปแล้ว การสอบแต่ละครั้งเข้าสอบได้เพียงครั้งเดียว หากมีเหตุจำเป็นต้องสอบใหม่ กรุณาติดต่ออาจารย์ผู้สอน';
+function findSubmitted(roomId, studentId, cb) {
+    db.get("SELECT score, maxScore, date, time FROM exam_results WHERE roomId = ? AND (studentId = ? OR REPLACE(studentId, '-', '') = REPLACE(?, '-', '')) LIMIT 1",
+        [roomId, String(studentId || '').trim(), String(studentId || '').trim()], (e, row) => cb(e ? null : row));
+}
+global.__findSubmitted = findSubmitted; global.__ALREADY_SUBMITTED_MSG = ALREADY_SUBMITTED_MSG;
+
 app.post('/api/student/check-exam-access', (req, res) => {
     const { studentId, examCode } = req.body;
     if (!studentId || !examCode) {
@@ -1552,7 +1558,7 @@ app.post('/api/student/check-exam-access', (req, res) => {
     db.get(roomSql, [cleanCode, cleanCode], (err, room) => {
         if (err) return res.status(500).json({ success: false, message: err.message });
         if (!room) {
-            return res.status(404).json({ success: false, message: "❌ ไม่พบห้องสอบสำหรับรหัส PIN นี้ กรุณาตรวจสอบอีกครั้ง" });
+            return res.status(404).json({ success: false, message: "ไม่พบห้องสอบสำหรับรหัส PIN นี้ กรุณาตรวจสอบอีกครั้ง" });
         }
 
         // 2. ดึงข้อมูลนักศึกษาในระบบ
@@ -1563,7 +1569,8 @@ app.post('/api/student/check-exam-access', (req, res) => {
                 return res.status(404).json({ success: false, message: "ไม่พบบัญชีนักศึกษา กรุณาเข้าสู่ระบบก่อนครับ" });
             }
 
-            const sendApprovedResponse = () => {
+            const sendApprovedResponse = () => findSubmitted(room.roomId, student.studentId, done => {
+                if (done) return res.status(403).json({ success: false, alreadySubmitted: true, roomId: room.roomId, message: ALREADY_SUBMITTED_MSG });
                 res.json({
                     success: true,
                     allowed: true,
@@ -1581,9 +1588,9 @@ app.post('/api/student/check-exam-access', (req, res) => {
                         class: student.class || ''
                     }
                 });
-            };
+            });
 
-            // 3. 🔒 คัดกรองความปลอดภัย: ถ้ารายวิชานี้มีการผูกไว้ และมีรายชื่อนักศึกษาใน course_students
+            // 3. คัดกรองความปลอดภัย: ถ้ารายวิชานี้มีการผูกไว้ และมีรายชื่อนักศึกษาใน course_students
             if (room.courseId && room.courseId > 0) {
                 db.all('SELECT * FROM course_students WHERE courseId = ? OR CAST(courseId AS TEXT) = ?', [room.courseId, String(room.courseId)], (err3, enrolledList) => {
                     if (err3) return res.status(500).json({ success: false, message: err3.message });
@@ -1599,7 +1606,7 @@ app.post('/api/student/check-exam-access', (req, res) => {
                             return res.status(403).json({
                                 success: false,
                                 accessDenied: true,
-                                message: `❌ ขออภัย รหัสนักศึกษา (${cleanStudentId}) ไม่มีรายชื่ออยู่ในบัญชีผู้มีสิทธิ์สอบรายวิชา "${room.courseName || room.courseCode || 'วิชานี้'}" จึงไม่สามารถเข้ามาร่วมสอบได้`
+                                message: `ขออภัย รหัสนักศึกษา (${cleanStudentId}) ไม่มีรายชื่ออยู่ในบัญชีผู้มีสิทธิ์สอบรายวิชา "${room.courseName || room.courseCode || 'วิชานี้'}" จึงไม่สามารถเข้ามาร่วมสอบได้`
                             });
                         }
                     }
@@ -1615,7 +1622,7 @@ app.post('/api/student/check-exam-access', (req, res) => {
     });
 });
 
-// 💓 Heartbeat สำหรับนักศึกษาที่กำลังสอบ หรือรอสอบ (Real-time Heartbeat)
+// Heartbeat สำหรับนักศึกษาที่กำลังสอบ หรือรอสอบ (Real-time Heartbeat)
 app.post('/api/student/heartbeat', (req, res) => {
     let roomId = req.body && req.body.roomId;
     let studentId = req.body && req.body.studentId;
@@ -1640,7 +1647,7 @@ app.post('/api/student/heartbeat', (req, res) => {
     res.json({ success: true, active: true });
 });
 
-// 🚪 แจ้งเตือนเมื่อนักศึกษาออกจากห้องสอบ (ปิดแท็บ / กดย้อนกลับ / ออกจากระบบ)
+// แจ้งเตือนเมื่อนักศึกษาออกจากห้องสอบ (ปิดแท็บ / กดย้อนกลับ / ออกจากระบบ)
 app.post('/api/student/leave-room', (req, res) => {
     let roomId = req.body && req.body.roomId;
     let studentId = req.body && req.body.studentId;
@@ -1655,7 +1662,7 @@ app.post('/api/student/leave-room', (req, res) => {
 
     if (roomId && studentId) {
         removeStudentActive(roomId, studentId);
-        console.log(`🚪 [นักศึกษาออกจากห้องสอบ] รหัสนักศึกษา ${studentId} ออกจากห้อง ${roomId}`);
+        console.log(`[นักศึกษาออกจากห้องสอบ] รหัสนักศึกษา ${studentId} ออกจากห้อง ${roomId}`);
     }
 
     res.json({ success: true, left: true });
@@ -1663,13 +1670,13 @@ app.post('/api/student/leave-room', (req, res) => {
 })(app, routeCtx);
 
 // =====================================================================
-// 🧩 04-live-dashboard.js — อาจารย์: รายชื่อเข้าสอบเทียบรายวิชา และแดชบอร์ดห้องสอบสด
+// 04-live-dashboard.js — อาจารย์: รายชื่อเข้าสอบเทียบรายวิชา และแดชบอร์ดห้องสอบสด
 // (โค้ดเดิม ไม่เปลี่ยนการทำงาน)
 // =====================================================================
 (function (app, ctx) {
     const { db, getActiveRoomStudentMap } = ctx;
 
-// 📊 เปรียบเทียบรายชื่อนักศึกษาในรายวิชา (course_students) กับคนที่เข้ามาสอบจริงในห้องนี้แบบ Real-time
+// เปรียบเทียบรายชื่อนักศึกษาในรายวิชา (course_students) กับคนที่เข้ามาสอบจริงในห้องนี้แบบ Real-time
 app.get('/api/teacher/room-roster-attendance', (req, res) => {
     const { roomId } = req.query;
     if (!roomId) return res.status(400).json({ message: "กรุณาระบุ roomId" });
@@ -1715,25 +1722,25 @@ app.get('/api/teacher/room-roster-attendance', (req, res) => {
                         const hadLoggedIn = loggedInMap.get(sIdStr);
 
                         let status = 'not_joined';
-                        let statusText = '🔴 ยังไม่เข้าสอบ';
+                        let statusText = 'ยังไม่เข้าสอบ';
                         let statusBg = 'bg-rose-50 text-rose-700 border-rose-200';
                         let score = null;
                         let maxScore = null;
 
                         if (isSubmitted) {
                             status = 'submitted';
-                            statusText = '✅ ส่งข้อสอบแล้ว';
+                            statusText = 'ส่งข้อสอบแล้ว';
                             statusBg = 'bg-emerald-50 text-emerald-700 border-emerald-200';
                             score = isSubmitted.score;
                             maxScore = isSubmitted.maxScore;
                         } else if (isActive) {
                             status = 'joined';
-                            statusText = '🟢 อยู่ในห้องสอบ (กำลังทำ)';
+                            statusText = 'อยู่ในห้องสอบ (กำลังทำ)';
                             statusBg = 'bg-indigo-50 text-indigo-700 border-indigo-200';
                         } else if (hadLoggedIn) {
                             // เคยเข้าห้องสอบมาแล้ว แต่ปัจจุบันออกจากห้องสอบไปแล้ว
                             status = 'not_joined';
-                            statusText = '🔴 ออกจากห้องสอบแล้ว (ออฟไลน์)';
+                            statusText = 'ออกจากห้องสอบแล้ว (ออฟไลน์)';
                             statusBg = 'bg-amber-50 text-amber-700 border-amber-200';
                         }
 
@@ -1765,7 +1772,7 @@ app.get('/api/teacher/room-roster-attendance', (req, res) => {
                                 name,
                                 class: cls,
                                 status: isSubmitted ? 'submitted' : (isActive ? 'joined' : 'not_joined'),
-                                statusText: isSubmitted ? '✅ ส่งข้อสอบแล้ว (นอกรายชื่อ)' : (isActive ? '🟢 อยู่ในห้องสอบ (นอกรายชื่อ)' : '🔴 ออกจากห้องสอบแล้ว'),
+                                statusText: isSubmitted ? 'ส่งข้อสอบแล้ว (นอกรายชื่อ)' : (isActive ? 'อยู่ในห้องสอบ (นอกรายชื่อ)' : 'ออกจากห้องสอบแล้ว'),
                                 statusBg: isSubmitted ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : (isActive ? 'bg-cyan-50 text-cyan-700 border-cyan-200' : 'bg-slate-100 text-slate-600 border-slate-200'),
                                 score: isSubmitted ? isSubmitted.score : null,
                                 maxScore: isSubmitted ? isSubmitted.maxScore : null
@@ -1800,7 +1807,7 @@ app.get('/api/teacher/room-roster-attendance', (req, res) => {
 });
 
 // ==========================================
-// 📊 Real-time Exam Summary Dashboard API
+// Real-time Exam Summary Dashboard API
 // ==========================================
 app.get('/api/teacher/room-realtime-dashboard', (req, res) => {
     const { roomId } = req.query;
@@ -1990,14 +1997,14 @@ app.get('/api/teacher/room-realtime-dashboard', (req, res) => {
 })(app, routeCtx);
 
 // =====================================================================
-// 🧩 05-courses.js — รายวิชา รายชื่อนักศึกษาประจำวิชา และการอนุมัตินักศึกษา
+// 05-courses.js — รายวิชา รายชื่อนักศึกษาประจำวิชา และการอนุมัตินักศึกษา
 // (โค้ดเดิม ไม่เปลี่ยนการทำงาน)
 // =====================================================================
 (function (app, ctx) {
     const { db, hashPassword } = ctx;
 
 // ==========================================
-// 📚 ระบบจัดการรายวิชาและนำเข้ารายชื่อนักศึกษา (Course & Student Roster Management)
+// ระบบจัดการรายวิชาและนำเข้ารายชื่อนักศึกษา (Course & Student Roster Management)
 // ==========================================
 
 // ดึงรายการรายวิชาของอาจารย์
@@ -2014,14 +2021,14 @@ app.get('/api/teacher/courses', (req, res) => {
         WHERE (c.teacherUsername = ? OR ? = 'admin')
         ORDER BY c.id DESC
     `;
-    // 🔐 อาจารย์เห็นเฉพาะรายวิชาของตัวเอง (แอดมินเห็นทั้งหมด)
+    // อาจารย์เห็นเฉพาะรายวิชาของตัวเอง (แอดมินเห็นทั้งหมด)
     db.all(sql, [username, username], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
         res.json(rows || []);
     });
 });
 
-// 📝 ดึงรายการชุดข้อสอบทั้งหมดที่อยู่ในรายวิชานี้
+// ดึงรายการชุดข้อสอบทั้งหมดที่อยู่ในรายวิชานี้
 app.get('/api/courses/:courseId/exams', (req, res) => {
     const courseId = parseInt(req.params.courseId, 10);
     if (!courseId) return res.status(400).json({ message: "กรุณาระบุ courseId" });
@@ -2350,7 +2357,7 @@ app.post('/api/admin/delete-student', (req, res) => {
 })(app, routeCtx);
 
 // =====================================================================
-// 🧩 06-rooms-manage.js — จัดการห้องสอบ: ห้องที่เปิดอยู่ ค้นห้องจาก PIN เปลี่ยนชื่อ ลบห้อง
+// 06-rooms-manage.js — จัดการห้องสอบ: ห้องที่เปิดอยู่ ค้นห้องจาก PIN เปลี่ยนชื่อ ลบห้อง
 // (โค้ดเดิม ไม่เปลี่ยนการทำงาน)
 // =====================================================================
 (function (app, ctx) {
@@ -2372,7 +2379,7 @@ app.get('/api/teacher/active-published-rooms', (req, res) => {
     });
 });
 
-// 🔍 API สำหรับนักศึกษาค้นหาห้องสอบจากรหัสข้อสอบ (examCode) และอาจารย์ผู้สอน (teacherUsername หรือค้นหาจาก PIN โดยตรง)
+// API สำหรับนักศึกษาค้นหาห้องสอบจากรหัสข้อสอบ (examCode) และอาจารย์ผู้สอน (teacherUsername หรือค้นหาจาก PIN โดยตรง)
 app.get('/api/student/get-room-by-code', (req, res) => {
     const { teacherUsername, examCode, roomId, infoOnly } = req.query;
     const queryCode = examCode || roomId;
@@ -2412,12 +2419,12 @@ app.get('/api/student/get-room-by-code', (req, res) => {
         });
 
         if (!match) {
-            return res.status(404).json({ message: "❌ ไม่พบรหัส PIN หรือห้องสอบนี้ กรุณาตรวจสอบอีกครั้งครับ" });
+            return res.status(404).json({ message: "ไม่พบรหัส PIN หรือห้องสอบนี้ กรุณาตรวจสอบอีกครั้งครับ" });
         }
 
         if (match.is_published !== 1 && !infoOnly) {
             return res.status(403).json({ 
-                message: "⏳ ข้อสอบชุดนี้ยังไม่ได้เปิดให้สอบ (สถานะแบบร่าง) กรุณาแจ้งอาจารย์ผู้สอนกดยืนยันเผยแพร่ข้อสอบก่อนครับ",
+                message: "ข้อสอบชุดนี้ยังไม่ได้เปิดให้สอบ (สถานะแบบร่าง) กรุณาแจ้งอาจารย์ผู้สอนกดยืนยันเผยแพร่ข้อสอบก่อนครับ",
                 is_published: 0
             });
         }
@@ -2436,7 +2443,7 @@ app.get('/api/student/get-room-by-code', (req, res) => {
     });
 });
 
-// 👤 API สำหรับดึงรายชื่ออาจารย์ทั้งหมดในระบบ (สำหรับหน้าจอนักศึกษาเลือกคุมสอบ)
+// API สำหรับดึงรายชื่ออาจารย์ทั้งหมดในระบบ (สำหรับหน้าจอนักศึกษาเลือกคุมสอบ)
 app.get('/api/teachers', (req, res) => {
     db.all("SELECT username, name FROM teachers WHERE role != 'admin' AND status = 'approved' ORDER BY name ASC", [], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
@@ -2444,20 +2451,21 @@ app.get('/api/teachers', (req, res) => {
     });
 });
 
-// 🏠 API สำหรับดึงห้องสอบทั้งหมดของทุกอาจารย์มารวมกัน (พร้อมดึงชื่ออาจารย์ผู้สอนและชื่อการสอบ)
+// API สำหรับดึงห้องสอบทั้งหมดของทุกอาจารย์มารวมกัน (พร้อมดึงชื่ออาจารย์ผู้สอนและชื่อการสอบ)
 app.get('/api/all-rooms', (req, res) => {
     db.all(`
         SELECT tr.roomId, tr.roomName, tr.exam_title, t.name as teacherName 
         FROM teacher_rooms tr 
         JOIN teachers t ON tr.teacherUsername = t.username 
+        WHERE (? = 1 OR tr.teacherUsername = ?)
         ORDER BY t.name ASC, tr.roomId ASC
-    `, [], (err, rows) => {
+    `, [viewer(req).adm, viewer(req).user], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
         res.json(rows);
     });
 });
 
-// ⚙️ API สำหรับเปลี่ยนชื่อห้องสอบ
+// API สำหรับเปลี่ยนชื่อห้องสอบ
 app.post('/api/teacher/update-room-name', (req, res) => {
     const { username, roomId, roomName } = req.body;
     if (!username || !roomId || !roomName) return res.status(400).json({ message: "ข้อมูลไม่ครบถ้วน" });
@@ -2468,20 +2476,20 @@ app.post('/api/teacher/update-room-name', (req, res) => {
     });
 });
 
-// 🏷️ API สำหรับตั้งชื่อการสอบ (เก็บคะแนน / กลางภาค / ปลายภาค ฯลฯ)
+// API สำหรับตั้งชื่อการสอบ (เก็บคะแนน / กลางภาค / ปลายภาค ฯลฯ)
 app.post('/api/teacher/update-exam-title', (req, res) => {
     const { username, roomId, examTitle } = req.body;
     if (!username || !roomId) return res.status(400).json({ message: "ข้อมูลไม่ครบถ้วน" });
     db.run('UPDATE teacher_rooms SET exam_title = ? WHERE teacherUsername = ? AND roomId = ?',
         [examTitle || '', username, roomId], function(err) {
         if (err) return res.status(500).json({ message: err.message });
-        console.log(`🏷️ [ห้อง: ${roomId}] ตั้งชื่อการสอบเป็น: "${examTitle}"`);
+        console.log(`[ห้อง: ${roomId}] ตั้งชื่อการสอบเป็น: "${examTitle}"`);
         syncRoomToLibrary(roomId);
         res.json({ success: true });
     });
 });
 
-// 🗑️ API สำหรับลบ/ปิดห้องสอบของอาจารย์
+// API สำหรับลบ/ปิดห้องสอบของอาจารย์
 app.delete('/api/teacher/room', (req, res) => {
     const { username, roomId } = req.body;
     if (!roomId) return res.status(400).json({ message: "กรุณาระบุรหัสห้องสอบ (roomId)" });
@@ -2506,7 +2514,7 @@ app.delete('/api/teacher/room', (req, res) => {
             if (typeof waitingStudentsTracker !== 'undefined' && waitingStudentsTracker) {
                 waitingStudentsTracker.delete(roomId);
             }
-            console.log(`🗑️ [ห้อง: ${roomId}] ลบห้องสอบสำเร็จ`);
+            console.log(`[ห้อง: ${roomId}] ลบห้องสอบสำเร็จ`);
             res.json({ success: true, message: "ลบห้องสอบเรียบร้อยแล้ว" });
         });
     });
@@ -2514,14 +2522,14 @@ app.delete('/api/teacher/room', (req, res) => {
 })(app, routeCtx);
 
 // =====================================================================
-// 🧩 07-questions.js — ข้อสอบ: นำเข้า Excel เพิ่ม/บันทึกข้อสอบ ดึงข้อสอบ
+// 07-questions.js — ข้อสอบ: นำเข้า Excel เพิ่ม/บันทึกข้อสอบ ดึงข้อสอบ
 // (โค้ดเดิม ไม่เปลี่ยนการทำงาน)
 // =====================================================================
 (function (app, ctx) {
     const { db, saveQuestionsToTemplateHelper, syncRoomToLibrary } = ctx;
 
 // ==========================================
-// 📝 ระบบคลังข้อสอบ (Questions API - รองรับสูงสุด 10 ช้อยส์)
+// ระบบคลังข้อสอบ (Questions API - รองรับสูงสุด 10 ช้อยส์)
 // ==========================================
 
 // อาจารย์อัปโหลดข้อสอบ (ลบของเก่าในห้องสอบนั้น แล้วบันทึกชุดใหม่)
@@ -2577,7 +2585,7 @@ app.post('/api/upload-questions-excel', (req, res) => {
                 if (uErr) console.error("ไม่สามารถรีเซ็ตสถานะเผยแพร่ได้:", uErr);
             });
 
-            console.log(`📥 [ห้อง: ${roomId}] อัปโหลดข้อสอบสำเร็จ: ${questions.length} ข้อ`);
+            console.log(`[ห้อง: ${roomId}] อัปโหลดข้อสอบสำเร็จ: ${questions.length} ข้อ`);
             syncRoomToLibrary(roomId);
             return res.json({ success: true, count: questions.length });
         } catch (insertErr) {
@@ -2631,7 +2639,7 @@ app.post('/api/teacher/add-questions', async (req, res) => {
             if (uErr) console.error("ไม่สามารถรีเซ็ตสถานะเผยแพร่ได้:", uErr);
         });
 
-        console.log(`📥 [ห้อง: ${roomId}] เพิ่มข้อสอบใหม่สำเร็จ: ${questions.length} ข้อ`);
+        console.log(`[ห้อง: ${roomId}] เพิ่มข้อสอบใหม่สำเร็จ: ${questions.length} ข้อ`);
         syncRoomToLibrary(roomId);
         return res.json({ success: true, count: questions.length });
     } catch (insertErr) {
@@ -2641,7 +2649,7 @@ app.post('/api/teacher/add-questions', async (req, res) => {
 });
 
 // ==========================================
-// 📝 บันทึกข้อสอบทั้งชุดจากหน้าสร้างข้อสอบ (Replace all + sync ไปคลัง)
+// บันทึกข้อสอบทั้งชุดจากหน้าสร้างข้อสอบ (Replace all + sync ไปคลัง)
 // ==========================================
 app.post('/api/teacher/save-questions', async (req, res) => {
     const { roomId, questions } = req.body;
@@ -2681,7 +2689,7 @@ app.post('/api/teacher/save-questions', async (req, res) => {
                 });
             }
 
-            console.log(`💾 [ห้อง: ${roomId}] บันทึกข้อสอบสำเร็จ: ${questions.length} ข้อ (sync ไปคลังอัตโนมัติ)`);
+            console.log(`[ห้อง: ${roomId}] บันทึกข้อสอบสำเร็จ: ${questions.length} ข้อ (sync ไปคลังอัตโนมัติ)`);
             syncRoomToLibrary(roomId);
             return res.json({ success: true, count: questions.length });
         } catch (insertErr) {
@@ -2692,7 +2700,7 @@ app.post('/api/teacher/save-questions', async (req, res) => {
 });
 
 // ==========================================
-// 📚 บันทึกชุดข้อสอบประจำวิชา (เฉพาะเข้าคลังข้อสอบวิชา ไม่สร้างห้องสอบใน teacher_rooms)
+// บันทึกชุดข้อสอบประจำวิชา (เฉพาะเข้าคลังข้อสอบวิชา ไม่สร้างห้องสอบใน teacher_rooms)
 // ==========================================
 app.post('/api/teacher/save-course-exam', (req, res) => {
     const { username, courseId, examTitle, questions } = req.body;
@@ -2738,8 +2746,15 @@ app.get('/api/get-questions', (req, res) => {
     db.get('SELECT is_published, exam_title, duration, announcement, show_score FROM teacher_rooms WHERE roomId = ?', [roomId], (err, room) => {
         if (err) return res.status(500).json({ message: err.message });
         if (!room || room.is_published !== 1) {
-            return res.status(400).json({ message: "❌ ไม่สามารถสอบได้: ข้อสอบในห้องสอบนี้ยังอยู่ในสถานะแบบร่าง (ยังไม่กดยืนยันเผยแพร่โดยครูผู้สอน)" });
+            return res.status(400).json({ message: "ไม่สามารถสอบได้: ข้อสอบในห้องสอบนี้ยังอยู่ในสถานะแบบร่าง (ยังไม่กดยืนยันเผยแพร่โดยครูผู้สอน)" });
         }
+        const sid = (req.authUser && req.authUser.typ === 'student') ? req.authUser.u : '';
+        if (sid) return global.__findSubmitted(roomId, sid, done => {
+            if (done) return res.status(403).json({ success: false, alreadySubmitted: true, message: global.__ALREADY_SUBMITTED_MSG });
+            sendQuestions();
+        });
+        sendQuestions();
+        function sendQuestions() {
 
         db.all('SELECT id, question, question_img, a, b, c, d, e, f, g, h, i, j, a_img, b_img, c_img, d_img, e_img, f_img, g_img, h_img, i_img, j_img FROM questions WHERE roomId = ?', [roomId], (err, rows) => {
             if (err) return res.status(500).json({ message: err.message });
@@ -2751,6 +2766,7 @@ app.get('/api/get-questions', (req, res) => {
                 questions: rows
             });
         });
+        }
     });
 });
 
@@ -2767,14 +2783,14 @@ app.get('/api/teacher/get-questions', (req, res) => {
 })(app, routeCtx);
 
 // =====================================================================
-// 🧩 08-exam-results.js — ระหว่าง/หลังสอบ: บันทึกสลับหน้าจอ ส่งข้อสอบ ผลสอบ วิเคราะห์ ตั้งค่าห้อง รายงานปัญหา
+// 08-exam-results.js — ระหว่าง/หลังสอบ: บันทึกสลับหน้าจอ ส่งข้อสอบ ผลสอบ วิเคราะห์ ตั้งค่าห้อง รายงานปัญหา
 // (โค้ดเดิม ไม่เปลี่ยนการทำงาน)
 // =====================================================================
 (function (app, ctx) {
     const { db, removeStudentActive } = ctx;
 
 // ==========================================
-// 🚨 ระบบตรวจจับทุจริต (Cheat Logs API - รองรับชั้นเรียน)
+// ระบบตรวจจับทุจริต (Cheat Logs API - รองรับชั้นเรียน)
 // ==========================================
 
 app.post('/api/report-cheat', (req, res) => {
@@ -2783,7 +2799,7 @@ app.post('/api/report-cheat', (req, res) => {
 
     const time = new Date().toLocaleTimeString('th-TH', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit', second: '2-digit' });
     db.run('INSERT INTO cheat_logs (roomId, studentId, name, class, action, time) VALUES (?, ?, ?, ?, ?, ?)', 
-        [roomId, studentId, name, studentClass || '', action || "🚨 ตรวจพบการสลับหน้าจอ", time], (err) => {
+        [roomId, studentId, name, studentClass || '', action || "ตรวจพบการสลับหน้าจอ", time], (err) => {
             if (err) return res.status(500).json({ message: err.message });
             res.json({ success: true });
         }
@@ -2793,53 +2809,14 @@ app.post('/api/report-cheat', (req, res) => {
 // ดึงประวัติโกงสอบ แยกห้องเรียน
 app.get('/api/cheat-logs', (req, res) => {
     const roomId = req.query.roomId;
-    const username = req.query.username;
-    
-    if (roomId === 'ALL') {
-        if (username && username !== 'admin') {
-            db.all(`
-                SELECT studentId, name, class, action, time, roomId 
-                FROM cheat_logs 
-                WHERE (
-                    roomId IN (SELECT roomId FROM teacher_rooms WHERE teacherUsername = ?)
-                    OR studentId IN (SELECT studentId FROM students WHERE teacherUsername = ?)
-                    OR studentId IN (
-                        SELECT cs.studentId FROM course_students cs
-                        JOIN courses c ON c.id = cs.courseId
-                        WHERE c.teacherUsername = ?
-                    )
-                    OR REPLACE(studentId, '-', '') IN (
-                        SELECT REPLACE(cs.studentId, '-', '') FROM course_students cs
-                        JOIN courses c ON c.id = cs.courseId
-                        WHERE c.teacherUsername = ?
-                    )
-                )
-                ORDER BY id DESC
-            `, [username, username, username, username], (err, rows) => {
-                if (err) return res.status(500).json({ message: err.message });
-                res.json(rows || []);
-            });
-        } else {
-            db.all(`
-                SELECT studentId, name, class, action, time, roomId 
-                FROM cheat_logs 
-                ORDER BY id DESC
-            `, [], (err, rows) => {
-                if (err) return res.status(500).json({ message: err.message });
-                res.json(rows || []);
-            });
-        }
-    } else if (roomId) {
-        db.all('SELECT studentId, name, class, action, time, roomId FROM cheat_logs WHERE roomId = ? ORDER BY id DESC', [roomId], (err, rows) => {
-            if (err) return res.status(500).json({ message: err.message });
-            res.json(rows || []);
-        });
-    } else {
-        db.all('SELECT studentId, name, class, action, time, roomId FROM cheat_logs ORDER BY id DESC', (err, rows) => {
-            if (err) return res.status(500).json({ message: err.message });
-            res.json(rows || []);
-        });
+    const v = viewer(req);
+    const send = (err, rows) => { if (err) return res.status(500).json({ message: err.message }); res.json(rows || []); };
+    if (roomId && roomId !== 'ALL') {
+        // ห้องของอาจารย์คนอื่นถูกกันไว้ที่ auth.js แล้ว
+        return db.all('SELECT studentId, name, class, action, time, roomId FROM cheat_logs WHERE roomId = ? ORDER BY id DESC', [roomId], send);
     }
+    // ทั้งหมด = เฉพาะห้องสอบของอาจารย์คนนี้ (แอดมินเห็นทุกห้อง)
+    db.all(`SELECT studentId, name, class, action, time, roomId FROM cheat_logs WHERE (? = 1 OR roomId IN (${MY_ROOMS})) ORDER BY id DESC`, [v.adm, v.user], send);
 });
 
 // ล้างประวัติการทุจริตของห้องเรียนนั้นๆ
@@ -2849,13 +2826,13 @@ app.delete('/api/clear-cheat-logs', (req, res) => {
 
     db.run('DELETE FROM cheat_logs WHERE roomId = ?', [roomId], (err) => {
         if (err) return res.status(500).json({ message: err.message });
-        console.log(`🧹 ล้างประวัติล็อกพฤติกรรมมิชอบของห้อง ${roomId} เรียบร้อยแล้ว`);
+        console.log(`ล้างประวัติล็อกพฤติกรรมมิชอบของห้อง ${roomId} เรียบร้อยแล้ว`);
         res.json({ success: true, message: `ล้างประวัติห้อง ${roomId} สำเร็จ` });
     });
 });
 
 // ==========================================
-// 💯 ระบบตรวจคำตอบและแสดงผลสอบ (Results API - รองรับชั้นเรียน วันที่ และจับคู่ตาม ID)
+// ระบบตรวจคำตอบและแสดงผลสอบ (Results API - รองรับชั้นเรียน วันที่ และจับคู่ตาม ID)
 // ==========================================
 
 app.post('/api/submit-exam', (req, res) => {
@@ -2873,7 +2850,7 @@ app.post('/api/submit-exam', (req, res) => {
                     const time = new Date().toLocaleTimeString('th-TH', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit', second: '2-digit' });
                     for (let i = existingCount + 1; i <= swCount; i++) {
                         db.run('INSERT INTO cheat_logs (roomId, studentId, name, class, action, time) VALUES (?, ?, ?, ?, ?, ?)',
-                            [roomId, studentId, name, studentClass || '', `🚨 สลับแท็บเบราว์เซอร์ / ออกหน้าจออื่น (ครั้งที่ ${i})`, time]);
+                            [roomId, studentId, name, studentClass || '', `สลับแท็บเบราว์เซอร์ / ออกหน้าจออื่น (ครั้งที่ ${i})`, time]);
                     }
                 }
             }
@@ -2906,10 +2883,10 @@ app.post('/api/submit-exam', (req, res) => {
                 // 3. บันทึก/อัปเดตผลสอบลงใน exam_results ทันที
                 db.get('SELECT id, score, maxScore FROM exam_results WHERE roomId = ? AND (studentId = ? OR REPLACE(studentId, \'-\', \'\') = REPLACE(?, \'-\', \'\'))', [roomId, studentId, studentId], (existErr, existRow) => {
                     if (existRow) {
-                        // 🔒 ส่งแล้วส่งทับไม่ได้ (เดิมเขียนทับคะแนน → ส่งครั้งแรกดูคะแนนแล้วแก้คำตอบส่งใหม่ได้)
+                        // ส่งแล้วส่งทับไม่ได้ (เดิมเขียนทับคะแนน → ส่งครั้งแรกดูคะแนนแล้วแก้คำตอบส่งใหม่ได้)
                         // ตอบกลับด้วยคะแนนเดิม เพื่อให้กรณีเน็ตหลุดแล้วหน้าเว็บส่งซ้ำ ยังไปหน้าสรุปผลได้ตามปกติ
                         // ถ้าอาจารย์ต้องการให้สอบใหม่ ให้ลบผลของนักศึกษาคนนั้นในหน้า "ตรวจสอบผลการสอบ" ก่อน
-                        console.log(`⛔ [ส่งซ้ำ] นักศึกษา ${studentId} ส่งข้อสอบห้อง ${roomId} ซ้ำ — คงคะแนนเดิม ${existRow.score}/${existRow.maxScore}`);
+                        console.log(`[ส่งซ้ำ] นักศึกษา ${studentId} ส่งข้อสอบห้อง ${roomId} ซ้ำ — คงคะแนนเดิม ${existRow.score}/${existRow.maxScore}`);
                         return res.json({ success: true, score: existRow.score, maxScore: existRow.maxScore, alreadySubmitted: true });
                     } else {
                         db.run(`
@@ -2917,7 +2894,7 @@ app.post('/api/submit-exam', (req, res) => {
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         `, [roomId, studentId, name, studentClass || '', score, questions.length, time, date, answersJson, finalCourseId], (insErr) => {
                             if (insErr) return res.status(500).json({ message: insErr.message });
-                            console.log(`✅ [ผลสอบบันทึกสำเร็จ] นักศึกษา ${studentId} (${name}) ได้ ${score}/${questions.length} ในห้อง ${roomId}`);
+                            console.log(`[ผลสอบบันทึกสำเร็จ] นักศึกษา ${studentId} (${name}) ได้ ${score}/${questions.length} ในห้อง ${roomId}`);
                             res.json({ success: true, score, maxScore: questions.length });
                         });
                     }
@@ -3013,8 +2990,10 @@ app.get('/api/exam-results', (req, res) => {
 
         sql += `
             )
+            AND (? = 1 OR er.roomId IN (${MY_ROOMS}))
             ORDER BY er.id DESC
         `;
+        params.push(viewer(req).adm, viewer(req).user);
 
         db.all(sql, params, (err, rows) => {
             if (err) return res.status(500).json({ message: err.message });
@@ -3025,24 +3004,10 @@ app.get('/api/exam-results', (req, res) => {
 
     if (!roomId && !username) return res.status(400).json({ message: "กรุณาระบุ courseId, roomId หรือ username" });
 
-    if (roomId === 'ALL' && username) {
-        db.all(`
-            SELECT id, studentId, name, class, score, maxScore, time, date, roomId, answers_json 
-            FROM exam_results 
-            WHERE roomId IN (SELECT roomId FROM teacher_rooms WHERE teacherUsername = ?)
-               OR courseId IN (SELECT id FROM courses WHERE teacherUsername = ?)
-               OR studentId IN (
-                   SELECT cs.studentId FROM course_students cs
-                   JOIN courses c ON c.id = cs.courseId
-                   WHERE c.teacherUsername = ?
-               )
-               OR REPLACE(studentId, '-', '') IN (
-                   SELECT REPLACE(cs.studentId, '-', '') FROM course_students cs
-                   JOIN courses c ON c.id = cs.courseId
-                   WHERE c.teacherUsername = ?
-               )
-            ORDER BY id DESC
-        `, [username, username, username, username], (err, rows) => {
+    if (roomId === 'ALL') {
+        // ทั้งหมด = เฉพาะห้องสอบของอาจารย์คนนี้ (แอดมินเห็นทุกห้อง)
+        const v = viewer(req);
+        db.all(`SELECT id, studentId, name, class, score, maxScore, time, date, roomId, answers_json FROM exam_results WHERE (? = 1 OR roomId IN (${MY_ROOMS})) ORDER BY id DESC`, [v.adm, v.user], (err, rows) => {
             if (err) return res.status(500).json({ message: err.message });
             res.json(rows || []);
         });
@@ -3061,7 +3026,8 @@ app.get('/api/student-history', (req, res) => {
     const studentId = req.query.studentId;
     if (!studentId) return res.status(400).json({ message: "กรุณาระบุรหัสนักศึกษา" });
 
-    db.all('SELECT roomId, score, maxScore, time, date FROM exam_results WHERE studentId = ? ORDER BY id DESC', [studentId], (err, rows) => {
+    const v = viewer(req);
+    db.all(`SELECT roomId, score, maxScore, time, date FROM exam_results WHERE studentId = ? AND (? = 1 OR roomId IN (${MY_ROOMS})) ORDER BY id DESC`, [studentId, v.adm, v.user], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
         res.json(rows);
     });
@@ -3074,11 +3040,14 @@ app.delete('/api/clear-results', (req, res) => {
 
     let sql1, sql2, sql3, sql4, params;
     if (roomId === 'ALL') {
-        sql1 = 'DELETE FROM exam_results';
-        sql2 = 'DELETE FROM cheat_logs';
-        sql3 = 'DELETE FROM student_warnings';
-        sql4 = 'DELETE FROM student_logins';
-        params = [];
+        // ล้างทั้งหมด = เฉพาะห้องสอบของอาจารย์คนนี้ (แอดมินล้างได้ทุกห้อง)
+        const v = viewer(req);
+        const w = ` WHERE (? = 1 OR roomId IN (${MY_ROOMS}))`;
+        sql1 = 'DELETE FROM exam_results' + w;
+        sql2 = 'DELETE FROM cheat_logs' + w;
+        sql3 = 'DELETE FROM student_warnings' + w;
+        sql4 = 'DELETE FROM student_logins' + w;
+        params = [v.adm, v.user];
     } else {
         sql1 = 'DELETE FROM exam_results WHERE roomId = ?';
         sql2 = 'DELETE FROM cheat_logs WHERE roomId = ?';
@@ -3098,7 +3067,7 @@ app.delete('/api/clear-results', (req, res) => {
                 
                 db.run(sql4, params, (err) => {
                     if (err) return res.status(500).json({ message: err.message });
-                    console.log(`🧹 ล้างประวัติผลสอบ ประวัติทุจริต การแจ้งเตือน และล็อกอินนักศึกษาของห้อง ${roomId} เรียบร้อยแล้ว`);
+                    console.log(`ล้างประวัติผลสอบ ประวัติทุจริต การแจ้งเตือน และล็อกอินนักศึกษาของห้อง ${roomId} เรียบร้อยแล้ว`);
                     res.json({ success: true });
                 });
             });
@@ -3107,7 +3076,7 @@ app.delete('/api/clear-results', (req, res) => {
 });
 
 // ==========================================
-// 📊 API วิเคราะห์เปอร์เซ็นต์คำตอบ (Exam Items Analysis - คำนวณจากคะแนนจริง)
+// API วิเคราะห์เปอร์เซ็นต์คำตอบ (Exam Items Analysis - คำนวณจากคะแนนจริง)
 // ==========================================
 app.get('/api/exam-analysis', (req, res) => {
     const roomId = req.query.roomId;
@@ -3159,7 +3128,7 @@ app.get('/api/exam-analysis', (req, res) => {
 });
 
 // ==========================================
-// ⚙️ ระบบจัดการการตั้งค่าห้องสอบเพิ่มเติม (สุ่มข้อสอบ, เวลาทำข้อสอบ, ประกาศ)
+// ระบบจัดการการตั้งค่าห้องสอบเพิ่มเติม (สุ่มข้อสอบ, เวลาทำข้อสอบ, ประกาศ)
 // ==========================================
 
 // ดึงการตั้งค่าห้องสอบ
@@ -3245,7 +3214,7 @@ app.delete('/api/delete-student-result', (req, res) => {
 });
 
 // ==========================================
-// 🚨 ระบบแจ้งรายงานปัญหาจากนักศึกษา (Student Issue Reports APIs)
+// ระบบแจ้งรายงานปัญหาจากนักศึกษา (Student Issue Reports APIs)
 // ==========================================
 
 // ส่งรายงานปัญหาจากนักศึกษา (ปิดการใช้งานแล้ว)
@@ -3282,7 +3251,8 @@ app.delete('/api/delete-student-report', (req, res) => {
     const { id } = req.body;
     if (!id) return res.status(400).json({ message: "กรุณาระบุ ID ของรายงาน" });
 
-    db.run('DELETE FROM student_reports WHERE id = ?', [id], function(err) {
+    const v = viewer(req);
+    db.run(`DELETE FROM student_reports WHERE id = ? AND (? = 1 OR roomId IN (${MY_ROOMS}))`, [id, v.adm, v.user], function(err) {
         if (err) return res.status(500).json({ message: err.message });
         res.json({ success: true });
     });
@@ -3290,14 +3260,14 @@ app.delete('/api/delete-student-report', (req, res) => {
 })(app, routeCtx);
 
 // =====================================================================
-// 🧩 09-question-edit.js — แก้ไข/ลบข้อสอบทีละข้อ
+// 09-question-edit.js — แก้ไข/ลบข้อสอบทีละข้อ
 // (โค้ดเดิม ไม่เปลี่ยนการทำงาน)
 // =====================================================================
 (function (app, ctx) {
     const { db, syncRoomToLibrary } = ctx;
 
 // ==========================================
-// ✏️ ระบบจัดการข้อสอบรายข้อสำหรับอาจารย์ (Single Question Edit/Delete)
+// ระบบจัดการข้อสอบรายข้อสำหรับอาจารย์ (Single Question Edit/Delete)
 // ==========================================
 
 // อัปเดตข้อสอบทีละข้อ
@@ -3362,14 +3332,14 @@ app.delete('/api/teacher/delete-question', (req, res) => {
 })(app, routeCtx);
 
 // =====================================================================
-// 🧩 10-superadmin-live.js — ผู้ดูแลระบบ และรายชื่อนักศึกษาที่กำลังสอบ
+// 10-superadmin-live.js — ผู้ดูแลระบบ และรายชื่อนักศึกษาที่กำลังสอบ
 // (โค้ดเดิม ไม่เปลี่ยนการทำงาน)
 // =====================================================================
 (function (app, ctx) {
     const { db, getActiveRoomStudents, hashTeacherPassword, verifyTeacherPassword } = ctx;
 
 // ==========================================
-// 🛡️ ระบบ Super Admin (อนุมัติอาจารย์ + ดูประวัตินักศึกษา)
+// ระบบ Super Admin (อนุมัติอาจารย์ + ดูประวัตินักศึกษา)
 // ==========================================
 
 // Super Admin Login
@@ -3393,7 +3363,7 @@ app.post('/api/superadmin/login', (req, res) => {
     });
 });
 
-// 🔑 แอดมินตั้งรหัสผ่านใหม่ให้อาจารย์ (หรือเปลี่ยนรหัสของตัวเอง) — รหัสถูกเก็บแบบเข้ารหัส
+// แอดมินตั้งรหัสผ่านใหม่ให้อาจารย์ (หรือเปลี่ยนรหัสของตัวเอง) — รหัสถูกเก็บแบบเข้ารหัส
 app.post('/api/superadmin/reset-password', (req, res) => {
     const { targetUsername, newPassword } = req.body || {};
     if (!targetUsername || !newPassword || String(newPassword).length < 6) return res.status(400).json({ success: false, message: 'รหัสผ่านใหม่ต้องยาวอย่างน้อย 6 ตัวอักษร' });
@@ -3421,7 +3391,7 @@ app.post('/api/superadmin/approve-teacher', (req, res) => {
 
     db.run('UPDATE teachers SET status = ? WHERE username = ?', ['approved', username], function(err) {
         if (err) return res.status(500).json({ message: err.message });
-        console.log(`✅ Admin อนุมัติบัญชีอาจารย์: ${username}`);
+        console.log(`Admin อนุมัติบัญชีอาจารย์: ${username}`);
         res.json({ success: true, message: `อนุมัติบัญชี ${username} สำเร็จ` });
     });
 });
@@ -3433,7 +3403,7 @@ app.post('/api/superadmin/reject-teacher', (req, res) => {
 
     db.run('UPDATE teachers SET status = ? WHERE username = ?', ['rejected', username], function(err) {
         if (err) return res.status(500).json({ message: err.message });
-        console.log(`❌ Admin ปฏิเสธบัญชีอาจารย์: ${username}`);
+        console.log(`Admin ปฏิเสธบัญชีอาจารย์: ${username}`);
         res.json({ success: true, message: `ปฏิเสธบัญชี ${username} สำเร็จ` });
     });
 });
@@ -3447,7 +3417,7 @@ app.post('/api/superadmin/delete-teacher', (req, res) => {
         if (err) return res.status(500).json({ message: err.message });
         // ลบห้องสอบของอาจารย์คนนี้ด้วย
         db.run('DELETE FROM teacher_rooms WHERE teacherUsername = ?', [username]);
-        console.log(`🗑️ Admin ลบบัญชีอาจารย์: ${username}`);
+        console.log(`Admin ลบบัญชีอาจารย์: ${username}`);
         res.json({ success: true, message: `ลบบัญชี ${username} สำเร็จ` });
     });
 });
@@ -3476,7 +3446,7 @@ app.post('/api/log-student-login', (req, res) => {
     );
 });
 
-// 👨‍🎓 API สำหรับดึงรายชื่อนักศึกษาที่กำลังทำข้อสอบอยู่ในห้องนั้นๆ (Active Students List - Real-time Live)
+// API สำหรับดึงรายชื่อนักศึกษาที่กำลังทำข้อสอบอยู่ในห้องนั้นๆ (Active Students List - Real-time Live)
 app.get('/api/teacher/active-students-list', (req, res) => {
     const { roomId } = req.query;
     if (!roomId) return res.status(400).json({ message: "กรุณาระบุ roomId" });
@@ -3515,7 +3485,7 @@ app.get('/api/teacher/active-students-list', (req, res) => {
     });
 });
 
-// 👨‍🎓 API สำหรับดึงจำนวนนักศึกษาที่กำลังเข้าสอบแบบเรียลไทม์ (Active Students - Real-time Live)
+// API สำหรับดึงจำนวนนักศึกษาที่กำลังเข้าสอบแบบเรียลไทม์ (Active Students - Real-time Live)
 app.get('/api/teacher/active-students', (req, res) => {
     const { username } = req.query;
     if (!username || username === 'undefined') return res.status(400).json({ message: "กรุณาระบุ username" });
@@ -3638,14 +3608,14 @@ app.get('/api/superadmin/stats', (req, res) => {
 })(app, routeCtx);
 
 // =====================================================================
-// 🧩 11-ai-warnings-publish.js — สร้างข้อสอบด้วย AI (แบบเดิม) แจ้งเตือนนักศึกษา และเปิด/ปิดห้องสอบ
+// 11-ai-warnings-publish.js — สร้างข้อสอบด้วย AI (แบบเดิม) แจ้งเตือนนักศึกษา และเปิด/ปิดห้องสอบ
 // (โค้ดเดิม ไม่เปลี่ยนการทำงาน)
 // =====================================================================
 (function (app, ctx) {
     const { db, getWaitingStudents, recordWaitingStudent } = ctx;
 
 // ==========================================
-// 🧠 AI Quiz Generator (ระบบช่วยคิดโจทย์ด้วย AI จำลอง)
+// AI Quiz Generator (ระบบช่วยคิดโจทย์ด้วย AI จำลอง)
 // ==========================================
 app.post('/api/generate-ai-quiz', (req, res) => {
     const { topic, difficulty, numQuestions } = req.body;
@@ -3765,12 +3735,12 @@ app.post('/api/generate-ai-quiz', (req, res) => {
         }
     }
 
-    console.log(`🤖 AI Quiz Generator: สร้างข้อสอบหัวข้อ "${topic}" จำนวน ${questions.length} ข้อสำเร็จ`);
+    console.log(`AI Quiz Generator: สร้างข้อสอบหัวข้อ "${topic}" จำนวน ${questions.length} ข้อสำเร็จ`);
     res.json({ success: true, questions });
 });
 
 // ==========================================
-// 🛡️ API สำหรับแจ้งเตือนนักศึกษาคุมสอบรายคน
+// API สำหรับแจ้งเตือนนักศึกษาคุมสอบรายคน
 // ==========================================
 
 // ส่งข้อความเตือนไปยังตัวนักศึกษา
@@ -3783,7 +3753,7 @@ app.post('/api/send-warning', (req, res) => {
     db.run('INSERT INTO student_warnings (roomId, studentId, message, status, time) VALUES (?, ?, ?, ?, ?)',
         [roomId, studentId, message, 'unread', time], function(err) {
             if (err) return res.status(500).json({ message: err.message });
-            console.log(`💬 ส่งข้อความเตือนไปยังนักศึกษา ${studentId} ในห้อง ${roomId}: "${message}"`);
+            console.log(`ส่งข้อความเตือนไปยังนักศึกษา ${studentId} ในห้อง ${roomId}: "${message}"`);
             res.json({ success: true });
         }
     );
@@ -3812,7 +3782,7 @@ app.post('/api/mark-warning-read', (req, res) => {
     });
 });
 
-// 🟢 ดึงสถานะการเผยแพร่ห้องสอบ พร้อมจำนวนประวัติผลสอบเดิม รหัส PIN และนับนักศึกษาในห้องรอสอบ
+// ดึงสถานะการเผยแพร่ห้องสอบ พร้อมจำนวนประวัติผลสอบเดิม รหัส PIN และนับนักศึกษาในห้องรอสอบ
 app.get('/api/teacher/get-publish-status', (req, res) => {
     const roomId = req.query.roomId;
     const studentId = req.query.studentId;
@@ -3844,7 +3814,7 @@ app.get('/api/teacher/get-publish-status', (req, res) => {
     });
 });
 
-// 🟢 สลับสถานะการเผยแพร่ห้องสอบ (Publish / Unpublish) พร้อมสร้างรหัส PIN 6 หลักอัตโนมัติ
+// สลับสถานะการเผยแพร่ห้องสอบ (Publish / Unpublish) พร้อมสร้างรหัส PIN 6 หลักอัตโนมัติ
 app.post('/api/teacher/publish-exam', (req, res) => {
     const { roomId, publish, resetResults } = req.body;
     if (!roomId) return res.status(400).json({ message: "กรุณาระบุ roomId" });
@@ -3885,7 +3855,7 @@ app.post('/api/teacher/publish-exam', (req, res) => {
                     db.run('DELETE FROM cheat_logs WHERE roomId = ?', [roomId], () => {
                         db.run('DELETE FROM student_warnings WHERE roomId = ?', [roomId], () => {
                             db.run('DELETE FROM student_logins WHERE roomId = ?', [roomId], () => {
-                                console.log(`🔄 รีเซ็ตประวัติผลสอบและรายชื่อเข้าสอบของห้อง ${roomId} เพื่อเริ่มรอบใหม่เรียบร้อย`);
+                                console.log(`รีเซ็ตประวัติผลสอบและรายชื่อเข้าสอบของห้อง ${roomId} เพื่อเริ่มรอบใหม่เรียบร้อย`);
                                 doPublish();
                             });
                         });
@@ -3906,7 +3876,7 @@ app.post('/api/teacher/publish-exam', (req, res) => {
 })(app, routeCtx);
 
 // =====================================================================
-// 🧩 12-library-storage.js — คลังข้อสอบ และพื้นที่จัดเก็บ
+// 12-library-storage.js — คลังข้อสอบ และพื้นที่จัดเก็บ
 // (โค้ดเดิม ไม่เปลี่ยนการทำงาน)
 // =====================================================================
 (function (app, ctx) {
@@ -4007,6 +3977,29 @@ app.post('/api/library/delete-template', (req, res) => {
         db.run('DELETE FROM exam_templates WHERE id = ?', [templateId], (err) => {
             if (err) return res.status(500).json({ message: err.message });
             res.json({ success: true });
+        });
+    });
+});
+
+// 4.5 ทำสำเนาชุดข้อสอบ (เช่น ไว้ทำข้อสอบรอบซ่อม) — ทำได้เฉพาะชุดของตัวเอง
+app.post('/api/library/duplicate-template', (req, res) => {
+    const templateId = Number(req.body && req.body.templateId);
+    const username = String((req.body && req.body.username) || '');
+    if (!templateId) return res.status(400).json({ message: "กรุณาระบุ templateId" });
+    db.get('SELECT * FROM exam_templates WHERE id = ?', [templateId], (err, t) => {
+        if (err) return res.status(500).json({ message: err.message });
+        if (!t) return res.status(404).json({ message: "ไม่พบชุดข้อสอบนี้" });
+        if (username !== 'admin' && t.teacherUsername !== username) return res.status(403).json({ message: "ชุดข้อสอบนี้ไม่ใช่ของคุณ" });
+        const nowStr = new Date().toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        db.run('INSERT INTO exam_templates (teacherUsername, templateName, courseId, created_at) VALUES (?, ?, ?, ?)',
+            [t.teacherUsername, `${t.templateName} (สำเนา)`, t.courseId || 0, nowStr], function (insErr) {
+            if (insErr) return res.status(500).json({ message: insErr.message });
+            const newId = this.lastID;
+            const cols = 'question, question_img, a, b, c, d, e, f, g, h, i, j, a_img, b_img, c_img, d_img, e_img, f_img, g_img, h_img, i_img, j_img, answer';
+            db.run(`INSERT INTO template_questions (templateId, ${cols}) SELECT ?, ${cols} FROM template_questions WHERE templateId = ? ORDER BY id ASC`, [newId, templateId], (cpErr) => {
+                if (cpErr) return res.status(500).json({ message: cpErr.message });
+                res.json({ success: true, templateId: newId, templateName: `${t.templateName} (สำเนา)` });
+            });
         });
     });
 });
@@ -4158,17 +4151,17 @@ app.get('/api/admin/storage-stats', (req, res) => {
 });
 })(app, routeCtx);
 
-// 📝 ระบบตรวจข้อสอบอัตนัยด้วย AI (โมดูลแยก: essay-grader.js) — ถ้าโหลดไม่สำเร็จ ระบบสอบเดิมยังทำงานตามปกติ
-try { require('./essay-grader')(app, db); } catch (e) { console.error('⚠️ โหลด Essay Grader ไม่สำเร็จ:', e.message); }
-// 👁️ รายงานรวมตาเฝ้า + ตาอ่าน รายคน
-try { require('./trinetra-link')(app, db); } catch (e) { console.error('⚠️ โหลดรายงานรวมตรีเนตรไม่สำเร็จ:', e.message); }
-// 💾 ดาวน์โหลดข้อมูลสำรองทั้งหมด (สำคัญเมื่อใช้ Neon แผนฟรี)
-try { require('./backup-export')(app, db); } catch (e) { console.error('⚠️ โหลดระบบดาวน์โหลดข้อมูลสำรองไม่สำเร็จ:', e.message); }
-// 💾 สำรองฐานข้อมูลอัตโนมัติทุกวัน (backup.js)
-try { require('./backup')(db, process.env.DATA_DIR || path.join(__dirname, '.data')); } catch (e) { console.error('⚠️ โหลดระบบสำรองข้อมูลไม่สำเร็จ:', e.message); }
+// ระบบตรวจข้อสอบอัตนัยด้วย AI (โมดูลแยก: essay-grader.js) — ถ้าโหลดไม่สำเร็จ ระบบสอบเดิมยังทำงานตามปกติ
+try { require('./essay-grader')(app, db); } catch (e) { console.error('โหลด Essay Grader ไม่สำเร็จ:', e.message); }
+// รายงานรวมตาเฝ้า + ตาอ่าน รายคน
+try { require('./trinetra-link')(app, db); } catch (e) { console.error('โหลดรายงานรวม ExamPro ไม่สำเร็จ:', e.message); }
+// ดาวน์โหลดข้อมูลสำรองทั้งหมด (สำคัญเมื่อใช้ Neon แผนฟรี)
+try { require('./backup-export')(app, db); } catch (e) { console.error('โหลดระบบดาวน์โหลดข้อมูลสำรองไม่สำเร็จ:', e.message); }
+// สำรองฐานข้อมูลอัตโนมัติทุกวัน (backup.js)
+try { require('./backup')(db, process.env.DATA_DIR || path.join(__dirname, '.data')); } catch (e) { console.error('โหลดระบบสำรองข้อมูลไม่สำเร็จ:', e.message); }
 
 app.listen(PORT, () => {
     console.log(`=======================================================`);
-    console.log(`🚀 Server SQLite Full System พร้อมทำงาน: http://localhost:${PORT}`);
+    console.log(`Server SQLite Full System พร้อมทำงาน: http://localhost:${PORT}`);
     console.log(`=======================================================`);
 });

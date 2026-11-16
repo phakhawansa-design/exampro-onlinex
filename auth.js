@@ -1,5 +1,5 @@
 // =====================================================================
-// 🔐 ระบบยืนยันตัวตนด้วย Token (auth.js)
+// ระบบยืนยันตัวตนด้วย Token (auth.js)
 // ---------------------------------------------------------------------
 // - ออก token ให้อัตโนมัติเมื่อล็อกอินสำเร็จ (อาจารย์ / แอดมิน / นักเรียน)
 // - API ฝั่งอาจารย์และแอดมินต้องมี token ที่ถูกต้อง
@@ -96,7 +96,7 @@ function register(app, db, dataDir) {
     // คอลัมน์ "ต้องเปลี่ยนรหัสผ่าน" (ใช้หลังอาจารย์รีเซ็ตรหัสให้นักศึกษา) — รอให้ server.js สร้างตารางก่อน
     setTimeout(() => db.run('ALTER TABLE students ADD COLUMN must_change INTEGER DEFAULT 0', () => {}), 3000);
 
-    // ---------- 🚦 จำกัดการเดารหัสผ่าน ----------
+    // ---------- จำกัดการเดารหัสผ่าน ----------
     const MAX_FAILS = parseInt(process.env.LOGIN_MAX_FAILS || '5');        // ผิดกี่ครั้งต่อบัญชี (ต่อเครื่อง)
     const LOCK_MIN = parseFloat(process.env.LOGIN_LOCK_MINUTES || '10');   // ล็อกกี่นาที
     const IP_MAX_FAILS = parseInt(process.env.LOGIN_IP_MAX_FAILS || '50'); // ผิดรวมต่อ IP (เผื่อทั้งห้องใช้เน็ตเดียวกัน)
@@ -183,7 +183,16 @@ function register(app, db, dataDir) {
         const tok = hdr.startsWith('Bearer ') ? hdr.slice(7) : (req.query.token || '');
         const user = auth.verify(tok);
         req.authUser = user;
-        if (req.method === 'OPTIONS' || PUBLIC.includes(key)) return next();
+        if (req.method === 'OPTIONS') return next();
+        if (PUBLIC.includes(key)) {
+            // หน้าสอบของนักศึกษาเรียกได้ตามเดิม แต่บัญชีอาจารย์ห้ามใช้เส้นทางนี้ส่องห้องสอบของอาจารย์คนอื่น
+            const rid = (req.query && req.query.roomId) || (req.body && typeof req.body === 'object' && req.body.roomId);
+            if (!rid || !user || user.typ !== 'teacher' || user.role === 'admin') return next();
+            return db.get('SELECT teacherUsername FROM teacher_rooms WHERE roomId = ?', [String(rid)], (err, row) => {
+                if (row && row.teacherUsername && row.teacherUsername !== user.u) return res.status(403).json({ success: false, message: 'ห้องสอบนี้ไม่ใช่ของคุณ' });
+                next();
+            });
+        }
 
         if (STUDENT_ONLY.includes(key)) {
             if (!user || user.typ !== 'student') return res.status(401).json({ success: false, authRequired: true, student: true, message: 'กรุณาเข้าสู่ระบบใหม่อีกครั้ง' });
@@ -237,6 +246,12 @@ function register(app, db, dataDir) {
                 const row = await get('SELECT teacherUsername FROM courses WHERE id = ?', [Number(cid)]);
                 if (row && row.teacherUsername && row.teacherUsername !== user.u) return res.status(403).json({ success: false, message: 'รายวิชานี้ไม่ใช่ของคุณ' });
             }
+            // 2.5) ชุดข้อสอบในคลัง (templateId) ต้องเป็นของอาจารย์คนนี้ (กันอ่านเฉลย/แก้/ลบชุดของคนอื่น)
+            const tid = (req.query && req.query.templateId) || (req.body && typeof req.body === 'object' && req.body.templateId);
+            if (tid && /^\d+$/.test(String(tid))) {
+                const row = await get('SELECT teacherUsername FROM exam_templates WHERE id = ?', [Number(tid)]);
+                if (row && row.teacherUsername && row.teacherUsername !== user.u) return res.status(403).json({ success: false, message: 'ชุดข้อสอบนี้ไม่ใช่ของคุณ' });
+            }
             // 3) ลบ/อนุมัตินักศึกษา: ต้องเป็นนักศึกษาในวิชาของตัวเอง (อนุมัติได้ถ้ายังไม่อยู่ในวิชาใด)
             if (key === 'POST /api/admin/delete-student' || key === 'POST /api/admin/approve-student') {
                 const sid = String((req.body && req.body.studentId) || '');
@@ -249,7 +264,7 @@ function register(app, db, dataDir) {
         })().catch(() => res.status(500).json({ success: false, message: 'ตรวจสิทธิ์ไม่สำเร็จ' }));
     });
 
-    // 🔐 อาจารย์/แอดมินเปลี่ยนรหัสผ่านของตัวเอง (ใช้ตอนถูกบังคับเปลี่ยนรหัสเริ่มต้น และเปลี่ยนเองได้ตามปกติ)
+    // อาจารย์/แอดมินเปลี่ยนรหัสผ่านของตัวเอง (ใช้ตอนถูกบังคับเปลี่ยนรหัสเริ่มต้น และเปลี่ยนเองได้ตามปกติ)
     app.post('/api/teacher/change-own-password', (req, res) => {
         const user = req.authUser;
         if (!user || user.typ !== 'teacher') return res.status(401).json({ success: false, authRequired: true, message: 'กรุณาเข้าสู่ระบบ' });
@@ -261,13 +276,13 @@ function register(app, db, dataDir) {
             if (!row || !verifyTeacherPassword(row.password, oldPw).ok) return res.status(401).json({ success: false, message: 'รหัสผ่านเดิมไม่ถูกต้อง' });
             db.run('UPDATE teachers SET password = ? WHERE id = ?', [hashTeacherPassword(newPw), row.id], err2 => {
                 if (err2) return res.status(500).json({ success: false, message: err2.message });
-                console.log(`🔐 ${user.u} เปลี่ยนรหัสผ่านของตัวเองแล้ว`);
+                console.log(`${user.u} เปลี่ยนรหัสผ่านของตัวเองแล้ว`);
                 res.json({ success: true, token: auth.issue({ typ: 'teacher', u: user.u, role: user.role || 'teacher' }), message: 'ตั้งรหัสผ่านใหม่เรียบร้อย' });
             });
         });
     });
 
-    // 🔑 อาจารย์รีเซ็ตรหัสผ่านนักศึกษา → ได้รหัสชั่วคราว นักศึกษาต้องตั้งรหัสใหม่ตอนเข้าสู่ระบบครั้งถัดไป
+    // อาจารย์รีเซ็ตรหัสผ่านนักศึกษา → ได้รหัสชั่วคราว นักศึกษาต้องตั้งรหัสใหม่ตอนเข้าสู่ระบบครั้งถัดไป
     app.post('/api/teacher/reset-student-password', (req, res) => {
         const user = req.authUser;
         if (!user || user.typ !== 'teacher') return res.status(401).json({ success: false, authRequired: true, message: 'กรุณาเข้าสู่ระบบ' });
@@ -282,7 +297,7 @@ function register(app, db, dataDir) {
             db.run('UPDATE students SET password_hash = ?, must_change = 1 WHERE studentId = ?', [h, sid], err2 => {
                 if (err2) return res.status(500).json({ success: false, message: err2.message });
                 [...fails.keys()].filter(k => k.startsWith(`a|s|${sid.toLowerCase()}|`)).forEach(k => fails.delete(k)); // ปลดล็อกด้วย
-                console.log(`🔑 ${user.u} รีเซ็ตรหัสผ่านนักศึกษา ${sid}`);
+                console.log(`${user.u} รีเซ็ตรหัสผ่านนักศึกษา ${sid}`);
                 res.json({ success: true, tempPassword: temp, message: 'รีเซ็ตรหัสผ่านแล้ว' });
             });
         });
@@ -293,7 +308,7 @@ function register(app, db, dataDir) {
         });
     });
 
-    console.log(enforce ? '🔐 เปิดระบบยืนยันตัวตนด้วย token แล้ว' : '⚠️ AUTH_ENFORCE=off: ปิดการบังคับ token (ไม่แนะนำ)');
+    console.log(enforce ? 'เปิดระบบยืนยันตัวตนด้วย token แล้ว' : 'AUTH_ENFORCE=off: ปิดการบังคับ token (ไม่แนะนำ)');
     return auth;
 }
 

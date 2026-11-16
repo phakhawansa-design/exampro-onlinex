@@ -4,9 +4,9 @@
     <script src="auth-client.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>จัดการรายวิชาและนักศึกษา - ตรีเนตร e-Exam</title>
+    <title>จัดการรายวิชาและนักศึกษา - ExamPro</title>
     <meta name="description" content="สร้างรายวิชาและนำเข้ารายชื่อนักศึกษาประจำวิชา">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- SheetJS for Excel (.xlsx/.xls) parsing -->
     <script src="vendor/xlsx.full.min.js"></script><script>window.XLSX || document.write('<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>')</script>
     <style>
@@ -24,7 +24,7 @@
         }
         * { box-sizing: border-box; }
         body {
-            font-family: 'Kanit', sans-serif;
+            font-family: 'Noto Sans Thai Looped', sans-serif;
             background-color: #f8fafc;
             color: #1e293b;
         }
@@ -112,25 +112,88 @@
             display: flex; align-items: center; justify-content: space-between;
         }
         .glass-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; box-shadow: 0 2px 10px rgba(15,23,42,0.03); }
-        input, select, textarea { font-family: 'Kanit', sans-serif; }
+        input, select, textarea { font-family: 'Noto Sans Thai Looped', sans-serif; }
         .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.65); backdrop-filter: blur(5px); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 1rem; }
     </style>
     <link rel="stylesheet" href="theme.css">
     <script src="theme.js" defer></script>
     <link rel="stylesheet" href="tailwind.css">
+    <style>
+        /* ===== ป๊อปอัปชุดข้อสอบในรายวิชา ===== */
+        .ce-box { background: #fff; width: 100%; max-width: 760px; max-height: 86vh; display: flex; flex-direction: column; border-radius: 22px; border: 1px solid #e2e8f0; box-shadow: 0 30px 60px -20px rgba(15,23,42,.35); overflow: hidden; }
+        .ce-sub { max-width: 680px; }
+        .ce-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding: 20px 24px 16px; border-bottom: 1px solid #e2e8f0; }
+        .ce-head-t { min-width: 0; }
+        .ce-meta { font-size: 13px; color: #64748b; font-weight: 500; }
+        .ce-head h3 { margin: 2px 0 0; font-size: 21px; font-weight: 700; color: #0f172a; line-height: 1.35; }
+        .ce-head-a { display: flex; align-items: center; gap: 8px; flex: none; }
+        .ce-x { width: 38px; height: 38px; border-radius: 12px; border: 1px solid #e2e8f0; background: #fff; color: #475569; font-size: 22px; line-height: 1; cursor: pointer; }
+        .ce-x:hover { background: #f1f5f9; }
+        .ce-btn { display: inline-flex; align-items: center; justify-content: center; padding: 9px 14px; border-radius: 12px; font-size: 14px; font-weight: 600; border: 1px solid #cbd5e1; background: #fff; color: #1e293b; cursor: pointer; white-space: nowrap; text-decoration: none; transition: .15s; }
+        .ce-btn:hover { background: #f8fafc; border-color: #94a3b8; }
+        .ce-btn-p { background: #0b2a7a; border-color: #0b2a7a; color: #fff; }
+        .ce-btn-p:hover { background: #1e40af; border-color: #1e40af; }
+        .ce-btn-go { border-color: #93c5fd; color: #1d4ed8; background: #eff6ff; }
+        .ce-btn-go:hover { background: #dbeafe; border-color: #60a5fa; }
+        .ce-btn-d { background: #e11d48; border-color: #e11d48; color: #fff; }
+        .ce-btn-d:hover { background: #be123c; }
+        .ce-body { flex: 1; overflow-y: auto; padding: 4px 24px 12px; }
+        .ce-row { display: flex; align-items: center; gap: 10px; padding: 14px 0; border-bottom: 1px solid #f1f5f9; }
+        .ce-row:last-child { border-bottom: 0; }
+        .ce-info { flex: 1; min-width: 0; }
+        .ce-name { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .ce-name b { font-size: 16px; font-weight: 700; color: #0f172a; }
+        .ce-sub-l { font-size: 13px; color: #64748b; margin-top: 3px; }
+        .ce-tag { font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 8px; white-space: nowrap; }
+        .ce-tag-on { background: #dcfce7; color: #166534; }
+        .ce-tag-wait { background: #fef3c7; color: #92400e; }
+        .ce-tag-off { background: #f1f5f9; color: #475569; }
+        .ce-acts { display: flex; align-items: center; gap: 8px; flex: none; position: relative; }
+        .ce-more { width: 38px; padding-left: 0; padding-right: 0; letter-spacing: 1px; }
+        .ce-menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 5; min-width: 200px; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; box-shadow: 0 16px 32px -12px rgba(15,23,42,.3); padding: 6px; }
+        .ce-menu button { display: block; width: 100%; text-align: left; padding: 9px 12px; border: 0; background: none; border-radius: 9px; font: inherit; font-size: 14px; color: #1e293b; cursor: pointer; }
+        .ce-menu button:hover { background: #f1f5f9; }
+        .ce-menu .ce-danger { color: #e11d48; }
+        .ce-menu .ce-danger:hover { background: #fff1f2; }
+        .ce-menu hr { border: 0; border-top: 1px solid #f1f5f9; margin: 4px 0; }
+        .ce-empty { padding: 44px 12px; text-align: center; color: #64748b; font-size: 15px; }
+        .ce-empty b { display: block; color: #0f172a; font-size: 17px; margin-bottom: 6px; }
+        .ce-empty .ce-btn { margin-top: 14px; }
+        .ce-q { padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
+        .ce-q:last-child { border-bottom: 0; }
+        .ce-q p { margin: 0 0 8px; font-weight: 600; color: #0f172a; white-space: pre-wrap; }
+        .ce-q img { max-height: 160px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 8px; }
+        .ce-ch { display: flex; gap: 8px; padding: 5px 10px; border-radius: 9px; font-size: 14px; color: #334155; }
+        .ce-ch.ok { background: #dcfce7; color: #166534; font-weight: 600; }
+        .ce-ch span { flex: none; width: 22px; color: #64748b; }
+        .ce-ch.ok span { color: #166534; }
+        .ce-del p { margin: 6px 0 12px; color: #334155; line-height: 1.7; }
+        .ce-del input { width: 100%; padding: 11px 13px; border: 1.5px solid #cbd5e1; border-radius: 12px; font: inherit; font-size: 16px; }
+        .ce-del input:focus { outline: none; border-color: #e11d48; box-shadow: 0 0 0 3px rgba(225,29,72,.12); }
+        .ce-err { min-height: 20px; margin-top: 6px; font-size: 13px; color: #e11d48; }
+        .ce-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 6px 0 10px; }
+        @media (max-width: 640px) {
+            .ce-head { padding: 16px 16px 12px; flex-wrap: wrap; }
+            .ce-head h3 { font-size: 18px; }
+            .ce-head-a { width: 100%; }
+            .ce-head-a .ce-btn-p { flex: 1; }
+            .ce-body { padding: 0 16px 10px; }
+            .ce-row { flex-wrap: wrap; }
+            .ce-acts { width: 100%; }
+            .ce-acts .ce-btn:not(.ce-more) { flex: 1; }
+        }
+    </style>
 </head>
+
 <body class="flex h-screen overflow-hidden">
 
 <!-- ===== SIDEBAR ===== -->
 <aside id="sidebar">
     <div class="sidebar-inner p-4 space-y-4 flex-1 overflow-y-auto">
-        <!-- Logo Header (ตรีเนตร e-Exam) -->
+        <!-- Logo Header (ExamPro) -->
         <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
-            <div class="w-10 h-12 bg-white rounded-lg p-1 border border-slate-200 flex items-center justify-center shrink-0 shadow-xs">
-                <img src="trinetra-logo.svg" alt="ตรีเนตร e-Exam" class="w-full h-full object-contain" />
-            </div>
             <div class="leading-tight">
-                <div class="font-bold text-base tracking-tight text-slate-900">ตรีเนตร <span class="text-blue-700 font-extrabold">e-Exam</span></div>
+                <div class="font-bold text-base tracking-tight text-slate-900">Exam<span class="text-blue-700 font-extrabold">Pro</span></div>
                 <div class="text-[10px] text-amber-700 font-bold uppercase tracking-wider">ตาที่ 3 ของอาจารย์</div>
             </div>
         </div>
@@ -219,7 +282,7 @@
                 </div>
             </div>
         </div>
-        <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2 px-3 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 border border-slate-200 hover:border-rose-200 transition">
+        <a href="login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2 px-3 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 border border-slate-200 hover:border-rose-200 transition">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H2.25" /></svg>
             <span>ออกจากระบบ</span>
         </a>
@@ -235,17 +298,17 @@
             </button>
             <div>
                 <h1 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight">2. จัดการรายวิชาและรายชื่อนักศึกษา</h1>
-                <p class="text-xs text-slate-500 font-medium">ตรีเนตร e-Exam &middot; ประจำภาคการศึกษาปัจจุบัน</p>
+                <p class="text-xs text-slate-500 font-medium">ExamPro &middot; ประจำภาคการศึกษาปัจจุบัน</p>
             </div>
         </div>
         <div class="flex items-center gap-3">
             <button onclick="window.TabLockGuide.open('courses')" class="flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition shadow-xs cursor-pointer">
-                <span>💡</span>
+                <span></span>
                 <span class="hidden sm:inline">คู่มือการใช้งาน</span>
             </button>
             <button onclick="openCourseModal()"
                 class="flex items-center gap-2 px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-xl text-xs sm:text-sm font-bold shadow-xs transition active:scale-95 cursor-pointer">
-                <span>➕</span>
+                <span></span>
                 <span>สร้างรายวิชาใหม่</span>
             </button>
         </div>
@@ -256,7 +319,7 @@
         <div>
             <div class="flex items-center justify-between mb-5">
                 <h2 class="text-xl md:text-2xl font-bold text-slate-900 flex items-center gap-3">
-                    <span>📖 รายการวิชาที่สอน</span>
+                    <span>รายการวิชาที่สอน</span>
                     <span id="course-count-badge" class="text-sm md:text-base bg-indigo-100 text-indigo-800 font-bold px-4 py-1 rounded-full border border-indigo-200">0 วิชา</span>
                 </h2>
             </div>
@@ -270,7 +333,7 @@
     <!-- Footer -->
     <footer class="border-t border-slate-200 bg-white py-3.5 px-8 text-center">
         <p class="text-xs text-slate-500 font-medium">
-            &copy; 2026 ตรีเนตร e-Exam &middot; ตาที่ 3 ของอาจารย์ &middot; ทีม TEC Hope
+            &copy; 2026 ExamPro &middot; ตาที่ 3 ของอาจารย์ &middot; ทีม TEC Hope
         </p>
     </footer>
 </div>
@@ -279,7 +342,7 @@
 <div id="course-modal" class="modal-overlay hidden">
     <div class="bg-white rounded-3xl p-7 sm:p-8 max-w-xl w-full shadow-2xl space-y-5 relative border-2 border-slate-200/80">
         <div class="flex justify-between items-center border-b border-slate-200 pb-4">
-            <h3 class="text-xl sm:text-2xl font-bold text-slate-900" id="course-modal-title">➕ สร้างรายวิชาใหม่</h3>
+            <h3 class="text-xl sm:text-2xl font-bold text-slate-900" id="course-modal-title">สร้างรายวิชาใหม่</h3>
             <button onclick="closeCourseModal()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xl transition">&times;</button>
         </div>
         <input type="hidden" id="modal-course-id">
@@ -306,7 +369,7 @@
         <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
             <button onclick="closeCourseModal()" class="px-5 py-3 text-slate-600 hover:bg-slate-100 rounded-2xl text-sm font-semibold transition">ยกเลิก</button>
             <button onclick="saveCourse()" id="btn-save-course" class="px-7 py-3 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white rounded-2xl text-sm sm:text-base font-bold shadow-lg shadow-cyan-500/25 active:scale-95 transition cursor-pointer">
-                💾 บันทึกรายวิชา
+                บันทึกรายวิชา
             </button>
         </div>
     </div>
@@ -319,7 +382,7 @@
         <div class="flex justify-between items-start border-b border-slate-200 pb-4">
             <div>
                 <div class="flex items-center gap-3">
-                    <span class="text-3xl">👥</span>
+                    <span class="text-3xl"></span>
                     <h3 class="text-xl sm:text-2xl font-bold text-slate-900" id="roster-modal-course-title">รายชื่อนักศึกษาประจำวิชา</h3>
                 </div>
                 <p class="text-sm text-slate-500 font-semibold mt-1" id="roster-modal-course-subtitle">รายชื่อผู้มีสิทธิ์เข้าสอบในรายวิชานี้</p>
@@ -330,7 +393,7 @@
         <!-- Toolbar -->
         <div class="flex flex-wrap items-center justify-between gap-3 py-1">
             <div class="flex items-center gap-3">
-                <input type="text" id="roster-search-input" placeholder="🔍 ค้นหารหัส / ชื่อ..." onkeyup="filterRoster()"
+                <input type="text" id="roster-search-input" placeholder="ค้นหารหัส / ชื่อ..." onkeyup="filterRoster()"
                     class="w-64 sm:w-72 px-4 py-2.5 border-2 border-slate-300 rounded-2xl text-sm font-bold text-slate-900 focus:outline-none focus:border-cyan-500">
                 <span id="roster-count-label" class="text-sm font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-xl">0 คน</span>
             </div>
@@ -339,29 +402,29 @@
                 <input type="file" id="roster-file-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleRosterFileUpload(event)">
                 <button onclick="document.getElementById('roster-file-input').click()"
                     class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs sm:text-sm font-bold transition flex items-center gap-2 shadow-md shadow-emerald-500/20 active:scale-95 cursor-pointer">
-                    📥 นำเข้า Excel / CSV
+                    นำเข้า Excel / CSV
                 </button>
                 <!-- Download Template -->
                 <button onclick="downloadRosterTemplate()"
                     class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-2xl text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 active:scale-95 cursor-pointer">
-                    📄 โหลดตัวอย่าง CSV
+                    โหลดตัวอย่าง CSV
                 </button>
                 <!-- Add Single Student -->
                 <button onclick="openAddStudentToCourseModal()"
                     class="px-4 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white rounded-2xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 active:scale-95 cursor-pointer">
-                    ➕ เพิ่มรายคน
+                    เพิ่มรายคน
                 </button>
                 <!-- Clear All -->
                 <button onclick="clearAllRosterStudents()"
                     class="px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border-2 border-rose-200 rounded-2xl text-xs sm:text-sm font-semibold transition active:scale-95 cursor-pointer">
-                    🗑️ ล้างทั้งหมด
+                    ล้างทั้งหมด
                 </button>
             </div>
         </div>
 
         <!-- Format Helper Banner -->
         <div class="p-4 bg-amber-50 border-2 border-amber-200 rounded-2xl text-xs sm:text-sm text-amber-900 flex items-start gap-3">
-            <span class="text-xl shrink-0">💡</span>
+            <span class="text-xl shrink-0"></span>
             <div class="leading-relaxed font-semibold">
                 <strong>รูปแบบไฟล์ที่รองรับ:</strong> คอลัมน์ <code class="bg-amber-100 px-1.5 py-0.5 rounded text-amber-900 font-mono font-bold">STUDENT_NO</code> (รหัสนักศึกษา เช่น 69325110007-0), <code class="bg-amber-100 px-1.5 py-0.5 rounded text-amber-900 font-mono font-bold">FULLNAME</code> (ชื่อ-นามสกุล ภาษาไทย เช่น นาย ธนนันท์ มุขธระโกษา), <code class="bg-amber-100 px-1.5 py-0.5 rounded text-amber-900 font-mono font-bold">FULLNAME_EN</code> (ภาษาอังกฤษ). ระบบจะแยกคำนำหน้าและเปิดบัญชีให้นักศึกษาเข้าใช้งานได้ทันที!
             </div>
@@ -392,7 +455,7 @@
 <div id="add-student-modal" class="modal-overlay hidden" style="z-index: 60;">
     <div class="bg-white rounded-3xl p-7 max-w-lg w-full shadow-2xl space-y-5 border-2 border-slate-200">
         <div class="flex justify-between items-center border-b border-slate-200 pb-3">
-            <h3 class="text-lg sm:text-xl font-bold text-slate-900">➕ เพิ่มนักศึกษาในวิชา</h3>
+            <h3 class="text-lg sm:text-xl font-bold text-slate-900">เพิ่มนักศึกษาในวิชา</h3>
             <button onclick="closeAddStudentToCourseModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-lg transition">&times;</button>
         </div>
         <div class="space-y-4 text-sm">
@@ -430,35 +493,36 @@
     </div>
 </div>
 
-<!-- MODAL: แสดงชุดข้อสอบในรายวิชา (แยกตามรายวิชา) -->
+<!-- MODAL: ชุดข้อสอบในรายวิชา (แถวกะทัดรัด + สถานะการเปิดสอบ + เมนูเพิ่มเติม) -->
 <div id="course-exams-modal" class="modal-overlay hidden" style="z-index: 55;">
-    <div class="bg-white rounded-3xl p-7 sm:p-8 max-w-3xl lg:max-w-4xl w-full shadow-2xl space-y-5 border-2 border-slate-200/90 flex flex-col max-h-[85vh]">
-        <div class="flex justify-between items-center border-b border-slate-200 pb-4 shrink-0">
-            <div class="flex items-center gap-3.5">
-                <div class="w-12 h-12 rounded-2xl bg-indigo-100 border border-indigo-200 flex items-center justify-center text-2xl shadow-xs">
-                    📝
-                </div>
-                <div>
-                    <h3 class="text-xl sm:text-2xl font-bold text-slate-900" id="exams-modal-title">ข้อสอบในรายวิชา</h3>
-                    <p class="text-xs sm:text-sm text-slate-500 font-bold mt-0.5" id="exams-modal-subtitle">รายวิชา...</p>
-                </div>
+    <div class="ce-box" role="dialog" aria-modal="true" aria-labelledby="exams-modal-title">
+        <div class="ce-head">
+            <div class="ce-head-t">
+                <div class="ce-meta" id="exams-modal-subtitle">รายวิชา...</div>
+                <h3 id="exams-modal-title">ข้อสอบในรายวิชา</h3>
             </div>
-            <button onclick="closeCourseExamsModal()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xl transition">&times;</button>
+            <div class="ce-head-a">
+                <a id="btn-create-exam-for-course" href="admin-questions.html" class="ce-btn ce-btn-p">+ สร้างชุดข้อสอบ</a>
+                <button type="button" onclick="closeCourseExamsModal()" class="ce-x" aria-label="ปิด">&times;</button>
+            </div>
         </div>
+        <div class="ce-body" id="course-exams-list">
+            <div class="ce-empty">กำลังโหลดข้อสอบในวิชานี้...</div>
+        </div>
+    </div>
+</div>
 
-        <div class="flex-1 overflow-y-auto space-y-4 pr-1" id="course-exams-list">
-            <div class="text-center py-12 text-slate-400 font-bold text-base">กำลังโหลดข้อสอบในวิชานี้...</div>
+<!-- MODAL: ดูตัวอย่างข้อสอบ / ยืนยันลบชุดข้อสอบ -->
+<div id="ce-sub-modal" class="modal-overlay hidden" style="z-index: 58;">
+    <div class="ce-box ce-sub" role="dialog" aria-modal="true">
+        <div class="ce-head">
+            <div class="ce-head-t">
+                <div class="ce-meta" id="ce-sub-meta"></div>
+                <h3 id="ce-sub-title"></h3>
+            </div>
+            <div class="ce-head-a"><button type="button" onclick="closeCeSub()" class="ce-x" aria-label="ปิด">&times;</button></div>
         </div>
-
-        <div class="flex items-center justify-between pt-4 border-t border-slate-200 shrink-0">
-            <button onclick="closeCourseExamsModal()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl text-sm font-semibold transition cursor-pointer">
-                ปิด
-            </button>
-            <a id="btn-create-exam-for-course" href="admin-questions.html" class="px-6 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-2xl text-sm sm:text-base font-bold shadow-lg shadow-indigo-600/25 transition active:scale-95 flex items-center gap-2 cursor-pointer">
-                <span>➕</span>
-                <span>สร้างข้อสอบใหม่ในวิชานี้</span>
-            </a>
-        </div>
+        <div class="ce-body" id="ce-sub-body"></div>
     </div>
 </div>
 
@@ -486,7 +550,7 @@
             renderCourses();
         } catch(e) {
             console.error(e);
-            document.getElementById('courses-container').innerHTML = `<div class="col-span-full py-8 text-center text-rose-500 font-bold">❌ โหลดข้อมูลไม่สำเร็จ</div>`;
+            document.getElementById('courses-container').innerHTML = `<div class="col-span-full py-8 text-center text-rose-500 font-bold">โหลดข้อมูลไม่สำเร็จ</div>`;
         }
     }
 
@@ -497,7 +561,7 @@
         if (!coursesList || coursesList.length === 0) {
             container.innerHTML = `
                 <div class="col-span-full py-16 text-center text-slate-400 glass-card space-y-3">
-                    <span class="text-4xl">📚</span>
+                    <span class="text-4xl"></span>
                     <div class="font-bold text-slate-600">ยังไม่มีรายวิชาที่สร้างไว้</div>
                     <p class="text-xs text-slate-400">กดปุ่ม "+ สร้างรายวิชาใหม่" ด้านบน เพื่อเริ่มต้นสร้างรายวิชาและนำเข้ารายชื่อนักศึกษา</p>
                 </div>
@@ -522,11 +586,11 @@
                     </div>
                     <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-200 text-xs sm:text-sm">
                         <div class="flex items-center gap-1.5 text-slate-700 font-semibold">
-                            <span>👥 นักศึกษา:</span>
+                            <span>นักศึกษา:</span>
                             <span class="text-cyan-600 font-bold text-sm sm:text-base">${c.studentCount || 0} คน</span>
                         </div>
                         <div class="flex items-center gap-1.5 text-slate-700 font-semibold">
-                            <span>📝 ชุดข้อสอบ:</span>
+                            <span>ชุดข้อสอบ:</span>
                             <span class="text-indigo-600 font-bold text-sm sm:text-base">${c.examCount || 0} ชุด</span>
                         </div>
                     </div>
@@ -536,22 +600,22 @@
                     <!-- ปุ่มกดดูข้อสอบที่มีในวิชา -->
                     <button onclick="openCourseExamsModal(${c.id})"
                         class="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-sm sm:text-base font-bold rounded-2xl transition shadow-md shadow-indigo-600/20 active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-                        <span>📝</span>
+                        <span></span>
                         <span>ดูข้อสอบในวิชานี้ (${c.examCount || 0})</span>
                     </button>
 
                     <div class="flex items-center justify-between gap-2.5">
                         <button onclick="openRosterModal(${c.id})"
                             class="flex-1 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs sm:text-sm font-bold rounded-2xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer border border-slate-200">
-                            👥 นักศึกษา (${c.studentCount || 0})
+                            นักศึกษา (${c.studentCount || 0})
                         </button>
                         <button onclick="openEditCourseModal(${c.id})" title="แก้ไข"
                             class="p-2.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-2xl transition cursor-pointer text-base sm:text-lg border border-slate-200">
-                            ✏️
+                            
                         </button>
                         <button onclick="deleteCourse(${c.id})" title="ลบรายวิชา"
                             class="p-2.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-2xl transition cursor-pointer text-base sm:text-lg border border-rose-200">
-                            🗑️
+                            
                         </button>
                     </div>
                 </div>
@@ -561,7 +625,7 @@
 
     function openCourseModal() {
         document.getElementById('modal-course-id').value = '';
-        document.getElementById('course-modal-title').textContent = '➕ สร้างรายวิชาใหม่';
+        document.getElementById('course-modal-title').textContent = 'สร้างรายวิชาใหม่';
         document.getElementById('modal-course-code').value = '';
         document.getElementById('modal-course-name').value = '';
         document.getElementById('modal-course-semester').value = '';
@@ -573,7 +637,7 @@
         const c = coursesList.find(x => x.id === courseId);
         if (!c) return;
         document.getElementById('modal-course-id').value = c.id;
-        document.getElementById('course-modal-title').textContent = '✏️ แก้ไขรายวิชา';
+        document.getElementById('course-modal-title').textContent = 'แก้ไขรายวิชา';
         document.getElementById('modal-course-code').value = c.courseCode || '';
         document.getElementById('modal-course-name').value = c.courseName || '';
         document.getElementById('modal-course-semester').value = c.semester || '';
@@ -585,91 +649,159 @@
         document.getElementById('course-modal').classList.add('hidden');
     }
 
-    // เปิดป็อปอัปแสดงชุดข้อสอบที่อยู่ในรายวิชานี้
+    // ===== ป๊อปอัปชุดข้อสอบในรายวิชา =====
+    let ceCourse = null, ceExams = [];
+    const TH_MON = { 'มกราคม':'ม.ค.','กุมภาพันธ์':'ก.พ.','มีนาคม':'มี.ค.','เมษายน':'เม.ย.','พฤษภาคม':'พ.ค.','มิถุนายน':'มิ.ย.','กรกฎาคม':'ก.ค.','สิงหาคม':'ส.ค.','กันยายน':'ก.ย.','ตุลาคม':'ต.ค.','พฤศจิกายน':'พ.ย.','ธันวาคม':'ธ.ค.' };
+    // "วันจันทร์ที่ 16 พฤศจิกายน 2569 เวลา 15:52" → "16 พ.ย. 69 15:52"
+    function shortThaiDate(s) {
+        s = String(s || '').replace(/^วัน\S*?ที่\s*/, '').replace(/\s*เวลา\s*/, ' ');
+        Object.keys(TH_MON).forEach(m => { s = s.replace(m, TH_MON[m]); });
+        return s.replace(/\b(25\d\d)\b/, (y) => y.slice(2)).replace(/\s+/g, ' ').trim() || '-';
+    }
+    const fmtPin = p => { p = String(p || '').replace(/\s/g, ''); return p.length === 6 ? p.slice(0, 3) + ' ' + p.slice(3) : p; };
+
     async function openCourseExamsModal(courseId) {
         const c = coursesList.find(x => x.id === courseId);
         if (!c) return;
-
-        document.getElementById('exams-modal-title').textContent = `ข้อสอบในวิชา: ${c.courseName}`;
-        document.getElementById('exams-modal-subtitle').textContent = `รหัสวิชา: ${c.courseCode} | ${c.semester || 'ภาคเรียนทั่วไป'}`;
+        ceCourse = c;
+        document.getElementById('exams-modal-title').textContent = c.courseName;
+        document.getElementById('exams-modal-subtitle').textContent = `${c.courseCode} · ${c.semester || 'ภาคเรียนทั่วไป'}`;
         document.getElementById('btn-create-exam-for-course').href = `admin-questions.html?courseId=${c.id}`;
-
-        const listContainer = document.getElementById('course-exams-list');
-        listContainer.innerHTML = '<div class="text-center py-12 text-slate-400 font-bold text-base">กำลังโหลดข้อสอบในวิชานี้...</div>';
+        const list = document.getElementById('course-exams-list');
+        list.innerHTML = '<div class="ce-empty">กำลังโหลดข้อสอบในวิชานี้...</div>';
         document.getElementById('course-exams-modal').classList.remove('hidden');
 
         try {
-            const res = await fetch(`/api/courses/${courseId}/exams`);
-            const exams = await res.json();
-
-            if (!exams || exams.length === 0) {
-                listContainer.innerHTML = `
-                    <div class="p-8 sm:p-10 text-center bg-slate-50 border-2 border-slate-200 rounded-3xl space-y-4">
-                        <span class="text-4xl">📝</span>
-                        <div class="font-bold text-slate-800 text-base sm:text-lg">ยังไม่มีชุดข้อสอบในวิชานี้</div>
-                        <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto font-medium leading-relaxed">
-                            ข้อสอบแต่ละวิชาจะถูกจัดเก็บแยกกันอย่างเป็นระเบียบ คุณสามารถสร้างข้อสอบใหม่สำหรับวิชานี้ได้ทันที
-                        </p>
-                        <a href="admin-questions.html?courseId=${c.id}" class="inline-flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-xs sm:text-sm font-bold shadow-md transition active:scale-95">
-                            <span>➕ สร้างข้อสอบชุดแรกสำหรับวิชานี้</span>
-                        </a>
-                    </div>
-                `;
-                return;
-            }
-
-            listContainer.innerHTML = exams.map(ex => `
-                <div class="p-5 sm:p-6 bg-slate-50 hover:bg-white border-2 border-slate-200 rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition shadow-xs hover:shadow-md">
-                    <div class="space-y-1.5">
-                        <div class="flex items-center gap-2.5">
-                            <span class="text-2xl">📄</span>
-                            <h4 class="text-base sm:text-lg font-bold text-slate-900">${escapeHtml(ex.templateName)}</h4>
-                        </div>
-                        <div class="text-xs sm:text-sm text-slate-500 font-bold flex flex-wrap items-center gap-2 sm:gap-3">
-                            <span>จำนวนข้อสอบ: <b class="text-indigo-600 font-bold text-sm sm:text-base">${ex.questionCount || 0} ข้อ</b></span>
-                            <span>•</span>
-                            <span>สร้างเมื่อ: ${escapeHtml(ex.created_at || '-')}</span>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-2.5 shrink-0">
-                        <a href="admin-rooms.html?courseId=${c.id}&templateId=${ex.id}" class="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-md transition active:scale-95 flex items-center gap-1.5">
-                            <span>🚀 เปิดห้องสอบ</span>
-                        </a>
-                        <a href="admin-questions.html?courseId=${c.id}&templateId=${ex.id}" class="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-200 text-xs sm:text-sm font-semibold rounded-2xl transition active:scale-95 flex items-center gap-1.5">
-                            <span>✏️ แก้ไข</span>
-                        </a>
-                        <button onclick="deleteExamFromCourse(${ex.id}, ${c.id})" title="ลบชุดข้อสอบ" class="p-2.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-2xl transition active:scale-95 cursor-pointer text-base sm:text-lg border-2 border-rose-200">
-                            🗑️
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-
-        } catch(e) {
+            const [exams, rooms] = await Promise.all([
+                fetch(`/api/courses/${courseId}/exams`).then(r => r.json()),
+                fetch(`/api/teacher/rooms?username=${encodeURIComponent(currentUsername)}`).then(r => r.ok ? r.json() : []).catch(() => [])
+            ]);
+            ceExams = Array.isArray(exams) ? exams : [];
+            const courseRooms = (Array.isArray(rooms) ? rooms : []).filter(r => Number(r.courseId) === Number(c.id));
+            renderCourseExams(courseRooms);
+        } catch (e) {
             console.error(e);
-            listContainer.innerHTML = '<div class="text-center py-6 text-rose-500 font-bold">❌ โหลดข้อมูลข้อสอบไม่สำเร็จ</div>';
+            list.innerHTML = '<div class="ce-empty">โหลดข้อมูลข้อสอบไม่สำเร็จ ลองเปิดใหม่อีกครั้ง</div>';
         }
     }
 
-    async function deleteExamFromCourse(templateId, courseId) {
-        if (!confirm("ยืนยันลบชุดข้อสอบนี้ออกจากรายวิชา?")) return;
-        try {
-            const res = await fetch('/api/library/delete-template', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ templateId })
-            });
-            if (res.ok) {
-                await openCourseExamsModal(courseId);
-                await loadCourses();
-            }
-        } catch(e) {
-            console.error(e);
+    function renderCourseExams(courseRooms) {
+        const c = ceCourse, list = document.getElementById('course-exams-list');
+        document.getElementById('exams-modal-subtitle').textContent = `${c.courseCode} · ${c.semester || 'ภาคเรียนทั่วไป'} · ${ceExams.length} ชุดข้อสอบ`;
+        if (!ceExams.length) {
+            list.innerHTML = `<div class="ce-empty"><b>ยังไม่มีชุดข้อสอบในวิชานี้</b>สร้างชุดแรกได้เลย ระบบจะเก็บแยกตามรายวิชาให้อัตโนมัติ<br><a class="ce-btn ce-btn-p" href="admin-questions.html?courseId=${c.id}">สร้างชุดข้อสอบชุดแรก</a></div>`;
+            return;
         }
+        list.innerHTML = ceExams.map(ex => {
+            // หาห้องสอบที่ใช้ชุดนี้ (วิชาเดียวกัน และชื่อข้อสอบตรงกับชื่อชุด)
+            const used = courseRooms.filter(r => (r.exam_title || '').trim() === (ex.templateName || '').trim());
+            const live = used.find(r => Number(r.is_published) === 1);
+            const tag = live ? `<span class="ce-tag ce-tag-on">กำลังเปิดสอบ · PIN ${escapeHtml(fmtPin(live.exam_code))}</span>`
+                : used.length ? '<span class="ce-tag ce-tag-wait">มีห้องสอบแล้ว ยังไม่เปิด</span>'
+                : '<span class="ce-tag ce-tag-off">ยังไม่เปิดสอบ</span>';
+            const main = live
+                ? `<a class="ce-btn ce-btn-go" href="admin-rooms.html?courseId=${c.id}">ดูห้องสอบ</a>`
+                : `<a class="ce-btn ce-btn-go" href="admin-rooms.html?courseId=${c.id}&templateId=${ex.id}">เปิดห้องสอบ</a>`;
+            return `<div class="ce-row">
+                <div class="ce-info">
+                    <div class="ce-name"><b>${escapeHtml(ex.templateName)}</b>${tag}</div>
+                    <div class="ce-sub-l">${ex.questionCount || 0} ข้อ · แก้ไขล่าสุด ${escapeHtml(shortThaiDate(ex.created_at))}</div>
+                </div>
+                <div class="ce-acts">
+                    ${main}
+                    <a class="ce-btn" href="admin-questions.html?courseId=${c.id}&templateId=${ex.id}">แก้ไข</a>
+                    <button type="button" class="ce-btn ce-more" aria-label="เพิ่มเติม" aria-haspopup="true" onclick="toggleCeMenu(event, ${ex.id})">•••</button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function closeCeMenus() { document.querySelectorAll('.ce-menu').forEach(m => m.remove()); }
+    function toggleCeMenu(e, id) {
+        e.stopPropagation();
+        const host = e.currentTarget.parentElement, had = host.querySelector('.ce-menu');
+        closeCeMenus();
+        if (had) return;
+        const m = document.createElement('div');
+        m.className = 'ce-menu'; m.setAttribute('role', 'menu');
+        m.innerHTML = `<button type="button" role="menuitem" onclick="previewExamSet(${id})">ดูตัวอย่างข้อสอบ</button>
+            <button type="button" role="menuitem" onclick="duplicateExamSet(${id})">ทำสำเนาชุดข้อสอบ</button><hr>
+            <button type="button" role="menuitem" class="ce-danger" onclick="askDeleteExamSet(${id})">ลบชุดข้อสอบ</button>`;
+        host.appendChild(m);
+    }
+    document.addEventListener('click', e => { if (!e.target.closest('.ce-menu')) closeCeMenus(); });
+    document.addEventListener('keydown', e => {
+        if (e.key !== 'Escape') return;
+        if (document.querySelector('.ce-menu')) return closeCeMenus();
+        if (!document.getElementById('ce-sub-modal').classList.contains('hidden')) return closeCeSub();
+        if (!document.getElementById('course-exams-modal').classList.contains('hidden')) closeCourseExamsModal();
+    });
+
+    function openCeSub(title, meta, html) {
+        closeCeMenus();
+        document.getElementById('ce-sub-title').textContent = title;
+        document.getElementById('ce-sub-meta').textContent = meta;
+        document.getElementById('ce-sub-body').innerHTML = html;
+        document.getElementById('ce-sub-modal').classList.remove('hidden');
+    }
+    function closeCeSub() { document.getElementById('ce-sub-modal').classList.add('hidden'); }
+
+    async function previewExamSet(id) {
+        const ex = ceExams.find(x => x.id === id); if (!ex) return;
+        openCeSub(ex.templateName, 'ตัวอย่างข้อสอบ · เฉลยแสดงเป็นแถบสีเขียว', '<div class="ce-empty">กำลังโหลด...</div>');
+        try {
+            const qs = await fetch(`/api/library/get-template-questions?templateId=${id}`).then(r => r.json());
+            const L = 'abcdefghij', TH = ['ก', 'ข', 'ค', 'ง', 'จ', 'ฉ', 'ช', 'ซ', 'ฌ', 'ญ'];
+            document.getElementById('ce-sub-meta').textContent = `ตัวอย่างข้อสอบ · ${qs.length} ข้อ · เฉลยแสดงเป็นแถบสีเขียว`;
+            document.getElementById('ce-sub-body').innerHTML = qs.length ? qs.map((q, i) => {
+                const ans = String(q.answer || '').trim().toLowerCase();
+                const ch = [...L].map((k, j) => (q[k] || q[k + '_img']) ? `<div class="ce-ch${ans === k ? ' ok' : ''}"><span>${TH[j]}.</span><div>${escapeHtml(q[k] || '(รูปภาพ)')}</div></div>` : '').join('');
+                return `<div class="ce-q"><p>${i + 1}. ${escapeHtml(q.question || '')}</p>${q.question_img ? `<img src="${escapeHtml(q.question_img)}" alt="">` : ''}${ch}</div>`;
+            }).join('') : '<div class="ce-empty">ชุดนี้ยังไม่มีข้อสอบ</div>';
+        } catch (e) { document.getElementById('ce-sub-body').innerHTML = '<div class="ce-empty">โหลดข้อสอบไม่สำเร็จ</div>'; }
+    }
+
+    async function duplicateExamSet(id) {
+        closeCeMenus();
+        try {
+            const r = await fetch('/api/library/duplicate-template', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ templateId: id }) });
+            const d = await r.json().catch(() => ({}));
+            if (!r.ok || !d.success) throw new Error(d.message || 'ทำสำเนาไม่สำเร็จ');
+            await openCourseExamsModal(ceCourse.id);
+            await loadCourses();
+        } catch (e) { alert(e.message); }
+    }
+
+    function askDeleteExamSet(id) {
+        const ex = ceExams.find(x => x.id === id); if (!ex) return;
+        openCeSub('ลบชุดข้อสอบ', ex.templateName, `<div class="ce-del">
+            <p>ลบแล้วกู้คืนไม่ได้ ข้อสอบทั้ง ${ex.questionCount || 0} ข้อในชุดนี้จะหายไป (ผลสอบที่นักศึกษาส่งแล้วยังอยู่)<br>พิมพ์ชื่อชุด <b>${escapeHtml(ex.templateName)}</b> เพื่อยืนยัน</p>
+            <input id="ce-del-input" type="text" autocomplete="off" placeholder="${escapeHtml(ex.templateName)}">
+            <div class="ce-err" id="ce-del-err"></div>
+            <div class="ce-foot"><button type="button" class="ce-btn" onclick="closeCeSub()">ยกเลิก</button><button type="button" class="ce-btn ce-btn-d" onclick="confirmDeleteExamSet(${id})">ลบชุดข้อสอบ</button></div></div>`);
+        const inp = document.getElementById('ce-del-input');
+        inp.addEventListener('input', () => { document.getElementById('ce-del-err').textContent = ''; });
+        inp.addEventListener('keydown', e => { if (e.key === 'Enter') confirmDeleteExamSet(id); });
+        setTimeout(() => inp.focus(), 50);
+    }
+
+    async function confirmDeleteExamSet(id) {
+        const ex = ceExams.find(x => x.id === id); if (!ex) return;
+        if (document.getElementById('ce-del-input').value.trim() !== String(ex.templateName).trim()) {
+            document.getElementById('ce-del-err').textContent = 'ชื่อชุดไม่ตรง พิมพ์ให้ตรงทุกตัวอักษร';
+            return;
+        }
+        try {
+            const r = await fetch('/api/library/delete-template', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ templateId: id }) });
+            if (!r.ok) throw new Error('ลบไม่สำเร็จ');
+            closeCeSub();
+            await openCourseExamsModal(ceCourse.id);
+            await loadCourses();
+        } catch (e) { document.getElementById('ce-del-err').textContent = e.message; }
     }
 
     function closeCourseExamsModal() {
+        closeCeMenus(); closeCeSub();
         document.getElementById('course-exams-modal').classList.add('hidden');
     }
 
@@ -682,7 +814,7 @@
         const btn = document.getElementById('btn-save-course');
 
         if (!courseCode || !courseName) {
-            alert("⚠️ กรุณาระบุรหัสวิชาและชื่อวิชา");
+            alert("กรุณาระบุรหัสวิชาและชื่อวิชา");
             return;
         }
 
@@ -702,35 +834,35 @@
                 closeCourseModal();
                 loadCourses();
             } else {
-                alert(`❌ ล้มเหลว: ${data.message}`);
+                alert(`ล้มเหลว: ${data.message}`);
             }
         } catch(e) {
             console.error(e);
-            alert("❌ ไม่สามารถติดต่อเซิร์ฟเวอร์ได้");
+            alert("ไม่สามารถติดต่อเซิร์ฟเวอร์ได้");
         } finally {
             btn.disabled = false;
-            btn.textContent = "💾 บันทึกรายวิชา";
+            btn.textContent = "บันทึกรายวิชา";
         }
     }
 
     async function deleteCourse(id) {
-        if (!confirm("⚠️ ยืนยันการลบรายวิชานี้?\nข้อมูลรายชื่อนักศึกษาที่ผูกกับวิชานี้จะถูกนำออก")) return;
+        if (!confirm("ยืนยันการลบรายวิชานี้?\nข้อมูลรายชื่อนักศึกษาที่ผูกกับวิชานี้จะถูกนำออก")) return;
         try {
             const res = await fetch(`/api/teacher/courses/${id}`, { method: 'DELETE' });
             const data = await res.json();
             if (res.ok) {
                 loadCourses();
             } else {
-                alert(`❌ ${data.message}`);
+                alert(`${data.message}`);
             }
         } catch(e) {
             console.error(e);
-            alert("❌ เกิดข้อผิดพลาด");
+            alert("เกิดข้อผิดพลาด");
         }
     }
 
     // ==========================================
-    // 👥 Roster Management Functions
+    // Roster Management Functions
     // ==========================================
 
     async function openRosterModal(courseId) {
@@ -779,7 +911,7 @@
                 <td class="px-5 py-3.5 text-slate-700 font-semibold text-xs sm:text-sm">${escapeHtml(s.class || '-')}</td>
                 <td class="px-5 py-3.5 text-center">
                     <button onclick="deleteRosterStudent(${s.id})" title="ลบนักศึกษาออกจากวิชา" class="text-rose-500 hover:text-rose-700 p-2 hover:bg-rose-50 rounded-xl transition text-base border border-rose-200 cursor-pointer">
-                        🗑️
+                        
                     </button>
                 </td>
             </tr>
@@ -802,7 +934,7 @@
         renderRosterTable(filtered);
     }
 
-    // 📥 นำเข้าไฟล์ Excel / CSV
+    // นำเข้าไฟล์ Excel / CSV
     function handleRosterFileUpload(e) {
         const file = e.target.files[0];
         if (!file) return;
@@ -828,14 +960,14 @@
                 }
 
                 if (!parsedRows || parsedRows.length === 0) {
-                    alert("⚠️ ไม่พบข้อมูลในไฟล์ กรุณาตรวจสอบหัวคอลัมน์ STUDENT_NO และ FULLNAME ครับ");
+                    alert("ไม่พบข้อมูลในไฟล์ กรุณาตรวจสอบหัวคอลัมน์ STUDENT_NO และ FULLNAME ครับ");
                     return;
                 }
 
                 const c = coursesList.find(x => x.id === currentCourseId);
                 const defaultClass = c ? c.description : '';
 
-                if (!confirm(`📥 ตรวจพบข้อมูลนักศึกษา ${parsedRows.length} รายการ\nต้องการนำเข้าสู่รายวิชานี้หรือไม่?`)) {
+                if (!confirm(`ตรวจพบข้อมูลนักศึกษา ${parsedRows.length} รายการ\nต้องการนำเข้าสู่รายวิชานี้หรือไม่?`)) {
                     return;
                 }
 
@@ -847,14 +979,14 @@
                 const result = await res.json();
 
                 if (res.ok && result.success) {
-                    alert(`🎉 ${result.message}`);
+                    alert(`${result.message}`);
                     await loadCourseStudents();
                 } else {
-                    alert(`❌ ล้มเหลว: ${result.message}`);
+                    alert(`ล้มเหลว: ${result.message}`);
                 }
             } catch(err) {
                 console.error(err);
-                alert("❌ เกิดข้อผิดพลาดในการอ่านไฟล์ กรุณาตรวจสอบว่าเป็นไฟล์ Excel หรือ CSV ที่ถูกต้อง");
+                alert("เกิดข้อผิดพลาดในการอ่านไฟล์ กรุณาตรวจสอบว่าเป็นไฟล์ Excel หรือ CSV ที่ถูกต้อง");
             } finally {
                 e.target.value = '';
             }
@@ -884,7 +1016,7 @@
         return rows;
     }
 
-    // 📄 ดาวน์โหลดไฟล์ตัวอย่างแม่แบบ CSV ตามที่กำหนด
+    // ดาวน์โหลดไฟล์ตัวอย่างแม่แบบ CSV ตามที่กำหนด
     function downloadRosterTemplate() {
         const csvContent = "\uFEFFSTUDENT_NO,FULLNAME,FULLNAME_EN\n" +
             "69325110007-0,นาย ธนนันท์ มุขธระโกษา,Mr. THANANAN MUKHATHRAKOSA\n" +
@@ -900,7 +1032,7 @@
         document.body.removeChild(link);
     }
 
-    // ➕ Modal เพิ่มนักศึกษาเดี่ยว
+    // Modal เพิ่มนักศึกษาเดี่ยว
     function openAddStudentToCourseModal() {
         document.getElementById('add-s-id').value = '';
         document.getElementById('add-s-prefix').value = 'นาย';
@@ -925,13 +1057,13 @@
         const cls = document.getElementById('add-s-class').value.trim();
 
         if (!studentId || !firstName) {
-            alert("⚠️ กรุณาระบุรหัสนักศึกษาและชื่อจริง");
+            alert("กรุณาระบุรหัสนักศึกษาและชื่อจริง");
             return;
         }
 
         const thaiRegex = /^[\u0E00-\u0E7F\s.]+$/;
         if (!thaiRegex.test(firstName) || (lastName && !thaiRegex.test(lastName))) {
-            alert("⚠️ ชื่อและนามสกุลต้องเป็นภาษาไทยเท่านั้นครับ");
+            alert("ชื่อและนามสกุลต้องเป็นภาษาไทยเท่านั้นครับ");
             return;
         }
 
@@ -946,11 +1078,11 @@
                 closeAddStudentToCourseModal();
                 loadCourseStudents();
             } else {
-                alert(`❌ ${data.message}`);
+                alert(`${data.message}`);
             }
         } catch(e) {
             console.error(e);
-            alert("❌ ไม่สามารถติดต่อเซิร์ฟเวอร์ได้");
+            alert("ไม่สามารถติดต่อเซิร์ฟเวอร์ได้");
         }
     }
 
@@ -965,7 +1097,7 @@
     }
 
     async function clearAllRosterStudents() {
-        if (!confirm("⚠️ ต้องการล้างรายชื่อนักศึกษาทั้งหมดในวิชานี้ใช่หรือไม่?")) return;
+        if (!confirm("ต้องการล้างรายชื่อนักศึกษาทั้งหมดในวิชานี้ใช่หรือไม่?")) return;
         try {
             const res = await fetch(`/api/courses/${currentCourseId}/students-all`, { method: 'DELETE' });
             if (res.ok) {

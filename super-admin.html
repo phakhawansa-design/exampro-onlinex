@@ -4,8 +4,8 @@
     <script src="auth-client.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Admin Dashboard - ตรีเนตร e-Exam</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
+    <title>Super Admin Dashboard - ExamPro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         html { font-size: 100%; -webkit-text-size-adjust: 100%; }
 
@@ -22,7 +22,7 @@
         }
 
         body {
-            font-family: 'Kanit', 'Inter', sans-serif;
+            font-family: 'Noto Sans Thai Looped', sans-serif;
             background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 50%, #eef4ff 100%) !important;
             background-attachment: fixed !important;
             color: #334155 !important;
@@ -164,28 +164,27 @@
     <!-- Top Header Bar -->
     <header class="bg-white/80 backdrop-blur-md border-b border-rose-100 px-6 py-4 flex items-center justify-between sticky top-0 z-40">
         <div class="flex items-center gap-3">
-            <img src="trinetra-logo.svg" alt="ตรีเนตร e-Exam" class="h-8 w-8 object-cover rounded-lg shadow-sm border border-slate-100" />
             <div>
                 <h1 class="text-base font-semibold text-slate-800 tracking-tight">Super Admin Dashboard</h1>
-                <p class="text-[10px] text-rose-600 font-bold uppercase tracking-widest">ตรีเนตร e-Exam</p>
+                <p class="text-[10px] text-rose-600 font-bold uppercase tracking-widest">ExamPro</p>
             </div>
         </div>
         <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap">
-            <button onclick="resetTeacherPw(localStorage.getItem('admin_username') || 'admin')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">🔑 เปลี่ยนรหัสแอดมิน</button>
-            <button id="btn-backup" onclick="downloadBackup(this)" class="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 text-xs font-bold" title="ดาวน์โหลดข้อมูลทั้งหมดเก็บไว้ (แนะนำหลังสอบทุกครั้ง)">💾 ดาวน์โหลดข้อมูลสำรอง</button>
-            <a href="admin-essay.html" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-pink-500 to-sky-500 text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5 active:scale-95">📝 ตรวจอัตนัย AI</a>
+            <button onclick="resetTeacherPw(localStorage.getItem('admin_username') || 'admin')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">เปลี่ยนรหัสแอดมิน</button>
+            <button id="btn-backup" onclick="downloadBackup(this)" class="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 text-xs font-bold" title="ดาวน์โหลดข้อมูลทั้งหมดเก็บไว้ (แนะนำหลังสอบทุกครั้ง)">ดาวน์โหลดข้อมูลสำรอง</button>
+            <a href="admin-essay.html" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-pink-500 to-sky-500 text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5 active:scale-95">ตรวจอัตนัย AI</a>
             <a href="admin-monitoring.html" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5 active:scale-95">
                 <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-                🛡️ ตรวจจับพฤติกรรมสด
+                ตรวจจับพฤติกรรมสด
             </a>
             <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-200 text-[10px] text-rose-600 font-semibold">
                 <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
                 ADMIN MODE
             </div>
             <span class="text-xs text-slate-800 font-bold" id="admin-name-display">Admin</span>
-            <a href="admin-login.html" onclick="localStorage.removeItem('admin_username'); localStorage.removeItem('admin_name');" 
+            <a href="login.html" onclick="localStorage.removeItem('admin_username'); localStorage.removeItem('admin_name');" 
                 class="px-3.5 py-1.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl text-xs font-bold text-rose-600 transition">
-                ออกจากระบบ ➡️
+                ออกจากระบบ 
             </a>
         </div>
     </header>
@@ -196,21 +195,21 @@
         <!-- Stats Cards -->
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
             <div class="bg-white border border-rose-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition">
-                <span class="p-3 bg-rose-50 border border-rose-100 rounded-xl text-xl flex-shrink-0">👨‍🏫</span>
+                <span class="p-3 bg-rose-50 border border-rose-100 rounded-xl text-xl flex-shrink-0"></span>
                 <div class="min-w-0">
                     <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider truncate">อาจารย์ทั้งหมด</div>
                     <div class="text-lg font-semibold text-slate-800" id="stat-total-teachers">0</div>
                 </div>
             </div>
             <div onclick="switchTab('teachers')" class="bg-white border border-rose-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition cursor-pointer group">
-                <span class="p-3 bg-amber-50 border border-amber-100 rounded-xl text-xl flex-shrink-0 group-hover:scale-105 transition">⏳</span>
+                <span class="p-3 bg-amber-50 border border-amber-100 rounded-xl text-xl flex-shrink-0 group-hover:scale-105 transition"></span>
                 <div class="min-w-0">
                     <div class="text-[10px] font-bold text-amber-700 uppercase tracking-wider truncate">อาจารย์รออนุมัติ</div>
                     <div class="text-lg font-semibold text-amber-600" id="stat-pending">0</div>
                 </div>
             </div>
             <div onclick="switchTab('students')" class="bg-white border border-rose-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition cursor-pointer group relative overflow-hidden">
-                <span class="p-3 bg-rose-50 border border-rose-100 rounded-xl text-xl flex-shrink-0 group-hover:scale-105 transition">🎓</span>
+                <span class="p-3 bg-rose-50 border border-rose-100 rounded-xl text-xl flex-shrink-0 group-hover:scale-105 transition"></span>
                 <div class="min-w-0">
                     <div class="text-[10px] font-bold text-rose-600 uppercase tracking-wider truncate flex items-center gap-1">
                         นักศึกษารออนุมัติ
@@ -220,14 +219,14 @@
                 </div>
             </div>
             <div onclick="switchTab('students')" class="bg-white border border-rose-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition cursor-pointer">
-                <span class="p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-xl flex-shrink-0">👥</span>
+                <span class="p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-xl flex-shrink-0"></span>
                 <div class="min-w-0">
                     <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider truncate">นักศึกษาในระบบ</div>
                     <div class="text-lg font-semibold text-emerald-600" id="stat-unique-students">0</div>
                 </div>
             </div>
             <div class="bg-white border border-rose-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition">
-                <span class="p-3 bg-cyan-50 border border-cyan-100 rounded-xl text-xl flex-shrink-0">📊</span>
+                <span class="p-3 bg-cyan-50 border border-cyan-100 rounded-xl text-xl flex-shrink-0"></span>
                 <div class="min-w-0">
                     <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider truncate">ครั้งที่เข้าสอบ</div>
                     <div class="text-lg font-semibold text-cyan-600" id="stat-total-logins">0</div>
@@ -239,24 +238,24 @@
         <div class="flex gap-2 flex-wrap items-center">
             <button onclick="switchTab('teachers')" id="tab-teachers"
                 class="tab-btn active px-5 py-2.5 rounded-xl text-xs font-bold transition duration-300 border flex items-center gap-2">
-                <span>📋 จัดการบัญชีอาจารย์</span>
+                <span>จัดการบัญชีอาจารย์</span>
             </button>
             <button onclick="switchTab('students')" id="tab-students"
                 class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition duration-300 border flex items-center gap-2">
-                <span>👨‍🎓 อนุมัติ & จัดการบัญชีนักศึกษา</span>
+                <span>อนุมัติ & จัดการบัญชีนักศึกษา</span>
                 <span id="badge-pending-students" class="hidden px-2 py-0.5 rounded-full text-[10px] bg-rose-500 text-white font-bold animate-pulse">0</span>
             </button>
             <button onclick="switchTab('storage')" id="tab-storage"
                 class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition duration-300 border flex items-center gap-2">
-                <span>🗄️ พื้นที่จัดเก็บข้อมูล</span>
+                <span>พื้นที่จัดเก็บข้อมูล</span>
             </button>
         </div>
 
         <!-- Tab 1: Teachers Management -->
         <div id="panel-teachers" class="bg-white/80 backdrop-blur-sm border border-rose-150 rounded-3xl p-6 space-y-4 shadow-md">
             <div class="flex items-center justify-between">
-                <h2 class="text-sm font-semibold text-slate-850 flex items-center gap-2">📋 รายชื่ออาจารย์ในระบบทั้งหมด</h2>
-                <button onclick="loadTeachers()" class="px-4 py-2 bg-slate-950 hover:bg-slate-900 border border-slate-800/80 rounded-xl text-[10px] font-bold text-white transition">🔄 รีเฟรช</button>
+                <h2 class="text-sm font-semibold text-slate-850 flex items-center gap-2">รายชื่ออาจารย์ในระบบทั้งหมด</h2>
+                <button onclick="loadTeachers()" class="px-4 py-2 bg-slate-950 hover:bg-slate-900 border border-slate-800/80 rounded-xl text-[10px] font-bold text-white transition">รีเฟรช</button>
             </div>
 
             <div class="overflow-x-auto">
@@ -286,17 +285,17 @@
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                 <div>
                     <h2 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
-                        <span>🎓 ระบบอนุมัติและจัดการบัญชีนักศึกษา</span>
+                        <span>ระบบอนุมัติและจัดการบัญชีนักศึกษา</span>
                     </h2>
                     <p class="text-[11px] text-slate-500 mt-0.5">ตรวจสอบและอนุมัติคำขอสมัครสมาชิกของนักศึกษาก่อนอนุญาตให้เข้าห้องสอบ</p>
                 </div>
 
                 <div class="flex items-center gap-2 flex-wrap">
                     <button onclick="approveAllStudents()" id="btn-approve-all-students" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition shadow-sm active:scale-95 flex items-center gap-1.5">
-                        ⚡ อนุมัติคำขอทั้งหมด (Approve All)
+                        อนุมัติคำขอทั้งหมด (Approve All)
                     </button>
                     <button onclick="loadStudentsData()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-1">
-                        🔄 รีเฟรช
+                        รีเฟรช
                     </button>
                 </div>
             </div>
@@ -305,17 +304,17 @@
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                 <div class="inline-flex p-1 bg-slate-100 rounded-xl gap-1">
                     <button onclick="setStudentFilter('pending')" id="filter-pending-btn" class="px-4 py-1.5 rounded-lg text-xs font-bold transition bg-white text-slate-800 shadow-sm flex items-center gap-1.5">
-                        <span>⏳ รออนุมัติ</span>
+                        <span>รออนุมัติ</span>
                         <span id="subtab-pending-count" class="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-500 text-white font-bold">0</span>
                     </button>
                     <button onclick="setStudentFilter('all')" id="filter-all-btn" class="px-4 py-1.5 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900 flex items-center gap-1.5">
-                        <span>👥 นักศึกษาทั้งหมด</span>
+                        <span>นักศึกษาทั้งหมด</span>
                         <span id="subtab-all-count" class="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-200 text-slate-700 font-bold">0</span>
                     </button>
                 </div>
 
                 <div class="relative min-w-[260px]">
-                    <input type="text" id="student-search-input" oninput="filterStudentTable()" placeholder="🔍 ค้นหารหัสนักศึกษา, ชื่อ, ชั้นเรียน..." class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-rose-400 outline-none">
+                    <input type="text" id="student-search-input" oninput="filterStudentTable()" placeholder="ค้นหารหัสนักศึกษา, ชื่อ, ชั้นเรียน..." class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-rose-400 outline-none">
                 </div>
             </div>
 
@@ -368,8 +367,8 @@
 
             <!-- Storage Header -->
             <div class="flex items-center justify-between">
-                <h2 class="text-sm font-semibold flex items-center gap-2" style="color:#ffe4e6">🗄️ การใช้พื้นที่จัดเก็บแยกตามอาจารย์</h2>
-                <button onclick="loadStorageStats()" class="px-4 py-2 bg-slate-950 hover:bg-slate-900 border border-slate-800/80 rounded-xl text-[10px] font-bold text-white transition">🔄 รีเฟรช</button>
+                <h2 class="text-sm font-semibold flex items-center gap-2" style="color:#ffe4e6">การใช้พื้นที่จัดเก็บแยกตามอาจารย์</h2>
+                <button onclick="loadStorageStats()" class="px-4 py-2 bg-slate-950 hover:bg-slate-900 border border-slate-800/80 rounded-xl text-[10px] font-bold text-white transition">รีเฟรช</button>
             </div>
 
             <!-- Loading -->
@@ -385,7 +384,7 @@
     </main>
 
     <footer class="border-t border-rose-100 py-5 text-center text-slate-550 text-[10px] mt-10">
-        <p>&copy; 2026 ตรีเนตร e-Exam · Super Admin. สงวนสิทธิ์ทั้งหมด.</p>
+        <p>&copy; 2026 ExamPro · Super Admin. สงวนสิทธิ์ทั้งหมด.</p>
     </footer>
 
     <script>
@@ -393,7 +392,7 @@
         const adminUsername = localStorage.getItem('admin_username');
         const adminName = localStorage.getItem('admin_name');
         if (!adminUsername) {
-            window.location.href = 'admin-login.html';
+            window.location.href = 'login.html';
         }
         document.getElementById('admin-name-display').textContent = adminName || 'Admin';
 
@@ -445,7 +444,7 @@
 
                 const list = document.getElementById('storage-list');
                 list.innerHTML = '';
-                const ranks = ['🥇','🥈','🥉'];
+                const ranks = ['','',''];
                 data.forEach((t, i) => {
                     const pct = maxBytes > 0 ? Math.max(2, Math.round((t.totalBytes / maxBytes) * 100)) : 2;
                     const barColor = pct >= 75 ? 'from-rose-500 to-red-600' : pct >= 40 ? 'from-amber-400 to-orange-500' : 'from-cyan-400 to-violet-500';
@@ -460,13 +459,13 @@
                                 <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px">
                                     <span style="font-weight:800;color:#1e293b;font-size:13px">${escapeHtml(t.name || t.username)}</span>
                                     <span style="font-size:10px;color:#64748b">@${escapeHtml(t.username)}</span>
-                                    ${t.status==='approved' ? '<span style="font-size:9px;font-weight:700;color:#059669;background:rgba(5,150,105,0.08);border:1px solid rgba(5,150,105,0.2);padding:1px 8px;border-radius:20px">✓ อนุมัติแล้ว</span>' : '<span style="font-size:9px;font-weight:700;color:#d97706;background:rgba(217,119,6,0.08);border:1px solid rgba(217,119,6,0.2);padding:1px 8px;border-radius:20px">⏳ รอการอนุมัติ</span>'}
+                                    ${t.status==='approved' ? '<span style="font-size:9px;font-weight:700;color:#059669;background:rgba(5,150,105,0.08);border:1px solid rgba(5,150,105,0.2);padding:1px 8px;border-radius:20px">✓ อนุมัติแล้ว</span>' : '<span style="font-size:9px;font-weight:700;color:#d97706;background:rgba(217,119,6,0.08);border:1px solid rgba(217,119,6,0.2);padding:1px 8px;border-radius:20px">รอการอนุมัติ</span>'}
                                 </div>
                                 <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
-                                    <span class="stat-chip-dark">🏫 ${t.roomCount||0} ห้องสอบ</span>
-                                    <span class="stat-chip-dark">📝 ${(t.questionCount||0).toLocaleString()} ข้อสอบ</span>
-                                    <span class="stat-chip-dark">📊 ${(t.resultCount||0).toLocaleString()} ผลสอบ</span>
-                                    <span class="stat-chip-dark">📚 ${t.templateCount||0} เทมเพลต</span>
+                                    <span class="stat-chip-dark">${t.roomCount||0} ห้องสอบ</span>
+                                    <span class="stat-chip-dark">${(t.questionCount||0).toLocaleString()} ข้อสอบ</span>
+                                    <span class="stat-chip-dark">${(t.resultCount||0).toLocaleString()} ผลสอบ</span>
+                                    <span class="stat-chip-dark">${t.templateCount||0} เทมเพลต</span>
                                 </div>
                                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
                                     <span style="font-size:10px;color:#64748b;font-weight:600">พื้นที่ใช้ไป</span>
@@ -555,26 +554,26 @@
 
                 tbody.innerHTML = teachers.map((t, i) => {
                     const statusBadge = t.status === 'pending' 
-                        ? '<span class="px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-bold">⏳ รอตรวจ</span>'
+                        ? '<span class="px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-bold">รอตรวจ</span>'
                         : t.status === 'approved'
-                        ? '<span class="px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold">✅ อนุมัติแล้ว</span>'
-                        : '<span class="px-2.5 py-1 rounded-lg bg-red-50 border border-red-200 text-red-700 text-[10px] font-bold">❌ ปฏิเสธ</span>';
+                        ? '<span class="px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold">อนุมัติแล้ว</span>'
+                        : '<span class="px-2.5 py-1 rounded-lg bg-red-50 border border-red-200 text-red-700 text-[10px] font-bold">ปฏิเสธ</span>';
 
                     let actions = '';
                     if (t.status === 'pending') {
                         actions = `
-                            <button onclick="approveTeacher('${t.username}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-bold transition active:scale-95">✅ อนุมัติ</button>
-                            <button onclick="rejectTeacher('${t.username}')" class="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-lg text-[10px] font-bold transition active:scale-95">❌ ปฏิเสธ</button>
+                            <button onclick="approveTeacher('${t.username}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-bold transition active:scale-95">อนุมัติ</button>
+                            <button onclick="rejectTeacher('${t.username}')" class="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-lg text-[10px] font-bold transition active:scale-95">ปฏิเสธ</button>
                         `;
                     } else if (t.status === 'approved') {
                         actions = `
-                            <button onclick="rejectTeacher('${t.username}')" class="px-3 py-1.5 bg-orange-600 hover:bg-orange-500 text-white rounded-lg text-[10px] font-bold transition active:scale-95">⛔ ระงับ</button>
-                            <button onclick="deleteTeacher('${t.username}')" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-[10px] font-bold transition active:scale-95">🗑️ ลบ</button>
+                            <button onclick="rejectTeacher('${t.username}')" class="px-3 py-1.5 bg-orange-600 hover:bg-orange-500 text-white rounded-lg text-[10px] font-bold transition active:scale-95">ระงับ</button>
+                            <button onclick="deleteTeacher('${t.username}')" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-[10px] font-bold transition active:scale-95">ลบ</button>
                         `;
                     } else {
                         actions = `
-                            <button onclick="approveTeacher('${t.username}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-bold transition active:scale-95">✅ อนุมัติ</button>
-                            <button onclick="deleteTeacher('${t.username}')" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-[10px] font-bold transition active:scale-95">🗑️ ลบ</button>
+                            <button onclick="approveTeacher('${t.username}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-bold transition active:scale-95">อนุมัติ</button>
+                            <button onclick="deleteTeacher('${t.username}')" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-[10px] font-bold transition active:scale-95">ลบ</button>
                         `;
                     }
 
@@ -582,7 +581,7 @@
                         <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
                             <td class="py-3 pr-4 text-xs text-slate-500 font-mono">${i + 1}</td>
                             <td class="py-3 pr-4 text-xs font-mono font-bold text-slate-800">${escapeHtml(t.username)}</td>
-                            <td class="py-3 pr-4 text-xs"><button onclick="resetTeacherPw('${escapeHtml(t.username)}')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">🔑 ตั้งรหัสใหม่</button></td>
+                            <td class="py-3 pr-4 text-xs"><button onclick="resetTeacherPw('${escapeHtml(t.username)}')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold">ตั้งรหัสใหม่</button></td>
                             <td class="py-3 pr-4 text-xs font-mono text-indigo-600 font-semibold">${escapeHtml(t.phone || '-')}</td>
                             <td class="py-3 pr-4 text-xs font-semibold text-slate-700">${escapeHtml(t.name)}</td>
                             <td class="py-3 pr-4 text-[10px] text-slate-500 font-semibold">${t.created_at || '-'}</td>
@@ -629,7 +628,7 @@
         }
 
         async function deleteTeacher(username) {
-            if (!confirm(`⚠️ ลบบัญชี "${username}" ถาวร? (ห้องสอบทั้งหมดจะถูกลบด้วย)`)) return;
+            if (!confirm(`ลบบัญชี "${username}" ถาวร? (ห้องสอบทั้งหมดจะถูกลบด้วย)`)) return;
             try {
                 const res = await fetch('/api/superadmin/delete-teacher', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -645,14 +644,14 @@
 
 
         // ==========================================
-        // 👨‍🎓 ระบบอนุมัติและจัดการบัญชีนักศึกษา (Super Admin)
+        // ระบบอนุมัติและจัดการบัญชีนักศึกษา (Super Admin)
         // ==========================================
         let allStudentsList = [];
         let currentStudentFilter = 'pending'; // 'pending' | 'all'
 
         async function loadStudentsData() {
             const tbody = document.getElementById('students-table-body');
-            tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-xs text-slate-500">⏳ กำลังโหลดข้อมูลนักศึกษา...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-xs text-slate-500">กำลังโหลดข้อมูลนักศึกษา...</td></tr>';
             try {
                 const res = await fetch('/api/students?username=admin');
                 const data = await res.json();
@@ -661,7 +660,7 @@
                 renderStudentsTable();
             } catch(e) {
                 console.error(e);
-                tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-xs text-rose-500">❌ โหลดข้อมูลนักศึกษาล้มเหลว</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-xs text-rose-500">โหลดข้อมูลนักศึกษาล้มเหลว</td></tr>';
             }
         }
 
@@ -725,7 +724,7 @@
 
             if (list.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="7" class="py-12 text-center text-slate-400">
-                    <div class="text-3xl mb-2">${currentStudentFilter === 'pending' ? '🎉' : '📭'}</div>
+                    <div class="text-3xl mb-2">${currentStudentFilter === 'pending' ? '' : ''}</div>
                     <div class="font-bold text-xs text-slate-600">${currentStudentFilter === 'pending' ? 'ไม่มีคำขอรออนุมัติในขณะนี้' : 'ไม่พบข้อมูลนักศึกษา'}</div>
                 </td></tr>`;
                 return;
@@ -742,8 +741,8 @@
                 const statusBadge = status === 'pending'
                     ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> รออนุมัติ</span>`
                     : status === 'approved'
-                    ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">✅ อนุมัติแล้ว</span>`
-                    : `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">❌ ปฏิเสธ</span>`;
+                    ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">อนุมัติแล้ว</span>`
+                    : `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">ปฏิเสธ</span>`;
 
                 let actions = '';
                 if (status === 'pending') {
@@ -756,15 +755,15 @@
                 } else if (status === 'approved') {
                     actions = `
                         <div class="flex justify-center gap-1.5">
-                            <button onclick="approveSingleStudent('${sid}', 'reject')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-lg text-[10px] font-bold transition active:scale-95">⛔ ระงับ</button>
-                            <button onclick="deleteSingleStudent('${sid}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[10px] font-bold transition active:scale-95">🗑️ ลบ</button>
+                            <button onclick="approveSingleStudent('${sid}', 'reject')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-lg text-[10px] font-bold transition active:scale-95">ระงับ</button>
+                            <button onclick="deleteSingleStudent('${sid}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[10px] font-bold transition active:scale-95">ลบ</button>
                         </div>
                     `;
                 } else {
                     actions = `
                         <div class="flex justify-center gap-1.5">
                             <button onclick="approveSingleStudent('${sid}', 'approve')" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-bold transition active:scale-95">✔ อนุมัติใหม่</button>
-                            <button onclick="deleteSingleStudent('${sid}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[10px] font-bold transition active:scale-95">🗑️ ลบ</button>
+                            <button onclick="deleteSingleStudent('${sid}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[10px] font-bold transition active:scale-95">ลบ</button>
                         </div>
                     `;
                 }
@@ -798,7 +797,7 @@
                     await loadStudentsData();
                     await loadStats();
                 } else {
-                    alert('❌ ไม่สามารถดำเนินการได้: ' + (data.message || ''));
+                    alert('ไม่สามารถดำเนินการได้: ' + (data.message || ''));
                 }
             } catch(e) {
                 alert('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์');
@@ -821,11 +820,11 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    alert('🎉 ' + data.message);
+                    alert('' + data.message);
                     await loadStudentsData();
                     await loadStats();
                 } else {
-                    alert('❌ ไม่สามารถดำเนินการได้: ' + (data.message || ''));
+                    alert('ไม่สามารถดำเนินการได้: ' + (data.message || ''));
                 }
             } catch(e) {
                 alert('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์');
@@ -833,7 +832,7 @@
         }
 
         async function deleteSingleStudent(studentId) {
-            if (!confirm(`⚠️ ยืนยันการลบบัญชีนักศึกษารหัส "${studentId}" หรือไม่? (ข้อมูลจะไม่สามารถกู้คืนได้)`)) return;
+            if (!confirm(`ยืนยันการลบบัญชีนักศึกษารหัส "${studentId}" หรือไม่? (ข้อมูลจะไม่สามารถกู้คืนได้)`)) return;
             try {
                 const res = await fetch('/api/admin/delete-student', {
                     method: 'POST',
@@ -846,7 +845,7 @@
                     await loadStudentsData();
                     await loadStats();
                 } else {
-                    alert('❌ ไม่สามารถลบได้: ' + (data.message || ''));
+                    alert('ไม่สามารถลบได้: ' + (data.message || ''));
                 }
             } catch(e) {
                 alert('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์');
@@ -868,9 +867,9 @@
     </script>
     <script src="user-guide-system.js"></script>
 <script>
-// 💾 ดาวน์โหลดข้อมูลสำรองทั้งหมด (ผลสอบ ข้อสอบ ประวัติตาเฝ้า รายวิชา งานอัตนัย) เป็นไฟล์ JSON
+// ดาวน์โหลดข้อมูลสำรองทั้งหมด (ผลสอบ ข้อสอบ ประวัติตาเฝ้า รายวิชา งานอัตนัย) เป็นไฟล์ JSON
 async function downloadBackup(btn) {
-    const old = btn.textContent; btn.disabled = true; btn.textContent = '⏳ กำลังเตรียมไฟล์...';
+    const old = btn.textContent; btn.disabled = true; btn.textContent = 'กำลังเตรียมไฟล์...';
     try {
         const r = await fetch('/api/superadmin/backup-export');
         if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error(j.message || ('HTTP ' + r.status)); }

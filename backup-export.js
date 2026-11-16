@@ -1,5 +1,5 @@
 // =====================================================================
-// 💾 ตรีเนตร · ดาวน์โหลดข้อมูลสำรองทั้งหมด (backup-export.js)
+// ExamPro · ดาวน์โหลดข้อมูลสำรองทั้งหมด (backup-export.js)
 // ---------------------------------------------------------------------
 // GET /api/superadmin/backup-export  (เฉพาะผู้ดูแลระบบ)
 //   ได้ไฟล์ JSON ไฟล์เดียว มีทุกตาราง: ห้องสอบ ข้อสอบ ผลสอบ ประวัติตาเฝ้า รายวิชา รายชื่อ งานอัตนัยและคะแนน
@@ -34,13 +34,13 @@ module.exports = function backupExport(app, db) {
             const stamp = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}`;
             const out = {
                 meta: {
-                    system: 'ตรีเนตร e-Exam', exportedAt: d.toISOString(), exportedBy: u.u,
+                    system: 'ExamPro', exportedAt: d.toISOString(), exportedBy: u.u,
                     database: db.isPg ? 'PostgreSQL' : 'SQLite', counts,
                     note: 'ไม่รวมรหัสผ่านและไฟล์ภาพกระดาษคำตอบ · เป็นข้อมูลส่วนบุคคลของนักศึกษา (PDPA) โปรดเก็บในที่ปลอดภัย'
                 },
                 tables
             };
-            console.log(`💾 ${u.u} ดาวน์โหลดข้อมูลสำรอง (${Object.values(counts).reduce((a, b) => a + b, 0)} แถว)`);
+            console.log(`${u.u} ดาวน์โหลดข้อมูลสำรอง (${Object.values(counts).reduce((a, b) => a + b, 0)} แถว)`);
             res.setHeader('Content-Type', 'application/json; charset=utf-8');
             res.setHeader('Content-Disposition', `attachment; filename="trinetra-backup_${stamp}.json"`);
             res.setHeader('Cache-Control', 'no-store');

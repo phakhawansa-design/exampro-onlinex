@@ -1,5 +1,5 @@
 // =====================================================================
-// 👁️ ตรีเนตร · เชื่อม "ตาเฝ้า" กับ "ตาอ่าน" (trinetra-link.js)
+// ExamPro · เชื่อม "ตาเฝ้า" กับ "ตาอ่าน" (trinetra-link.js)
 // ---------------------------------------------------------------------
 // GET /api/trinetra/course-report?courseId=
 //   รายงานรวมรายคนของรายวิชา: คะแนนปรนัยทุกห้องสอบ + คะแนนอัตนัยทุกงาน
@@ -15,10 +15,11 @@ module.exports = function trinetraLink(app, db) {
     const norm = id => String(id || '').replace(/[^0-9a-zA-Z]/g, '').toLowerCase();
     const kindOf = a => {
         a = String(a || '');
-        if (a.startsWith('⏸️')) return 'gap';
-        if (a.startsWith('🖥️')) return 'fs';
-        if (a.startsWith('🚨')) return 'switch';
-        if (a.startsWith('📱')) return 'multi';
+        // แยกประเภทจากข้อความ (ประวัติเก่าที่มีอีโมจินำหน้าก็ยังแยกได้)
+        if (/หายจากหน้าสอบ|หยุดทำงาน/.test(a)) return 'gap';
+        if (/เต็มจอ/.test(a)) return 'fs';
+        if (/อีกเครื่อง|หลายเครื่อง|หลายแท็บ|แท็บใหม่/.test(a)) return 'multi';
+        if (/สลับ|ออกหน้าจอ/.test(a)) return 'switch';
         return 'other';
     };
 
@@ -80,13 +81,13 @@ module.exports = function trinetraLink(app, db) {
                 p.watch.rooms[l.roomId] = (p.watch.rooms[l.roomId] || 0) + 1;
                 p.watch.events.push({ roomId: l.roomId, room: roomLabel[l.roomId] || l.roomId, kind: k, action: l.action, time: l.time });
             }
-            // ✏️ ตอบ/แก้คำตอบหลังกลับจากการสลับหน้าจอ (ไม่นับรวมเป็นครั้งที่ผิดระเบียบ แต่แสดงเป็นหลักฐานประกอบ)
+            // ตอบ/แก้คำตอบหลังกลับจากการสลับหน้าจอ (ไม่นับรวมเป็นครั้งที่ผิดระเบียบ แต่แสดงเป็นหลักฐานประกอบ)
             for (const a of answers) {
                 const p = person(a.student_id); if (!p) continue;
                 p.watch.answer++;
                 const q = `ข้อ ${a.question_no || '?'}`, w = `${a.after_sec} วินาทีหลังกลับจาก${a.after_what ? a.after_what : 'การสลับหน้าจอ'}`;
                 p.watch.events.push({ roomId: a.room_id, room: roomLabel[a.room_id] || a.room_id, kind: 'answer', time: a.time,
-                    action: a.kind === 'change' ? `✏️ แก้คำตอบ${q} จาก "${a.from_text}" เป็น "${a.to_text}" · ${w}` : `✏️ ตอบ${q} เป็น "${a.to_text}" · ${w}` });
+                    action: a.kind === 'change' ? `แก้คำตอบ${q} จาก "${a.from_text}" เป็น "${a.to_text}" · ${w}` : `ตอบ${q} เป็น "${a.to_text}" · ${w}` });
             }
             for (const p of people.values()) p.watch.events.sort((x, y) => String(x.room).localeCompare(String(y.room)) || String(x.time).localeCompare(String(y.time)));
             const totalMax = columns.reduce((t, c) => t + (c.max || 0), 0);

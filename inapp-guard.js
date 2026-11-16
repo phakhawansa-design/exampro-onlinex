@@ -1,4 +1,4 @@
-/* ตรีเนตร e-Exam · กันการเปิดหน้าสอบในเบราว์เซอร์ของแอปแชต (LINE, Facebook, Messenger, IG, TikTok ฯลฯ)
+/* ExamPro · กันการเปิดหน้าสอบในเบราว์เซอร์ของแอปแชต (LINE, Facebook, Messenger, IG, TikTok ฯลฯ)
  * เบราว์เซอร์ในแอปเหล่านี้แจ้งเหตุการณ์สลับหน้าจอได้ไม่ครบ ระบบตาเฝ้าจึงตรวจจับไม่ได้
  *  - LINE: ส่งต่อไปเปิดใน Safari/Chrome อัตโนมัติด้วย openExternalBrowser=1
  *  - แอปอื่น: ขึ้นหน้าแนะนำวิธีเปิดในเบราว์เซอร์หลัก พร้อมปุ่มคัดลอกลิงก์ / เปิดใน Chrome (Android)
@@ -85,7 +85,7 @@
         var st = document.createElement('style');
         st.textContent =
             '#tn-inapp{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:20px;' +
-            'background:radial-gradient(ellipse at 50% 30%,#0d3b8e 0,#061a4a 60%,#020b26 100%);font-family:Kanit,Prompt,"Leelawadee UI",Tahoma,sans-serif;color:#0f1d3a;overflow:auto}' +
+            'background:radial-gradient(ellipse at 50% 30%,#0d3b8e 0,#061a4a 60%,#020b26 100%);font-family:Noto Sans Thai Looped, "Leelawadee UI",Tahoma,sans-serif;color:#0f1d3a;overflow:auto}' +
             '#tn-inapp .bx{width:100%;max-width:420px;background:#fff;border-radius:22px;padding:26px 22px 22px;box-shadow:0 30px 70px -20px rgba(0,0,0,.6);text-align:center}' +
             '#tn-inapp .ic{width:64px;height:64px;margin:0 auto 12px;border-radius:18px;display:grid;place-items:center;background:#fff4e5;color:#e8663d}' +
             '#tn-inapp h2{margin:0 0 6px;font-size:21px;line-height:1.35;color:#0d3b8e}' +
@@ -98,7 +98,7 @@
         document.head.appendChild(st);
 
         var steps = isIOS
-            ? 'แตะปุ่ม <b>•••</b> หรือ <b>⤴︎ แชร์</b> มุมจอ แล้วเลือก <b>"เปิดใน Safari"</b> / <b>"Open in browser"</b>'
+            ? 'แตะปุ่ม <b>•••</b> หรือ <b>แชร์</b> มุมจอ แล้วเลือก <b>"เปิดใน Safari"</b> / <b>"Open in browser"</b>'
             : 'แตะปุ่ม <b>⋮</b> มุมขวาบน แล้วเลือก <b>"เปิดในเบราว์เซอร์"</b> / <b>"Open in Chrome"</b>';
         var lead = (app === 'LINE' && lineTried)
             ? 'ระบบกำลังส่งไปเปิดใน ' + (isIOS ? 'Safari' : 'Chrome') + ' ให้อัตโนมัติ ถ้ายังไม่เด้ง ให้ทำตามขั้นตอนด้านล่าง'
@@ -116,7 +116,7 @@
             (app === 'LINE' ? '<a class="bt pr" id="tn-go" href="' + url.replace(/"/g, '&quot;') + '">เปิดในเบราว์เซอร์อีกครั้ง</a>' : '') +
             (isAndroid ? '<a class="bt ' + (app === 'LINE' ? 'sc' : 'pr') + '" href="' + chromeIntent(url).replace(/"/g, '&quot;') + '">เปิดใน Chrome</a>' : '') +
             '<button type="button" class="' + (app === 'LINE' || isAndroid ? 'sc' : 'pr') + '" id="tn-copy">คัดลอกลิงก์ไปเปิดเอง</button>' +
-            '<div class="ft">ตรีเนตร e-Exam · ตาเฝ้าทำงานได้เต็มที่เฉพาะในเบราว์เซอร์หลัก</div>' +
+            '<div class="ft">ExamPro · ตาเฝ้าทำงานได้เต็มที่เฉพาะในเบราว์เซอร์หลัก</div>' +
             '</div>';
         document.body.appendChild(d);
         document.documentElement.style.overflow = 'hidden';

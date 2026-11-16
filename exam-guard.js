@@ -1,5 +1,5 @@
 // =====================================================================
-// 🛡️ ตรีเนตร · ตัวช่วยฝั่งเซิร์ฟเวอร์ระหว่างสอบ (exam-guard.js)
+// ExamPro · ตัวช่วยฝั่งเซิร์ฟเวอร์ระหว่างสอบ (exam-guard.js)
 // ---------------------------------------------------------------------
 // 1) บันทึกคำตอบระหว่างสอบ (exam_progress)
 //    - รีเฟรช / แบตหมด / เน็ตหลุด กลับมาทำต่อได้ คำตอบไม่หาย
@@ -56,7 +56,7 @@ module.exports = function examGuard(app, db) {
         started_at TEXT,
         updated_at TEXT,
         UNIQUE(room_id, student_id)
-    )`, err => { if (!err) console.log('🛡️ ระบบบันทึกคำตอบระหว่างสอบ + ตรวจสัญญาณขาดหาย พร้อมใช้งาน'); });
+    )`, err => { if (!err) console.log('ระบบบันทึกคำตอบระหว่างสอบ + ตรวจสัญญาณขาดหาย พร้อมใช้งาน'); });
     db.run(`CREATE TABLE IF NOT EXISTS answer_events (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         room_id TEXT,
@@ -115,10 +115,10 @@ module.exports = function examGuard(app, db) {
                 if (!deniedAt.has(k) || now - deniedAt.get(k) > 60000) {
                     deniedAt.set(k, now);
                     db.run('INSERT INTO cheat_logs (roomId, studentId, name, class, action, time) VALUES (?, ?, ?, ?, ?, ?)',
-                        [String(roomId), req.authUser.u, req.authUser.u, '', '🚫 พยายามเปิดข้อสอบห้องนี้ แต่ไม่มีรายชื่อในรายวิชา (ระบบไม่ให้เข้า)', thaiTime()], () => {});
+                        [String(roomId), req.authUser.u, req.authUser.u, '', 'พยายามเปิดข้อสอบห้องนี้ แต่ไม่มีรายชื่อในรายวิชา (ระบบไม่ให้เข้า)', thaiTime()], () => {});
                 }
                 return res.status(403).json({ success: false, accessDenied: true,
-                    message: `❌ รหัสนักศึกษา (${req.authUser.u}) ไม่มีรายชื่อในรายวิชาของห้องสอบนี้\nจึงเข้าสอบหรือส่งคำตอบไม่ได้ กรุณาติดต่ออาจารย์ผู้สอน` });
+                    message: `รหัสนักศึกษา (${req.authUser.u}) ไม่มีรายชื่อในรายวิชาของห้องสอบนี้\nจึงเข้าสอบหรือส่งคำตอบไม่ได้ กรุณาติดต่ออาจารย์ผู้สอน` });
             }
         } catch (e) { console.error('ตรวจรายชื่อรายวิชาไม่สำเร็จ:', e.message); }
         next();
@@ -130,7 +130,7 @@ module.exports = function examGuard(app, db) {
         if (p === '/api/get-questions' && req.method === 'GET' && !allowInApp && isInApp(req.headers['user-agent'])) {
             return res.status(403).json({
                 success: false, inApp: true,
-                message: `❌ เปิดข้อสอบใน ${inAppName(req.headers['user-agent'])} ไม่ได้ เพราะระบบตรวจจับการสลับหน้าจอไม่ได้\nกรุณาคัดลอกลิงก์ไปเปิดใน Safari หรือ Chrome`
+                message: `เปิดข้อสอบใน ${inAppName(req.headers['user-agent'])} ไม่ได้ เพราะระบบตรวจจับการสลับหน้าจอไม่ได้\nกรุณาคัดลอกลิงก์ไปเปิดใน Safari หรือ Chrome`
             });
         }
         // (2b) อนุญาตเบราว์เซอร์ในแอปไว้ (ALLOW_INAPP_BROWSER=on) → แจ้งอาจารย์ว่าคนนี้สอบในแอป ตาเฝ้าอาจจับไม่ครบ
@@ -139,7 +139,7 @@ module.exports = function examGuard(app, db) {
             const k = keyOf(req.query.roomId, req.authUser.u), now = Date.now();
             if (!deniedAt.has('inapp|' + k) || now - deniedAt.get('inapp|' + k) > 10 * 60e3) {
                 deniedAt.set('inapp|' + k, now);
-                logCheat(req.query.roomId, req.authUser.u, req.authUser.u, '', `📵 เปิดข้อสอบในเบราว์เซอร์ของ ${inAppName(req.headers['user-agent'])} (ตาเฝ้าอาจตรวจจับการสลับหน้าจอได้ไม่ครบ)`);
+                logCheat(req.query.roomId, req.authUser.u, req.authUser.u, '', `เปิดข้อสอบในเบราว์เซอร์ของ ${inAppName(req.headers['user-agent'])} (ตาเฝ้าอาจตรวจจับการสลับหน้าจอได้ไม่ครบ)`);
             }
         }
         // (4) เปิดข้อสอบ = จองเป็นเจ้าของการสอบ ถ้ามีหน้าสอบอื่นของคนเดียวกันยังทำงานอยู่ → ไม่ให้เข้า
@@ -149,16 +149,16 @@ module.exports = function examGuard(app, db) {
                 if (cur && cur.sid !== sid && now - cur.t < SESSION_IDLE_MS) {
                     if (!cur.blockedAt || now - cur.blockedAt > 60000) { // บันทึกไม่เกินนาทีละครั้ง
                         cur.blockedAt = now;
-                        logCheat(req.query.roomId, req.authUser.u, cur.name, cur.cls, '📱 พยายามเปิดข้อสอบบนอีกเครื่อง/อีกแท็บ ขณะที่หน้าสอบเดิมยังเปิดอยู่ (ระบบไม่ให้เข้า)');
+                        logCheat(req.query.roomId, req.authUser.u, cur.name, cur.cls, 'พยายามเปิดข้อสอบบนอีกเครื่อง/อีกแท็บ ขณะที่หน้าสอบเดิมยังเปิดอยู่ (ระบบไม่ให้เข้า)');
                         lastCheat.set(k, now);
                     }
                     return res.status(409).json({
                         success: false, concurrent: true,
-                        message: '❌ บัญชีนี้กำลังทำข้อสอบอยู่บนอีกเครื่องหรืออีกแท็บ\nระบบบันทึกและแจ้งอาจารย์แล้ว\n\nถ้าเครื่องเดิมปิดไปแล้ว รอประมาณ 15 วินาทีแล้วลองใหม่'
+                        message: 'บัญชีนี้กำลังทำข้อสอบอยู่บนอีกเครื่องหรืออีกแท็บ\nระบบบันทึกและแจ้งอาจารย์แล้ว\n\nถ้าเครื่องเดิมปิดไปแล้ว รอประมาณ 15 วินาทีแล้วลองใหม่'
                     });
                 }
                 if (cur && cur.sid !== sid && cur.sid) {
-                    logCheat(req.query.roomId, req.authUser.u, cur.name, cur.cls, '📱 เปิดข้อสอบจากเครื่อง/แท็บใหม่ (หน้าสอบเดิมถูกหยุด)');
+                    logCheat(req.query.roomId, req.authUser.u, cur.name, cur.cls, 'เปิดข้อสอบจากเครื่อง/แท็บใหม่ (หน้าสอบเดิมถูกหยุด)');
                     lastCheat.set(k, now);
                 }
                 sessions.set(k, { sid, t: now, name: cur && cur.name, cls: cur && cur.cls });
@@ -180,7 +180,7 @@ module.exports = function examGuard(app, db) {
                     res.setHeader('X-Trinetra-Session', 'superseded');
                     if (!own.warned || own.warned !== sid) {
                         own.warned = sid;
-                        logCheat(b.roomId, b.studentId, b.name, b.class, '📱 พบหน้าสอบเปิดพร้อมกันหลายเครื่อง/หลายแท็บ (หน้าสอบเก่าถูกหยุด)');
+                        logCheat(b.roomId, b.studentId, b.name, b.class, 'พบหน้าสอบเปิดพร้อมกันหลายเครื่อง/หลายแท็บ (หน้าสอบเก่าถูกหยุด)');
                         lastCheat.set(k, now);
                     }
                     beats.set(k, prev || { t: now, state: 'in_exam', vis: 'visible' });
@@ -191,7 +191,7 @@ module.exports = function examGuard(app, db) {
             if (state === 'in_exam' && prev && prev.state === 'in_exam' && prev.vis !== 'hidden'
                 && now - prev.t > GAP_MS && (lastCheat.get(k) || 0) < prev.t) {
                 const sec = Math.round((now - prev.t) / 1000);
-                const action = `⏸️ หายจากหน้าสอบประมาณ ${sec} วินาที (พับแอป/ล็อกจอ/สลับแอป หรือเน็ตหลุด)`;
+                const action = `หายจากหน้าสอบประมาณ ${sec} วินาที (พับแอป/ล็อกจอ/สลับแอป หรือเน็ตหลุด)`;
                 db.run('INSERT INTO cheat_logs (roomId, studentId, name, class, action, time) VALUES (?, ?, ?, ?, ?, ?)',
                     [String(b.roomId), String(b.studentId).trim(), b.name || '', b.class || '', action, thaiTime()], () => {});
                 lastCheat.set(k, now);

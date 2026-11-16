@@ -4,9 +4,9 @@
     <script src="auth-client.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ตรวจสอบพฤติกรรมน่าสงสัย - ตรีเนตร e-Exam</title>
-    <meta name="description" content="ศูนย์ตรวจสอบพฤติกรรมน่าสงสัยแบบเรียลไทม์ ตรีเนตร e-Exam">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
+    <title>ตรวจสอบพฤติกรรมน่าสงสัย - ExamPro</title>
+    <meta name="description" content="ศูนย์ตรวจสอบพฤติกรรมน่าสงสัยแบบเรียลไทม์ ExamPro">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         html { font-size: 100%; -webkit-text-size-adjust: 100%; }
 
@@ -24,7 +24,7 @@
 
         * { box-sizing: border-box; }
         body {
-            font-family: 'Kanit', sans-serif;
+            font-family: 'Noto Sans Thai Looped', sans-serif;
             background-color: #f8fafc;
             color: #1e293b;
         }
@@ -118,13 +118,10 @@
     <!-- ===== SIDEBAR ===== -->
     <aside id="sidebar">
         <div class="sidebar-inner p-4 space-y-4 flex-1 overflow-y-auto">
-            <!-- Logo Header (ตรีเนตร e-Exam) -->
+            <!-- Logo Header (ExamPro) -->
             <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
-                <div class="w-10 h-12 bg-white rounded-lg p-1 border border-slate-200 flex items-center justify-center shrink-0 shadow-xs">
-                    <img src="trinetra-logo.svg" alt="ตรีเนตร e-Exam" class="w-full h-full object-contain" />
-                </div>
                 <div class="leading-tight">
-                    <div class="font-bold text-base tracking-tight text-slate-900">ตรีเนตร <span class="text-blue-700 font-extrabold">e-Exam</span></div>
+                    <div class="font-bold text-base tracking-tight text-slate-900">Exam<span class="text-blue-700 font-extrabold">Pro</span></div>
                     <div class="text-[10px] text-amber-700 font-bold uppercase tracking-wider">ตาที่ 3 ของอาจารย์</div>
                 </div>
             </div>
@@ -213,7 +210,7 @@
                     </div>
                 </div>
             </div>
-            <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2 px-3 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 border border-slate-200 hover:border-rose-200 transition">
+            <a href="login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2 px-3 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 border border-slate-200 hover:border-rose-200 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H2.25" /></svg>
                 <span>ออกจากระบบ</span>
             </a>
@@ -233,17 +230,17 @@
                         <span class="inline-block w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
                         <h1 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight">9. ตรวจสอบพฤติกรรมน่าสงสัย</h1>
                     </div>
-                    <p class="text-xs text-slate-500 font-medium">ตรีเนตร e-Exam &middot; ศูนย์สังเกตการณ์แบบเรียลไทม์</p>
+                    <p class="text-xs text-slate-500 font-medium">ExamPro &middot; ศูนย์สังเกตการณ์แบบเรียลไทม์</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
                 <button onclick="openActiveStudentsModalFromMonitoring()" class="flex items-center gap-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3.5 py-1.5 rounded-xl text-emerald-800 font-bold text-xs transition cursor-pointer shadow-xs">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span id="active-students-badge">👨‍🎓 กำลังทำข้อสอบ: 0 คน</span>
+                    <span id="active-students-badge">กำลังทำข้อสอบ: 0 คน</span>
                     <span class="text-xs text-emerald-700 underline font-semibold ml-0.5">ดูรายชื่อ</span>
                 </button>
                 <button onclick="window.TabLockGuide.open('monitoring')" class="flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow-xs cursor-pointer">
-                    <span>💡</span>
+                    <span></span>
                     <span class="hidden sm:inline">คู่มือ</span>
                 </button>
                 <span class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200" id="global-log-count">รวม 0 รายการ</span>
@@ -255,7 +252,7 @@
 
             <!-- ① เลือกห้องสอบ -->
             <div class="mn-tabs-card" id="room-tabs-bar">
-                <div class="mn-tabs-l">🏫 ห้องสอบ</div>
+                <div class="mn-tabs-l">ห้องสอบ</div>
                 <div class="mn-tabs" id="room-tabs">
                     <div class="mn-muted">กำลังโหลดห้องสอบ...</div>
                 </div>
@@ -264,19 +261,19 @@
             <!-- ② ตัวเลขสรุป -->
             <div class="mn-kpis">
                 <button type="button" class="mn-kpi mn-kpi-btn" onclick="openActiveStudentsModalFromMonitoring()" title="ดูรายชื่อนักศึกษาที่กำลังทำข้อสอบ">
-                    <span class="mn-ic" style="background:#ecfdf5;color:#047857">🟢</span>
+                    <span class="mn-ic" style="background:#ecfdf5;color:#047857"></span>
                     <div><small>กำลังทำข้อสอบ</small><b id="mn-k-active">0</b><em>คน · ดูรายชื่อ →</em></div>
                 </button>
                 <div class="mn-kpi">
-                    <span class="mn-ic" style="background:#eff6ff;color:#1d4ed8">👥</span>
+                    <span class="mn-ic" style="background:#eff6ff;color:#1d4ed8"></span>
                     <div><small>นักศึกษาที่ถูกบันทึก</small><b id="mn-k-students">0</b><em>คน</em></div>
                 </div>
                 <div class="mn-kpi">
-                    <span class="mn-ic" style="background:#fffbeb;color:#b45309">📋</span>
+                    <span class="mn-ic" style="background:#fffbeb;color:#b45309"></span>
                     <div><small>พฤติกรรมทั้งหมด</small><b id="mn-k-events">0</b><em>ครั้ง</em></div>
                 </div>
                 <div class="mn-kpi mn-kpi-risk">
-                    <span class="mn-ic" style="background:#fff1f2;color:#be123c">🚨</span>
+                    <span class="mn-ic" style="background:#fff1f2;color:#be123c"></span>
                     <div><small>เสี่ยงสูง (≥ 3 ครั้ง)</small><b id="mn-k-high" style="color:#be123c">0</b><em>คน</em></div>
                 </div>
             </div>
@@ -287,7 +284,7 @@
             <!-- ③ กลุ่มเสี่ยงสูง -->
             <div id="high-risk-panel" class="mn-risk hidden">
                 <div class="mn-risk-h">
-                    <span>🚨 ควรติดตามด่วน · พบพฤติกรรมน่าสงสัย 3 ครั้งขึ้นไป</span>
+                    <span>ควรติดตามด่วน · พบพฤติกรรมน่าสงสัย 3 ครั้งขึ้นไป</span>
                     <span class="mn-risk-n" id="high-risk-count">0 คน</span>
                 </div>
                 <div id="high-risk-list" class="mn-risk-list"></div>
@@ -296,26 +293,26 @@
             <!-- ④ บันทึกพฤติกรรม -->
             <section class="mn-card">
                 <div class="mn-card-h">
-                    <h3>📋 บันทึกพฤติกรรม <span class="mn-badge" id="log-count-badge">0 รายการ</span></h3>
+                    <h3>บันทึกพฤติกรรม <span class="mn-badge" id="log-count-badge">0 รายการ</span></h3>
                     <div class="mn-seg" role="tablist">
-                        <button type="button" id="mn-view-person" class="on" onclick="setLogView('person')">👥 สรุปรายคน</button>
-                        <button type="button" id="mn-view-time" onclick="setLogView('time')">🕒 ไทม์ไลน์</button>
+                        <button type="button" id="mn-view-person" class="on" onclick="setLogView('person')">สรุปรายคน</button>
+                        <button type="button" id="mn-view-time" onclick="setLogView('time')">ไทม์ไลน์</button>
                     </div>
                 </div>
                 <div class="mn-tools">
-                    <label class="mn-search"><span>🔍</span><input id="mn-search" type="search" placeholder="ค้นหาชื่อ หรือรหัสนักศึกษา" oninput="renderLogs()"></label>
+                    <label class="mn-search"><span></span><input id="mn-search" type="search" placeholder="ค้นหาชื่อ หรือรหัสนักศึกษา" oninput="renderLogs()"></label>
                     <label class="mn-chk"><input id="mn-only-high" type="checkbox" onchange="renderLogs()"> เฉพาะเสี่ยงสูง</label>
                     <div class="mn-legend"><span class="lv-1">● ปกติ (1)</span><span class="lv-2">● เฝ้าระวัง (2)</span><span class="lv-3">● เสี่ยงสูง (3+)</span></div>
                     <div class="mn-tools-r">
-                        <button onclick="downloadExcel()" class="mn-btn mn-btn-p">📥 ดาวน์โหลด Excel</button>
+                        <button onclick="downloadExcel()" class="mn-btn mn-btn-p">ดาวน์โหลด Excel</button>
                     </div>
                 </div>
                 <div id="live-logs-container" class="mn-list">
-                    <div class="mn-empty">📭 ยังไม่มีข้อมูล</div>
+                    <div class="mn-empty">ยังไม่มีข้อมูล</div>
                 </div>
                 <div class="mn-foot">
                     <span>สลับหน้าจอไม่ได้แปลว่าทุจริตเสมอ ใช้ประกอบการพิจารณาของอาจารย์ · อัปเดตอัตโนมัติทุก 3 วินาที</span>
-                    <button onclick="clearCheatLogs()" class="mn-danger" title="ลบบันทึกพฤติกรรมทั้งหมดของห้องที่เลือก">🧹 ล้างบันทึกห้องนี้</button>
+                    <button onclick="clearCheatLogs()" class="mn-danger" title="ลบบันทึกพฤติกรรมทั้งหมดของห้องที่เลือก">ล้างบันทึกห้องนี้</button>
                 </div>
             </section>
         </main>
@@ -323,7 +320,7 @@
         <!-- Footer -->
         <footer class="border-t border-slate-200 bg-white py-3.5 px-8 text-center shrink-0">
             <p class="text-xs text-slate-500 font-medium">
-                &copy; 2026 ตรีเนตร e-Exam &middot; ตาที่ 3 ของอาจารย์ &middot; ทีม TEC Hope
+                &copy; 2026 ExamPro &middot; ตาที่ 3 ของอาจารย์ &middot; ทีม TEC Hope
             </p>
         </footer>
     </div>
@@ -408,7 +405,7 @@
                 currentRoomId = 'ALL';
             }
 
-            const all = [{ roomId: 'ALL', roomName: '📝 ทุกห้องรวม' }, ...activeRooms];
+            const all = [{ roomId: 'ALL', roomName: 'ทุกห้องรวม' }, ...activeRooms];
             tabsEl.innerHTML = all.map(r => {
                 const teacherTag = (username === 'admin' && r.teacherUsername) ? `[${r.teacherUsername}] ` : '';
                 const displayName = r.roomId === 'ALL' ? r.roomName : `${teacherTag}${r.roomName || r.exam_title || r.roomId}`;
@@ -436,7 +433,7 @@
                 // Update badge for ALL rooms tab
                 const allBadge = document.getElementById('active-student-badge-ALL');
                 if (allBadge) {
-                    allBadge.textContent = `👨‍🎓 รวม ${totalActiveAcrossAll} คน`;
+                    allBadge.textContent = `รวม ${totalActiveAcrossAll} คน`;
                     allBadge.classList.toggle('hidden', totalActiveAcrossAll === 0);
                 }
 
@@ -450,7 +447,7 @@
 
                 const badgeEl = document.getElementById('active-students-badge');
                 if (badgeEl) {
-                    badgeEl.textContent = `👨‍🎓 กำลังทำข้อสอบ: ${activeCount} คน`;
+                    badgeEl.textContent = `กำลังทำข้อสอบ: ${activeCount} คน`;
                 }
                 const kAct = document.getElementById('mn-k-active');
                 if (kAct) kAct.textContent = activeCount;
@@ -461,7 +458,7 @@
                     const activeInRoom = roomInfo ? roomInfo.active : 0;
                     const badge = document.getElementById(`active-student-badge-${r.roomId}`);
                     if (badge) {
-                        badge.textContent = `👨‍🎓 ${activeInRoom} คน`;
+                        badge.textContent = `${activeInRoom} คน`;
                         badge.classList.toggle('hidden', activeInRoom === 0);
                     }
                 });
@@ -546,9 +543,9 @@
                 const roomName = rooms.find(rm => rm.roomId === r.room)?.roomName || r.room;
                 const nStu = Object.keys(r.students).length;
                 return `<button type="button" class="mn-room" onclick="selectRoom('${r.room}')" title="ดูเฉพาะห้องนี้">
-                    <div class="mn-room-t">🏫 ${escapeHtml(roomName)}</div>
+                    <div class="mn-room-t">${escapeHtml(roomName)}</div>
                     <div class="mn-room-b"><b>${nStu}</b><span>คน · ${r.count} ครั้ง</span>
-                        ${r.highRisk > 0 ? `<em class="bad">⚠️ เสี่ยง ${r.highRisk} คน</em>` : `<em class="good">✅ ปกติ</em>`}</div>
+                        ${r.highRisk > 0 ? `<em class="bad">เสี่ยง ${r.highRisk} คน</em>` : `<em class="good">ปกติ</em>`}</div>
                 </button>`;
             }).join('');
 
@@ -567,15 +564,15 @@
         // จัดกลุ่มพฤติกรรมตามข้อความ → ไอคอน/สี
         function classifyAction(a) {
             a = String(a || '');
-            if (/อีกเครื่อง|หลายเครื่อง|หลายแท็บ|แท็บใหม่/.test(a)) return { k: 'dev', ic: '📱', t: 'เปิดหลายเครื่อง/แท็บ' };
-            if (/เต็มจอ/.test(a)) return { k: 'fs', ic: '🖥️', t: 'ออกจากเต็มจอ' };
-            if (/หาย|หยุดทำงาน|ขาด/.test(a)) return { k: 'away', ic: '⏸️', t: 'หายจากหน้าสอบ' };
-            if (/สลับ|ออกหน้าจอ/.test(a)) return { k: 'sw', ic: '🔀', t: 'สลับหน้าจอ' };
-            if (/เบราว์เซอร์ของ|LINE|Facebook/i.test(a)) return { k: 'app', ic: '📵', t: 'เปิดในแอปแชต' };
-            if (/รายชื่อ/.test(a)) return { k: 'ros', ic: '🚫', t: 'ไม่มีรายชื่อ' };
-            return { k: 'etc', ic: '⚠️', t: 'อื่น ๆ' };
+            if (/อีกเครื่อง|หลายเครื่อง|หลายแท็บ|แท็บใหม่/.test(a)) return { k: 'dev', ic: '', t: 'เปิดหลายเครื่อง/แท็บ' };
+            if (/เต็มจอ/.test(a)) return { k: 'fs', ic: '', t: 'ออกจากเต็มจอ' };
+            if (/หาย|หยุดทำงาน|ขาด/.test(a)) return { k: 'away', ic: '', t: 'หายจากหน้าสอบ' };
+            if (/สลับ|ออกหน้าจอ/.test(a)) return { k: 'sw', ic: '', t: 'สลับหน้าจอ' };
+            if (/เบราว์เซอร์ของ|LINE|Facebook/i.test(a)) return { k: 'app', ic: '', t: 'เปิดในแอปแชต' };
+            if (/รายชื่อ/.test(a)) return { k: 'ros', ic: '', t: 'ไม่มีรายชื่อ' };
+            return { k: 'etc', ic: '', t: 'อื่น ๆ' };
         }
-        const cleanAction = a => String(a || '').replace(/^[\u{1F300}-\u{1FAFF}☀-➿️\s]+/u, '');
+        const cleanAction = a => String(a || '').replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\s]+/u, '');
         const lvOf = n => n >= HIGH ? 3 : n >= 2 ? 2 : 1;
         const lvText = n => n >= HIGH ? 'เสี่ยงสูง' : n >= 2 ? 'เฝ้าระวัง' : 'ปกติ';
         const roomNameOf = id => (rooms.find(r => r.roomId === id) || {}).roomName || id;
@@ -614,7 +611,7 @@
                     </div>
                     <div class="mn-hr-a">
                         <button onclick="focusStudent('${escapeHtml(s.key)}')" class="mn-btn">ดูประวัติ</button>
-                        <button onclick="sendDirectWarning('${escapeHtml(s.studentId)}', '${escapeHtml(s.name)}', '${escapeHtml(s.roomId)}')" class="mn-btn mn-btn-warn">💬 ส่งเตือน</button>
+                        <button onclick="sendDirectWarning('${escapeHtml(s.studentId)}', '${escapeHtml(s.name)}', '${escapeHtml(s.roomId)}')" class="mn-btn mn-btn-warn">ส่งเตือน</button>
                     </div>
                 </div>`).join('');
             hrPanel.classList.remove('hidden');
@@ -643,20 +640,20 @@
             const match = l => !q || (String(l.name || '') + ' ' + String(l.studentId || '')).toLowerCase().replace(/-/g, '').includes(q);
             let studs = groupStudents(lastLogs);
             const counts = Object.fromEntries(studs.map(s => [s.key, s.count]));
-            if (!lastLogs.length) { container.innerHTML = '<div class="mn-empty">✅ ยังไม่พบพฤติกรรมน่าสงสัยในห้องนี้</div>'; return; }
+            if (!lastLogs.length) { container.innerHTML = '<div class="mn-empty">ยังไม่พบพฤติกรรมน่าสงสัยในห้องนี้</div>'; return; }
 
             if (logView === 'time') {
                 let list = lastLogs.filter(match);
                 if (onlyHigh) list = list.filter(l => counts[keyOf(l)] >= HIGH);
                 list = [...list].sort((x, y) => String(y.time).localeCompare(String(x.time)));
-                if (!list.length) { container.innerHTML = '<div class="mn-empty">🔍 ไม่พบรายการที่ตรงกับการค้นหา</div>'; return; }
+                if (!list.length) { container.innerHTML = '<div class="mn-empty">ไม่พบรายการที่ตรงกับการค้นหา</div>'; return; }
                 container.innerHTML = '<div class="mn-tl">' + list.map(l => {
                     const c = classifyAction(l.action), n = counts[keyOf(l)] || 1;
                     return `<div class="mn-tl-row">
                         <span class="mn-tl-time">${escapeHtml(l.time || '')}</span>
                         <span class="mn-ev mn-ev-${c.k}" title="${escapeHtml(c.t)}">${c.ic}</span>
                         <div class="mn-tl-body">
-                            <div class="mn-tl-who"><b>${escapeHtml(l.name)}</b><span>${escapeHtml(l.studentId)}</span>${l.class ? `<span class="mn-cls">${escapeHtml(l.class)}</span>` : ''}${currentRoomId === 'ALL' ? `<span class="mn-room-tag">🏫 ${escapeHtml(roomNameOf(l.roomId))}</span>` : ''}<span class="mn-lv lv-${lvOf(n)}">${lvText(n)}</span></div>
+                            <div class="mn-tl-who"><b>${escapeHtml(l.name)}</b><span>${escapeHtml(l.studentId)}</span>${l.class ? `<span class="mn-cls">${escapeHtml(l.class)}</span>` : ''}${currentRoomId === 'ALL' ? `<span class="mn-room-tag">${escapeHtml(roomNameOf(l.roomId))}</span>` : ''}<span class="mn-lv lv-${lvOf(n)}">${lvText(n)}</span></div>
                             <div class="mn-tl-act">${escapeHtml(cleanAction(l.action))}</div>
                         </div>
                     </div>`;
@@ -666,7 +663,7 @@
 
             studs = studs.filter(s => s.events.some(match));
             if (onlyHigh) studs = studs.filter(s => s.count >= HIGH);
-            if (!studs.length) { container.innerHTML = '<div class="mn-empty">🔍 ไม่พบนักศึกษาที่ตรงกับการค้นหา</div>'; return; }
+            if (!studs.length) { container.innerHTML = '<div class="mn-empty">ไม่พบนักศึกษาที่ตรงกับการค้นหา</div>'; return; }
             container.innerHTML = studs.map(s => {
                 const lv = lvOf(s.count), open = expandedStudents.has(s.key), c = classifyAction(s.last.action);
                 const kinds = {}; s.events.forEach(e => { const k = classifyAction(e.action); kinds[k.k] = kinds[k.k] || { ...k, n: 0 }; kinds[k.k].n++; });
@@ -675,13 +672,13 @@
                         <div class="mn-av lv-${lv}">${escapeHtml((s.name || '?').trim().charAt(0))}</div>
                         <div class="mn-st-who">
                             <div><b>${escapeHtml(s.name)}</b><span class="mn-lv lv-${lv}">${lvText(s.count)}</span></div>
-                            <div class="mn-st-meta"><span class="mn-id">${escapeHtml(s.studentId)}</span>${s.class ? `<span class="mn-cls">${escapeHtml(s.class)}</span>` : ''}${currentRoomId === 'ALL' ? `<span class="mn-room-tag">🏫 ${escapeHtml(roomNameOf(s.roomId))}</span>` : ''}</div>
+                            <div class="mn-st-meta"><span class="mn-id">${escapeHtml(s.studentId)}</span>${s.class ? `<span class="mn-cls">${escapeHtml(s.class)}</span>` : ''}${currentRoomId === 'ALL' ? `<span class="mn-room-tag">${escapeHtml(roomNameOf(s.roomId))}</span>` : ''}</div>
                             <div class="mn-kinds">${Object.values(kinds).map(k => `<span class="mn-kind mn-ev-${k.k}">${k.ic} ${k.t} ${k.n}</span>`).join('')}</div>
                         </div>
                         <div class="mn-st-count"><b>${s.count}</b><span>ครั้ง</span></div>
                         <div class="mn-st-last"><span>ล่าสุด ${escapeHtml(s.last.time || '')}</span><em>${c.ic} ${escapeHtml(c.t)}</em></div>
                         <div class="mn-st-act" onclick="event.stopPropagation()">
-                            <button onclick="sendDirectWarning('${escapeHtml(s.studentId)}', '${escapeHtml(s.name)}', '${escapeHtml(s.roomId)}')" class="mn-btn mn-btn-warn">💬 ส่งเตือน</button>
+                            <button onclick="sendDirectWarning('${escapeHtml(s.studentId)}', '${escapeHtml(s.name)}', '${escapeHtml(s.roomId)}')" class="mn-btn mn-btn-warn">ส่งเตือน</button>
                             <button onclick="toggleStudent('${escapeHtml(s.key)}')" class="mn-btn mn-more" aria-label="ดูประวัติ">${open ? '▲' : '▼'}</button>
                         </div>
                     </div>
@@ -691,7 +688,7 @@
         }
 
         async function sendDirectWarning(studentId, name, roomId) {
-            const warningMsg = prompt(`💬 ส่งข้อความแจ้งเตือนไปยัง [${name}]:`, 'กรุณาอย่าสลับหน้าจอเด็ดขาด ระบบกำลังบันทึกพฤติกรรม');
+            const warningMsg = prompt(`ส่งข้อความแจ้งเตือนไปยัง [${name}]:`, 'กรุณาอย่าสลับหน้าจอเด็ดขาด ระบบกำลังบันทึกพฤติกรรม');
             if (warningMsg === null) return;
             const trimmed = warningMsg.trim();
             if (!trimmed) { alert('กรุณากรอกข้อความก่อน'); return; }
@@ -705,19 +702,19 @@
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ roomId: targetRoom, studentId, message: trimmed })
                 });
-                alert(res.ok ? '✅ ส่งข้อความแจ้งเตือนสำเร็จ!' : '❌ ล้มเหลวในการส่งข้อความ');
+                alert(res.ok ? 'ส่งข้อความแจ้งเตือนสำเร็จ!' : 'ล้มเหลวในการส่งข้อความ');
             } catch(err) { alert('เกิดข้อผิดพลาดในการเชื่อมต่อ'); }
         }
         async function clearCheatLogs() {
             if (currentRoomId === 'ALL') { alert('กรุณาเลือกห้องสอบก่อนล้างบันทึกครับ'); return; }
-            if (!confirm(`⚠️ ยืนยันการล้างบันทึกทุจริตทั้งหมดของห้อง ${currentRoomId}?`)) return;
+            if (!confirm(`ยืนยันการล้างบันทึกทุจริตทั้งหมดของห้อง ${currentRoomId}?`)) return;
             try {
                 const res = await fetch('/api/clear-cheat-logs', {
                     method: 'DELETE', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ roomId: currentRoomId })
                 });
                 if (res.ok) { 
-                    alert('🧹 ล้างบันทึกเรียบร้อยแล้ว'); 
+                    alert('ล้างบันทึกเรียบร้อยแล้ว'); 
                     await renderRoomTabsWithFilter();
                     loadCheatLogs(); 
                 }
@@ -830,7 +827,7 @@
 
             if (targetRoomId === 'ALL') {
                 titleEl.textContent = `ข้อสอบทุกห้องเรียน ( grand total )`;
-                tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400 font-bold animate-pulse">⏳ กำลังรวมรายชื่อนักศึกษาจากทุกห้องสอบ...</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400 font-bold animate-pulse">กำลังรวมรายชื่อนักศึกษาจากทุกห้องสอบ...</td></tr>';
                 modal.classList.remove('hidden');
 
                 try {
@@ -850,7 +847,7 @@
                         tbody.innerHTML = `
                             <tr>
                                 <td colspan="5" class="p-10 text-center text-slate-400 space-y-2">
-                                    <div class="text-3xl">📭</div>
+                                    <div class="text-3xl"></div>
                                     <div class="font-bold text-xs">ขณะนี้ไม่มีนักศึกษากำลังทำข้อสอบในทุกห้อง</div>
                                 </td>
                             </tr>
@@ -871,13 +868,13 @@
                     `).join('');
                 } catch(e) {
                     console.error(e);
-                    tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-rose-500 font-bold">❌ ไม่สามารถดึงรายชื่อนักศึกษาได้</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-rose-500 font-bold">ไม่สามารถดึงรายชื่อนักศึกษาได้</td></tr>';
                 }
             } else {
                 const targetRoom = rooms.find(r => r.roomId === targetRoomId);
                 const roomTitle = targetRoom ? (targetRoom.exam_title || targetRoom.roomName || targetRoomId) : targetRoomId;
                 titleEl.textContent = `ห้องสอบ: ${roomTitle} (${targetRoomId})`;
-                tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400 font-bold animate-pulse">⏳ กำลังดึงรายชื่อนักศึกษา...</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400 font-bold animate-pulse">กำลังดึงรายชื่อนักศึกษา...</td></tr>';
                 totalEl.textContent = 'รวม 0 คน';
                 modal.classList.remove('hidden');
 
@@ -891,7 +888,7 @@
                         tbody.innerHTML = `
                             <tr>
                                 <td colspan="5" class="p-10 text-center text-slate-400 space-y-2">
-                                    <div class="text-3xl">📭</div>
+                                    <div class="text-3xl"></div>
                                     <div class="font-bold text-xs">ขณะนี้ไม่มีนักศึกษากำลังทำข้อสอบในห้องนี้</div>
                                 </td>
                             </tr>
@@ -912,7 +909,7 @@
                     `).join('');
                 } catch (err) {
                     console.error(err);
-                    tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-rose-500 font-bold">❌ ไม่สามารถโหลดข้อมูลรายชื่อได้</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-rose-500 font-bold">ไม่สามารถโหลดข้อมูลรายชื่อได้</td></tr>';
                 }
             }
         }
@@ -947,7 +944,7 @@
         <div class="w-full max-w-4xl lg:max-w-5xl bg-white border border-slate-200 p-8 rounded-3xl shadow-2xl space-y-6 text-slate-800 flex flex-col max-h-[90vh]">
             <div class="flex justify-between items-start border-b border-slate-100 pb-4">
                 <div class="flex items-center gap-3">
-                    <span class="text-indigo-600 text-2xl p-2 bg-slate-50 rounded-2xl border border-slate-100">👨‍🎓</span>
+                    <span class="text-indigo-600 text-2xl p-2 bg-slate-50 rounded-2xl border border-slate-100"></span>
                     <div>
                         <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 flex items-center gap-2">
                             รายชื่อนักศึกษาที่กำลังทำข้อสอบอยู่

@@ -4,9 +4,9 @@
     <script src="auth-client.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>นำเข้าข้อสอบ Excel - ตรีเนตร e-Exam</title>
+    <title>นำเข้าข้อสอบ Excel - ExamPro</title>
     <script src="vendor/xlsx.full.min.js"></script><script>window.XLSX || document.write('<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>')</script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         html { font-size: 100%; -webkit-text-size-adjust: 100%; }
 
@@ -24,7 +24,7 @@
 
         * { box-sizing: border-box; }
         body {
-            font-family: 'Kanit', 'Inter', sans-serif;
+            font-family: 'Noto Sans Thai Looped', sans-serif;
             background: linear-gradient(to right, #f8fafc 0%, #eff6ff 50%, #eef4ff 100%);
             background-attachment: fixed;
             color: #334155;
@@ -136,7 +136,7 @@
             color: #1e293b; border-radius: 12px;
             padding: 8px 14px; font-size: 13px;
             font-weight: 600;
-            font-family: 'Kanit', sans-serif;
+            font-family: 'Noto Sans Thai Looped', sans-serif;
             outline: none; width: 100%; transition: all 0.2s ease;
             box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
             cursor: pointer;
@@ -167,16 +167,13 @@
     <div class="fixed w-[500px] h-[500px] bg-cyan-500/5 blur-[120px] rounded-full -top-20 -left-20 pointer-events-none"></div>
     <div class="fixed w-[550px] h-[550px] bg-pink-500/4 blur-[130px] rounded-full -bottom-20 -right-20 pointer-events-none"></div>
 
-    <!-- 📊 Left Sidebar Navigation -->
+    <!-- Left Sidebar Navigation -->
     <aside id="sidebar">
     <div class="sidebar-inner p-4 sm:p-5 space-y-4 flex-1 overflow-y-auto">
         <!-- Logo Header -->
         <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
-            <div class="logo-shield bg-white p-1.5 border border-slate-200 shadow-sm rounded-xl flex items-center justify-center">
-                <img src="trinetra-logo.svg" alt="ตรีเนตร e-Exam" class="w-8 h-8 object-cover rounded-lg" />
-            </div>
             <div class="logo-text leading-tight">
-                <div class="font-bold text-lg tracking-tight text-slate-900">ตรีเนตร <span class="logo-gradient">e-Exam</span></div>
+                <div class="font-bold text-lg tracking-tight text-slate-900">Exam<span class="logo-gradient">Pro</span></div>
                 <div class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">ตาที่ 3 ของอาจารย์</div>
             </div>
         </div>
@@ -268,14 +265,14 @@
                 </div>
             </div>
         </div>
-        <a href="teacher-login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-red-200 transition-colors">
+        <a href="login.html" onclick="localStorage.clear(); sessionStorage.clear();" class="w-full py-2.5 px-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-red-200 transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l3 3m0 0l-3 3m3-3H2.25" /></svg>
             <span class="logout-btn-text">ออกจากระบบ</span>
         </a>
     </div>
 </aside>
 
-    <!-- 💻 Main Display Area -->
+    <!-- Main Display Area -->
     <div id="main-area">
         
         <!-- Header -->
@@ -283,17 +280,17 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
                 <div class="flex items-center gap-3">
                     <a href="dashboard.html" class="md:hidden text-xs text-slate-500 hover:text-slate-800 font-bold">&larr; กลับ</a>
-                    <h1 class="text-xl md:text-2xl font-bold text-slate-900">📂 นำเข้าข้อสอบจาก Excel</h1>
+                    <h1 class="text-xl md:text-2xl font-bold text-slate-900">นำเข้าข้อสอบจาก Excel</h1>
                 </div>
 
-                <!-- 🏠 Room Selector -->
+                <!-- Room Selector -->
                 <div class="flex items-center gap-3 w-full sm:w-auto shrink-0 justify-end">
                     <span class="text-sm font-bold text-slate-700">ห้องสอบที่ต้องการบันทึก:</span>
                     <select id="room-selector" onchange="onRoomChange()" class="dark-select max-w-[200px] text-sm">
                         <!-- รายการห้องจะโหลดมาตรงนี้ -->
                     </select>
                     <button onclick="window.TabLockGuide.open('excel')" class="bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-700 hover:to-indigo-700 text-white font-semibold px-3.5 py-2 rounded-xl text-xs md:text-sm transition duration-300 shadow-sm active:scale-95 flex items-center gap-1.5 shrink-0 cursor-pointer">
-                        <span>💡 คู่มือหน้านี้</span>
+                        <span>คู่มือหน้านี้</span>
                     </button>
                 </div>
             </div>
@@ -305,7 +302,7 @@
             <div class="glass-card p-8 space-y-6 shadow-2xl">
                 <div class="space-y-1">
                     <h2 class="text-xl md:text-2xl font-bold bg-gradient-to-r from-cyan-600 to-indigo-600 bg-clip-text text-transparent flex items-center gap-2">
-                        📂 นำเข้าข้อสอบผ่านไฟล์ Microsoft Excel (.xlsx)
+                        นำเข้าข้อสอบผ่านไฟล์ Microsoft Excel (.xlsx)
                     </h2>
                     <p class="text-sm text-slate-600 font-medium">กรุณาจัดโครงสร้างตารางข้อมูลข้อสอบให้ตรงตามคู่มือตารางด้านล่าง เพื่อความแม่นยำในการนำเข้าคำถาม</p>
                 </div>
@@ -313,7 +310,7 @@
                 <!-- Guidelines Table -->
                 <div class="space-y-3">
                     <p class="text-xs text-slate-650 font-bold flex items-center gap-1">
-                        💡 ข้อกำหนดโครงสร้างข้อมูลตาราง (เริ่มบรรทัดที่ 1 ของตาราง Excel):
+                        ข้อกำหนดโครงสร้างข้อมูลตาราง (เริ่มบรรทัดที่ 1 ของตาราง Excel):
                     </p>
                     <div class="overflow-x-auto border border-slate-200 rounded-2xl">
                         <table class="w-full text-left text-xs font-mono">
@@ -347,14 +344,14 @@
                 <div id="drop-zone" class="border-2 border-dashed border-slate-300 hover:border-cyan-500 bg-slate-50/50 hover:bg-cyan-50/30 p-16 rounded-2xl transition duration-300 text-center cursor-pointer group shadow-sm">
                     <input type="file" id="file-input" accept=".xlsx, .xls" class="hidden">
                     <div class="space-y-3">
-                        <span class="text-5xl block group-hover:scale-110 transition duration-300">📊</span>
+                        <span class="text-5xl block group-hover:scale-110 transition duration-300"></span>
                         <p class="text-slate-700 font-semibold text-sm">ลากไฟล์ Excel (.xlsx) มาวางตรงนี้ หรือคลิกเพื่อเลือกไฟล์</p>
                         <p class="text-[10px] text-slate-500 uppercase tracking-widest">รองรับช้อยส์สูงสุด 10 ช้อยส์ (a-j)</p>
-                        <p class="text-[11px] text-amber-600 font-medium mt-1">⚠️ แนะนำการอัพโหลดไฟล์ Excel ขนาดไม่เกิน 50MB ต่อการอัพโหลด 1 ครั้ง</p>
+                        <p class="text-[11px] text-amber-600 font-medium mt-1">แนะนำการอัพโหลดไฟล์ Excel ขนาดไม่เกิน 50MB ต่อการอัพโหลด 1 ครั้ง</p>
                         <div class="pt-2">
                             <button type="button" onclick="event.stopPropagation(); downloadExcelTemplate();" 
                                 class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 rounded-xl text-[10px] font-bold text-cyan-600 transition">
-                                📄 ดาวน์โหลดไฟล์ Excel ตัวอย่างสำหรับกรอกข้อสอบ
+                                ดาวน์โหลดไฟล์ Excel ตัวอย่างสำหรับกรอกข้อสอบ
                             </button>
                         </div>
                     </div>
@@ -363,11 +360,11 @@
                 <!-- Preview File Info -->
                 <div id="preview-area" class="hidden space-y-4 pt-2">
                     <div class="flex justify-between items-center bg-cyan-50/70 border border-cyan-200 p-5 rounded-2xl text-xs">
-                        <span class="text-cyan-700 font-semibold flex items-center gap-1.5">📄 แฟ้มข้อมูล: <strong id="file-name" class="text-slate-800 font-bold"></strong></span>
+                        <span class="text-cyan-700 font-semibold flex items-center gap-1.5">แฟ้มข้อมูล: <strong id="file-name" class="text-slate-800 font-bold"></strong></span>
                         <span class="bg-cyan-600 text-white font-semibold px-3 py-1 rounded-full text-[10px]" id="row-count">0 ข้อ</span>
                     </div>
                     <button id="upload-btn" class="w-full bg-gradient-to-r from-cyan-500 to-indigo-500 hover:from-cyan-600 hover:to-indigo-600 text-white font-semibold text-sm py-4 px-4 rounded-2xl transition shadow-lg shadow-cyan-500/20 active:scale-[0.99]">
-                        🚀 นำข้อสอบเข้าสู่ระบบ
+                        นำข้อสอบเข้าสู่ระบบ
                     </button>
                 </div>
             </div>
@@ -376,7 +373,7 @@
 
         <!-- Footer -->
         <footer class="border-t border-slate-100 py-4 px-8 text-center text-slate-500 text-[10px]">
-            <p>&copy; 2026 ระบบการจัดการคลังข้อสอบ ตรีเนตร e-Exam. สงวนลิขสิทธิ์ทั้งหมด.</p>
+            <p>&copy; 2026 ระบบการจัดการคลังข้อสอบ ExamPro. สงวนลิขสิทธิ์ทั้งหมด.</p>
         </footer>
     </div>
 
@@ -452,7 +449,7 @@
 
         function handleFile(file) {
             if (!file || (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls'))) {
-                alert('❌ ใช้ไฟล์ Excel (.xlsx) เท่านั้นครับ'); 
+                alert('ใช้ไฟล์ Excel (.xlsx) เท่านั้นครับ'); 
                 return;
             }
             fileNameSpan.textContent = file.name;
@@ -462,7 +459,7 @@
                     const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
                     const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
                     if (json.length === 0) { 
-                        alert('❌ ไม่พบข้อมูลข้อสอบภายในไฟล์ Excel'); 
+                        alert('ไม่พบข้อมูลข้อสอบภายในไฟล์ Excel'); 
                         return; 
                     }
                     excelData = json.map(row => {
@@ -489,7 +486,7 @@
             if (!excelData || !currentRoomId) return;
 
             uploadBtn.disabled = true;
-            uploadBtn.textContent = '⏳ กำลังนำข้อสอบเข้าสู่ระบบ...';
+            uploadBtn.textContent = 'กำลังนำข้อสอบเข้าสู่ระบบ...';
 
             try {
                 const res = await fetch('/api/upload-questions-excel', {
@@ -506,19 +503,19 @@
                 }
 
                 if (res.ok && data.success) {
-                    alert(`✅ นำเข้าข้อสอบเข้าห้อง ${currentRoomId} สำเร็จจำนวน ${excelData.length} ข้อเรียบร้อยแล้ว!\nระบบจะพาท่านไปยังหน้าจัดการข้อสอบหลักเพื่อตรวจสอบครับ`);
+                    alert(`นำเข้าข้อสอบเข้าห้อง ${currentRoomId} สำเร็จจำนวน ${excelData.length} ข้อเรียบร้อยแล้ว!\nระบบจะพาท่านไปยังหน้าจัดการข้อสอบหลักเพื่อตรวจสอบครับ`);
                     previewArea.classList.add('hidden');
                     excelData = null;
                     window.location.href = 'admin-questions.html?tab=preview';
                 } else {
-                    alert(`❌ ล้มเหลว: ${data.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล'}`);
+                    alert(`ล้มเหลว: ${data.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล'}`);
                 }
             } catch (err) { 
                 console.error(err);
-                alert(`❌ เกิดข้อผิดพลาดในการเชื่อมต่อ: ${err.message}`); 
+                alert(`เกิดข้อผิดพลาดในการเชื่อมต่อ: ${err.message}`); 
             } finally {
                 uploadBtn.disabled = false;
-                uploadBtn.textContent = '🚀 นำข้อสอบเข้าสู่ระบบ';
+                uploadBtn.textContent = 'นำข้อสอบเข้าสู่ระบบ';
             }
         });
 

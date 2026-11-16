@@ -4,11 +4,11 @@
     <script src="auth-client.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ส่งคำตอบเรียบร้อยแล้ว · ตรีเนตร e-Exam</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Kanit:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
+    <title>ส่งคำตอบเรียบร้อยแล้ว · ExamPro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Kanit', 'Inter', sans-serif;
+            font-family: 'Noto Sans Thai Looped', sans-serif;
             background: linear-gradient(135deg, #fff6ed 0%, #f0f9ff 50%, #eef4ff 100%);
         }
         .glass-card {
@@ -51,7 +51,7 @@
         <div class="relative inline-block">
             <div class="absolute inset-0 bg-gradient-to-tr from-pink-400 to-sky-400 rounded-full blur-md opacity-40 animate-pulse"></div>
             <div class="relative w-24 h-24 bg-white border-2 border-pink-100 rounded-full flex items-center justify-center text-5xl shadow-lg select-none animate-float mx-auto" id="mascot-emoji">
-                🎉
+                
             </div>
         </div>
 
@@ -66,19 +66,19 @@
         <div class="bg-gradient-to-br from-white/90 to-slate-50/80 border border-slate-200/80 p-4.5 rounded-2xl text-left text-xs space-y-2.5 shadow-sm">
             <div class="flex items-center justify-between">
                 <span class="text-slate-400 font-medium flex items-center gap-1.5">
-                    <span class="text-pink-500">👤</span> ผู้เข้าสอบ:
+                    <span class="text-pink-500"></span> ผู้เข้าสอบ:
                 </span>
                 <strong class="text-slate-800 font-bold" id="display-name">กำลังดึงข้อมูล...</strong>
             </div>
             <div class="flex items-center justify-between">
                 <span class="text-slate-400 font-medium flex items-center gap-1.5">
-                    <span class="text-sky-500">🆔</span> รหัสนักศึกษา:
+                    <span class="text-sky-500"></span> รหัสนักศึกษา:
                 </span>
                 <strong class="text-slate-800 font-mono font-bold" id="display-id">-</strong>
             </div>
             <div class="flex items-center justify-between">
                 <span class="text-slate-400 font-medium flex items-center gap-1.5">
-                    <span class="text-purple-500">🚪</span> ห้องสอบ:
+                    <span class="text-purple-500"></span> ห้องสอบ:
                 </span>
                 <strong class="text-sky-600 font-mono font-bold bg-sky-50 px-2.5 py-0.5 rounded-lg border border-sky-100" id="display-room">-</strong>
             </div>
@@ -107,7 +107,7 @@
             <!-- Funny Teasing Quote Banner -->
             <div class="p-4 bg-gradient-to-r from-pink-50/70 via-purple-50/50 to-sky-50/70 border border-pink-100 rounded-2xl shadow-xs">
                 <p id="teasing-quote" class="text-xs text-slate-600 leading-relaxed font-semibold">
-                    กำลังประมวลผลคำตอบ... 🧐
+                    กำลังประมวลผลคำตอบ... 
                 </p>
             </div>
 
@@ -117,7 +117,7 @@
         <div class="pt-2 flex flex-col gap-3">
             <a href="student-portal.html" 
                 class="block w-full text-center py-3.5 bg-gradient-to-r from-pink-500 via-purple-500 to-sky-500 hover:from-pink-600 hover:to-sky-600 text-white rounded-2xl font-bold text-sm transition-all duration-300 shadow-lg shadow-pink-500/25 active:scale-[0.98]">
-                🎓 กลับสู่หน้าหลักนักศึกษา (Student Portal)
+                กลับสู่หน้าหลักนักศึกษา (Student Portal)
             </a>
             <a href="Student-login.html" 
                 class="block w-full text-center py-2.5 bg-white/80 hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-2xl font-bold text-xs transition duration-200 active:scale-[0.98]">
@@ -148,8 +148,8 @@
                 document.getElementById('display-name').textContent = "คนแอบแฝง";
                 document.getElementById('display-id').textContent = "999999";
                 document.getElementById('display-room').textContent = "ลับเฉพาะ";
-                document.getElementById('mascot-emoji').textContent = "🤨";
-                document.getElementById('teasing-quote').textContent = "แอบลิงก์เข้ามาตรงๆ โดยไม่ได้ทำข้อสอบใช่ไหมล่ะเรา? รู้นะ! กลับไปล็อกอินสอบก่อนนะวัยรุ่น 😜";
+                document.getElementById('mascot-emoji').textContent = "";
+                document.getElementById('teasing-quote').textContent = "แอบลิงก์เข้ามาตรงๆ โดยไม่ได้ทำข้อสอบใช่ไหมล่ะเรา? รู้นะ! กลับไปล็อกอินสอบก่อนนะวัยรุ่น ";
                 return;
             }
 
@@ -175,25 +175,25 @@
                 }, 300);
 
                 if (percent === 100) {
-                    emojiEl.textContent = "👑";
-                    teaseEl.textContent = "กราบแทบตักคุณพี่ศิษย์เอก! หัวดีเกินมนุษย์ขนาดนี้ ลอกเพื่อนนั่งข้างๆ มาป่ะเนี่ย หรือจารย์เฉลยข้อสอบรั่ว? 🧐";
+                    emojiEl.textContent = "";
+                    teaseEl.textContent = "กราบแทบตักคุณพี่ศิษย์เอก! หัวดีเกินมนุษย์ขนาดนี้ ลอกเพื่อนนั่งข้างๆ มาป่ะเนี่ย หรือจารย์เฉลยข้อสอบรั่ว? ";
                 } else if (percent >= 70) {
-                    emojiEl.textContent = "🚀";
-                    teaseEl.textContent = "เก่งไม่ธรรมดาเลยนะเราน่ะ! แอบอ่านสรุปตอนกวาดบ้านหรือพกเครื่องรางวัดดังมาสอบเหรอรอบนี้? ผ่านฉลุยจ้า! 🌟";
+                    emojiEl.textContent = "";
+                    teaseEl.textContent = "เก่งไม่ธรรมดาเลยนะเราน่ะ! แอบอ่านสรุปตอนกวาดบ้านหรือพกเครื่องรางวัดดังมาสอบเหรอรอบนี้? ผ่านฉลุยจ้า! ";
                 } else if (percent >= 50) {
-                    emojiEl.textContent = "🕯️";
-                    teaseEl.textContent = "รอดตายหวุดหวิดประหนึ่งปาฏิหาริย์! คะแนนผ่านเส้นยาแดงผ่าแปด สะดุดล้มหน้าคะมำก็ตกอ่ะบอกเลย ทำบุญปล่อยปลาด่วน! 🐟";
+                    emojiEl.textContent = "";
+                    teaseEl.textContent = "รอดตายหวุดหวิดประหนึ่งปาฏิหาริย์! คะแนนผ่านเส้นยาแดงผ่าแปด สะดุดล้มหน้าคะมำก็ตกอ่ะบอกเลย ทำบุญปล่อยปลาด่วน! ";
                 } else {
-                    emojiEl.textContent = "💀";
-                    teaseEl.textContent = "สอบตกจ้า! นี่คะแนนสอบหรือคะแนนความน่าจะเป็นของอุณหภูมิห้องห้องปรับอากาศ? ต่ำเตี้ยเรี่ยราดปวดใจจี๊ดเลยเพื่อน! 🐶💨";
+                    emojiEl.textContent = "";
+                    teaseEl.textContent = "สอบตกจ้า! นี่คะแนนสอบหรือคะแนนความน่าจะเป็นของอุณหภูมิห้องห้องปรับอากาศ? ต่ำเตี้ยเรี่ยราดปวดใจจี๊ดเลยเพื่อน! ";
                 }
             } else {
-                emojiEl.textContent = "🤫";
+                emojiEl.textContent = "";
                 
                 const hiddenQuotes = [
-                    "ส่งกระดาษคำตอบสำเร็จ! แต่คะแนนเป็นความลับระดับสุดยอด (Top Secret) รอลุ้นเกรดเอาเองนะ ถ้าอาจารย์ไม่อ่านการ์ตูนจนลืมตรวจ! 🤫",
-                    "ทำข้อสอบเสร็จแล้วก็รีบปิดคอมพ์ไปวิ่งเล่นข้างนอกซะ! คะแนนของคุณปลอดภัยในระบบดี... (มั้งนะ 🫣)",
-                    "บันทึกผลสอบเข้าระบบเรียบร้อย! ส่วนคะแนนนั้น... ลอยอยู่ในหลุมดำ รออาจารย์ปล่อยคิวเฉลยรอบหน้าทีเดียวนะจ๊ะ 🌌"
+                    "ส่งกระดาษคำตอบสำเร็จ! แต่คะแนนเป็นความลับระดับสุดยอด (Top Secret) รอลุ้นเกรดเอาเองนะ ถ้าอาจารย์ไม่อ่านการ์ตูนจนลืมตรวจ! ",
+                    "ทำข้อสอบเสร็จแล้วก็รีบปิดคอมพ์ไปวิ่งเล่นข้างนอกซะ! คะแนนของคุณปลอดภัยในระบบดี... (มั้งนะ )",
+                    "บันทึกผลสอบเข้าระบบเรียบร้อย! ส่วนคะแนนนั้น... ลอยอยู่ในหลุมดำ รออาจารย์ปล่อยคิวเฉลยรอบหน้าทีเดียวนะจ๊ะ "
                 ];
                 const randomQuoteIndex = (score + maxScore) % hiddenQuotes.length;
                 teaseEl.textContent = hiddenQuotes[randomQuoteIndex];
