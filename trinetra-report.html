@@ -60,7 +60,7 @@ tr.det td{background:#fbfcff;padding:4px 14px 14px}
 <body>
 <header>
   <div class="top">
-    <h1>รายงานรวมรายคน · ตาเฝ้า + ตาอ่าน<small>คะแนนปรนัย อัตนัย และประวัติระหว่างสอบของนักศึกษาแต่ละคนในหน้าเดียว</small></h1>
+    <h1>รายงานรวมรายคน<small>คะแนนสอบ และประวัติระหว่างสอบของนักศึกษาแต่ละคนในหน้าเดียว</small></h1>
     <a class="back" href="dashboard.html">← กลับหน้าจัดการ</a>
   </div>
 </header>
@@ -138,7 +138,7 @@ tr.det td{background:#fbfcff;padding:4px 14px 14px}
     if (!d.students.length) { $('tw').innerHTML = '<div class="empty">ยังไม่มีข้อมูลนักศึกษาในรายวิชานี้</div>'; return; }
     const cols = d.columns, span = cols.length + 6;
     $('tw').innerHTML = `<table><thead><tr><th>รหัส</th><th>ชื่อ-สกุล</th>
-      ${cols.map(c => `<th class="n"><span class="ty ${c.type}">${c.type === 'mc' ? 'ปรนัย' : 'อัตนัย'}</span><br>${esc(c.label)}<br>/${c.max || '–'}</th>`).join('')}
+      ${cols.map(c => `<th class="n"><span class="ty ${c.type}">ปรนัย</span><br>${esc(c.label)}<br>/${c.max || '–'}</th>`).join('')}
       <th class="n">รวม<br>/${d.totalMax}</th><th class="n">%</th><th>ตาเฝ้า</th><th class="noprint"></th></tr></thead><tbody>
       ${list.map(s => {
         const k = s.studentId, isOpen = open.has(k);
@@ -161,7 +161,7 @@ tr.det td{background:#fbfcff;padding:4px 14px 14px}
   function csv() {
     if (!data) return;
     const cols = data.columns, q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
-    const head = ['รหัส', 'ชื่อ-สกุล', 'ชั้นเรียน', ...cols.map(c => `${c.type === 'mc' ? 'ปรนัย' : 'อัตนัย'}: ${c.label} (/${c.max})`), `รวม (/${data.totalMax})`, 'ร้อยละ', 'สลับหน้าจอ', 'ออกเต็มจอ', 'หายจากหน้าสอบ', 'หลายเครื่อง', 'ตอบ/แก้หลังกลับมา', 'รายละเอียดตาเฝ้า'];
+    const head = ['รหัส', 'ชื่อ-สกุล', 'ชั้นเรียน', ...cols.map(c => `ปรนัย: ${c.label} (/${c.max})`), `รวม (/${data.totalMax})`, 'ร้อยละ', 'สลับหน้าจอ', 'ออกเต็มจอ', 'หายจากหน้าสอบ', 'หลายเครื่อง', 'ตอบ/แก้หลังกลับมา', 'รายละเอียดตาเฝ้า'];
     const lines = [head, ...rows().map(s => [s.studentId, s.name, s.class, ...cols.map(c => s.scores[c.key] ?? ''), s.total, s.percent ?? '', s.watch.switch, s.watch.fs, s.watch.gap, s.watch.multi, s.watch.answer,
       s.watch.events.map(e => `[${e.room} ${e.time}] ${e.action}`).join(' | ')])];
     const blob = new Blob(['﻿' + lines.map(r => r.map(q).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' });

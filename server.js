@@ -40,7 +40,7 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 // กันไม่ให้ดาวน์โหลดไฟล์ฝั่งเซิร์ฟเวอร์ (ฐานข้อมูล, โค้ด, สคริปต์) ผ่านเว็บ
 app.use((req, res, next) => {
     const p = decodeURIComponent(req.path).toLowerCase();
-    if (/\.(db|db-journal|sqlite|bat|env|log|md)$/.test(p) || /^\/(server|auth|essay-grader|ai-quiz|backup|check_storage|make_pdf|exam-guard|trinetra-link|backup-export)\.js$/.test(p) || /^\/(package(-lock)?\.json|\.npmrc|\.gitignore)$/.test(p) || p.startsWith('/_backup') || p.startsWith('/routes/') || p.startsWith('/node_modules') || p.startsWith('/.')) {
+    if (/\.(db|db-journal|sqlite|bat|env|log|md)$/.test(p) || /^\/(server|auth|ai-quiz|backup|check_storage|make_pdf|exam-guard|trinetra-link|backup-export)\.js$/.test(p) || /^\/(package(-lock)?\.json|\.npmrc|\.gitignore)$/.test(p) || p.startsWith('/_backup') || p.startsWith('/routes/') || p.startsWith('/node_modules') || p.startsWith('/.')) {
         return res.status(404).end();
     }
     next();
@@ -427,6 +427,10 @@ db.serialize(() => {
     });
     db.run("ALTER TABLE exam_results ADD COLUMN courseId INTEGER", (err) => {
         if (!err) console.log("✔ Added column 'courseId' to exam_results table");
+    });
+    // บันทึกการสลับหน้าจอ: เก็บรายวิชา ณ ตอนที่เกิดเหตุ (นับแยกวิชาได้ถูกต้อง แม้ภายหลังจะย้ายห้องสอบไปวิชาอื่น)
+    db.run("ALTER TABLE cheat_logs ADD COLUMN courseId INTEGER", () => {
+        db.run("UPDATE cheat_logs SET courseId = (SELECT tr.courseId FROM teacher_rooms tr WHERE tr.roomId = cheat_logs.roomId) WHERE courseId IS NULL", () => {});
     });
 
     // อัปเกรดตารางล็อกทุจริต (cheat_logs)
@@ -971,9 +975,9 @@ app.get('/api/students', (req, res) => {
         JOIN courses c ON c.id = cs.courseId
         LEFT JOIN students s ON (s.studentId = cs.studentId OR REPLACE(s.studentId, '-', '') = REPLACE(cs.studentId, '-', ''))
         LEFT JOIN exam_results er ON (er.studentId = cs.studentId OR REPLACE(er.studentId, '-', '') = REPLACE(cs.studentId, '-', ''))
-                                 AND er.roomId IN (SELECT roomId FROM teacher_rooms WHERE courseId = cs.courseId)
+                                 AND COALESCE(NULLIF(er.courseId, 0), (SELECT NULLIF(t9.courseId, 0) FROM teacher_rooms t9 WHERE t9.roomId = er.roomId)) = cs.courseId
         LEFT JOIN cheat_logs cl ON (cl.studentId = cs.studentId OR REPLACE(cl.studentId, '-', '') = REPLACE(cs.studentId, '-', ''))
-                                 AND cl.roomId IN (SELECT roomId FROM teacher_rooms WHERE courseId = cs.courseId)
+                                 AND COALESCE(NULLIF(cl.courseId, 0), (SELECT NULLIF(t8.courseId, 0) FROM teacher_rooms t8 WHERE t8.roomId = cl.roomId)) = cs.courseId
         WHERE ${one ? '(cs.courseId = ? OR CAST(cs.courseId AS TEXT) = ?)' : '(? = 1 OR c.teacherUsername = ?)'}
           AND (? = 1 OR c.teacherUsername = ?)
         GROUP BY cs.id, cs.studentId, cs.firstName, cs.lastName, cs.class, s.firstName, s.lastName, s.class, s.note, s.status, s.created_at, s.approved_at, c.id, c.courseCode, c.courseName
@@ -1096,12 +1100,13 @@ app.get('/api/students/exam-history', (req, res) => {
         FROM exam_results er
         LEFT JOIN teacher_rooms tr ON tr.roomId = er.roomId
         LEFT JOIN cheat_logs cl ON cl.roomId = er.roomId AND (cl.studentId = er.studentId OR REPLACE(cl.studentId, '-', '') = REPLACE(er.studentId, '-', ''))
+                                AND COALESCE(COALESCE(NULLIF(cl.courseId, 0), (SELECT NULLIF(t8.courseId, 0) FROM teacher_rooms t8 WHERE t8.roomId = cl.roomId)), -1) = COALESCE(COALESCE(NULLIF(er.courseId, 0), (SELECT NULLIF(t9.courseId, 0) FROM teacher_rooms t9 WHERE t9.roomId = er.roomId)), -1)
         WHERE (er.studentId = ? OR REPLACE(er.studentId, '-', '') = REPLACE(?, '-', ''))
           AND (? = 1 OR tr.teacherUsername = ?)
-          AND (? = '' OR CAST(er.courseId AS TEXT) = ? OR CAST(tr.courseId AS TEXT) = ?)
+          AND (? = '' OR CAST(COALESCE(NULLIF(er.courseId, 0), (SELECT NULLIF(t9.courseId, 0) FROM teacher_rooms t9 WHERE t9.roomId = er.roomId)) AS TEXT) = ?)
         GROUP BY er.id, er.roomId, er.score, er.maxScore, er.time, er.date, tr.roomName, tr.exam_title
         ORDER BY er.id DESC
-    `, [studentId, studentId, viewer(req).adm, viewer(req).user, cId, cId, cId], (err, rows) => {
+    `, [studentId, studentId, viewer(req).adm, viewer(req).user, cId, cId], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
         res.json(rows || []);
     });
@@ -1119,7 +1124,7 @@ app.get('/api/students/cheat-history', (req, res) => {
         LEFT JOIN teacher_rooms tr ON tr.roomId = cl.roomId
         WHERE (cl.studentId = ? OR REPLACE(cl.studentId, '-', '') = REPLACE(?, '-', ''))
           AND (? = 1 OR tr.teacherUsername = ?)
-          AND (? = '' OR CAST(tr.courseId AS TEXT) = ?)
+          AND (? = '' OR CAST(COALESCE(NULLIF(cl.courseId, 0), (SELECT NULLIF(t8.courseId, 0) FROM teacher_rooms t8 WHERE t8.roomId = cl.roomId)) AS TEXT) = ?)
         ORDER BY cl.id DESC
     `, [studentId, studentId, viewer(req).adm, viewer(req).user, cId, cId], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
@@ -2798,8 +2803,8 @@ app.post('/api/report-cheat', (req, res) => {
     if (!roomId || !studentId || !name) return res.status(400).json({ message: "ข้อมูลไม่ครบถ้วน" });
 
     const time = new Date().toLocaleTimeString('th-TH', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    db.run('INSERT INTO cheat_logs (roomId, studentId, name, class, action, time) VALUES (?, ?, ?, ?, ?, ?)', 
-        [roomId, studentId, name, studentClass || '', action || "ตรวจพบการสลับหน้าจอ", time], (err) => {
+    db.run('INSERT INTO cheat_logs (roomId, studentId, name, class, action, time, courseId) VALUES (?, ?, ?, ?, ?, ?, (SELECT courseId FROM teacher_rooms WHERE roomId = ?))', 
+        [roomId, studentId, name, studentClass || '', action || "ตรวจพบการสลับหน้าจอ", time, roomId], (err) => {
             if (err) return res.status(500).json({ message: err.message });
             res.json({ success: true });
         }
@@ -2849,8 +2854,8 @@ app.post('/api/submit-exam', (req, res) => {
                 if (existingCount < swCount) {
                     const time = new Date().toLocaleTimeString('th-TH', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit', second: '2-digit' });
                     for (let i = existingCount + 1; i <= swCount; i++) {
-                        db.run('INSERT INTO cheat_logs (roomId, studentId, name, class, action, time) VALUES (?, ?, ?, ?, ?, ?)',
-                            [roomId, studentId, name, studentClass || '', `สลับแท็บเบราว์เซอร์ / ออกหน้าจออื่น (ครั้งที่ ${i})`, time]);
+                        db.run('INSERT INTO cheat_logs (roomId, studentId, name, class, action, time, courseId) VALUES (?, ?, ?, ?, ?, ?, (SELECT courseId FROM teacher_rooms WHERE roomId = ?))',
+                            [roomId, studentId, name, studentClass || '', `สลับแท็บเบราว์เซอร์ / ออกหน้าจออื่น (ครั้งที่ ${i})`, time, roomId]);
                     }
                 }
             }
@@ -2903,34 +2908,15 @@ app.post('/api/submit-exam', (req, res) => {
         };
 
         if (!courseId || courseId === 0) {
-            // ค้นหาคอร์สที่นักศึกษาลงทะเบียนไว้จาก course_students ก่อน
-            db.get(`
-                SELECT cs.courseId FROM course_students cs
+            // ห้องสอบยังไม่ผูกรายวิชา: ระบุวิชาให้เฉพาะเมื่อนักศึกษามีชื่ออยู่ในรายวิชาของอาจารย์เจ้าของห้อง "วิชาเดียว" เท่านั้น
+            // (ไม่เดาข้ามอาจารย์ และไม่ย้ายห้องไปผูกวิชาเอง เพื่อให้จำนวนสอบ/สลับหน้าจอของแต่ละวิชาตรงกันทุกหน้า)
+            db.all(`
+                SELECT DISTINCT cs.courseId FROM course_students cs
                 JOIN courses c ON c.id = cs.courseId
                 WHERE (cs.studentId = ? OR REPLACE(cs.studentId, '-', '') = REPLACE(?, '-', ''))
-                  AND (c.teacherUsername = ? OR ? IS NULL)
-                ORDER BY cs.id DESC LIMIT 1
-            `, [studentId, studentId, teacherUsername, teacherUsername], (csErr, csRow) => {
-                if (!csErr && csRow && csRow.courseId) {
-                    courseId = csRow.courseId;
-                    processSubmission(courseId);
-                } else if (teacherUsername) {
-                    db.get('SELECT id FROM courses WHERE teacherUsername = ? ORDER BY id ASC LIMIT 1', [teacherUsername], (cErr, cRow) => {
-                        if (!cErr && cRow && cRow.id) {
-                            courseId = cRow.id;
-                            db.run('UPDATE teacher_rooms SET courseId = ? WHERE roomId = ?', [courseId, roomId]);
-                        }
-                        processSubmission(courseId);
-                    });
-                } else {
-                    db.get(`
-                        SELECT courseId FROM course_students 
-                        WHERE studentId = ? OR REPLACE(studentId, '-', '') = REPLACE(?, '-', '') 
-                        ORDER BY id DESC LIMIT 1
-                    `, [studentId, studentId], (c2Err, c2Row) => {
-                        processSubmission(c2Row ? c2Row.courseId : null);
-                    });
-                }
+                  AND c.teacherUsername = ?
+            `, [studentId, studentId, teacherUsername || ''], (csErr, rows) => {
+                processSubmission(!csErr && rows && rows.length === 1 ? rows[0].courseId : null);
             });
         } else {
             processSubmission(courseId);
@@ -2947,54 +2933,15 @@ app.get('/api/exam-results', (req, res) => {
         const validId = !isNaN(cIdNum) ? cIdNum : -1;
         const cCodeStr = String(courseId).trim();
 
-        let sql = `
-            SELECT DISTINCT er.id, er.studentId, er.name, er.class, er.score, er.maxScore, er.time, er.date, er.roomId, er.answers_json, er.courseId
+        // ผลสอบของรายวิชา = รายวิชาที่บันทึกไว้ตอนส่งข้อสอบ (ถ้าไม่มี ใช้รายวิชาของห้องสอบ) — กติกาเดียวกับหน้าประวัตินักศึกษา
+        const sql = `
+            SELECT er.id, er.studentId, er.name, er.class, er.score, er.maxScore, er.time, er.date, er.roomId, er.answers_json, er.courseId
             FROM exam_results er
-            LEFT JOIN teacher_rooms tr ON er.roomId = tr.roomId
-            WHERE (
-                er.courseId = ? 
-                OR CAST(er.courseId AS TEXT) = ?
-                OR er.courseId IN (SELECT id FROM courses WHERE id = ? OR courseCode = ?)
-                OR tr.courseId = ? 
-                OR CAST(tr.courseId AS TEXT) = ?
-                OR tr.courseId IN (SELECT id FROM courses WHERE id = ? OR courseCode = ?)
-                -- นับจากรายชื่อนักศึกษา เฉพาะผลสอบที่ไม่ได้ผูกกับรายวิชาใดเลย
-                -- (เดิมดึงผลสอบทุกห้อง/ทุกวิชาของนักศึกษาที่มีชื่อในรายวิชานี้ → ผลสอบเก่าหรือของวิชาอื่นมาปน)
-                OR (
-                    (er.courseId IS NULL OR er.courseId = 0) AND (tr.courseId IS NULL OR tr.courseId = 0)
-                    AND (
-                        er.studentId IN (SELECT studentId FROM course_students WHERE courseId = ? OR CAST(courseId AS TEXT) = ?)
-                        OR REPLACE(er.studentId, '-', '') IN (SELECT REPLACE(studentId, '-', '') FROM course_students WHERE courseId = ? OR CAST(courseId AS TEXT) = ?)
-                    )
-                )
-        `;
-        const params = [
-            validId, cCodeStr,
-            validId, cCodeStr,
-            validId, cCodeStr,
-            validId, cCodeStr,
-            validId, cCodeStr,
-            validId, cCodeStr
-        ];
-
-        if (username) {
-            sql += `
-                OR (
-                    tr.teacherUsername = ? 
-                    AND (er.courseId IS NULL OR er.courseId = 0) 
-                    AND (tr.courseId IS NULL OR tr.courseId = 0)
-                )
-            `;
-            params.push(String(username).trim());
-        }
-
-        sql += `
-            )
-            AND (? = 1 OR er.roomId IN (${MY_ROOMS}))
+            WHERE COALESCE(NULLIF(er.courseId, 0), (SELECT NULLIF(t9.courseId, 0) FROM teacher_rooms t9 WHERE t9.roomId = er.roomId)) IN (SELECT id FROM courses WHERE id = ? OR courseCode = ?)
+              AND (? = 1 OR er.roomId IN (${MY_ROOMS}))
             ORDER BY er.id DESC
         `;
-        params.push(viewer(req).adm, viewer(req).user);
-
+        const params = [validId, cCodeStr, viewer(req).adm, viewer(req).user];
         db.all(sql, params, (err, rows) => {
             if (err) return res.status(500).json({ message: err.message });
             res.json(rows || []);
@@ -4151,9 +4098,7 @@ app.get('/api/admin/storage-stats', (req, res) => {
 });
 })(app, routeCtx);
 
-// ระบบตรวจข้อสอบอัตนัยด้วย AI (โมดูลแยก: essay-grader.js) — ถ้าโหลดไม่สำเร็จ ระบบสอบเดิมยังทำงานตามปกติ
-try { require('./essay-grader')(app, db); } catch (e) { console.error('โหลด Essay Grader ไม่สำเร็จ:', e.message); }
-// รายงานรวมตาเฝ้า + ตาอ่าน รายคน
+// รายงานรวมรายคนของรายวิชา
 try { require('./trinetra-link')(app, db); } catch (e) { console.error('โหลดรายงานรวม ExamPro ไม่สำเร็จ:', e.message); }
 // ดาวน์โหลดข้อมูลสำรองทั้งหมด (สำคัญเมื่อใช้ Neon แผนฟรี)
 try { require('./backup-export')(app, db); } catch (e) { console.error('โหลดระบบดาวน์โหลดข้อมูลสำรองไม่สำเร็จ:', e.message); }

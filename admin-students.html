@@ -129,11 +129,11 @@
 <!-- ===== SIDEBAR ===== -->
 <aside id="sidebar">
     <div class="sidebar-inner p-4 space-y-4 flex-1 overflow-y-auto">
-        <!-- Logo Header (ExamPro) -->
+        <!-- Logo Header ExamPro -->
         <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
             <div class="leading-tight">
                 <div class="font-bold text-base tracking-tight text-slate-900">Exam<span class="text-blue-700 font-extrabold">Pro</span></div>
-                <div class="text-[10px] text-amber-700 font-bold uppercase tracking-wider">ตาที่ 3 ของอาจารย์</div>
+                <div class="text-[10px] text-amber-700 font-bold uppercase tracking-wider">ระบบสอบออนไลน์</div>
             </div>
         </div>
 
@@ -191,17 +191,13 @@
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" /></svg>
                         <span>7. ตรวจสอบผลการสอบ</span>
                     </a>
-                    <a href="admin-essay.html" class="nav-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zM19.5 7.125L16.862 4.487M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
-                        <span>8. ตรวจอัตนัยด้วย AI</span>
-                    </a>
                     <a href="admin-monitoring.html" class="nav-link">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" /></svg>
-                        <span>9. ตรวจสอบพฤติกรรมน่าสงสัย</span>
+                        <span>8. ตรวจสอบพฤติกรรมน่าสงสัย</span>
                     </a>
                     <a href="trinetra-report.html" class="nav-link">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                        <span>10. รายงานรวมรายคน</span>
+                        <span>9. รายงานรวมรายคน</span>
                     </a>
                 </div>
             </div>
@@ -332,12 +328,11 @@
                             <th class="text-left px-5 py-3.5 font-bold text-slate-700 uppercase tracking-wider text-xs">ชั้น / ห้อง</th>
                             <th class="text-center px-4 py-3.5 font-bold text-slate-700 uppercase tracking-wider text-xs">สถานะบัญชี</th>
                             <th class="text-center px-4 py-3.5 font-bold text-slate-700 uppercase tracking-wider text-xs">สอบแล้ว</th>
-                            <th class="text-center px-4 py-3.5 font-bold text-slate-700 uppercase tracking-wider text-xs min-w-[120px]">คะแนนเฉลี่ย</th>
                             <th class="text-center px-4 py-3.5 font-bold text-slate-700 uppercase tracking-wider text-xs">จัดการ</th>
                         </tr>
                     </thead>
                     <tbody id="student-table-body">
-                        <tr><td colspan="7" class="text-center py-16 text-slate-400 font-bold text-base">กำลังโหลดข้อมูล...</td></tr>
+                        <tr><td colspan="6" class="text-center py-16 text-slate-400 font-bold text-base">กำลังโหลดข้อมูล...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -346,7 +341,7 @@
     <!-- Footer -->
     <footer class="border-t border-slate-200 bg-white py-3.5 px-8 text-center">
         <p class="text-xs text-slate-500 font-medium">
-            &copy; 2026 ExamPro &middot; ตาที่ 3 ของอาจารย์ &middot; ทีม TEC Hope
+            &copy; 2026 ExamPro &middot; ทีม TEC Hope
         </p>
     </footer>
 </div>
@@ -420,14 +415,10 @@
         </div>
 
         <!-- Stats -->
-        <div class="px-6 py-4 grid grid-cols-3 gap-4 border-b border-slate-200 shrink-0 bg-slate-50/70">
+        <div class="px-6 py-4 grid grid-cols-2 gap-4 border-b border-slate-200 shrink-0 bg-slate-50/70">
             <div class="text-center">
                 <div class="text-2xl font-bold text-slate-900" id="hist-exam-count">0</div>
                 <div class="text-xs text-slate-500 font-semibold">ครั้งที่สอบ</div>
-            </div>
-            <div class="text-center">
-                <div class="text-2xl font-bold text-emerald-600" id="hist-avg">—</div>
-                <div class="text-xs text-slate-500 font-semibold">คะแนนเฉลี่ย</div>
             </div>
             <div class="text-center">
                 <div class="text-2xl font-bold text-rose-500" id="hist-cheat-count">0</div>
@@ -637,7 +628,7 @@
     async function loadStudents(courseId = selectedCourseFilter) {
         if (!courseId) return;
         const tbody = document.getElementById('student-table-body');
-        if (tbody) tbody.innerHTML = `<tr><td colspan="7" class="text-center py-16 text-slate-400 font-bold text-base">กำลังโหลดข้อมูลนักศึกษา...</td></tr>`;
+        if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="text-center py-16 text-slate-400 font-bold text-base">กำลังโหลดข้อมูลนักศึกษา...</td></tr>`;
 
         try {
             const url = courseId && courseId !== 'ALL'
@@ -652,7 +643,7 @@
             // ไม่ใช้ข้อมูลจำลองแทนอีกแล้ว (เดิมโชว์รายชื่อ/คะแนนปลอมเมื่อโหลดไม่สำเร็จ ทำให้เข้าใจผิด)
             console.warn("API โหลดนักศึกษาไม่สำเร็จ:", e);
             allStudents = [];
-            if (tbody) { tbody.innerHTML = `<tr><td colspan="7" class="text-center py-16 text-rose-500 font-bold text-base">โหลดข้อมูลนักศึกษาไม่สำเร็จ ตรวจการเชื่อมต่อแล้วลองใหม่</td></tr>`; }
+            if (tbody) { tbody.innerHTML = `<tr><td colspan="6" class="text-center py-16 text-rose-500 font-bold text-base">โหลดข้อมูลนักศึกษาไม่สำเร็จ ตรวจการเชื่อมต่อแล้วลองใหม่</td></tr>`; }
             updateStats();
             return;
         }
@@ -837,7 +828,7 @@
     function renderTable(students) {
         const tbody = document.getElementById('student-table-body');
         if (!students.length) {
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-16 text-slate-400">
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-16 text-slate-400">
                 <div class="font-bold text-slate-500 text-base">ยังไม่มีข้อมูลนักศึกษา</div>
                 <div class="text-xs mt-1.5 text-slate-400 font-medium">กดปุ่ม "เพิ่มนักศึกษา" หรือดึงข้อมูลจากผลสอบครับ</div>
             </td></tr>`;
@@ -879,12 +870,6 @@
                     ${statusBadge}
                 </td>
                 <td class="px-4 py-4 text-center font-bold text-slate-800 text-sm sm:text-base">${s.examCount || 0} ครั้ง</td>
-                <td class="px-4 py-4 text-center min-w-[120px]">
-                    ${avg
-                        ? `<div class="${avgColor} font-bold text-sm sm:text-base">${avg}%</div>
-                           <div class="score-bar mt-1.5"><div class="score-bar-fill" style="width:${Math.min(avg,100)}%;background:${barColor}"></div></div>`
-                        : `<span class="text-slate-300 font-bold text-base">—</span>`}
-                </td>
                 <td class="px-4 py-4 text-center">
                     <div class="flex justify-center items-center gap-2">
                         <button onclick='openHistoryModal(${JSON.stringify(s.studentId)},${JSON.stringify(fn+" "+ln)},${JSON.stringify(s.class||"")},${s.examCount||0},${JSON.stringify(s.courseId||"")})'
@@ -989,7 +974,6 @@
         document.getElementById('hist-class').textContent = (cls || '—') + (sObj.courseName ? ` · วิชา ${sObj.courseCode || ''} ${sObj.courseName}` : '');
         document.getElementById('hist-exam-count').textContent = realExamCount + ' ครั้ง';
         document.getElementById('hist-cheat-count').textContent = realCheatCount + ' ครั้ง';
-        document.getElementById('hist-avg').textContent = sObj.avgScore ? sObj.avgScore + '%' : '...';
         
         document.getElementById('history-modal').classList.remove('hidden');
         updateTabUI(); 
@@ -1030,7 +1014,6 @@
 
         if (!records || records.length === 0) {
             document.getElementById('hist-exam-count').textContent = '0 ครั้ง';
-            document.getElementById('hist-avg').textContent = '—';
             content.innerHTML = `
                 <div class="text-center py-12 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl space-y-2">
                     <div class="font-extrabold text-slate-700 text-base">ยังไม่พบประวัติการทำข้อสอบ</div>
@@ -1042,8 +1025,6 @@
 
         document.getElementById('hist-exam-count').textContent = records.length + ' ครั้ง';
 
-        const avgPct = records.reduce((s,r) => s + (r.maxScore > 0 ? r.score/r.maxScore*100 : 0), 0) / records.length;
-        document.getElementById('hist-avg').textContent = avgPct.toFixed(1) + '%';
 
         content.innerHTML = records.map(r => {
             const pct = r.maxScore > 0 ? Math.round(r.score/r.maxScore*100) : 0;

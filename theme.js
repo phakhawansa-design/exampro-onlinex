@@ -1,60 +1,15 @@
 // theme.js — ใส่โลโก้ ExamPro และปรับหน้าตาเล็กน้อย (ไม่แตะการทำงานของหน้า)
 (function () {
 
-  // =====================================================================
-  // สวิตช์เปิด/ปิดเมนู (จุดเดียวทั้งระบบ)
-  // ระบบตรวจข้อสอบอัตนัย (เมนู "ตรวจอัตนัยด้วย AI" + หน้ากระดาษคำตอบ) ปิดไว้ระหว่างพัฒนาปรับปรุง
-  // เปิดกลับ: เปลี่ยน false → true แล้วอัปโหลดไฟล์นี้ (โค้ดและข้อมูลเดิมยังอยู่ครบ ไม่ได้ลบ)
-  // =====================================================================
-  const ESSAY_ENABLED = false;
-
   const pageNow = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
-  if (!ESSAY_ENABLED) {
-    // ซ่อนลิงก์ทันที (ก่อนหน้าเว็บแสดง กันเห็นเมนูแวบขึ้นมา)
-    const st = document.createElement('style');
-    st.textContent = 'a[href="admin-essay.html"],a[href^="admin-essay.html?"],a[href="essay-sheets.html"],a[href^="essay-sheets.html?"]{display:none!important}';
-    (document.head || document.documentElement).appendChild(st);
-    // เปิดหน้าตรวจอัตนัยตรง ๆ (เช่น บุ๊กมาร์กไว้) → พากลับแดชบอร์ด
-    if (/^(admin-essay|essay-sheets)\.html$/.test(pageNow)) {
-      location.replace('dashboard.html?notice=essay-off');
-      return;
-    }
-  }
 
   const run = () => {
     const page = pageNow;
-    // 0.5) ปิดเมนูตรวจอัตนัย → เลื่อนเลขเมนูที่ตามมาให้ต่อเนื่อง (9→8, 10→9) ทั้งเมนูข้างและหัวข้อหน้า
-    if (!ESSAY_ENABLED) {
-      const map = {}; let n = 0;
-      document.querySelectorAll('#sidebar a').forEach(a => {
-        if (/admin-essay\.html/.test(a.getAttribute('href') || '')) return;
-        const sp = [...a.querySelectorAll('span')].find(s => /^\s*\d+\.\s/.test(s.textContent));
-        if (!sp) return;
-        const old = parseInt(sp.textContent, 10); n++; map[old] = n;
-        if (old !== n) sp.textContent = sp.textContent.replace(/^(\s*)\d+\./, `$1${n}.`);
-      });
-      document.querySelectorAll('h1').forEach(h => {
-        const walker = document.createTreeWalker(h, NodeFilter.SHOW_TEXT);
-        let t; while ((t = walker.nextNode())) {
-          const m = t.textContent.match(/^(\s*)(\d+)\./);
-          if (m) { if (map[m[2]] && map[m[2]] !== Number(m[2])) t.textContent = t.textContent.replace(/^(\s*)\d+\./, `$1${map[m[2]]}.`); break; }
-          if (t.textContent.trim()) break;
-        }
-      });
-      if (/[?&]notice=essay-off\b/.test(location.search)) {
-        const toast = document.createElement('div');
-        toast.textContent = 'ระบบตรวจข้อสอบอัตนัยปิดปรับปรุงชั่วคราว';
-        toast.style.cssText = 'position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:99999;background:#0b2a7a;color:#fff;padding:10px 18px;border-radius:12px;font:600 14px Noto Sans Thai Looped,sans-serif;box-shadow:0 10px 24px rgba(0,0,0,.2)';
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 4000);
-        history.replaceState(null, '', location.pathname);
-      }
-    }
     // 1.5) คำว่า Pro ในโลโก้ตัวหนังสือของแถบข้าง (พื้นน้ำเงินเข้ม) = สีเหลือง
     document.querySelectorAll('#sidebar span, #sidebar b').forEach(el => { if (el.children.length === 0 && el.textContent.trim() === 'Pro') el.classList.add('rm-pro'); });
     // 2) ชื่อใต้โลโก้ในแถบข้าง
     const sub = document.querySelector('#sidebar .logo-text > div:last-child');
-    if (sub) sub.textContent = 'ตาที่ 3 ของอาจารย์';
+    if (sub) sub.textContent = 'ระบบสอบออนไลน์';
     // 2.5) ปุ่มเปิดเมนูบนมือถือ (บางหน้าเดิมไม่มีปุ่มนี้ ทำให้เปิดเมนูไม่ได้บนมือถือ)
     const sb = document.getElementById('sidebar');
     if (sb && !document.querySelector('.rm-menu-btn')) {
@@ -78,7 +33,7 @@
       if (ls && !document.querySelector('.rm-uni-s')) {
         const box = document.createElement('div');
         box.style.cssText = 'width:100%;max-width:32rem;position:relative;z-index:1';
-        box.innerHTML = `<div class="rm-uni-s">ExamPro · ตาที่ 3 ของอาจารย์</div>`;
+        box.innerHTML = `<div class="rm-uni-s">ExamPro</div>`;
         ls.parentElement.style.flexDirection = 'column';
         ls.parentElement.insertBefore(box, ls);
         // ซ่อนแถบชื่อระบบเมื่อเข้าสู่หน้าทำข้อสอบ
@@ -94,7 +49,7 @@
       if (wrap && !document.querySelector('.rm-uni')) {
         const u = document.createElement('div');
         u.className = 'rm-uni';
-        u.innerHTML = `ExamPro · ตาที่ 3 ของอาจารย์`;
+        u.innerHTML = `ExamPro`;
         wrap.prepend(u);
       }
       [['6%', '18%', 1], ['88%', '12%', .7], ['80%', '72%', .5]].forEach(([l, t, s]) => {

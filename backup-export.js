@@ -2,16 +2,15 @@
 // ExamPro · ดาวน์โหลดข้อมูลสำรองทั้งหมด (backup-export.js)
 // ---------------------------------------------------------------------
 // GET /api/superadmin/backup-export  (เฉพาะผู้ดูแลระบบ)
-//   ได้ไฟล์ JSON ไฟล์เดียว มีทุกตาราง: ห้องสอบ ข้อสอบ ผลสอบ ประวัติตาเฝ้า รายวิชา รายชื่อ งานอัตนัยและคะแนน
+//   ได้ไฟล์ JSON ไฟล์เดียว มีทุกตาราง: ห้องสอบ ข้อสอบ ผลสอบ ประวัติตาเฝ้า รายวิชา รายชื่อ
 //   ใช้ได้ทั้ง SQLite และ PostgreSQL (Neon) — สำคัญมากเมื่อใช้ Neon แผนฟรีที่ย้อนข้อมูลได้แค่ไม่กี่ชั่วโมง
-//   ไม่รวมรหัสผ่าน (แม้จะเข้ารหัสแล้ว) และไม่รวมไฟล์ภาพกระดาษคำตอบ
+//   ไม่รวมรหัสผ่าน (แม้จะเข้ารหัสแล้ว)
 // =====================================================================
 
 const TABLES = [
     'teachers', 'teacher_rooms', 'courses', 'course_students', 'students',
     'questions', 'exam_results', 'cheat_logs', 'answer_events', 'student_logins', 'student_warnings', 'student_reports',
-    'exam_templates', 'template_questions',
-    'essay_assignments', 'essay_submissions', 'essay_grades'
+    'exam_templates', 'template_questions'
 ];
 const HIDDEN = { teachers: ['password'], students: ['password_hash'] };
 
@@ -36,7 +35,7 @@ module.exports = function backupExport(app, db) {
                 meta: {
                     system: 'ExamPro', exportedAt: d.toISOString(), exportedBy: u.u,
                     database: db.isPg ? 'PostgreSQL' : 'SQLite', counts,
-                    note: 'ไม่รวมรหัสผ่านและไฟล์ภาพกระดาษคำตอบ · เป็นข้อมูลส่วนบุคคลของนักศึกษา (PDPA) โปรดเก็บในที่ปลอดภัย'
+                    note: 'ไม่รวมรหัสผ่าน · เป็นข้อมูลส่วนบุคคลของนักศึกษา (PDPA) โปรดเก็บในที่ปลอดภัย'
                 },
                 tables
             };

@@ -80,8 +80,8 @@ module.exports = function examGuard(app, db) {
     const sessions = new Map();   // key -> { sid, t, warned } หน้าสอบที่เป็นเจ้าของการสอบตอนนี้
     const SESSION_IDLE_MS = 15000;
     const cleanSid = v => String(v || '').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 64);
-    const logCheat = (roomId, studentId, name, cls, action) => db.run('INSERT INTO cheat_logs (roomId, studentId, name, class, action, time) VALUES (?, ?, ?, ?, ?, ?)',
-        [String(roomId), String(studentId).trim(), name || String(studentId).trim(), cls || '', action, thaiTime()], () => {});
+    const logCheat = (roomId, studentId, name, cls, action) => db.run('INSERT INTO cheat_logs (roomId, studentId, name, class, action, time, courseId) VALUES (?, ?, ?, ?, ?, ?, (SELECT courseId FROM teacher_rooms WHERE roomId = ?))',
+        [String(roomId), String(studentId).trim(), name || String(studentId).trim(), cls || '', action, thaiTime(), String(roomId)], () => {});
     setInterval(() => {
         const old = Date.now() - 6 * 3600e3;
         for (const [k, v] of beats) if (v.t < old) beats.delete(k);
@@ -114,8 +114,8 @@ module.exports = function examGuard(app, db) {
                 const k = keyOf(roomId, req.authUser.u), now = Date.now();
                 if (!deniedAt.has(k) || now - deniedAt.get(k) > 60000) {
                     deniedAt.set(k, now);
-                    db.run('INSERT INTO cheat_logs (roomId, studentId, name, class, action, time) VALUES (?, ?, ?, ?, ?, ?)',
-                        [String(roomId), req.authUser.u, req.authUser.u, '', 'พยายามเปิดข้อสอบห้องนี้ แต่ไม่มีรายชื่อในรายวิชา (ระบบไม่ให้เข้า)', thaiTime()], () => {});
+                    db.run('INSERT INTO cheat_logs (roomId, studentId, name, class, action, time, courseId) VALUES (?, ?, ?, ?, ?, ?, (SELECT courseId FROM teacher_rooms WHERE roomId = ?))',
+                        [String(roomId), req.authUser.u, req.authUser.u, '', 'พยายามเปิดข้อสอบห้องนี้ แต่ไม่มีรายชื่อในรายวิชา (ระบบไม่ให้เข้า)', thaiTime(), String(roomId)], () => {});
                 }
                 return res.status(403).json({ success: false, accessDenied: true,
                     message: `รหัสนักศึกษา (${req.authUser.u}) ไม่มีรายชื่อในรายวิชาของห้องสอบนี้\nจึงเข้าสอบหรือส่งคำตอบไม่ได้ กรุณาติดต่ออาจารย์ผู้สอน` });
@@ -192,8 +192,8 @@ module.exports = function examGuard(app, db) {
                 && now - prev.t > GAP_MS && (lastCheat.get(k) || 0) < prev.t) {
                 const sec = Math.round((now - prev.t) / 1000);
                 const action = `หายจากหน้าสอบประมาณ ${sec} วินาที (พับแอป/ล็อกจอ/สลับแอป หรือเน็ตหลุด)`;
-                db.run('INSERT INTO cheat_logs (roomId, studentId, name, class, action, time) VALUES (?, ?, ?, ?, ?, ?)',
-                    [String(b.roomId), String(b.studentId).trim(), b.name || '', b.class || '', action, thaiTime()], () => {});
+                db.run('INSERT INTO cheat_logs (roomId, studentId, name, class, action, time, courseId) VALUES (?, ?, ?, ?, ?, ?, (SELECT courseId FROM teacher_rooms WHERE roomId = ?))',
+                    [String(b.roomId), String(b.studentId).trim(), b.name || '', b.class || '', action, thaiTime(), String(b.roomId)], () => {});
                 lastCheat.set(k, now);
             }
             beats.set(k, { t: now, state, vis });

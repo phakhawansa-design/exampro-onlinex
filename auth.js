@@ -72,12 +72,11 @@ const PUBLIC = [
     'POST /api/teacher/login', 'POST /api/superadmin/login', 'POST /api/admin/create-teacher',
     'POST /api/student/login', 'POST /api/student/register',
     'GET /api/student/get-room-by-code', 'POST /api/report-issue',
-    'GET /api/room-settings', 'GET /api/teacher/get-publish-status', 'POST /api/office/submit',
-    'GET /api/essay/status'
+    'GET /api/room-settings', 'GET /api/teacher/get-publish-status', 'POST /api/office/submit'
 ];
 // API ของนักเรียน: ต้องมี token นักเรียน และ studentId ที่ส่งมาต้องเป็นของตัวเอง (กันส่งข้อสอบ/เปลี่ยนรหัสแทนคนอื่น)
 const STUDENT_ONLY = [
-    'GET /api/student/essay-feedback', 'POST /api/student/change-password', 'POST /api/student/heartbeat',
+    'POST /api/student/change-password', 'POST /api/student/heartbeat',
     'POST /api/student/leave-room', 'POST /api/student/check-exam-access', 'GET /api/student/my-exam-history',
     'POST /api/student/update-profile', 'GET /api/get-warnings', 'POST /api/mark-warning-read',
     'POST /api/report-cheat', 'POST /api/log-student-login', 'POST /api/submit-exam', 'GET /api/get-questions',

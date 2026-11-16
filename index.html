@@ -15,8 +15,8 @@
       }
     })();
   </script>
-  <title>ExamPro · ตาที่ 3 ของอาจารย์</title>
-  <meta name="description" content="ระบบสอบออนไลน์ ป้องกันการทุจริตแบบเรียลไทม์ และตรวจข้อสอบอัตนัยด้วย AI">
+  <title>ExamPro</title>
+  <meta name="description" content="ระบบสอบออนไลน์ ป้องกันการทุจริตแบบเรียลไทม์">
   <meta name="theme-color" content="#0b2a7a">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -79,7 +79,7 @@
     @media(max-width:860px){.badge-live{left:0;top:auto;bottom:10px;padding:7px 10px;font-size:11px;gap:7px;animation:none}.badge-live b{font-size:12px}.badge-live .dot{width:28px;height:28px}.badge-ai{display:none}.brand small{display:none}body{overflow-x:hidden}.hero{padding:110px 0 150px}.hero .wrap{grid-template-columns:1fr}.art{height:320px;max-width:380px;margin:0 auto;width:100%}}
 
     /* feature cards */
-    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:-150px;position:relative;z-index:5}
+    .cards{display:grid;grid-template-columns:repeat(2,1fr);max-width:860px;margin-left:auto;margin-right:auto;gap:22px;margin-top:-150px;position:relative;z-index:5}
     .card{background:#fff;border-radius:16px;padding:34px 26px 28px;text-align:center;box-shadow:0 22px 50px -24px rgba(11,42,122,.35);border:1px solid var(--line);transition:.25s}
     .card:hover{transform:translateY(-6px)}
     .ico{width:84px;height:74px;margin:0 auto 18px;display:grid;place-items:center;color:#fff;font-size:30px;position:relative}
@@ -405,16 +405,12 @@
       </g>
     </svg>
   </div>
-    <div class="ibr"><b><span>ตาที่ 3</span> ของอาจารย์</b>
-      <div class="ichips"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>ตาเฝ้า · ระหว่างสอบ</i><i class="g"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M4 12h16"/></svg>ตาอ่าน · หลังสอบ</i></div></div>
+    <div class="ibr"><b>Exam<span>Pro</span></b>
+      <div class="ichips"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>ตาเฝ้า · ระหว่างสอบ</i></div></div>
     <div class="hud l"><div class="hh"><span class="hi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg></span><span><b>ตาเฝ้า</b><small>ระหว่างสอบออนไลน์</small></span><em class="live"><i></i>สด</em></div>
       <div class="hs"><div><b>32</b><small>กำลังสอบ</small></div><div><b class="r">1</b><small>สลับหน้าจอ</small></div></div>
       <div class="hb"><i style="--h:40%"></i><i style="--h:65%"></i><i style="--h:30%"></i><i style="--h:80%"></i><i style="--h:55%"></i><i class="r" style="--h:95%"></i><i style="--h:45%"></i></div>
       <div class="hf">✓ แจ้งอาจารย์ผู้คุมสอบแล้ว</div></div>
-    <div class="hud r"><div class="hh"><span class="hi g"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M4 12h16"/></svg></span><span><b>ตาอ่าน</b><small>หลังสอบ · ตรวจกระดาษคำตอบ</small></span></div>
-      <div class="hp"><i></i><i></i><i></i><i></i><i></i><b class="beam"></b></div>
-      <div class="hg"><span>ตรวจแล้ว</span><b>28 / 32</b></div><div class="hbar"><i></i></div>
-      <div class="hf g">AI เสนอคะแนน · อาจารย์ยืนยัน</div></div>
     <i class="ihex"></i>
     <canvas id="ifx"></canvas>
   </div>
@@ -633,7 +629,7 @@ void main(){vec2 uv=(gl_FragCoord.xy-.5*r)/r.y;uv/=1.+w*2.4;
 
 <nav>
   <div class="wrap">
-    <a class="brand" href="index.html"><span><b>Exam<i>Pro</i></b><small>ตาที่ 3 ของอาจารย์</small></span></a>
+    <a class="brand" href="index.html"><span><b>Exam<i>Pro</i></b><small>ระบบสอบออนไลน์</small></span></a>
     <div class="menu"><a href="#features">ความสามารถ</a><a href="#how">วิธีใช้งาน</a><a href="#faq">คำถามที่พบบ่อย</a></div>
     <a class="btn btn-ol nav-cta" href="login.html">เข้าสู่ระบบ</a>
   </div>
@@ -642,9 +638,9 @@ void main(){vec2 uv=(gl_FragCoord.xy-.5*r)/r.y;uv/=1.+w*2.4;
 <header class="hero">
   <div class="wrap">
     <div>
-      <div class="tag"><i></i>ระบบสอบออนไลน์ · ตาที่ 3 ของอาจารย์</div>
-      <h1>สอบออนไลน์อย่างมั่นใจ<br><em>ป้องกันทุจริต</em> และตรวจอัตนัยด้วย AI</h1>
-      <p class="lead">จัดสอบ ติดตามพฤติกรรมแบบเรียลไทม์ และให้ AI ช่วยตรวจข้อสอบอัตนัยเทียบกับเฉลย โดยอาจารย์เป็นผู้ยืนยันคะแนนสุดท้ายเสมอ</p>
+      <div class="tag"><i></i>ระบบสอบออนไลน์</div>
+      <h1>สอบออนไลน์อย่างมั่นใจ<br><em>ป้องกันทุจริต</em> ได้แบบเรียลไทม์</h1>
+      <p class="lead">จัดสอบปรนัย ติดตามพฤติกรรมผู้เข้าสอบแบบเรียลไทม์ ตรวจคะแนนอัตโนมัติ และส่งออกผลเป็น Excel</p>
       <div class="cta">
         <a class="btn btn-or" href="login.html"><svg class="ic "><use href="#i-cap"/></svg> เข้าสู่ระบบ</a>
       </div>
@@ -660,7 +656,6 @@ void main(){vec2 uv=(gl_FragCoord.xy-.5*r)/r.y;uv/=1.+w*2.4;
 <div class="wrap" id="features">
   <div class="cards">
     <div class="card reveal"><div class="ico hex i-or"><svg class="ic "><use href="#i-shield"/></svg></div><h3>ป้องกันการทุจริต</h3><p>ตรวจจับการสลับแท็บ ย่อหน้าต่าง ล็อกคีย์ลัดคัดลอก และส่งคำเตือนถึงนักศึกษารายคนได้ทันที</p><a href="login.html">ดูหน้าคุมสอบ →</a></div>
-    <div class="card reveal"><div class="ico hex i-nv"><svg class="ic "><use href="#i-doc"/></svg></div><h3>ตรวจอัตนัยด้วย AI</h3><p>นำเข้า PDF กระดาษคำตอบ AI อ่านลายมือ เทียบความใกล้เคียงกับเฉลย แล้วเสนอคะแนนให้อาจารย์เลือก</p><a href="grader-intro.html">ดูวิธีทำงาน →</a></div>
     <div class="card reveal"><div class="ico hex i-cy"><svg class="ic "><use href="#i-chart"/></svg></div><h3>ผลสอบและวิเคราะห์</h3><p>คะแนนรายข้อ สถิติห้องเรียน คะแนนรวมรายวิชา และส่งออก Excel ได้ในคลิกเดียว</p><a href="login.html">เข้าสู่ระบบ →</a></div>
   </div>
 </div>
@@ -671,10 +666,9 @@ void main(){vec2 uv=(gl_FragCoord.xy-.5*r)/r.y;uv/=1.+w*2.4;
       <div class="sec-ico hex i-cy"><svg class="ic sm"><use href="#i-list"/></svg></div>
       <h2>ครบในระบบเดียว<br>ตั้งแต่สร้างข้อสอบถึงส่งเกรด</h2>
       <ul class="checks">
-        <li>สร้างรายวิชา นำเข้ารายชื่อนักศึกษา และสร้างข้อสอบเอง นำเข้าจาก Excel หรือให้ AI ช่วยออกข้อสอบ</li>
+        <li>สร้างรายวิชา นำเข้ารายชื่อนักศึกษา และสร้างข้อสอบเอง หรือนำเข้าจาก Excel</li>
         <li>เปิดห้องสอบด้วยรหัส PIN หรือ QR นักศึกษาเข้าสอบได้จากทุกอุปกรณ์</li>
         <li>ติดตามผู้เข้าสอบและพฤติกรรมน่าสงสัยแบบเรียลไทม์</li>
-        <li>ข้อสอบอัตนัย: AI ช่วยตรวจ อาจารย์ตรวจทานและยืนยันทุกคะแนน</li>
       </ul>
       <a class="btn btn-navy" href="login.html">เริ่มใช้งานสำหรับอาจารย์</a>
     </div>
@@ -688,9 +682,9 @@ void main(){vec2 uv=(gl_FragCoord.xy-.5*r)/r.y;uv/=1.+w*2.4;
     <p class="sub">สำหรับอาจารย์ผู้สอน</p>
     <div class="steps" style="text-align:left">
       <div class="step reveal"><b class="hex i-or">1</b><h4>สร้างรายวิชา</h4><p>เพิ่มรายวิชาและรายชื่อนักศึกษา</p></div>
-      <div class="step reveal"><b class="hex i-nv">2</b><h4>สร้างข้อสอบ</h4><p>ปรนัยในระบบ หรืออัตนัยพร้อมเฉลย</p></div>
+      <div class="step reveal"><b class="hex i-nv">2</b><h4>สร้างข้อสอบ</h4><p>ข้อสอบปรนัยพร้อมเฉลย ระบบตรวจให้อัตโนมัติ</p></div>
       <div class="step reveal"><b class="hex i-cy">3</b><h4>เปิดห้องสอบ</h4><p>แจก PIN ให้นักศึกษา แล้วคุมสอบแบบเรียลไทม์</p></div>
-      <div class="step reveal"><b class="hex i-or">4</b><h4>ตรวจและส่งออก</h4><p>ยืนยันคะแนน แล้วส่งออก Excel</p></div>
+      <div class="step reveal"><b class="hex i-or">4</b><h4>ตรวจและส่งออก</h4><p>ดูคะแนนและพฤติกรรม แล้วส่งออก Excel</p></div>
     </div>
   </div>
 </section>
