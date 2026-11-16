@@ -195,21 +195,18 @@
         <!-- Stats Cards -->
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
             <div class="bg-white border border-rose-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition">
-                <span class="p-3 bg-rose-50 border border-rose-100 rounded-xl text-xl flex-shrink-0"></span>
                 <div class="min-w-0">
                     <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider truncate">อาจารย์ทั้งหมด</div>
                     <div class="text-lg font-semibold text-slate-800" id="stat-total-teachers">0</div>
                 </div>
             </div>
             <div onclick="switchTab('teachers')" class="bg-white border border-rose-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition cursor-pointer group">
-                <span class="p-3 bg-amber-50 border border-amber-100 rounded-xl text-xl flex-shrink-0 group-hover:scale-105 transition"></span>
                 <div class="min-w-0">
                     <div class="text-[10px] font-bold text-amber-700 uppercase tracking-wider truncate">อาจารย์รออนุมัติ</div>
                     <div class="text-lg font-semibold text-amber-600" id="stat-pending">0</div>
                 </div>
             </div>
             <div onclick="switchTab('students')" class="bg-white border border-rose-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition cursor-pointer group relative overflow-hidden">
-                <span class="p-3 bg-rose-50 border border-rose-100 rounded-xl text-xl flex-shrink-0 group-hover:scale-105 transition"></span>
                 <div class="min-w-0">
                     <div class="text-[10px] font-bold text-rose-600 uppercase tracking-wider truncate flex items-center gap-1">
                         นักศึกษารออนุมัติ
@@ -219,14 +216,12 @@
                 </div>
             </div>
             <div onclick="switchTab('students')" class="bg-white border border-rose-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition cursor-pointer">
-                <span class="p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-xl flex-shrink-0"></span>
                 <div class="min-w-0">
                     <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider truncate">นักศึกษาในระบบ</div>
                     <div class="text-lg font-semibold text-emerald-600" id="stat-unique-students">0</div>
                 </div>
             </div>
             <div class="bg-white border border-rose-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition">
-                <span class="p-3 bg-cyan-50 border border-cyan-100 rounded-xl text-xl flex-shrink-0"></span>
                 <div class="min-w-0">
                     <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider truncate">ครั้งที่เข้าสอบ</div>
                     <div class="text-lg font-semibold text-cyan-600" id="stat-total-logins">0</div>

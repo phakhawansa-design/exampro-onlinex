@@ -244,17 +244,14 @@
             <input type="text" id="search-input" placeholder="ค้นหารหัส / ชื่อ / ชั้น..." onkeyup="filterStudents()"
                 class="w-48 sm:w-60 px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:border-blue-600 transition shadow-xs" />
             <button onclick="window.TabLockGuide.open('students')" class="flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3.5 py-2 rounded-xl text-xs font-semibold transition shadow-xs cursor-pointer">
-                <span></span>
                 <span class="hidden sm:inline">คู่มือ</span>
             </button>
             <button onclick="importStudents()" id="btn-import-students"
                 class="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-xs active:scale-95 cursor-pointer">
-                <span></span>
                 <span>ดึงจากผลสอบ</span>
             </button>
             <button onclick="openAddModal()" id="btn-add-student"
                 class="flex items-center gap-1.5 px-3.5 py-2 bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold rounded-xl transition shadow-xs active:scale-95 cursor-pointer">
-                <span></span>
                 <span>เพิ่มนักศึกษา</span>
             </button>
         </div>
@@ -265,7 +262,6 @@
         <!-- Course Filter Hero Card (อยู่ตรงกลาง เด่น ชัดเจน) -->
         <div class="glass-card p-6 sm:p-8 border-2 border-indigo-200/90 shadow-lg flex flex-col items-center justify-center text-center space-y-4 bg-gradient-to-b from-white via-indigo-50/25 to-white rounded-3xl">
             <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs sm:text-sm font-extrabold shadow-xs">
-                <span class="text-base"></span>
                 <span>เลือกรายวิชาเพื่อดูรายชื่อนักศึกษา</span>
             </div>
 
@@ -294,14 +290,13 @@
         <div id="stat-card-row" class="hidden">
             <div class="glass-card p-5 sm:p-6 flex items-center justify-between border-2 border-slate-200/90 shadow-sm flex-wrap gap-4">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-600 flex items-center justify-center text-2xl flex-shrink-0"></div>
                     <div>
                         <div class="text-3xl font-bold text-slate-900" id="stat-total">0</div>
                         <div class="text-xs text-slate-500 font-semibold uppercase tracking-wide" id="stat-total-label">นักศึกษาในรายวิชา</div>
                     </div>
                 </div>
                 <div id="stat-course-name" class="text-xs sm:text-sm font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-4 py-2 rounded-2xl flex items-center gap-2">
-                    <span></span> <span id="stat-course-text">ยังไม่ได้เลือกวิชา</span>
+                    <span id="stat-course-text">ยังไม่ได้เลือกวิชา</span>
                 </div>
             </div>
         </div>
@@ -319,9 +314,6 @@
 
             <!-- View Placeholder: When NO course is selected yet -->
             <div id="select-course-prompt" class="py-16 px-6 text-center space-y-4">
-                <div class="w-20 h-20 mx-auto rounded-3xl bg-indigo-50 border-2 border-indigo-200 flex items-center justify-center text-4xl shadow-inner">
-                    
-                </div>
                 <div class="max-w-md mx-auto space-y-1.5">
                     <h3 class="text-xl font-extrabold text-slate-800">กรุณาเลือกรายวิชาก่อน</h3>
                     <p class="text-sm font-semibold text-slate-500 leading-relaxed">
@@ -704,7 +696,6 @@
         const tbody = document.getElementById('pending-table-body');
         if (!pendingStudents.length) {
             tbody.innerHTML = `<tr><td colspan="6" class="text-center py-16 text-slate-400">
-                <div class="text-4xl mb-3"></div>
                 <div class="font-bold text-slate-600">ไม่มีคำขอที่รอการอนุมัติในขณะนี้</div>
                 <div class="text-[10px] mt-1.5 text-slate-400">เมื่อมีนักศึกษาสมัครสมาชิกใหม่ รายชื่อจะปรากฏที่นี่เพื่อให้แอดมินอนุมัติ</div>
             </td></tr>`;
@@ -847,7 +838,6 @@
         const tbody = document.getElementById('student-table-body');
         if (!students.length) {
             tbody.innerHTML = `<tr><td colspan="7" class="text-center py-16 text-slate-400">
-                <div class="text-4xl mb-3"></div>
                 <div class="font-bold text-slate-500 text-base">ยังไม่มีข้อมูลนักศึกษา</div>
                 <div class="text-xs mt-1.5 text-slate-400 font-medium">กดปุ่ม "เพิ่มนักศึกษา" หรือดึงข้อมูลจากผลสอบครับ</div>
             </td></tr>`;
@@ -900,11 +890,11 @@
                         <button onclick='openHistoryModal(${JSON.stringify(s.studentId)},${JSON.stringify(fn+" "+ln)},${JSON.stringify(s.class||"")},${s.examCount||0},${JSON.stringify(s.courseId||"")})'
                             class="px-3.5 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-sm shadow-indigo-600/20 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1 active:scale-95">ดูประวัติ</button>
                         <button onclick='openEditModal(${JSON.stringify(s.studentId)},${JSON.stringify(s.firstName)},${JSON.stringify(s.lastName)},${JSON.stringify(s.class||"")},${JSON.stringify(s.note||"")})'
-                            class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-xl text-xs font-bold transition cursor-pointer text-sm"></button>
+                            class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap" title="แก้ไขข้อมูลนักศึกษา">แก้ไข</button>
                         <button onclick='resetStudentPw(${JSON.stringify(s.studentId)},${JSON.stringify(fn+" "+ln)})' title="รีเซ็ตรหัสผ่าน"
-                            class="px-2.5 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 rounded-xl text-xs font-bold transition cursor-pointer text-sm"></button>
+                            class="px-2.5 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap">รีเซ็ตรหัส</button>
                         <button onclick='deleteStudent(${JSON.stringify(s.studentId)},${JSON.stringify(fn+" "+ln)})'
-                            class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition cursor-pointer text-sm"></button>
+                            class="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition cursor-pointer whitespace-nowrap" title="ลบนักศึกษา">ลบ</button>
                     </div>
                 </td>
             </tr>`;
@@ -1043,7 +1033,6 @@
             document.getElementById('hist-avg').textContent = '—';
             content.innerHTML = `
                 <div class="text-center py-12 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl space-y-2">
-                    <div class="text-5xl mb-1"></div>
                     <div class="font-extrabold text-slate-700 text-base">ยังไม่พบประวัติการทำข้อสอบ</div>
                     <div class="text-xs text-slate-500 font-medium">นักศึกษายังไม่ได้ส่งคำตอบหรือทำข้อสอบในระบบ</div>
                 </div>
@@ -1113,7 +1102,6 @@
         if (!records || records.length === 0) {
             document.getElementById('hist-content').innerHTML = `
                 <div class="text-center py-12 bg-emerald-50/50 border-2 border-dashed border-emerald-200 rounded-3xl space-y-2">
-                    <div class="text-5xl mb-1"></div>
                     <div class="font-extrabold text-emerald-800 text-base">ไม่พบประวัติพฤติกรรมน่าสงสัย</div>
                     <div class="text-xs text-emerald-600 font-bold">นักศึกษาคนนี้ซื่อสัตย์ ไม่มีการสลับหน้าจอระหว่างสอบ</div>
                 </div>

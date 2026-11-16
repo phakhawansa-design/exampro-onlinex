@@ -841,7 +841,6 @@
 
         btn.innerHTML = `
             <span class="tablock-guide-pulse-dot"></span>
-            <span class="text-base"></span>
             <span>แนะนำวิธีใช้งาน</span>
         `;
         btn.onclick = () => {

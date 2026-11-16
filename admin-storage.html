@@ -269,7 +269,6 @@
                     รีเฟรช
                 </button>
                 <a href="dashboard.html" class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500 via-rose-500 to-sky-500 hover:from-pink-600 hover:to-sky-600 text-white font-black rounded-2xl text-xs sm:text-sm transition-all duration-200 shadow-md shadow-pink-500/25 active:scale-95 border border-white/20">
-                    <span></span>
                     <span>กลับแดชบอร์ดหลัก</span>
                 </a>
             </div>
@@ -309,7 +308,6 @@
 
         <!-- Empty State -->
         <div id="empty-state" class="glass-card p-10 flex-col items-center justify-center gap-4 hidden">
-            <div class="text-5xl"></div>
             <p class="text-sm font-semibold text-slate-500">ยังไม่มีข้อมูลอาจารย์ในระบบ</p>
         </div>
 
@@ -358,9 +356,9 @@
     }
 
     function getRankBadge(rank) {
-        if (rank === 1) return { bg: 'bg-yellow-100', text: 'text-yellow-700', icon: '' };
-        if (rank === 2) return { bg: 'bg-slate-100', text: 'text-slate-600', icon: '' };
-        if (rank === 3) return { bg: 'bg-orange-100', text: 'text-orange-600', icon: '' };
+        if (rank === 1) return { bg: 'bg-yellow-100', text: 'text-yellow-700', icon: 1 };
+        if (rank === 2) return { bg: 'bg-slate-100', text: 'text-slate-600', icon: 2 };
+        if (rank === 3) return { bg: 'bg-orange-100', text: 'text-orange-600', icon: 3 };
         return { bg: 'bg-slate-50', text: 'text-slate-500', icon: rank };
     }
 
@@ -471,7 +469,6 @@
 
         } catch (e) {
             document.getElementById('loading-state').innerHTML = `
-                <div class="text-rose-500 text-2xl"></div>
                 <p class="text-sm font-semibold text-rose-500">ไม่สามารถโหลดข้อมูลได้: ${e.message}</p>
                 <button onclick="loadStorageStats()" class="text-xs bg-rose-50 text-rose-600 px-4 py-2 rounded-xl font-bold">ลองใหม่</button>
             `;

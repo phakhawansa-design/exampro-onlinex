@@ -240,7 +240,6 @@
                     <span class="text-xs text-emerald-700 underline font-semibold ml-0.5">ดูรายชื่อ</span>
                 </button>
                 <button onclick="window.TabLockGuide.open('monitoring')" class="flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow-xs cursor-pointer">
-                    <span></span>
                     <span class="hidden sm:inline">คู่มือ</span>
                 </button>
                 <span class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200" id="global-log-count">รวม 0 รายการ</span>
@@ -261,19 +260,15 @@
             <!-- ② ตัวเลขสรุป -->
             <div class="mn-kpis">
                 <button type="button" class="mn-kpi mn-kpi-btn" onclick="openActiveStudentsModalFromMonitoring()" title="ดูรายชื่อนักศึกษาที่กำลังทำข้อสอบ">
-                    <span class="mn-ic" style="background:#ecfdf5;color:#047857"></span>
                     <div><small>กำลังทำข้อสอบ</small><b id="mn-k-active">0</b><em>คน · ดูรายชื่อ →</em></div>
                 </button>
                 <div class="mn-kpi">
-                    <span class="mn-ic" style="background:#eff6ff;color:#1d4ed8"></span>
                     <div><small>นักศึกษาที่ถูกบันทึก</small><b id="mn-k-students">0</b><em>คน</em></div>
                 </div>
                 <div class="mn-kpi">
-                    <span class="mn-ic" style="background:#fffbeb;color:#b45309"></span>
                     <div><small>พฤติกรรมทั้งหมด</small><b id="mn-k-events">0</b><em>ครั้ง</em></div>
                 </div>
                 <div class="mn-kpi mn-kpi-risk">
-                    <span class="mn-ic" style="background:#fff1f2;color:#be123c"></span>
                     <div><small>เสี่ยงสูง (≥ 3 ครั้ง)</small><b id="mn-k-high" style="color:#be123c">0</b><em>คน</em></div>
                 </div>
             </div>
@@ -300,7 +295,7 @@
                     </div>
                 </div>
                 <div class="mn-tools">
-                    <label class="mn-search"><span></span><input id="mn-search" type="search" placeholder="ค้นหาชื่อ หรือรหัสนักศึกษา" oninput="renderLogs()"></label>
+                    <label class="mn-search"><input id="mn-search" type="search" placeholder="ค้นหาชื่อ หรือรหัสนักศึกษา" oninput="renderLogs()"></label>
                     <label class="mn-chk"><input id="mn-only-high" type="checkbox" onchange="renderLogs()"> เฉพาะเสี่ยงสูง</label>
                     <div class="mn-legend"><span class="lv-1">● ปกติ (1)</span><span class="lv-2">● เฝ้าระวัง (2)</span><span class="lv-3">● เสี่ยงสูง (3+)</span></div>
                     <div class="mn-tools-r">
@@ -847,7 +842,6 @@
                         tbody.innerHTML = `
                             <tr>
                                 <td colspan="5" class="p-10 text-center text-slate-400 space-y-2">
-                                    <div class="text-3xl"></div>
                                     <div class="font-bold text-xs">ขณะนี้ไม่มีนักศึกษากำลังทำข้อสอบในทุกห้อง</div>
                                 </td>
                             </tr>
@@ -888,7 +882,6 @@
                         tbody.innerHTML = `
                             <tr>
                                 <td colspan="5" class="p-10 text-center text-slate-400 space-y-2">
-                                    <div class="text-3xl"></div>
                                     <div class="font-bold text-xs">ขณะนี้ไม่มีนักศึกษากำลังทำข้อสอบในห้องนี้</div>
                                 </td>
                             </tr>
@@ -944,7 +937,6 @@
         <div class="w-full max-w-4xl lg:max-w-5xl bg-white border border-slate-200 p-8 rounded-3xl shadow-2xl space-y-6 text-slate-800 flex flex-col max-h-[90vh]">
             <div class="flex justify-between items-start border-b border-slate-100 pb-4">
                 <div class="flex items-center gap-3">
-                    <span class="text-indigo-600 text-2xl p-2 bg-slate-50 rounded-2xl border border-slate-100"></span>
                     <div>
                         <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 flex items-center gap-2">
                             รายชื่อนักศึกษาที่กำลังทำข้อสอบอยู่

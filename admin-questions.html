@@ -137,7 +137,6 @@
         <div class="qx-left">
             <a href="dashboard.html" onclick="return confirmLeaveIfUnsaved(event, 'dashboard.html')" class="qx-back" title="กลับไปหน้าแดชบอร์ดหลัก">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
-                <span class="qx-back-ic"></span>
                 <span>กลับหน้าหลัก</span>
             </a>
             <div class="qx-title">
@@ -165,9 +164,8 @@
 
         <!-- ขวา: คู่มือ + บันทึก -->
         <div class="qx-right">
-            <button onclick="window.TabLockGuide.open('questions')" class="qx-help" title="คู่มือการใช้งานหน้านี้"><span></span><span class="qx-hide-sm">คู่มือ</span></button>
+            <button onclick="window.TabLockGuide.open('questions')" class="qx-help" title="คู่มือการใช้งานหน้านี้"><span class="qx-hide-sm">คู่มือ</span></button>
             <button onclick="saveQuestionsToCourse()" id="btn-save-course" class="qx-save">
-                <span class="text-base"></span>
                 <span>บันทึกข้อสอบ</span>
             </button>
         </div>
@@ -187,10 +185,10 @@
             <div class="p-3.5 border-b-2 border-slate-100 bg-slate-50/90 space-y-2">
                 <div class="flex items-center justify-between gap-2">
                     <span class="text-xs sm:text-sm font-extrabold text-slate-900 flex items-center gap-1.5 whitespace-nowrap">
-                        <span></span> ข้อสอบ (<span id="total-questions-count" class="text-indigo-600 font-black">1</span> ข้อ)
+                        ข้อสอบ (<span id="total-questions-count" class="text-indigo-600 font-black">1</span> ข้อ)
                     </span>
                     <button onclick="deleteAllQuestions()" title="ลบข้อสอบทั้งหมดในชุดนี้" class="text-xs font-bold text-rose-600 hover:text-white hover:bg-rose-600 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-xl transition active:scale-95 flex items-center gap-1 cursor-pointer shadow-2xs">
-                        <span></span> <span>ลบทั้งหมด</span>
+                        <span>ลบทั้งหมด</span>
                     </button>
                 </div>
                 <div class="flex items-center">
@@ -212,7 +210,7 @@
                     <span>เพิ่มข้อสอบใหม่</span>
                 </button>
                 <button onclick="deleteAllQuestions()" class="w-full py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-xl font-bold text-xs transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
-                    <span></span> <span>ลบข้อสอบทั้งหมด</span>
+                    <span>ลบข้อสอบทั้งหมด</span>
                 </button>
 
                 <!-- Hidden Excel File Input -->
@@ -229,7 +227,7 @@
             <div class="qx-mbar w-full max-w-4xl flex lg:hidden items-center justify-between pb-3">
                 <span class="text-sm font-bold text-slate-900">ข้อที่ <span id="mobile-q-index" class="text-indigo-600">1</span></span>
                 <button onclick="toggleSettingsSidebar()" class="px-3.5 py-2 bg-white border-2 border-slate-300 rounded-xl text-xs font-bold text-slate-900 shadow-xs flex items-center gap-1.5">
-                    <span></span> เครื่องมือสร้างข้อสอบ
+                    เครื่องมือสร้างข้อสอบ
                 </button>
             </div>
 
@@ -268,7 +266,6 @@
                     <div id="question-media-box" class="w-full rounded-2xl bg-slate-50 border-2 border-dashed border-slate-300 hover:border-indigo-500 p-4 flex flex-col items-center justify-center text-center transition relative overflow-hidden group">
                         <!-- Empty State -->
                         <div id="media-empty-state" class="cursor-pointer py-1" onclick="triggerQuestionImageUpload()">
-                            <div class="text-3xl mb-1"></div>
                             <div class="text-sm font-bold text-indigo-800">แนบรูปภาพประกอบโจทย์ (ถ้ามี)</div>
                             <div class="text-xs font-bold text-slate-500 mt-0.5">คลิกเพื่ออัปโหลดไฟล์รูปภาพ (JPG, PNG, GIF)</div>
                         </div>
@@ -398,10 +395,10 @@
                     </div>
                     <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end">
                         <button onclick="duplicateCurrentQuestion()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 rounded-xl font-bold transition active:scale-95 flex items-center gap-1.5 cursor-pointer">
-                            <span></span> <span>ทำสำเนาข้อนี้</span>
+                            <span>ทำสำเนาข้อนี้</span>
                         </button>
                         <button onclick="deleteCurrentQuestion()" class="px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-xl font-bold transition active:scale-95 flex items-center gap-1.5 cursor-pointer">
-                            <span></span> <span>ลบข้อนี้</span>
+                            <span>ลบข้อนี้</span>
                         </button>
                     </div>
                 </div>
@@ -425,8 +422,7 @@
             <div class="qx-tools-b">
                 <!-- 1. Excel -->
                 <div class="qx-tool">
-                    <div class="qx-tool-h"><span class="qx-tool-ic" style="background:#ecfdf5;color:#047857"></span>
-                        <div><b>นำเข้าจาก Excel</b><small>มีข้อสอบในตาราง .xlsx อยู่แล้ว</small></div></div>
+                    <div class="qx-tool-h">                        <div><b>นำเข้าจาก Excel</b><small>มีข้อสอบในตาราง .xlsx อยู่แล้ว</small></div></div>
                     <button onclick="triggerExcelImport()" class="qx-tbtn">เลือกไฟล์ Excel</button>
                     <button onclick="downloadSampleExcel()" class="qx-link">ดาวน์โหลดไฟล์ตัวอย่าง .xlsx</button>
                 </div>
@@ -434,29 +430,25 @@
                 <!-- 2. ให้ AI สร้างข้อสอบ -->
                 <div class="qx-tool qx-tool-hi">
                     <span class="qx-badge">แนะนำ</span>
-                    <div class="qx-tool-h"><span class="qx-tool-ic" style="background:#0b2a7a;color:#fff"></span>
-                        <div><b>ให้ AI สร้างข้อสอบ</b><small>ออกจากหัวข้อ หรือแปลงจาก PDF / ภาพถ่าย</small></div></div>
+                    <div class="qx-tool-h">                        <div><b>ให้ AI สร้างข้อสอบ</b><small>ออกจากหัวข้อ หรือแปลงจาก PDF / ภาพถ่าย</small></div></div>
                     <button onclick="openAiGen()" class="qx-tbtn qx-tbtn-p">สร้างข้อสอบด้วย AI</button>
                 </div>
 
                 <!-- 3. แปลงข้อความจาก ChatGPT / Claude -->
                 <div class="qx-tool">
-                    <div class="qx-tool-h"><span class="qx-tool-ic" style="background:#f5f3ff;color:#6d28d9"></span>
-                        <div><b>แปลงจาก ChatGPT / Claude</b><small>คัดลอกคำสั่งไปใช้ แล้วนำผลกลับมา</small></div></div>
+                    <div class="qx-tool-h">                        <div><b>แปลงจาก ChatGPT / Claude</b><small>คัดลอกคำสั่งไปใช้ แล้วนำผลกลับมา</small></div></div>
                     <button onclick="openAiModal()" class="qx-tbtn">เปิดตัวแปลงข้อสอบ</button>
                 </div>
 
                 <!-- 4. คลังข้อสอบ -->
                 <div class="qx-tool">
-                    <div class="qx-tool-h"><span class="qx-tool-ic" style="background:#eff6ff;color:#1d4ed8"></span>
-                        <div><b>นำเข้าจากคลังข้อสอบ</b><small>ดึงข้อสอบสำเร็จรูปจากคลังระบบ</small></div></div>
+                    <div class="qx-tool-h">                        <div><b>นำเข้าจากคลังข้อสอบ</b><small>ดึงข้อสอบสำเร็จรูปจากคลังระบบ</small></div></div>
                     <button onclick="openLibraryModal()" class="qx-tbtn">เปิดคลังข้อสอบ</button>
                 </div>
             </div>
 
             <div class="qx-tools-f">
                 <button onclick="saveQuestionsToCourse()" class="qx-save qx-save-lg">
-                    <span class="text-lg"></span>
                     <span>บันทึกข้อสอบเข้าสู่วิชา</span>
                 </button>
                 <p>ข้อสอบจะถูกเก็บในรายวิชาที่เลือก นำไปเปิดห้องสอบได้ที่เมนู 6</p>
@@ -847,8 +839,8 @@
                         <div class="flex items-center justify-between mb-1">
                             <span class="text-[11px] font-bold ${isActive ? 'text-indigo-700' : 'text-slate-500'}">ข้อที่ ${idx + 1}</span>
                             <div class="flex items-center gap-1">
-                                <button onclick="event.stopPropagation(); duplicateQuestion(${idx})" title="ทำสำเนา" class="p-1 text-slate-400 hover:text-slate-700 rounded text-[11px]"></button>
-                                <button onclick="event.stopPropagation(); deleteQuestion(${idx})" title="ลบข้อนี้" class="p-1 text-slate-400 hover:text-rose-600 rounded text-[11px]"></button>
+                                <button onclick="event.stopPropagation(); duplicateQuestion(${idx})" title="ทำสำเนาข้อนี้" class="px-1.5 py-0.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded text-[11px] font-semibold">สำเนา</button>
+                                <button onclick="event.stopPropagation(); deleteQuestion(${idx})" title="ลบข้อนี้" class="px-1.5 py-0.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded text-[11px] font-semibold">ลบ</button>
                             </div>
                         </div>
 
@@ -1766,9 +1758,6 @@
             <!-- Modal Header -->
             <div class="flex items-center justify-between border-b pb-3 border-slate-100 shrink-0">
                 <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center text-2xl shadow-xs shrink-0">
-                        
-                    </div>
                     <div>
                         <h3 class="font-bold text-lg sm:text-xl text-slate-900 leading-tight">ตัวช่วยสร้าง & แปลงข้อสอบจาก AI</h3>
                         <p class="text-xs font-semibold text-purple-700">มี Prompt สำเร็จรูปให้คัดลอกไปสั่ง ChatGPT / Gemini / Claude ได้ทันที</p>
@@ -1814,7 +1803,6 @@
                         </div>
 
                         <button onclick="copyAiPrompt()" id="copy-ai-prompt-btn" class="text-xs font-bold bg-purple-100 hover:bg-purple-200 text-purple-800 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 shadow-2xs cursor-pointer">
-                            <span></span>
                             <span id="copy-ai-prompt-btn-text">คัดลอก Prompt</span>
                         </button>
                     </div>
@@ -1826,10 +1814,10 @@
                     <div class="flex flex-wrap items-center gap-2 pt-0.5">
                         <span class="text-[11px] font-bold text-slate-400">เปิด AI ทันที:</span>
                         <button type="button" onclick="copyPromptAndOpenAI('gemini')" class="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer">
-                            <span></span> <span>คัดลอกแล้วเปิด Gemini AI →</span>
+                            <span>คัดลอกแล้วเปิด Gemini AI →</span>
                         </button>
                         <button type="button" onclick="copyPromptAndOpenAI('chatgpt')" class="px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer">
-                            <span></span> <span>คัดลอกแล้วเปิด ChatGPT →</span>
+                            <span>คัดลอกแล้วเปิด ChatGPT →</span>
                         </button>
                     </div>
                 </div>
@@ -1838,7 +1826,6 @@
                 <div class="space-y-2 pt-2 border-t border-slate-100">
                     <div class="flex items-center justify-between">
                         <label class="block text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                            <span></span>
                             <span>วางข้อความผลลัพธ์ที่ได้จาก AI ลงในช่องนี้ (เช่น 1. โจทย์... ก. ... ข. ... เฉลย: ข):</span>
                         </label>
                         <button type="button" onclick="clearAiInput()" class="text-[11px] text-slate-400 hover:text-rose-600 font-bold cursor-pointer">ล้างข้อความ</button>
@@ -1867,11 +1854,9 @@
                 </button>
                 <div class="flex items-center gap-2">
                     <button type="button" onclick="triggerExcelImportFromAi()" class="hidden sm:inline-flex px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-xs font-bold transition items-center gap-1.5 cursor-pointer">
-                        <span></span>
                         <span>นำเข้าด้วยไฟล์ Excel (.xlsx)</span>
                     </button>
                     <button onclick="parseAiTextToQuestions()" class="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-md shadow-purple-600/25 transition active:scale-95 flex items-center gap-2 cursor-pointer">
-                        <span></span>
                         <span>แปลงและนำเข้าข้อสอบ</span>
                     </button>
                 </div>
@@ -1885,7 +1870,6 @@
         <div class="bg-white w-full max-w-3xl rounded-3xl p-6 shadow-2xl border-2 border-sky-200 space-y-4 max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between border-b pb-3 border-slate-100">
                 <div class="flex items-center gap-2">
-                    <span class="text-2xl"></span>
                     <div>
                         <h3 class="font-bold text-lg text-slate-900">คลังข้อสอบสำเร็จรูป & แม่แบบ</h3>
                         <p class="text-xs font-bold text-sky-700">เลือกดึงข้อสอบจากแม่แบบประจำวิชาเข้าสู่แบบทดสอบนี้</p>
@@ -1909,9 +1893,6 @@
 
             <!-- Header Icon -->
             <div class="relative inline-block mt-2">
-                <div class="w-16 h-16 bg-gradient-to-tr from-pink-100 via-rose-100 to-sky-100 rounded-full flex items-center justify-center text-3xl mx-auto shadow-inner border border-pink-200/80">
-                    
-                </div>
             </div>
 
             <!-- Message Header -->
@@ -1927,12 +1908,10 @@
             <!-- Choice Action Buttons -->
             <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
                 <button onclick="confirmHasCourse()" class="w-full sm:w-1/2 py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium rounded-2xl text-sm transition-all duration-200 shadow-md shadow-emerald-500/20 active:scale-95 flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap">
-                    <span></span>
                     <span>มีแล้ว (สร้างข้อสอบ)</span>
                 </button>
                 
                 <a href="admin-courses.html" class="w-full sm:w-1/2 py-3 px-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium rounded-2xl text-sm transition-all duration-200 shadow-md shadow-indigo-500/20 active:scale-95 flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap">
-                    <span></span>
                     <span>ยังไม่มี (สร้างรายวิชา)</span>
                 </a>
             </div>
@@ -1949,9 +1928,6 @@
 
             <!-- Header Icon -->
             <div class="relative inline-block mt-2">
-                <div class="w-16 h-16 bg-gradient-to-tr from-amber-100 via-orange-100 to-rose-100 rounded-2xl flex items-center justify-center text-3xl mx-auto shadow-inner border border-amber-200">
-                    
-                </div>
             </div>
 
             <!-- Message Header -->
@@ -1968,13 +1944,11 @@
             <div class="flex flex-col-reverse sm:flex-row items-center justify-center gap-3 pt-2">
                 <!-- ปุ่ม 1: ละทิ้งการสร้างข้อสอบ -->
                 <button type="button" onclick="handleDiscardUnsaved()" class="w-full sm:w-1/2 py-3 px-4 bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-700 hover:border-rose-300 border border-slate-200 font-bold rounded-2xl text-xs sm:text-sm transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap shadow-xs">
-                    <span></span>
                     <span>ละทิ้งการสร้างข้อสอบ</span>
                 </button>
                 
                 <!-- ปุ่ม 2: สร้างข้อสอบต่อ -->
                 <button type="button" onclick="handleContinueEditing()" class="w-full sm:w-1/2 py-3 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-2xl text-xs sm:text-sm transition-all duration-200 shadow-md shadow-emerald-600/25 active:scale-95 flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap">
-                    <span></span>
                     <span>สร้างข้อสอบต่อ</span>
                 </button>
             </div>

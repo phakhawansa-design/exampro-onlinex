@@ -85,7 +85,7 @@
 .rs-row-act { display: flex; gap: 6px; justify-content: center; }
 .rs-view { padding: 7px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; background: var(--rs-navy); color: #fff; border: 0; cursor: pointer; white-space: nowrap; }
 .rs-view:hover { background: var(--rs-navy-2); }
-.rs-del { width: 34px; border-radius: 10px; border: 1px solid #fecdd3; background: #fff; color: #e11d48; cursor: pointer; }
+.rs-del { padding: 7px 12px; border-radius: 10px; border: 1px solid #fecdd3; background: #fff; color: #e11d48; cursor: pointer; font: inherit; font-size: 13px; font-weight: 700; white-space: nowrap; }
 .rs-del:hover { background: #fff1f2; }
 .rs-empty { padding: 56px 16px !important; text-align: center; color: var(--rs-mute); }
 

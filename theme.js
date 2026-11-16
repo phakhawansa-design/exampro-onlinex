@@ -50,6 +50,8 @@
         history.replaceState(null, '', location.pathname);
       }
     }
+    // 1.5) คำว่า Pro ในโลโก้ตัวหนังสือของแถบข้าง (พื้นน้ำเงินเข้ม) = สีเหลือง
+    document.querySelectorAll('#sidebar span, #sidebar b').forEach(el => { if (el.children.length === 0 && el.textContent.trim() === 'Pro') el.classList.add('rm-pro'); });
     // 2) ชื่อใต้โลโก้ในแถบข้าง
     const sub = document.querySelector('#sidebar .logo-text > div:last-child');
     if (sub) sub.textContent = 'ตาที่ 3 ของอาจารย์';
@@ -140,6 +142,16 @@
       const host = svg.closest(HOST);
       if (host && !host.textContent.trim()) return;
       const p = svg.parentElement; svg.remove(); if (p) hideEmpty(p);
+    });
+    // 3) กล่องไอคอนที่สร้างจากข้อมูลแล้วว่างเปล่า (กล่องขนาด w-8 ขึ้นไป ไม่ใช่วงกลมหมุนรอโหลด) → ซ่อน
+    root.querySelectorAll('div[class*="w-"],span[class*="w-"]').forEach(el => {
+      if (el.dataset.rmHid && (el.children.length || el.textContent.trim())) { el.style.display = ''; delete el.dataset.rmHid; return; }
+      if (el.id || el.children.length || el.textContent.trim() || el.style.display === 'none') return;
+      const c = ' ' + el.className + ' ';
+      const w = c.match(/\sw-(\d+)\s/), h = c.match(/\sh-(\d+)\s/);
+      if (!w || !h || +w[1] < 8 || /animate-spin|\sfixed\s|\sabsolute\s/.test(c)) return;
+      if (!/text-(\dxl|xl|lg)\s|items-center/.test(c)) return;
+      el.style.display = 'none'; el.dataset.rmHid = '1';
     });
   }
   let pending = false;

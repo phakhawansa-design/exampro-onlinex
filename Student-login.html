@@ -62,7 +62,6 @@
 
             <!-- QR Code Scan Detection Banner -->
             <div id="qr-detected-banner" class="hidden p-3.5 bg-emerald-50 border border-emerald-300 rounded-2xl text-xs font-bold text-emerald-800 flex items-start gap-3 shadow-sm">
-                <span class="text-xl shrink-0"></span>
                 <div class="leading-tight space-y-1">
                     <div class="text-sm font-bold text-emerald-900">ตรวจพบรหัสจาก QR Code สำเร็จ!</div>
                     <div class="text-xs text-emerald-700 font-normal">รหัส PIN: <strong id="qr-detected-pin" class="font-mono font-bold text-emerald-900 text-sm"></strong></div>
@@ -92,7 +91,6 @@
                     <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">รหัสผ่าน (เริ่มต้น 1234) *</label>
                     <input type="password" id="student-password" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="กรอกรหัสผ่าน">
                     <p class="text-[11px] text-slate-500 font-medium flex items-center gap-1.5 pt-0.5">
-                        <span></span>
                         <span>เข้าสอบครั้งแรกใช้ <strong class="text-indigo-600 font-mono font-bold">1234</strong> หรือ 4 หลักท้ายของรหัสนักศึกษา<span id="pw-last4-hint"></span> แล้วระบบจะให้ตั้งรหัสใหม่</span>
                     </p>
                 </div>
@@ -242,9 +240,6 @@
     <!-- Modal แจ้งเตือนหมดเวลาทำข้อสอบ / ปิดการสอบ -->
     <div id="times-up-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md hidden flex items-center justify-center p-3 sm:p-4 z-50">
         <div class="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 max-w-md w-full text-center space-y-4 sm:space-y-5 shadow-2xl border border-slate-100 transform transition-all scale-100">
-            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-rose-100 border border-rose-200 rounded-full flex items-center justify-center mx-auto text-3xl sm:text-4xl shadow-inner animate-bounce">
-                
-            </div>
             <div>
                 <h3 id="times-up-title" class="text-xl sm:text-2xl font-bold text-slate-800">หมดเวลาทำข้อสอบ!</h3>
                 <p id="times-up-desc" class="text-xs text-slate-500 font-semibold mt-1.5 sm:mt-2 leading-relaxed">
@@ -268,7 +263,6 @@
     <!-- Warning Modal -->
     <div id="warning-modal" class="fixed inset-0 z-[100] flex items-center justify-center hidden p-3 sm:p-4" style="background:rgba(15,23,42,0.6); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);">
         <div class="w-full max-w-md glass p-6 sm:p-8 rounded-2xl sm:rounded-3xl text-center space-y-4 sm:space-y-6 shadow-2xl border-t-4 border-rose-500">
-            <div class="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-rose-50 border border-rose-200 text-rose-500 text-2xl sm:text-3xl animate-pulse"></div>
             <div class="space-y-1.5 sm:space-y-2">
                 <h2 class="text-base sm:text-lg font-bold text-slate-800 uppercase tracking-wide">สัญญาณคำเตือนจากผู้คุมสอบ</h2>
                 <p class="text-xs text-rose-600 font-semibold">กรุณาปฏิบัติตามคำชี้แจงด้านล่างอย่างเคร่งครัด</p>
@@ -286,9 +280,6 @@
             
             <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-amber-400 via-pink-500 to-sky-500"></div>
 
-            <div class="w-16 h-16 bg-amber-50 border border-amber-200 text-amber-600 rounded-full flex items-center justify-center text-3xl mx-auto shadow-inner animate-bounce">
-                
-            </div>
 
             <div class="space-y-1.5">
                 <h3 class="text-lg sm:text-xl font-bold text-slate-800">แจ้งเตือนเปลี่ยนรหัสผ่านสำหรับการเข้าใช้ครั้งแรก</h3>
@@ -394,7 +385,7 @@
 
                 const submitBtn = document.getElementById('btn-login-submit');
                 if (submitBtn) {
-                    submitBtn.innerHTML = `<span></span> <span>ยืนยันรหัสนักศึกษา & เข้าสู่ห้องสอบ</span>`;
+                    submitBtn.innerHTML = `<span>ยืนยันรหัสนักศึกษา & เข้าสู่ห้องสอบ</span>`;
                 }
 
                 // ดึงข้อมูลรายวิชาและผู้คุมสอบมาแสดงให้ทราบ
@@ -627,7 +618,7 @@
                     alert(loginData.message || "เข้าสู่ระบบไม่สำเร็จ กรุณาตรวจสอบรหัสนักศึกษาหรือรหัสผ่าน");
                     loginBtn.disabled = false;
                     loginBtn.innerHTML = currentUrlPin 
-                        ? `<span></span> <span>ยืนยันรหัส & เข้าสู่ห้องรอสอบ (PIN: ${currentUrlPin})</span>` 
+                        ? `<span>ยืนยันรหัส & เข้าสู่ห้องรอสอบ (PIN: ${currentUrlPin})</span>` 
                         : `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg> เข้าสู่ระบบ`;
                     return;
                 }
@@ -657,7 +648,7 @@
                 alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
                 loginBtn.disabled = false;
                 loginBtn.innerHTML = currentUrlPin 
-                    ? `<span></span> <span>ยืนยันรหัส & เข้าสู่ห้องรอสอบ (PIN: ${currentUrlPin})</span>` 
+                    ? `<span>ยืนยันรหัส & เข้าสู่ห้องรอสอบ (PIN: ${currentUrlPin})</span>` 
                     : `<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg> เข้าสู่ระบบ`;
             }
         }
@@ -845,7 +836,7 @@
             const d = document.createElement('div');
             d.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(2,11,38,.88)';
             d.innerHTML = '<div style="max-width:440px;width:100%;background:#fff;border-radius:22px;padding:26px 24px;text-align:center;font-family:Noto Sans Thai Looped, Tahoma, sans-serif">' +
-                '<div style="font-size:42px;line-height:1;margin-bottom:10px"></div><h3 style="margin:0 0 8px;font-size:20px;color:#b42318">ข้อสอบถูกเปิดบนเครื่องหรือแท็บอื่นแล้ว</h3>' +
+                '<h3 style="margin:0 0 8px;font-size:20px;color:#b42318">ข้อสอบถูกเปิดบนเครื่องหรือแท็บอื่นแล้ว</h3>' +
                 '<p style="margin:0;font-size:14px;line-height:1.7;color:#475569">หน้านี้หยุดทำงานแล้ว ระบบบันทึกเหตุการณ์และแจ้งอาจารย์ผู้คุมสอบ<br>คำตอบที่ทำไว้ยังอยู่ กรุณาทำข้อสอบต่อบนเครื่องที่เปิดล่าสุดเพียงเครื่องเดียว</p></div>';
             document.body.appendChild(d);
         }
@@ -911,7 +902,7 @@
             gate.id = 'fs-gate';
             gate.style.cssText = 'position:fixed;inset:0;z-index:9998;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(2,11,38,.86);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)';
             gate.innerHTML = '<div style="max-width:440px;width:100%;background:#fff;border-radius:22px;padding:26px 24px;text-align:center;box-shadow:0 30px 70px -20px rgba(0,0,0,.6)">' +
-                '<div style="font-size:42px;line-height:1;margin-bottom:10px"></div>' +
+                '' +
                 '<h3 id="fs-title" style="margin:0 0 8px;font-size:20px;font-weight:700;color:#0d3b8e">เข้าสู่โหมดเต็มจอเพื่อทำข้อสอบ</h3>' +
                 '<p id="fs-desc" style="margin:0 0 16px;font-size:14px;line-height:1.65;color:#475569">การสอบบนคอมพิวเตอร์ต้องทำในโหมดเต็มจอ ห้ามแบ่งหน้าจอหรือเปิดหน้าต่างอื่นซ้อน<br>การออกจากโหมดเต็มจอจะถูกบันทึกและแจ้งอาจารย์</p>' +
                 '<button id="fs-btn" type="button" style="width:100%;padding:13px;border:0;border-radius:14px;background:#e8663d;color:#fff;font-size:15.5px;font-weight:700;cursor:pointer">เข้าสู่โหมดเต็มจอ</button></div>';

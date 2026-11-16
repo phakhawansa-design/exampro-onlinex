@@ -245,3 +245,65 @@ body:has(#exam-screen:not(.hidden)) #tablock-floating-guide-btn .tablock-guide-p
   .text-\[9px\] { font-size: 10.5px !important; }
   .text-\[10px\] { font-size: 11px !important; }
 }
+
+/* =====================================================================
+   สีเสริม: น้ำเงินเข้ม (หลัก) + ส้ม (เน้น) + เขียวอ่อน (แต่งบางจุด)
+   ===================================================================== */
+:root {
+  --rm-yellow: #fcd34d;
+  --rm-mint: #86efac;
+  --rm-mint-bg: #ecfdf5;
+  --rm-mint-line: #bbf7d0;
+  --rm-mint-ink: #047857;
+  --rm-orange-bg: #fff4eb;
+  --rm-orange-line: #fed7aa;
+  --rm-orange-ink: #c2410c;
+}
+/* คำว่า Pro ในโลโก้ตัวหนังสือ = สีเหลือง */
+.rm-pro { color: var(--rm-yellow) !important; -webkit-text-fill-color: var(--rm-yellow) !important; background: none !important; }
+
+/* เมนูข้าง */
+#sidebar .nav-section-title { color: #fdba74 !important; opacity: .9; }
+#sidebar .nav-link:hover { background: rgba(255, 154, 60, .14) !important; }
+#sidebar .nav-link.active { box-shadow: inset 4px 0 0 var(--rm-orange), 0 10px 22px -8px rgba(0,0,0,.35) !important; }
+#sidebar .nav-link.active span { color: var(--rm-navy) !important; }
+
+/* แถบหัวหน้า: เส้นบนไล่สี น้ำเงิน → ส้ม → เขียวอ่อน */
+#top-header::before { background: linear-gradient(90deg, var(--rm-navy) 0%, var(--rm-orange) 55%, var(--rm-mint) 100%) !important; }
+#top-header h1 { position: relative; }
+
+/* การ์ด: เส้นสีด้านบนสลับ ส้ม / เขียวอ่อน / น้ำเงิน และขอบส้มอ่อนเมื่อชี้ */
+.academic-card { position: relative; overflow: hidden; }
+.academic-card::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--rm-orange); opacity: .9; }
+.grid > .academic-card:nth-child(3n+2)::after { background: var(--rm-mint); }
+.grid > .academic-card:nth-child(3n)::after { background: var(--rm-navy); }
+.academic-card:hover, .glass-card:hover { border-color: var(--rm-orange-line) !important; }
+
+/* ป้ายหัวการ์ดในแดชบอร์ด: ใช้ส้ม / เขียวอ่อน แทนโทนม่วง-ฟ้า */
+.academic-card span.bg-blue-50.text-blue-600 { background: var(--rm-orange-bg) !important; color: var(--rm-orange-ink) !important; }
+.academic-card span.bg-indigo-50.text-indigo-600 { background: var(--rm-mint-bg) !important; color: var(--rm-mint-ink) !important; }
+.academic-card span.bg-purple-50.text-purple-600 { background: #eef2ff !important; color: var(--rm-navy) !important; }
+
+/* ช่องกรอก: กรอบโฟกัสสีส้ม */
+select.dark-select:focus, input.dark-input:focus, textarea.dark-input:focus,
+#main-area input:focus, #main-area select:focus, #main-area textarea:focus {
+  border-color: var(--rm-orange) !important;
+  box-shadow: 0 0 0 3px rgba(255, 122, 26, .15) !important;
+  outline: none !important;
+}
+
+/* สถานะดี/ผ่าน/ปกติ ใช้เขียวอ่อนโทนเดียวกันทั้งระบบ */
+#main-area .bg-emerald-50 { background-color: var(--rm-mint-bg) !important; }
+#main-area .border-emerald-200 { border-color: var(--rm-mint-line) !important; }
+
+/* หน้าผลสอบ / ตรวจพฤติกรรม / สร้างข้อสอบ: แต่งส้มและเขียวอ่อน */
+.rs-kpi, .mn-kpi { border-top: 3px solid var(--rm-orange) !important; }
+.rs-kpis > .rs-kpi:nth-child(2n), .mn-kpis > .mn-kpi:nth-child(2n) { border-top-color: var(--rm-mint) !important; }
+.rs-chip, .mn-chip { border-color: rgba(253, 186, 116, .45) !important; }
+.rs-dot { background: var(--rm-mint) !important; }
+.rs-count { background: var(--rm-orange-bg) !important; color: var(--rm-orange-ink) !important; }
+.ce-tag-on { background: var(--rm-mint-bg) !important; color: var(--rm-mint-ink) !important; }
+.ce-head { border-top: 3px solid var(--rm-orange); }
+
+/* กล่องไอคอนที่ไม่มีอะไรข้างในแล้ว → ไม่แสดง */
+.rs-ic:empty, .mn-ic:empty, .qx-tool-ic:empty, .qx-back-ic:empty, .es-ic:empty, .es-drop-ic:empty { display: none !important; }

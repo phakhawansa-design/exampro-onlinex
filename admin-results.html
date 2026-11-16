@@ -255,11 +255,9 @@
                     </select>
                 </div>
                 <button onclick="window.TabLockGuide.open('results')" class="flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow-xs cursor-pointer">
-                    <span></span>
                     <span class="hidden sm:inline">คู่มือ</span>
                 </button>
                 <button onclick="exportToExcel()" class="flex items-center gap-1.5 px-3.5 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
-                    <span></span>
                     <span>ส่งออก Excel</span>
                 </button>
         </header>
@@ -269,9 +267,6 @@
             
             <!-- Card แสดงเมื่อยังไม่ได้เลือกรายวิชา -->
             <div id="no-course-card" class="glass-card p-10 sm:p-14 text-center space-y-4 max-w-xl mx-auto shadow-2xl my-8 border-2 border-indigo-200/60 bg-gradient-to-b from-white via-indigo-50/30 to-white">
-                <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-indigo-100 text-indigo-600 text-4xl shadow-inner animate-pulse">
-                    
-                </div>
                 <div class="space-y-2">
                     <h3 class="text-xl sm:text-2xl font-bold text-slate-800">กรุณาเลือกรายวิชาเพื่อดูผลการสอบ</h3>
                     <p class="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed max-w-md mx-auto">
@@ -300,10 +295,10 @@
 
             <!-- ② การ์ดสถิติ -->
             <div class="rs-kpis">
-                <div class="rs-kpi"><span class="rs-ic" style="background:#ecfdf5;color:#047857"></span><div><small>คะแนนสูงสุด</small><b id="stat-max" style="color:#047857">-</b></div></div>
-                <div class="rs-kpi"><span class="rs-ic" style="background:#fff1f2;color:#be123c"></span><div><small>คะแนนต่ำสุด</small><b id="stat-min" style="color:#be123c">-</b></div></div>
-                <div class="rs-kpi"><span class="rs-ic" style="background:#fffbeb;color:#b45309"></span><div><small>คะแนนเฉลี่ย (Mean)</small><b id="stat-avg" style="color:#b45309">-</b></div></div>
-                <div class="rs-kpi"><span class="rs-ic" style="background:#eef2ff;color:#4338ca"></span><div><small>ส่วนเบี่ยงเบนมาตรฐาน (SD)</small><b id="stat-sd" style="color:#4338ca">-</b><em>ยิ่งน้อย คะแนนยิ่งใกล้กัน</em></div></div>
+                <div class="rs-kpi"><div><small>คะแนนสูงสุด</small><b id="stat-max" style="color:#047857">-</b></div></div>
+                <div class="rs-kpi"><div><small>คะแนนต่ำสุด</small><b id="stat-min" style="color:#be123c">-</b></div></div>
+                <div class="rs-kpi"><div><small>คะแนนเฉลี่ย (Mean)</small><b id="stat-avg" style="color:#b45309">-</b></div></div>
+                <div class="rs-kpi"><div><small>ส่วนเบี่ยงเบนมาตรฐาน (SD)</small><b id="stat-sd" style="color:#4338ca">-</b><em>ยิ่งน้อย คะแนนยิ่งใกล้กัน</em></div></div>
             </div>
 
             <!-- ③ ตารางคะแนนรายคน -->
@@ -318,7 +313,7 @@
                 <div class="rs-tools">
                     <label class="rs-field rs-room"><span>ชุดข้อสอบ</span>
                         <select id="rs-room" onchange="onRoomChange()"><option value="ALL">กำลังโหลด...</option></select></label>
-                    <label class="rs-search"><span></span><input id="rs-search" type="search" placeholder="ค้นหาชื่อ หรือรหัสนักศึกษา" oninput="filterAndRenderResults()"></label>
+                    <label class="rs-search"><input id="rs-search" type="search" placeholder="ค้นหาชื่อ หรือรหัสนักศึกษา" oninput="filterAndRenderResults()"></label>
                     <label class="rs-field"><span>ชั้นเรียน</span>
                         <select id="class-filter" onchange="filterAndRenderResults()"><option value="ALL">ทุกชั้นเรียน</option></select></label>
                     <label class="rs-field"><span>เรียงตาม</span>
@@ -768,7 +763,7 @@
                         <td class="c">
                             <div class="rs-row-act">
                                 <button onclick="viewAnswerSheet(${student.id})" class="rs-view" title="ดูกระดาษคำตอบของนักศึกษาคนนี้">ดูคำตอบ</button>
-                                <button onclick="deleteStudentResult(${student.id}, '${escapeHtml(student.studentId)}')" class="rs-del" title="ลบประวัติคะแนนของนักศึกษาคนนี้" aria-label="ลบประวัติคะแนน"></button>
+                                <button onclick="deleteStudentResult(${student.id}, '${escapeHtml(student.studentId)}')" class="rs-del" title="ลบประวัติคะแนนของนักศึกษาคนนี้" aria-label="ลบประวัติคะแนน">ลบ</button>
                             </div>
                         </td>
                     </tr>

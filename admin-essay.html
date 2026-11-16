@@ -250,10 +250,10 @@
             </div>
             <div class="flex items-center gap-3 flex-wrap sm:flex-nowrap">
                 <a href="grader-intro.html" target="_blank" class="flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3 py-1.5 rounded-xl text-xs font-semibold transition shadow-xs">
-                    <span></span><span class="hidden sm:inline">ระบบนี้ทำงานอย่างไร</span>
+                    <span class="hidden sm:inline">ระบบนี้ทำงานอย่างไร</span>
                 </a>
                 <button onclick="openImport()" class="flex items-center gap-1.5 px-4 py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-xl text-sm font-bold shadow-md transition active:scale-95">
-                    <span></span><span>นำเข้า PDF สแกน</span>
+                    <span>นำเข้า PDF สแกน</span>
                 </button>
                 <button onclick="openEditor()" class="flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-blue-900 border border-blue-900/30 rounded-xl text-xs font-bold transition active:scale-95">
                     <span>＋</span><span>สร้างงานใหม่</span>
@@ -276,15 +276,14 @@
                         <h2>ตรวจกระดาษคำตอบอัตนัยด้วย AI</h2>
                         <p>สร้างงานพร้อมโจทย์และเฉลย พิมพ์กระดาษคำตอบรายคน แล้วสแกนกลับเข้ามา AI อ่านลายมือ ให้คะแนนตาม Rubric และอาจารย์ยืนยันคะแนนสุดท้าย</p>
                         <div class="es-actions">
-                            <label class="es-btn es-btn-w"><span></span><span>นำเข้า PDF สแกน</span>
+                            <label class="es-btn es-btn-w"><span>นำเข้า PDF สแกน</span>
                                 <input id="hero-file" type="file" accept="application/pdf,image/*" multiple hidden></label>
                             <button type="button" onclick="openEditor()" class="es-btn es-btn-b"><span>＋</span><span>สร้างงานใหม่</span></button>
-                            <a href="grader-intro.html" target="_blank" class="es-btn es-btn-d"><span></span><span>ระบบนี้ทำงานอย่างไร</span></a>
+                            <a href="grader-intro.html" target="_blank" class="es-btn es-btn-d"><span>ระบบนี้ทำงานอย่างไร</span></a>
                         </div>
                     </div>
                     <label class="es-drop" title="ลากไฟล์มาวาง หรือคลิกเพื่อเลือกไฟล์">
                         <input type="file" accept="application/pdf,image/*" multiple hidden onchange="const f=[...this.files];this.value='';if(f.length)openImport(f)">
-                        <div class="es-drop-ic"></div>
                         <b>ลากไฟล์ PDF มาวางที่นี่</b>
                         <small>PDF หรือรูปถ่าย · ไฟล์เดียวทั้งห้องก็ได้</small>
                         <div class="es-ticks"><span>✓ แยกรายคนอัตโนมัติ</span><span>✓ ปรับภาพให้คมชัด</span><span>✓ AI เริ่มตรวจทันที</span></div>
@@ -296,17 +295,17 @@
             <!-- KPI: การ์ดสถิติแบบแดชบอร์ด -->
             <div class="es-kpis mb-6">
                 <div class="glass-card es-kpi">
-                    <div class="es-kpi-h"><span class="es-ic" style="background:#eff6ff;color:#1d4ed8"></span><span class="es-tag" style="background:#eff6ff;color:#1d4ed8">ตรวจแล้ว</span></div>
+                    <div class="es-kpi-h"><span class="es-tag" style="background:#eff6ff;color:#1d4ed8">ตรวจแล้ว</span></div>
                     <small>กระดาษคำตอบที่ AI ตรวจแล้ว</small>
                     <div class="es-num"><span id="st-done">0</span><i>ฉบับ</i></div>
                 </div>
                 <button type="button" onclick="gotoReview()" class="glass-card es-kpi es-kpi-btn">
-                    <div class="es-kpi-h"><span class="es-ic" style="background:#fff7ed;color:#c2410c"></span><span class="es-tag" style="background:#fff7ed;color:#c2410c">รอตรวจทาน</span></div>
+                    <div class="es-kpi-h"><span class="es-tag" style="background:#fff7ed;color:#c2410c">รอตรวจทาน</span></div>
                     <small>ให้อาจารย์ตรวจทานก่อนยืนยัน</small>
                     <div class="es-num"><span id="st-review" style="color:#ea580c">0</span><i>ฉบับ →</i></div>
                 </button>
                 <div class="glass-card es-kpi">
-                    <div class="es-kpi-h"><span class="es-ic" style="background:#f5f3ff;color:#6d28d9"></span><span class="es-tag" style="background:#f5f3ff;color:#6d28d9">ค่า AI</span></div>
+                    <div class="es-kpi-h"><span class="es-tag" style="background:#f5f3ff;color:#6d28d9">ค่า AI</span></div>
                     <small>ค่าใช้จ่าย AI เดือนนี้ (ประมาณ)</small>
                     <div class="es-num"><span id="st-cost">–</span></div>
                 </div>
@@ -314,20 +313,19 @@
 
             <!-- ขั้นตอนการทำงาน -->
             <div class="glass-card es-steps-card mb-6">
-                <div class="es-sec"><span></span> ขั้นตอนการทำงาน</div>
+                <div class="es-sec">ขั้นตอนการทำงาน</div>
                 <ol id="steps" class="es-steps"></ol>
             </div>
             <div class="grid lg:grid-cols-[300px_1fr] gap-6">
                 <!-- Assignment list -->
                 <section class="glass-card p-4 h-fit">
-                    <div class="flex items-center justify-between mb-3"><h2 class="font-bold text-slate-800 flex items-center gap-1.5"><span></span> งาน / ข้อสอบอัตนัย</h2><button onclick="openEditor()" class="text-xs font-bold text-blue-900 hover:underline">＋ งานใหม่</button></div>
+                    <div class="flex items-center justify-between mb-3"><h2 class="font-bold text-slate-800 flex items-center gap-1.5">งาน / ข้อสอบอัตนัย</h2><button onclick="openEditor()" class="text-xs font-bold text-blue-900 hover:underline">＋ งานใหม่</button></div>
                     <div id="a-list" class="space-y-2 text-sm"></div>
                 </section>
 
                 <!-- Detail -->
                 <section id="detail" class="glass-card p-5 md:p-6 min-h-[420px]">
                     <div class="text-center text-slate-500 py-24">
-                        <div class="text-5xl mb-3"></div>
                         <b class="text-slate-700">เลือกงานทางซ้ายเพื่อดูผลคะแนน</b><br>
                         <span class="text-xs">หรือลากไฟล์ PDF ไปวางที่แบนเนอร์ด้านบนเพื่อเริ่มตรวจ</span>
                     </div>
@@ -366,7 +364,6 @@
                 <button onclick="startPending()" class="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-bold shadow-md">▶ เริ่มนำเข้าและตรวจ</button>
             </div>
             <div id="im-drop" class="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center">
-                <div class="text-4xl mb-2"></div>
                 <p class="font-semibold text-slate-700">ลากไฟล์ PDF มาวาง หรือ <label class="text-blue-900 underline cursor-pointer">เลือกไฟล์<input id="im-file" type="file" accept="application/pdf,image/*" multiple hidden></label></p>
                 <p class="text-xs text-slate-500 mt-1">PDF หรือภาพ ไม่เกิน 30MB ต่อไฟล์</p>
             </div>
@@ -673,8 +670,7 @@
               <label class="text-sm font-semibold text-slate-700">ชื่อ-สกุล<input id="u-name" class="dark-input mt-1" placeholder="ไม่บังคับ (ถ้าเว้นว่างจะใช้ชื่อไฟล์)"></label>
             </div>
             <datalist id="roster">${roster.map(r => `<option value="${esc(r.studentId)}">${esc((r.prefix || '') + r.firstName + ' ' + r.lastName)}</option>`).join('')}</datalist>
-            <div id="drop"><div class="text-4xl mb-2"></div>
-              <p class="font-semibold text-slate-700">ลากไฟล์มาวาง หรือ <label class="text-blue-900 underline cursor-pointer">เลือกไฟล์<input id="u-file" type="file" accept="application/pdf,image/*" multiple hidden></label></p>
+            <div id="drop">              <p class="font-semibold text-slate-700">ลากไฟล์มาวาง หรือ <label class="text-blue-900 underline cursor-pointer">เลือกไฟล์<input id="u-file" type="file" accept="application/pdf,image/*" multiple hidden></label></p>
               <p class="text-xs text-slate-500 mt-1">PDF หรือภาพ (1 ไฟล์ = นักเรียน 1 คน) ไม่เกิน 30MB · เลือกหลายไฟล์ได้ จะใช้ชื่อไฟล์เป็นชื่อนักเรียน</p></div>
             <div id="u-msg" class="text-sm mt-3"></div>`;
         else if (tab === 'results') body = subs.length ? `

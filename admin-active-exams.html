@@ -187,7 +187,6 @@
             </div>
             <div class="flex items-center gap-2.5">
                 <a href="admin-questions.html?action=new-room" class="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-bold px-4 py-2 rounded-xl text-xs md:text-sm transition duration-300 shadow-md shadow-emerald-600/25 active:scale-95 flex items-center gap-1.5 cursor-pointer">
-                    <span></span>
                     <span>เปิดห้องรอสอบใหม่</span>
                 </a>
                 <div class="header-card flex items-center gap-3">
@@ -207,9 +206,6 @@
 
             <!-- Information Alert -->
             <div class="glass-card p-5 bg-gradient-to-r from-emerald-500/5 via-teal-500/5 to-cyan-500/5 border-emerald-200 flex items-start gap-4">
-                <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shrink-0 mt-0.5">
-                    
-                </div>
                 <div class="space-y-1">
                     <h3 class="text-base font-semibold text-slate-800">ศูนย์ควบคุมการเปิด-ปิดสอบแบบ Real-Time</h3>
                     <p class="text-sm text-slate-600 leading-relaxed font-medium">
@@ -265,9 +261,6 @@
                     container.className = "w-full";
                     container.innerHTML = `
                         <div class="glass-card p-12 text-center space-y-4 max-w-lg mx-auto my-8 border-dashed border-2 border-slate-300">
-                            <div class="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center text-4xl mx-auto text-slate-400">
-                                
-                            </div>
                             <div>
                                 <h3 class="text-base font-semibold text-slate-800">ขณะนี้ไม่มีข้อสอบที่กำลังเผยแพร่</h3>
                                 <p class="text-xs text-slate-500 font-medium mt-1">ท่านยังไม่ได้เปิดเผยแพร่ข้อสอบใดๆ ให้นักศึกษาเข้าทำข้อสอบ</p>
@@ -341,7 +334,6 @@
                                     </div>
                                     ${r.announcement ? `
                                         <div class="pt-2 border-t border-slate-200 text-rose-600 text-[11px] font-bold flex items-start gap-1">
-                                            <span></span>
                                             <span class="truncate">${escapeHtml(r.announcement)}</span>
                                         </div>
                                     ` : ''}
@@ -431,7 +423,6 @@
                     tbody.innerHTML = `
                         <tr>
                             <td colspan="5" class="p-10 text-center text-slate-400 space-y-2">
-                                <div class="text-3xl"></div>
                                 <div class="font-bold text-xs">ขณะนี้ไม่มีนักศึกษากำลังทำข้อสอบในห้องนี้</div>
                             </td>
                         </tr>
@@ -478,7 +469,6 @@
         <div class="w-full max-w-4xl lg:max-w-5xl bg-white border border-slate-200 p-8 rounded-3xl shadow-2xl space-y-6 text-slate-800 flex flex-col max-h-[90vh]">
             <div class="flex justify-between items-start border-b border-slate-100 pb-4">
                 <div class="flex items-center gap-3">
-                    <span class="text-indigo-600 text-2xl p-2 bg-slate-50 rounded-2xl border border-slate-100"></span>
                     <div>
                         <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 flex items-center gap-2">
                             รายชื่อนักศึกษาที่กำลังทำข้อสอบอยู่
