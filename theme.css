@@ -298,3 +298,10 @@ select.dark-select:focus, input.dark-input:focus, textarea.dark-input:focus,
 
 /* กล่องไอคอนที่ไม่มีอะไรข้างในแล้ว → ไม่แสดง */
 .rs-ic:empty, .mn-ic:empty, .qx-tool-ic:empty, .qx-back-ic:empty, .es-ic:empty, .es-drop-ic:empty { display: none !important; }
+
+/* ---------- ข้อความโจทย์/ตัวเลือกยาว (ลิงก์ คำอังกฤษยาว ๆ) ตัดบรรทัด ไม่ล้นจอ ----------
+   หน้าทำข้อสอบ, กระดาษคำตอบในหน้าผลสอบ, ตัวอย่างชุดข้อสอบในคลัง/รายวิชา */
+#questions-container, #modal-answer-sheet-content, [id^="preview-"], #course-exams-list, #edit-modal-questions-list { overflow-wrap: anywhere; word-break: break-word; }
+#questions-container .flex > *, #questions-container .grid > *,
+#modal-answer-sheet-content .flex > *, #modal-answer-sheet-content .grid > * { min-width: 0; }
+#questions-container img, #modal-answer-sheet-content img { max-width: 100%; height: auto; }

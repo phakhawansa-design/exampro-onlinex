@@ -108,3 +108,15 @@
   .rs-kpi b { font-size: 18px; }
   .rs-table { font-size: 13px; } .rs-table td { padding: 10px; }
 }
+
+/* แถบเครื่องมือผลสอบ: ช่องเลือกชุดข้อสอบที่ชื่อยาว ไม่ดันจนล้นจอมือถือ */
+.rs-tools > * { min-width: 0; max-width: 100%; }
+.rs-tools select, .rs-tools input { max-width: 100%; min-width: 0; text-overflow: ellipsis; }
+@media (max-width: 640px) {
+  .rs-tools > .rs-field, .rs-tools > .rs-search { flex: 1 1 100%; }
+  .rs-field select { flex: 1 1 0; }
+}
+
+/* กราฟผลสอบ: ไม่ให้กล่องกราฟกว้างเกินจอมือถือ (ก่อนกราฟวาดเสร็จ canvas กว้างตั้งต้น 300px) */
+.h-60.relative { min-width: 0; max-width: 100%; }
+.h-60.relative canvas { max-width: 100% !important; }

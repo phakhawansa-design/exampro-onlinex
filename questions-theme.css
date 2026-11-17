@@ -190,3 +190,13 @@
   .aig-body textarea, .aig-body input:not([type=file]), .aig-body select { font-size: 16px !important; }
   .aig-head, .aig-body, .aig-foot { padding-left: 14px !important; padding-right: 14px !important; }
 }
+
+/* ---------- ตัวเลือกคำตอบ: ไม่ล้นการ์ดบนแท็บเล็ต/โน้ตบุ๊ก ----------
+   มีเมนูซ้าย + แถบเครื่องมือขวา พื้นที่ตรงกลางจะแคบ → เรียงตัวเลือกเป็นคอลัมน์เดียว
+   แสดง 2 คอลัมน์เฉพาะจอกว้างพอ และให้ช่องพิมพ์หดได้ ไม่ดันการ์ดให้ล้น */
+.choice-card { min-width: 0; }
+.choice-card input[type="text"] { min-width: 0; width: 0; }
+#choices-grid-container { grid-template-columns: minmax(0, 1fr) !important; }
+@media (min-width: 1600px) {
+  #choices-grid-container { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
