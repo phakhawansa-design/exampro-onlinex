@@ -431,6 +431,11 @@ db.serialize(() => {
         db.run("UPDATE cheat_logs SET courseId = (SELECT tr.courseId FROM teacher_rooms tr WHERE tr.roomId = cheat_logs.roomId) WHERE courseId IS NULL", () => {});
     });
 
+    // ล้างบันทึกในหน้า "ตรวจสอบพฤติกรรมน่าสงสัย" = ซ่อนจากหน้านั้นเท่านั้น (แฟ้มประวัติรวมและประวัตินักศึกษายังเก็บไว้ครบ)
+    db.run("ALTER TABLE cheat_logs ADD COLUMN monitor_hidden INTEGER DEFAULT 0", (err) => {
+        if (!err) console.log("✔ Added column 'monitor_hidden' to cheat_logs table");
+    });
+
     // อัปเกรดตารางล็อกทุจริต (cheat_logs)
     db.run("ALTER TABLE cheat_logs ADD COLUMN class TEXT", (err) => {
         if (!err) console.log("✔ Added column 'class' to cheat_logs table");
@@ -2824,10 +2829,10 @@ app.get('/api/cheat-logs', (req, res) => {
     const send = (err, rows) => { if (err) return res.status(500).json({ message: err.message }); res.json(rows || []); };
     if (roomId && roomId !== 'ALL') {
         // ห้องของอาจารย์คนอื่นถูกกันไว้ที่ auth.js แล้ว
-        return db.all('SELECT studentId, name, class, action, time, roomId FROM cheat_logs WHERE roomId = ? ORDER BY id DESC', [roomId], send);
+        return db.all('SELECT studentId, name, class, action, time, roomId FROM cheat_logs WHERE roomId = ? AND COALESCE(monitor_hidden, 0) = 0 ORDER BY id DESC', [roomId], send);
     }
-    // ทั้งหมด = เฉพาะห้องสอบของอาจารย์คนนี้ (แอดมินเห็นทุกห้อง)
-    db.all(`SELECT studentId, name, class, action, time, roomId FROM cheat_logs WHERE (? = 1 OR roomId IN (${MY_ROOMS})) ORDER BY id DESC`, [v.adm, v.user], send);
+    // ทั้งหมด = เฉพาะห้องสอบของอาจารย์คนนี้ (แอดมินเห็นทุกห้อง) · ไม่รวมบันทึกที่ล้างออกจากหน้านี้แล้ว
+    db.all(`SELECT studentId, name, class, action, time, roomId FROM cheat_logs WHERE (? = 1 OR roomId IN (${MY_ROOMS})) AND COALESCE(monitor_hidden, 0) = 0 ORDER BY id DESC`, [v.adm, v.user], send);
 });
 
 // ล้างประวัติการทุจริตของห้องเรียนนั้นๆ
@@ -2835,7 +2840,8 @@ app.delete('/api/clear-cheat-logs', (req, res) => {
     const { roomId } = req.body;
     if (!roomId) return res.status(400).json({ message: "กรุณาระบุรหัสห้องสอบ" });
 
-    db.run('DELETE FROM cheat_logs WHERE roomId = ?', [roomId], (err) => {
+    // ไม่ลบจริง: ซ่อนจากหน้าตรวจสอบพฤติกรรมเท่านั้น ประวัติยังอยู่ใน "แฟ้มประวัติรวม" และประวัตินักศึกษา
+    db.run('UPDATE cheat_logs SET monitor_hidden = 1 WHERE roomId = ?', [roomId], (err) => {
         if (err) return res.status(500).json({ message: err.message });
         console.log(`ล้างประวัติล็อกพฤติกรรมมิชอบของห้อง ${roomId} เรียบร้อยแล้ว`);
         res.json({ success: true, message: `ล้างประวัติห้อง ${roomId} สำเร็จ` });

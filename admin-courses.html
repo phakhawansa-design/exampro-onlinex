@@ -245,7 +245,7 @@
             <!-- Category 3: หมวดประเมินผล -->
             <div>
                 <div class="nav-section-header">
-                    <span class="nav-section-title">หมวดประเมินและกำกับ</span>
+                    <span class="nav-section-title">หมวดประเมิน</span>
                 </div>
                 <div class="space-y-1 mt-1">
                     <a href="admin-results.html" class="nav-link">
@@ -258,7 +258,7 @@
                     </a>
                     <a href="trinetra-report.html" class="nav-link">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                        <span>9. รายงานรวมรายคน</span>
+                        <span>9. แฟ้มประวัติรวม</span>
                     </a>
                 </div>
             </div>
@@ -398,6 +398,11 @@
                 <button onclick="downloadRosterTemplate()"
                     class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-2xl text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 active:scale-95 cursor-pointer">
                     โหลดตัวอย่าง CSV
+                </button>
+                <!-- Download current roster (Excel) -->
+                <button onclick="downloadRosterList()"
+                    class="px-4 py-2.5 bg-white hover:bg-emerald-50 text-emerald-700 border border-emerald-300 rounded-2xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                    ดาวน์โหลดรายชื่อ
                 </button>
                 <!-- Add Single Student -->
                 <button onclick="openAddStudentToCourseModal()"
@@ -1004,6 +1009,37 @@
     }
 
     // ดาวน์โหลดไฟล์ตัวอย่างแม่แบบ CSV ตามที่กำหนด
+    // ดาวน์โหลดรหัสนักศึกษาและรายชื่อของวิชานี้เป็นไฟล์ Excel (ถ้าโหลดตัวช่วย Excel ไม่ได้ จะได้ไฟล์ CSV แทน)
+    function downloadRosterList() {
+        const list = Array.isArray(currentRosterList) ? currentRosterList : [];
+        if (!list.length) { alert("ยังไม่มีรายชื่อนักศึกษาในวิชานี้"); return; }
+        const c = coursesList.find(x => x.id === currentCourseId) || {};
+        const head = ['ลำดับ', 'รหัสนักศึกษา', 'คำนำหน้า', 'ชื่อ', 'นามสกุล', 'ชื่อ-นามสกุล', 'FULL NAME (EN)', 'กลุ่มเรียน'];
+        const rows = list.map((s, i) => [
+            i + 1, String(s.studentId || ''), s.prefix || '', s.firstName || '', s.lastName || '',
+            `${s.prefix ? s.prefix + ' ' : ''}${s.firstName || ''} ${s.lastName || ''}`.trim(),
+            s.fullNameEn || '', s.class || ''
+        ]);
+        const safe = String(c.courseCode || 'รายวิชา').replace(/[\\/:*?"<>|]/g, '-');
+        const fileBase = `รายชื่อนักศึกษา_${safe}`;
+        if (window.XLSX) {
+            const ws = XLSX.utils.aoa_to_sheet([[`[${c.courseCode || ''}] ${c.courseName || ''}`], [`ภาคเรียน: ${c.semester || '-'} • กลุ่มเรียน: ${c.description || '-'} • จำนวน ${list.length} คน`], [], head, ...rows]);
+            // รหัสนักศึกษาเก็บเป็นข้อความ (ไม่ให้ Excel ตัดขีดหรือเลข 0 นำหน้า)
+            rows.forEach((_, i) => { const cell = ws[XLSX.utils.encode_cell({ r: 4 + i, c: 1 })]; if (cell) { cell.t = 's'; cell.z = '@'; } });
+            ws['!cols'] = [{ wch: 6 }, { wch: 16 }, { wch: 9 }, { wch: 16 }, { wch: 18 }, { wch: 30 }, { wch: 30 }, { wch: 12 }];
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'รายชื่อ');
+            XLSX.writeFile(wb, fileBase + '.xlsx');
+            return;
+        }
+        const esc = v => `"${String(v).replace(/"/g, '""')}"`;
+        const csv = '﻿' + [head, ...rows].map(r => r.map(esc).join(',')).join('\n');
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+        link.download = fileBase + '.csv';
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+
     function downloadRosterTemplate() {
         const csvContent = "\uFEFFSTUDENT_NO,FULLNAME,FULLNAME_EN\n" +
             "69325110007-0,นาย ธนนันท์ มุขธระโกษา,Mr. THANANAN MUKHATHRAKOSA\n" +

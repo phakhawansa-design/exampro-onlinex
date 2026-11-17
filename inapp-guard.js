@@ -1,5 +1,5 @@
 /* ExamPro · กันการเปิดหน้าสอบในเบราว์เซอร์ของแอปแชต (LINE, Facebook, Messenger, IG, TikTok ฯลฯ)
- * เบราว์เซอร์ในแอปเหล่านี้แจ้งเหตุการณ์สลับหน้าจอได้ไม่ครบ ระบบตาเฝ้าจึงตรวจจับไม่ได้
+ * เบราว์เซอร์ในแอปเหล่านี้แจ้งเหตุการณ์สลับหน้าจอได้ไม่ครบ ระบบจึงตรวจจับการสลับหน้าจอไม่ได้
  *  - LINE: ส่งต่อไปเปิดใน Safari/Chrome อัตโนมัติด้วย openExternalBrowser=1
  *  - แอปอื่น: ขึ้นหน้าแนะนำวิธีเปิดในเบราว์เซอร์หลัก พร้อมปุ่มคัดลอกลิงก์ / เปิดใน Chrome (Android)
  * หน้าในแอปจะถูกปิดทับไว้เสมอ จึงใช้สอบต่อในแอปไม่ได้แม้การส่งต่อจะไม่สำเร็จ
@@ -116,7 +116,7 @@
             (app === 'LINE' ? '<a class="bt pr" id="tn-go" href="' + url.replace(/"/g, '&quot;') + '">เปิดในเบราว์เซอร์อีกครั้ง</a>' : '') +
             (isAndroid ? '<a class="bt ' + (app === 'LINE' ? 'sc' : 'pr') + '" href="' + chromeIntent(url).replace(/"/g, '&quot;') + '">เปิดใน Chrome</a>' : '') +
             '<button type="button" class="' + (app === 'LINE' || isAndroid ? 'sc' : 'pr') + '" id="tn-copy">คัดลอกลิงก์ไปเปิดเอง</button>' +
-            '<div class="ft">ExamPro · ตาเฝ้าทำงานได้เต็มที่เฉพาะในเบราว์เซอร์หลัก</div>' +
+            '<div class="ft">ExamPro · ระบบตรวจจับการสลับหน้าจอทำงานได้เต็มที่เฉพาะในเบราว์เซอร์หลัก</div>' +
             '</div>';
         document.body.appendChild(d);
         document.documentElement.style.overflow = 'hidden';

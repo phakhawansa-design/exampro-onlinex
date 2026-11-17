@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="auth-client.js"></script>
-<title>รายงานรวมรายคน · ExamPro</title>
+<title>แฟ้มประวัติรวม · ExamPro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -60,7 +60,7 @@ tr.det td{background:#fbfcff;padding:4px 14px 14px}
 <body>
 <header>
   <div class="top">
-    <h1>รายงานรวมรายคน<small>คะแนนสอบ และประวัติระหว่างสอบของนักศึกษาแต่ละคนในหน้าเดียว</small></h1>
+    <h1>แฟ้มประวัติรวม<small>คะแนนสอบ และประวัติระหว่างสอบของนักศึกษาแต่ละคนในหน้าเดียว</small></h1>
     <a class="back" href="dashboard.html">← กลับหน้าจัดการ</a>
   </div>
 </header>
@@ -75,14 +75,14 @@ tr.det td{background:#fbfcff;padding:4px 14px 14px}
     <div class="tools noprint">
       <input type="search" id="q" placeholder="ค้นหารหัสหรือชื่อ" style="flex:1 1 200px">
       <select id="sort" aria-label="เรียงลำดับ">
-        <option value="watch">เรียง: ประวัติตาเฝ้ามากสุดก่อน</option>
+        <option value="watch">เรียง: สลับหน้าจอมากสุดก่อน</option>
         <option value="id">เรียง: รหัสนักศึกษา</option>
         <option value="low">เรียง: คะแนนรวมน้อยสุดก่อน</option>
         <option value="high">เรียง: คะแนนรวมมากสุดก่อน</option>
       </select>
-      <label><input type="checkbox" id="only"> เฉพาะคนที่มีประวัติตาเฝ้า</label>
+      <label><input type="checkbox" id="only"> เฉพาะคนที่มีประวัติสลับหน้าจอ</label>
     </div>
-    <p class="note">ประวัติตาเฝ้า: <span class="chip c-switch">สลับหน้าจอ</span> <span class="chip c-fs">ออกเต็มจอ</span> <span class="chip c-gap">หายจากหน้าสอบ</span> <span class="chip c-multi">หลายเครื่อง</span> <span class="chip c-ans">ตอบ/แก้หลังกลับมา</span> · ใช้ประกอบการพิจารณาเท่านั้น การสลับหน้าจอไม่ได้แปลว่าทุจริตเสมอ (เช่น เน็ตหลุด มีสายเรียกเข้า)</p>
+    <p class="note">ประวัติสลับหน้าจอ: <span class="chip c-switch">สลับหน้าจอ</span> <span class="chip c-fs">ออกเต็มจอ</span> <span class="chip c-gap">หายจากหน้าสอบ</span> <span class="chip c-multi">หลายเครื่อง</span> <span class="chip c-ans">ตอบ/แก้หลังกลับมา</span> · ใช้ประกอบการพิจารณาเท่านั้น การสลับหน้าจอไม่ได้แปลว่าทุจริตเสมอ (เช่น เน็ตหลุด มีสายเรียกเข้า)</p>
     <div class="tw" id="tw"><div class="empty">เลือกรายวิชาเพื่อดูรายงาน</div></div>
   </div>
 </main>
@@ -131,15 +131,15 @@ tr.det td{background:#fbfcff;padding:4px 14px 14px}
     const d = data, avg = d.students.length && d.totalMax ? (d.students.reduce((t, s) => t + (s.percent || 0), 0) / d.students.length).toFixed(1) : '–';
     $('cards').innerHTML = `
       <div class="card"><b>${d.summary.students}</b><span>นักศึกษาในรายงาน</span></div>
-      <div class="card w"><b>${d.summary.watched}</b><span>คนที่มีประวัติตาเฝ้า</span></div>
-      <div class="card"><b>${d.summary.events}</b><span>เหตุการณ์ตาเฝ้าทั้งหมด</span></div>
+      <div class="card w"><b>${d.summary.watched}</b><span>คนที่มีประวัติสลับหน้าจอ</span></div>
+      <div class="card"><b>${d.summary.events}</b><span>เหตุการณ์สลับหน้าจอทั้งหมด</span></div>
       <div class="card"><b>${avg}${avg === '–' ? '' : '%'}</b><span>คะแนนรวมเฉลี่ย (${d.columns.length} รายการ)</span></div>`;
     const list = rows();
     if (!d.students.length) { $('tw').innerHTML = '<div class="empty">ยังไม่มีข้อมูลนักศึกษาในรายวิชานี้</div>'; return; }
     const cols = d.columns, span = cols.length + 6;
     $('tw').innerHTML = `<table><thead><tr><th>รหัส</th><th>ชื่อ-สกุล</th>
       ${cols.map(c => `<th class="n"><span class="ty ${c.type}">ปรนัย</span><br>${esc(c.label)}<br>/${c.max || '–'}</th>`).join('')}
-      <th class="n">รวม<br>/${d.totalMax}</th><th class="n">%</th><th>ตาเฝ้า</th><th class="noprint"></th></tr></thead><tbody>
+      <th class="n">รวม<br>/${d.totalMax}</th><th class="n">%</th><th>สลับหน้าจอ</th><th class="noprint"></th></tr></thead><tbody>
       ${list.map(s => {
         const k = s.studentId, isOpen = open.has(k);
         return `<tr class="st ${s.watch.total ? 'flag' : ''}"><td>${esc(k)}</td><td class="nm"><b>${esc(s.name || '–')}</b>${s.class ? `<small>${esc(s.class)}</small>` : ''}</td>
@@ -161,12 +161,12 @@ tr.det td{background:#fbfcff;padding:4px 14px 14px}
   function csv() {
     if (!data) return;
     const cols = data.columns, q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
-    const head = ['รหัส', 'ชื่อ-สกุล', 'ชั้นเรียน', ...cols.map(c => `ปรนัย: ${c.label} (/${c.max})`), `รวม (/${data.totalMax})`, 'ร้อยละ', 'สลับหน้าจอ', 'ออกเต็มจอ', 'หายจากหน้าสอบ', 'หลายเครื่อง', 'ตอบ/แก้หลังกลับมา', 'รายละเอียดตาเฝ้า'];
+    const head = ['รหัส', 'ชื่อ-สกุล', 'ชั้นเรียน', ...cols.map(c => `ปรนัย: ${c.label} (/${c.max})`), `รวม (/${data.totalMax})`, 'ร้อยละ', 'สลับหน้าจอ', 'ออกเต็มจอ', 'หายจากหน้าสอบ', 'หลายเครื่อง', 'ตอบ/แก้หลังกลับมา', 'รายละเอียดการสลับหน้าจอ'];
     const lines = [head, ...rows().map(s => [s.studentId, s.name, s.class, ...cols.map(c => s.scores[c.key] ?? ''), s.total, s.percent ?? '', s.watch.switch, s.watch.fs, s.watch.gap, s.watch.multi, s.watch.answer,
       s.watch.events.map(e => `[${e.room} ${e.time}] ${e.action}`).join(' | ')])];
     const blob = new Blob(['﻿' + lines.map(r => r.map(q).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = `รายงานรวม_${data.course.code || data.course.id}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    a.download = `แฟ้มประวัติรวม_${data.course.code || data.course.id}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   }
   $('course').addEventListener('change', load);
   ['q', 'sort', 'only'].forEach(id => $(id).addEventListener(id === 'q' ? 'input' : 'change', () => data && render()));
