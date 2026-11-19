@@ -323,7 +323,7 @@
             </div>
             <style>
                 .term-seg{display:inline-flex;gap:4px;padding:4px;border-radius:14px;background:#fff;border:1.5px solid #e2e8f0;box-shadow:0 6px 16px -12px rgba(15,23,42,.3)}
-                .term-seg button{padding:8px 16px;border:0;border-radius:10px;background:transparent;color:#475569;font:700 14px inherit;font-family:inherit;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
+                .term-seg button{padding:8px 16px;border:0;border-radius:10px;background:transparent;color:#475569;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
                 .term-seg button:hover{background:#f1f5f9;color:#0f172a}
                 .term-seg button[aria-selected="true"]{background:#0b2a7a;color:#fff}
                 .term-seg button[hidden]{display:none}
@@ -735,6 +735,9 @@
     function renderCourseExams(courseRooms) {
         const c = ceCourse, list = document.getElementById('course-exams-list');
         document.getElementById('exams-modal-subtitle').textContent = `${c.courseCode} · ${c.semester || 'ภาคเรียนทั่วไป'} · ${ceExams.length} ชุดข้อสอบ`;
+        // ยังไม่มีชุดข้อสอบ → ใช้ปุ่มกลางหน้าปุ่มเดียว ซ่อนปุ่มมุมบน
+        const topBtn = document.getElementById('btn-create-exam-for-course');
+        if (topBtn) topBtn.style.display = ceExams.length ? '' : 'none';
         if (!ceExams.length) {
             list.innerHTML = `<div class="ce-empty"><b>ยังไม่มีชุดข้อสอบในวิชานี้</b>สร้างชุดแรกได้เลย ระบบจะเก็บแยกตามรายวิชาให้อัตโนมัติ<br><a class="ce-btn ce-btn-p" href="admin-questions.html?courseId=${c.id}">สร้างชุดข้อสอบชุดแรก</a></div>`;
             return;

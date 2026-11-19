@@ -1419,10 +1419,19 @@
             document.getElementById('ai-exam-modal').classList.add('hidden');
         }
 
+        // ลิงก์ Gem "ExamPro แปลงข้อสอบ" ใน Gemini (ตั้งคำสั่งไว้ใน Gem แล้ว ไม่ต้องคัดลอกคำสั่ง)
+        // ถ้าสร้าง Gem ใหม่ หรือ Google ย้าย Gem ไปเป็น Skills แล้วลิงก์เปลี่ยน → แก้ลิงก์ที่บรรทัดนี้บรรทัดเดียว
+        const EXAMPRO_GEM_URL = 'https://gemini.google.com/gem/1aEVffVXcZNe78G77zEjNEJGMNc3ScqwZ';
         const AIX_HINTS = {
-            text: 'กดปุ่มด้านล่าง ระบบจะคัดลอกคำสั่งให้แล้วเปิด AI ในแท็บใหม่ จากนั้น <b>วาง (Ctrl+V) ในช่องแชท</b> แล้ว<b>แนบไฟล์หรือรูปข้อสอบ</b> แล้วกดส่ง',
-            gen: 'กดปุ่มด้านล่าง ระบบจะคัดลอกคำสั่งให้แล้วเปิด AI ในแท็บใหม่ จากนั้น <b>วาง (Ctrl+V) ในช่องแชท</b> แล้ว<b>พิมพ์หัวข้อ จำนวนข้อ และระดับความยาก</b> ต่อท้าย แล้วกดส่ง'
+            text: '<b>Gem ExamPro (แนะนำ):</b> เปิดแล้ว<b>แนบไฟล์หรือรูปข้อสอบ</b> แล้วกดส่งได้เลย ไม่ต้องวางคำสั่ง<br><b>ChatGPT:</b> ระบบคัดลอกคำสั่งให้ <b>วาง (Ctrl+V) ในช่องแชท</b> แล้วแนบไฟล์ข้อสอบ แล้วกดส่ง',
+            gen: '<b>Gem ExamPro (แนะนำ):</b> เปิดแล้ว<b>พิมพ์หัวข้อ จำนวนข้อ และระดับ</b> เช่น "ระบบสุริยะ 10 ข้อ ระดับ ปวช." แล้วกดส่ง<br><b>ChatGPT:</b> ระบบคัดลอกคำสั่งให้ <b>วาง (Ctrl+V) ในช่องแชท</b> แล้วพิมพ์หัวข้อ จำนวนข้อ และระดับต่อท้าย แล้วกดส่ง'
         };
+        function openExamProGem() {
+            // Gem มีคำสั่งอยู่แล้ว · คัดลอกคำสั่งไว้ด้วยเผื่อเปิด Gem ไม่ได้ จะได้วางใน Gemini ปกติได้ทันที
+            const promptBox = document.getElementById('ai-prompt-box');
+            if (promptBox && navigator.clipboard) navigator.clipboard.writeText(promptBox.innerText).catch(() => {});
+            window.open(EXAMPRO_GEM_URL, '_blank', 'noopener');
+        }
         function switchPromptType(type) {
             currentActivePromptType = type;
             const promptBox = document.getElementById('ai-prompt-box');
@@ -1721,11 +1730,11 @@
                 <section class="aix-step">
                     <span class="aix-num">2</span>
                     <div class="aix-main">
-                        <h4>คัดลอกคำสั่ง แล้วเปิด AI</h4>
+                        <h4>เปิด AI</h4>
                         <p class="aix-hint" id="aix-hint2"></p>
                         <div class="aix-ai">
-                            <button type="button" class="aix-btn aix-gpt" onclick="copyPromptAndOpenAI('chatgpt')">คัดลอกแล้วเปิด ChatGPT</button>
-                            <button type="button" class="aix-btn aix-gem" onclick="copyPromptAndOpenAI('gemini')">คัดลอกแล้วเปิด Gemini</button>
+                            <button type="button" class="aix-btn aix-gem" onclick="openExamProGem()">เปิด Gem ExamPro <small>Gemini · ไม่ต้องวางคำสั่ง</small></button>
+                            <button type="button" class="aix-btn aix-gpt" onclick="copyPromptAndOpenAI('chatgpt')">คัดลอกแล้วเปิด ChatGPT <small>ต้องวางคำสั่ง (Ctrl+V)</small></button>
                         </div>
                         <div class="aix-row2">
                             <button type="button" class="aix-link" id="copy-ai-prompt-btn" onclick="copyAiPrompt()"><span id="copy-ai-prompt-btn-text">คัดลอกคำสั่งอย่างเดียว</span></button>
@@ -1786,11 +1795,12 @@
         .aix-mode[aria-checked="true"]{border-color:#1557e0;background:#eff6ff;box-shadow:inset 0 0 0 1px #1557e0}
         .aix-hint{margin:-4px 0 10px;font-size:13.5px;line-height:1.6;color:#475569}
         .aix-ai{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:10px}
-        .aix-btn{padding:12px 14px;border:0;border-radius:14px;color:#fff;font:700 15px inherit;font-family:inherit;cursor:pointer;transition:transform .12s,filter .15s}
+        .aix-btn{padding:12px 14px;border:0;border-radius:14px;color:#fff;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;transition:transform .12s,filter .15s}
         .aix-btn:hover{filter:brightness(1.07)}.aix-btn:active{transform:scale(.98)}
         .aix-gpt{background:#047857}.aix-gem{background:#1557e0}
+        .aix-btn small{display:block;font-size:12px;font-weight:500;opacity:.85;margin-top:2px}
         .aix-row2{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:10px}
-        .aix-link{border:0;background:none;padding:6px 2px;color:#1557e0;font:600 13.5px inherit;font-family:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+        .aix-link{border:0;background:none;padding:6px 2px;color:#1557e0;font-family:inherit;font-weight:600;font-size:13.5px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
         .aix-link:hover{color:#0b2a7a}
         .aix-details summary{cursor:pointer;color:#556275;font-size:13.5px;font-weight:600}
         .aix-details pre{margin:8px 0 0;max-height:180px;overflow:auto;white-space:pre-wrap;background:#0f172a;color:#e2e8f0;border-radius:14px;padding:12px 14px;font:12.5px/1.6 ui-monospace,Consolas,monospace}
@@ -1809,8 +1819,8 @@
         .aix-pv-list i{font-style:normal;font-weight:700;color:#047857}
         .aix-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:14px 22px;border-top:1px solid #e2e8f0;background:#f8fafc}
         .aix-foot-r{display:flex;gap:8px;margin-left:auto}
-        .aix-cancel{padding:11px 18px;border:1.5px solid #e2e8f0;border-radius:12px;background:#fff;color:#334155;font:600 14.5px inherit;font-family:inherit;cursor:pointer}
-        .aix-go{padding:11px 22px;border:0;border-radius:12px;background:#0b2a7a;color:#fff;font:700 15px inherit;font-family:inherit;cursor:pointer;box-shadow:0 10px 22px -12px rgba(11,42,122,.7)}
+        .aix-cancel{padding:11px 18px;border:1.5px solid #e2e8f0;border-radius:12px;background:#fff;color:#334155;font-family:inherit;font-weight:600;font-size:14.5px;cursor:pointer}
+        .aix-go{padding:11px 22px;border:0;border-radius:12px;background:#0b2a7a;color:#fff;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 10px 22px -12px rgba(11,42,122,.7)}
         .aix-go:hover:not(:disabled){background:#1557e0}
         .aix-go:disabled{background:#cbd5e1;box-shadow:none;cursor:not-allowed}
         @media (max-width:640px){.aix-head,.aix-body,.aix-foot{padding-left:16px;padding-right:16px}.aix-step{gap:10px}.aix-foot-r{width:100%}.aix-foot-r button{flex:1}}
@@ -1889,10 +1899,10 @@
                 .cc-empty{padding:16px;border-radius:14px;background:#fff7ed;border:1.5px solid #fdba74;color:#9a3412;font-size:14.5px;font-weight:600}
                 .cc-empty[hidden]{display:none}
                 .cc-empty a{display:block;margin-top:6px;color:#c2410c}
-                .cc-go{display:block;width:100%;margin-top:14px;padding:13px;border:0;border-radius:14px;background:#ff7a1a;color:#fff;font:700 15.5px inherit;font-family:inherit;cursor:pointer;box-shadow:0 12px 22px -12px rgba(255,122,26,.8)}
+                .cc-go{display:block;width:100%;margin-top:14px;padding:13px;border:0;border-radius:14px;background:#ff7a1a;color:#fff;font-family:inherit;font-weight:700;font-size:15.5px;cursor:pointer;box-shadow:0 12px 22px -12px rgba(255,122,26,.8)}
                 .cc-go:disabled{background:#cbd5e1;box-shadow:none;cursor:not-allowed}
                 .cc-go[hidden],.cc-list[hidden]{display:none}
-                .cc-back{display:block;width:100%;margin-top:8px;padding:10px;border:0;background:none;color:#64748b;font:600 14px inherit;font-family:inherit;cursor:pointer}
+                .cc-back{display:block;width:100%;margin-top:8px;padding:10px;border:0;background:none;color:#64748b;font-family:inherit;font-weight:600;font-size:14px;cursor:pointer}
                 .cc-back:hover{color:#0f172a}
             </style>
         </div>

@@ -212,6 +212,30 @@
         .db-hist i{flex:1;border-radius:6px 6px 3px 3px;background:#c9dbfa;min-height:4px;transition:height .6s cubic-bezier(.2,.8,.2,1)}
         .db-hist i.top{background:var(--bl)}
         .db-hist-l{display:flex;justify-content:space-between;gap:6px;font-size:11.5px;color:var(--mut);margin-top:6px}.db-hist-l span{flex:1;text-align:center}
+        /* คอลัมน์ขวา: เติมสี */
+        .db-todo{background:linear-gradient(160deg,#fff4ea 0%,#fff 70%);border-color:#ffd2ad;position:relative;overflow:hidden}
+        .db-todo::before{content:'';position:absolute;inset:0 0 auto 0;height:4px;background:linear-gradient(90deg,#ff7a1a,#ffb347)}
+        .db-todo.is-clear{background:linear-gradient(160deg,#e8f8ee 0%,#fff 70%);border-color:#b7e6c8}
+        .db-todo.is-clear::before{background:linear-gradient(90deg,#16a34a,#4ade80)}
+        .db-todo .db-row{border-top-color:#f6e2d2}
+        .db-scorecard{background:linear-gradient(140deg,#0b2a7a 0%,#1546b8 60%,#1d5fd6 100%);border-color:transparent;color:#fff;position:relative;overflow:hidden;box-shadow:0 18px 36px -22px rgba(11,42,122,.8)}
+        .db-scorecard::after{content:'';position:absolute;right:-60px;top:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(255,154,60,.35),transparent 70%);pointer-events:none}
+        .db-scorecard .db-h h3,.db-scorecard .db-avg b{color:#fff}
+        .db-scorecard .db-h a{color:#ffd0a6}
+        .db-scorecard .db-sub,.db-scorecard .db-empty,.db-scorecard .db-hist-l{color:#c8d8ff}
+        .db-scorecard .db-hist i{background:rgba(255,255,255,.28)}
+        .db-scorecard .db-hist i.top{background:#ff9a3c}
+        .db-scorecard > *{position:relative;z-index:1}
+        .db-quick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+        .db-q{display:flex;flex-direction:column;gap:2px;padding:14px;border-radius:14px;text-decoration:none;transition:transform .15s,box-shadow .15s}
+        .db-q:hover{transform:translateY(-2px);box-shadow:0 10px 20px -14px rgba(15,23,42,.45)}
+        .db-q b{font-size:14px;line-height:1.4}.db-q small{font-size:12px;opacity:.85}
+        .db-q-ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;background:rgba(255,255,255,.75)}
+        .db-q-ic svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+        .db-q-or{background:#fff1e4;color:#b4500c}.db-q-or .db-q-ic{color:#ff7a1a}
+        .db-q-gr{background:#e6f7ec;color:#166534}.db-q-gr .db-q-ic{color:#16a34a}
+        .db-q-bl{background:#e8f1ff;color:#0b2a7a}.db-q-bl .db-q-ic{color:#1d5fd6}
+        .db-q-nv{background:#eceffb;color:#1e2a5a}.db-q-nv .db-q-ic{color:#0b2a7a}
         /* ตัวเลขสรุป */
         .db-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
         .db-st{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:flex;gap:14px;align-items:center;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s}
@@ -395,14 +419,24 @@
 
             <div class="db-col">
                 <!-- 3) สิ่งที่ต้องทำ -->
-                <section class="db-card">
+                <section class="db-card db-todo" id="db-todo-card">
                     <div class="db-h"><h3>สิ่งที่ต้องทำ</h3><span id="db-todo-n" class="db-pill db-pill-or" hidden></span></div>
                     <div id="db-todo"><div class="db-empty">กำลังตรวจ…</div></div>
                 </section>
                 <!-- ผลสอบล่าสุด -->
-                <section class="db-card">
+                <section class="db-card db-scorecard">
                     <div class="db-h"><h3>ผลสอบล่าสุด</h3><a href="admin-results.html">ดูทั้งหมด →</a></div>
                     <div id="db-score"><div class="db-empty">กำลังโหลด…</div></div>
+                </section>
+                <!-- ทางลัด -->
+                <section class="db-card">
+                    <div class="db-h"><h3>ทางลัด</h3></div>
+                    <div class="db-quick">
+                        <a href="admin-questions.html" class="db-q db-q-or"><span class="db-q-ic"><svg viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9Z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8Z"/></svg></span><b>แปลงข้อสอบด้วย AI</b><small>จาก Word, PDF หรือรูป</small></a>
+                        <a href="admin-courses.html" class="db-q db-q-gr"><span class="db-q-ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M19 8v6M16 11h6"/></svg></span><b>เพิ่มรายชื่อนักศึกษา</b><small>นำเข้าจาก Excel</small></a>
+                        <a href="admin-results.html" class="db-q db-q-bl"><span class="db-q-ic"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><b>ดูผลและสถิติ</b><small>ส่งออก Excel ได้</small></a>
+                        <a href="trinetra-report.html" class="db-q db-q-nv"><span class="db-q-ic"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg></span><b>แฟ้มประวัติรวม</b><small>ประวัติสลับหน้าจอ</small></a>
+                    </div>
                 </section>
             </div>
         </div>
@@ -589,10 +623,10 @@
         const todoBox = document.getElementById('db-todo'), todoN = document.getElementById('db-todo-n');
         if (!todo.length) {
             todoBox.innerHTML = `<div class="db-ok">${ic('check', 'gr')}<span>ไม่มีงานค้าง ทุกอย่างพร้อมแล้ว</span></div>`;
-            todoN.hidden = true;
+            todoN.hidden = true; document.getElementById('db-todo-card').classList.add('is-clear');
         } else {
             todoBox.innerHTML = todo.slice(0, 6).map(x => `<a class="db-row" href="${x.href}">${ic(x.i, x.t)}<span class="db-row-t">${esc(x.h)}<small>${esc(x.s)}</small></span><span class="db-go">${x.go} →</span></a>`).join('');
-            todoN.textContent = todo.length + ' รายการ'; todoN.hidden = false;
+            todoN.textContent = todo.length + ' รายการ'; todoN.hidden = false; document.getElementById('db-todo-card').classList.remove('is-clear');
         }
 
         // ===== กิจกรรมล่าสุด =====
