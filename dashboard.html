@@ -139,6 +139,107 @@
     <link rel="stylesheet" href="theme.css">
     <script src="theme.js" defer></script>
     <link rel="stylesheet" href="tailwind.css">
+    <style>
+        /* ===== หน้าหลักอาจารย์ (ดีไซน์ใหม่) ===== */
+        #dash{--nv:#0b2a7a;--bl:#1d5fd6;--sky:#e8f1ff;--or:#ff7a1a;--or50:#fff4ea;--gr:#16a34a;--gr50:#eaf8ef;--rd:#dc2626;--rd50:#fdecea;--ink:#0f172a;--mut:#5b6b82;--line:#e5eaf2;background:#f5f7fb}
+        .db-wrap{max-width:1440px;margin:0 auto;padding:28px 32px 40px;display:grid;gap:20px}
+        .db-top{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+        .db-hello h2{margin:0;font-size:24px;font-weight:800;color:var(--ink);line-height:1.35}
+        .db-hello p{margin:4px 0 0;font-size:14.5px;color:var(--mut)}
+        .db-actions{display:flex;gap:10px;flex-wrap:wrap}
+        .db-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;border-radius:12px;padding:10px 16px;font-family:inherit;font-weight:700;font-size:14px;line-height:1.2;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;text-decoration:none;transition:border-color .15s,background .15s,transform .1s}
+        .db-btn:hover{border-color:#c7d3e6;background:#f8fafc}.db-btn:active{transform:scale(.98)}
+        .db-pri{background:var(--bl);border-color:var(--bl);color:#fff!important;box-shadow:0 8px 18px -8px rgba(29,95,214,.7)}.db-pri:hover{background:#174fb6;border-color:#174fb6}
+        .db-orb{background:var(--or);border-color:var(--or);color:#fff!important}.db-orb:hover{background:#ec6a0c;border-color:#ec6a0c}
+        .db-sm{padding:7px 12px;font-size:13px}
+        .db-search{min-width:300px;justify-content:space-between;color:var(--mut);font-weight:600}
+        .db-search-l{display:inline-flex;align-items:center;gap:8px}
+        .db-search kbd{font-family:inherit;font-weight:600;font-size:11px;border:1px solid var(--line);border-radius:6px;padding:2px 6px;color:var(--mut);background:#f8fafc}
+        .db-i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+        .db-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:20px;align-items:start}
+        .db-col{display:grid;gap:20px;min-width:0}
+        .db-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px 22px;min-width:0}
+        .db-skel{background:linear-gradient(90deg,#fff,#f1f5f9,#fff);background-size:200% 100%;animation:dbSk 1.2s infinite}
+        @keyframes dbSk{to{background-position:-200% 0}}
+        .db-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
+        .db-h h3{margin:0;font-size:16.5px;font-weight:800;color:var(--ink)}
+        .db-h a{font-size:13.5px;font-weight:700;color:var(--bl);text-decoration:none;white-space:nowrap}.db-h a:hover{text-decoration:underline}
+        .db-pill{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;border-radius:999px;padding:4px 10px;white-space:nowrap}
+        .db-pill[hidden]{display:none}
+        .db-pill-or{background:var(--or50);color:#b45309}.db-pill-gr{background:var(--gr50);color:#166534}.db-pill-bl{background:var(--sky);color:var(--nv)}
+        .db-dot{width:8px;height:8px;border-radius:50%;background:var(--gr);box-shadow:0 0 0 4px rgba(22,163,74,.18);animation:dbPulse 1.6s infinite}
+        @keyframes dbPulse{50%{box-shadow:0 0 0 7px rgba(22,163,74,.05)}}
+        /* การ์ดห้องที่กำลังสอบ */
+        .db-live{border:1.5px solid #ffc89c;background:linear-gradient(180deg,#fff 0%,#fffaf5 100%)}
+        .db-live+.db-live{margin-top:16px}
+        .db-live-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+        .db-live-t{font-size:20px;font-weight:800;color:var(--ink);margin-top:10px;line-height:1.4}
+        .db-sub{font-size:13.5px;color:var(--mut);margin-top:3px}
+        .db-pin-box{text-align:right;flex:none}
+        .db-pin{font-family:ui-monospace,Consolas,monospace;font-size:34px;font-weight:800;letter-spacing:6px;color:var(--nv);line-height:1.2}
+        .db-bar{height:12px;border-radius:99px;background:#eef2f7;overflow:hidden;display:flex;margin:18px 0 10px}
+        .db-bar i{display:block;height:100%;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+        .db-legend{display:flex;gap:6px 20px;font-size:13.5px;color:var(--mut);flex-wrap:wrap;align-items:baseline}
+        .db-legend b{font-size:19px;color:var(--ink);margin-right:4px}
+        .db-live-act{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+        .db-live-act .db-push{margin-left:auto}
+        .db-none{text-align:center;border:2px dashed #d6deea;background:#fbfcfe;padding:30px 22px}
+        .db-none b{display:block;font-size:17px;color:var(--ink)}.db-none p{margin:6px auto 16px;max-width:460px;font-size:14px;color:var(--mut);line-height:1.6}
+        /* ห้องอื่น */
+        .db-rooms{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr));gap:12px}
+        .db-rooms:empty{display:none}
+        .db-room{display:block;border:1px solid var(--line);background:#fff;border-radius:14px;padding:14px 16px;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s}
+        .db-room:hover{border-color:#9ec0f5;transform:translateY(-1px)}
+        .db-room-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+        .db-room-h b{font-size:14.5px;color:var(--ink);line-height:1.45;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+        /* รายการ */
+        .db-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);font-size:14px;color:var(--ink);text-decoration:none}
+        .db-h+div>.db-row:first-child{border-top:0}
+        a.db-row:hover .db-go{text-decoration:underline}
+        .db-row-t{min-width:0;flex:1;line-height:1.5}
+        .db-row-t small{display:block;font-size:12.5px;color:var(--mut)}
+        .db-ic{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:none}
+        .db-ic svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+        .db-ic-bl{background:var(--sky);color:var(--bl)}.db-ic-or{background:var(--or50);color:var(--or)}.db-ic-gr{background:var(--gr50);color:var(--gr)}.db-ic-rd{background:var(--rd50);color:var(--rd)}.db-ic-nv{background:#e3e9f7;color:var(--nv)}
+        .db-go{margin-left:auto;font-size:13.5px;font-weight:700;color:var(--bl);white-space:nowrap}
+        .db-t{margin-left:auto;font-size:12.5px;color:var(--mut);white-space:nowrap}
+        .db-empty{padding:14px 0 4px;font-size:14px;color:var(--mut)}
+        .db-ok{display:flex;align-items:center;gap:12px;padding:12px 0 2px;font-size:14px;color:#166534}
+        /* ผลสอบ */
+        .db-avg{display:flex;align-items:baseline;gap:10px;margin:6px 0 2px;flex-wrap:wrap}
+        .db-avg b{font-size:34px;font-weight:800;color:var(--ink);line-height:1.1}
+        .db-hist{display:flex;align-items:flex-end;gap:6px;height:84px;margin-top:14px}
+        .db-hist i{flex:1;border-radius:6px 6px 3px 3px;background:#c9dbfa;min-height:4px;transition:height .6s cubic-bezier(.2,.8,.2,1)}
+        .db-hist i.top{background:var(--bl)}
+        .db-hist-l{display:flex;justify-content:space-between;gap:6px;font-size:11.5px;color:var(--mut);margin-top:6px}.db-hist-l span{flex:1;text-align:center}
+        /* ตัวเลขสรุป */
+        .db-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+        .db-st{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:flex;gap:14px;align-items:center;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s}
+        .db-st:hover{border-color:#9ec0f5;transform:translateY(-1px)}
+        .db-st b{display:block;font-size:26px;font-weight:800;line-height:1.1;color:var(--ink)}.db-st span:not(.db-ic){font-size:13.5px;color:var(--mut)}
+        /* ค้นหาด่วน */
+        .db-finder{position:fixed;inset:0;z-index:10000;background:rgba(15,23,42,.45);display:flex;align-items:flex-start;justify-content:center;padding:12vh 16px 16px}
+        .db-finder[hidden]{display:none}
+        .db-finder-box{width:min(620px,100%);background:#fff;border-radius:18px;box-shadow:0 30px 60px -20px rgba(15,23,42,.45);overflow:hidden;animation:dbIn .16s ease-out}
+        @keyframes dbIn{from{opacity:0;transform:translateY(-6px) scale(.98)}}
+        .db-finder input{width:100%;border:0;border-bottom:1px solid var(--line);padding:18px 20px;font-family:inherit;font-weight:500;font-size:16px;outline:none;color:var(--ink)}
+        .db-finder ul{list-style:none;margin:0;padding:8px;max-height:min(52vh,420px);overflow-y:auto}
+        .db-finder li a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;text-decoration:none;color:var(--ink);font-size:14.5px}
+        .db-finder li a small{margin-left:auto;font-size:12px;color:var(--mut);white-space:nowrap}
+        .db-finder li a.on,.db-finder li a:hover{background:var(--sky)}
+        .db-finder-foot{padding:10px 20px;font-size:12px;color:var(--mut);border-top:1px solid var(--line);background:#f8fafc}
+        @media (max-width:1180px){.db-grid{grid-template-columns:minmax(0,1fr)}.db-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+        @media (max-width:640px){
+            .db-wrap{padding:18px 14px 28px;gap:16px}
+            .db-hello h2{font-size:20px}
+            .db-actions{width:100%}.db-actions .db-btn{flex:1}.db-search{min-width:0;flex-basis:100%!important}.db-search kbd{display:none}
+            .db-card{padding:16px}
+            .db-live-top{flex-direction:column;gap:12px}.db-pin-box{text-align:left;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+            .db-pin{font-size:28px;letter-spacing:4px}
+            .db-live-act .db-btn{flex:1}.db-live-act .db-push{margin-left:0}
+            .db-stats{gap:10px}.db-st{padding:12px 14px;gap:10px}.db-st b{font-size:22px}
+        }
+    </style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
@@ -249,7 +350,7 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
             </button>
             <div>
-                <h1 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight" id="welcome-text">ระบบควบคุมการสอบออนไลน์</h1>
+                <h1 class="text-lg md:text-xl font-bold text-slate-900 tracking-tight" id="welcome-text">แดชบอร์ดหลัก</h1>
                 <p class="text-xs text-slate-500 font-medium">ExamPro &middot; ประจำภาคการศึกษาปัจจุบัน</p>
             </div>
         </div>
@@ -260,325 +361,70 @@
         </div>
     </header>
 
-    <!-- Main Workspace -->
-    <main class="flex-1 p-6 md:p-8 space-y-7 overflow-y-auto max-w-[1440px] w-full mx-auto">
+    <main id="dash" data-keep-icon class="flex-1 overflow-y-auto w-full">
+      <div class="db-wrap">
 
-        <!-- ===== HERO BANNER: TRINETRA PORTAL ===== -->
-        <div class="academic-hero p-7 md:p-9 relative">
-            <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-                
-                <div class="space-y-3.5 max-w-3xl">
-                    <div class="inline-flex items-center gap-2 bg-blue-900/60 border border-blue-400/30 px-3 py-1 rounded-lg text-xs font-semibold text-blue-200">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span>ระบบสอบออนไลน์</span>
-                    </div>
-
-                    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
-                        หน้าหลักอาจารย์
-                    </h2>
-
-                    <p class="text-slate-300 text-sm md:text-base leading-relaxed font-normal">
-                        สร้างข้อสอบ เปิดห้องสอบ ดูคะแนน และประวัติการสลับหน้าจอของนักศึกษาได้ในที่เดียว
-                    </p>
-
-                    <!-- Quick Operation Shortcuts -->
-                    <div class="flex flex-wrap items-center gap-3 pt-2">
-                        <a href="admin-rooms.html" class="inline-flex items-center gap-2 bg-white hover:bg-slate-100 text-slate-900 font-bold px-5 py-2.5 rounded-xl text-xs sm:text-sm transition shadow-sm active:scale-95">
-                            <span>เปิดห้องสอบ</span>
-                        </a>
-                        <a href="admin-questions.html" class="inline-flex items-center gap-2 bg-blue-800/80 hover:bg-blue-700 text-white font-semibold px-4 py-2.5 rounded-xl text-xs sm:text-sm border border-blue-600/40 transition active:scale-95">
-                            <span>สร้างข้อสอบ</span>
-                        </a>
-                        <a href="admin-results.html" class="inline-flex items-center gap-2 bg-slate-800/80 hover:bg-slate-700 text-slate-200 font-semibold px-4 py-2.5 rounded-xl text-xs sm:text-sm border border-slate-700 transition active:scale-95">
-                            <span>ดูผลสอบ</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Trinetra Emblem Card -->
-                <div class="shrink-0 w-full lg:w-auto flex justify-center lg:justify-end">
-                    <div class="bg-white/10 backdrop-blur-md border border-white/20 p-5 rounded-2xl flex flex-col items-center justify-center text-center space-y-2.5 min-w-[220px]">
-                        <div>
-                            <div class="text-[11px] font-bold text-amber-300 tracking-wider">ExamPro</div>
-                            <div class="text-xs font-semibold text-white mt-0.5">ระบบสอบออนไลน์</div>
-                        </div>
-                        <div class="inline-flex items-center gap-1.5 bg-emerald-500/20 border border-emerald-400/30 px-2.5 py-0.5 rounded-md text-[11px] font-medium text-emerald-300">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                            <span>ระบบออนไลน์ปกติ</span>
-                        </div>
-                    </div>
-                </div>
-
+        <!-- 1) ทักทาย + ปุ่มหลัก -->
+        <section class="db-top">
+            <div class="db-hello">
+                <h2 id="db-greet">สวัสดี</h2>
+                <p id="db-summary">กำลังโหลดข้อมูล…</p>
             </div>
-        </div>
-
-        <!-- ===== เริ่มต้นใช้งาน 4 ขั้น (แสดงจนกว่าจะทำครบ) ===== -->
-        <section id="gs-card" class="gs" hidden aria-labelledby="gs-title">
-            <div class="gs-head">
-                <div>
-                    <h3 id="gs-title">เริ่มต้นใช้งาน</h3>
-                    <p id="gs-sub">ทำตาม 4 ขั้นนี้ แล้วนักศึกษาจะเข้าสอบได้</p>
-                </div>
-                <div class="gs-bar" aria-hidden="true"><i id="gs-fill"></i></div>
+            <div class="db-actions">
+                <button type="button" class="db-btn db-search" onclick="openFinder()" aria-label="ค้นหาวิชา ห้องสอบ หรือเมนู">
+                    <span class="db-search-l"><svg viewBox="0 0 24 24" class="db-i"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>ค้นหาวิชา ห้องสอบ เมนู</span>
+                    <kbd>Ctrl K</kbd>
+                </button>
+                <a href="admin-questions.html" class="db-btn">สร้างข้อสอบ</a>
+                <a href="admin-rooms.html" class="db-btn db-pri"><svg viewBox="0 0 24 24" class="db-i"><path d="M12 5v14M5 12h14"/></svg>เปิดห้องสอบ</a>
             </div>
-            <ol class="gs-list" id="gs-list"></ol>
         </section>
-        <style>
-            .gs{background:#fff;border:1.5px solid #fed7aa;border-radius:22px;padding:20px 20px 14px;box-shadow:0 10px 30px -18px rgba(255,122,26,.45)}
-            .gs[hidden]{display:none}
-            .gs-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:12px}
-            .gs h3{margin:0;font-size:19px;font-weight:800;color:#0f172a}
-            .gs-head p{margin:2px 0 0;font-size:14px;color:#64748b}
-            .gs-bar{flex:0 1 220px;height:8px;border-radius:99px;background:#f1f5f9;overflow:hidden}
-            .gs-bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#ff7a1a,#ffb347);transition:width .5s cubic-bezier(.2,.8,.2,1)}
-            .gs-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:10px}
-            .gs-item{display:flex;align-items:flex-start;gap:12px;padding:14px;border-radius:16px;border:1.5px solid #e2e8f0;background:#fff;text-decoration:none;color:inherit;transition:border-color .15s,background .15s,transform .15s}
-            a.gs-item:hover{border-color:#ff7a1a;background:#fff7ef;transform:translateY(-1px)}
-            .gs-num{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:14px;background:#f1f5f9;color:#475569}
-            .gs-item.now{border-color:#ff7a1a;background:#fff7ef}
-            .gs-item.now .gs-num{background:#ff7a1a;color:#fff}
-            .gs-item.done{background:#f0fdf4;border-color:#bbf7d0}
-            .gs-item.done .gs-num{background:#16a34a;color:#fff}
-            .gs-item b{display:block;font-size:15px;color:#0f172a}
-            .gs-item div > span{display:block;margin-top:2px;font-size:13px;color:#64748b;line-height:1.5}
-            .gs-item em{display:inline-block;margin-top:6px;font-style:normal;font-size:12.5px;font-weight:700;color:#c2410c}
-            .gs-item.done em{color:#15803d}
-            .gs-item.wait{opacity:.6}
-        </style>
-        <script>
-        (async function () {
-            const card = document.getElementById('gs-card'); if (!card) return;
-            const J = u => fetch(u).then(r => r.ok ? r.json() : []).catch(() => []);
-            const [courses, rooms] = await Promise.all([J('/api/teacher/courses'), J('/api/teacher/rooms')]);
-            const cs = Array.isArray(courses) ? courses : [], rs = Array.isArray(rooms) ? rooms : [];
-            const steps = [
-                { t: 'สร้างรายวิชา', d: 'ตั้งชื่อวิชาที่จะสอบ', href: 'admin-courses.html', done: cs.length > 0, cta: 'ไปสร้างรายวิชา' },
-                { t: 'เพิ่มรายชื่อนักศึกษา', d: 'นำเข้าจาก Excel หรือเพิ่มทีละคน', href: 'admin-courses.html', done: cs.some(c => Number(c.studentCount) > 0), cta: 'ไปเพิ่มรายชื่อ' },
-                { t: 'สร้างชุดข้อสอบ', d: 'พิมพ์เอง วางข้อความ หรือนำเข้า Excel', href: 'admin-questions.html', done: cs.some(c => Number(c.examCount) > 0), cta: 'ไปสร้างข้อสอบ' },
-                { t: 'เปิดห้องสอบ', d: 'ได้รหัส PIN และ QR ให้นักศึกษาเข้าสอบ', href: 'admin-rooms.html', done: rs.some(r => Number(r.courseId) > 0 && Number(r.questionCount) > 0), cta: 'ไปเปิดห้องสอบ' }
-            ];
-            const n = steps.filter(x => x.done).length;
-            if (n === steps.length) return; // ทำครบแล้ว ไม่ต้องแสดง
-            const next = steps.findIndex(x => !x.done);
-            document.getElementById('gs-sub').textContent = n === 0 ? 'ทำตาม 4 ขั้นนี้ แล้วนักศึกษาจะเข้าสอบได้' : 'ทำไปแล้ว ' + n + ' จาก 4 ขั้น · ขั้นต่อไป: ' + steps[next].t;
-            document.getElementById('gs-list').innerHTML = steps.map((x, i) => {
-                const cls = x.done ? 'done' : i === next ? 'now' : 'wait';
-                const tag = i === next ? 'a href="' + x.href + '"' : 'div';
-                const end = i === next ? 'a' : 'div';
-                return '<li><' + tag + ' class="gs-item ' + cls + '"><span class="gs-num">' + (x.done ? '✓' : i + 1) + '</span><div><b>' + x.t + '</b><span>' + x.d + '</span>' +
-                    (x.done ? '<em>เสร็จแล้ว</em>' : i === next ? '<em>' + x.cta + ' →</em>' : '') + '</div></' + end + '></li>';
-            }).join('');
-            card.hidden = false;
-            requestAnimationFrame(() => { document.getElementById('gs-fill').style.width = (n / steps.length * 100) + '%'; });
-        })();
-        </script>
 
-        <!-- ===== LIVE KPI CARDS (CONNECTED TO ACTUAL DATABASE) ===== -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            
-            <!-- 1. ห้องสอบที่กำลังเปิดสอบ -->
-            <a href="admin-rooms.html" class="academic-card p-5 block group">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-md">เปิดสอบสด</span>
-                </div>
-                <div class="mt-4">
-                    <div class="text-xs text-slate-500 font-medium">ห้องสอบที่เปิดอยู่ขณะนี้</div>
-                    <div class="text-2xl font-bold text-slate-900 mt-1 flex items-baseline gap-1.5">
-                        <span id="stat-active-rooms">0</span>
-                        <span class="text-xs font-normal text-slate-500">ห้อง</span>
-                    </div>
-                    <div class="text-[11px] text-blue-600 font-medium mt-1 flex items-center gap-1">
-                        <span>ไปที่ศูนย์ห้องสอบ</span>
-                        <span class="group-hover:translate-x-1 transition-transform">→</span>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 2. รายวิชาในความดูแล -->
-            <a href="admin-courses.html" class="academic-card p-5 block group">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-md">รายวิชา</span>
-                </div>
-                <div class="mt-4">
-                    <div class="text-xs text-slate-500 font-medium">รายวิชาในความรับผิดชอบ</div>
-                    <div class="text-2xl font-bold text-slate-900 mt-1 flex items-baseline gap-1.5">
-                        <span id="stat-total-courses">-</span>
-                        <span class="text-xs font-normal text-slate-500">วิชา</span>
-                    </div>
-                    <div class="text-[11px] text-indigo-600 font-medium mt-1 flex items-center gap-1">
-                        <span>จัดการกลุ่มและวิชา</span>
-                        <span class="group-hover:translate-x-1 transition-transform">→</span>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 3. ชุดข้อสอบในคลัง -->
-            <a href="admin-library.html" class="academic-card p-5 block group">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-purple-600 bg-purple-50 px-2.5 py-0.5 rounded-md">คลังข้อสอบ</span>
-                </div>
-                <div class="mt-4">
-                    <div class="text-xs text-slate-500 font-medium">ชุดข้อสอบในคลังทั้งหมด</div>
-                    <div class="text-2xl font-bold text-slate-900 mt-1 flex items-baseline gap-1.5">
-                        <span id="stat-total-templates">-</span>
-                        <span class="text-xs font-normal text-slate-500">ชุด</span>
-                    </div>
-                    <div class="text-[11px] text-purple-600 font-medium mt-1 flex items-center gap-1">
-                        <span>ดูคลังข้อสอบ</span>
-                        <span class="group-hover:translate-x-1 transition-transform">→</span>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 4. นักศึกษาในระบบ -->
-            <a href="admin-students.html" class="academic-card p-5 block group">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-md">นักศึกษา</span>
-                </div>
-                <div class="mt-4">
-                    <div class="text-xs text-slate-500 font-medium">นักศึกษาที่ลงทะเบียน</div>
-                    <div class="text-2xl font-bold text-slate-900 mt-1 flex items-baseline gap-1.5">
-                        <span id="stat-total-students">-</span>
-                        <span class="text-xs font-normal text-slate-500">คน</span>
-                    </div>
-                    <div class="text-[11px] text-emerald-600 font-medium mt-1 flex items-center gap-1">
-                        <span>ตรวจสอบรายชื่อ</span>
-                        <span class="group-hover:translate-x-1 transition-transform">→</span>
-                    </div>
-                </div>
-            </a>
-
-        </div>
-
-        <!-- ===== SECTION: LIVE ACTIVE EXAM ROOMS ===== -->
-        <div class="space-y-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <h3 class="text-base font-bold text-slate-900">ห้องสอบที่กำลังเปิดอยู่ในขณะนี้</h3>
-                </div>
-                <a href="admin-rooms.html" class="text-xs font-semibold text-blue-700 hover:text-blue-800 flex items-center gap-1">
-                    <span>จัดการห้องสอบทั้งหมด</span>
-                    <span>→</span>
-                </a>
+        <div class="db-grid">
+            <div class="db-col">
+                <!-- 2) ห้องที่กำลังสอบ -->
+                <div id="db-live"><div class="db-card db-skel" style="height:220px"></div></div>
+                <!-- ห้องสอบอื่น -->
+                <div id="db-rooms" class="db-rooms"></div>
+                <!-- 4) กิจกรรมล่าสุด -->
+                <section class="db-card">
+                    <div class="db-h"><h3>กิจกรรมล่าสุด</h3><a href="admin-results.html">ดูผลสอบทั้งหมด →</a></div>
+                    <div id="db-feed"><div class="db-empty">กำลังโหลด…</div></div>
+                </section>
             </div>
 
-            <!-- Dynamic Container for Active Rooms -->
-            <div id="live-rooms-container">
-                <!-- Fallback / Empty State -->
-                <div class="academic-card p-6 text-center space-y-3 bg-slate-50/50 border-dashed border-2 border-slate-200">
-                    <div>
-                        <div class="font-bold text-slate-800 text-sm">ยังไม่มีห้องสอบที่กำลังดำเนินการอยู่ในขณะนี้</div>
-                        <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-                            อาจารย์สามารถเลือกรายวิชาและเปิดห้องสอบใหม่เพื่อรับรหัส PIN 6 หลัก และฉายจอให้นักศึกษาเข้าสอบได้ทันที
-                        </p>
-                    </div>
-                    <div>
-                        <a href="admin-rooms.html" class="inline-flex items-center gap-2 bg-blue-900 hover:bg-blue-800 text-white font-semibold px-4 py-2 rounded-xl text-xs shadow-xs transition">
-                            <span>เปิดห้องสอบใหม่</span>
-                        </a>
-                    </div>
-                </div>
+            <div class="db-col">
+                <!-- 3) สิ่งที่ต้องทำ -->
+                <section class="db-card">
+                    <div class="db-h"><h3>สิ่งที่ต้องทำ</h3><span id="db-todo-n" class="db-pill db-pill-or" hidden></span></div>
+                    <div id="db-todo"><div class="db-empty">กำลังตรวจ…</div></div>
+                </section>
+                <!-- ผลสอบล่าสุด -->
+                <section class="db-card">
+                    <div class="db-h"><h3>ผลสอบล่าสุด</h3><a href="admin-results.html">ดูทั้งหมด →</a></div>
+                    <div id="db-score"><div class="db-empty">กำลังโหลด…</div></div>
+                </section>
             </div>
         </div>
 
-        <!-- ===== MAIN OPERATIONAL MODULES ===== -->
-        <div class="space-y-4">
-            <div class="flex items-center justify-between">
-                <h3 class="text-base font-bold text-slate-900">ระบบงานหลักสำหรับอาจารย์ผู้สอน</h3>
-                <span class="text-xs text-slate-500 font-medium">เข้าถึงฟังก์ชันงานหลักอย่างสะดวกรวดเร็ว</span>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                
-                <!-- 1. คลังและจัดการข้อสอบ -->
-                <a href="admin-questions.html" class="academic-card p-6 flex flex-col justify-between space-y-4 group">
-                    <div class="flex items-start justify-between gap-4">
-                        <span class="text-slate-400 group-hover:text-blue-700 transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
-                        </span>
-                    </div>
-                    <div>
-                        <h4 class="text-base font-bold text-slate-900 group-hover:text-blue-700 transition-colors">
-                            1. ระบบจัดการคลังข้อสอบ
-                        </h4>
-                        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                            สร้างและแก้ไขข้อสอบตามรายวิชา รองรับการนำเข้าไฟล์ Excel (.xlsx), แนบรูปภาพประกอบ และใช้งานระบบผู้ช่วยสร้างข้อสอบอัตโนมัติ
-                        </p>
-                    </div>
-                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-blue-700">
-                        <span>สร้างหรือแก้ไขชุดข้อสอบ</span>
-                        <span class="group-hover:translate-x-1 transition-transform">→</span>
-                    </div>
-                </a>
-
-                <!-- 2. ศูนย์ห้องสอบ & คุมสอบสด -->
-                <a href="admin-rooms.html" class="academic-card p-6 flex flex-col justify-between space-y-4 group">
-                    <div class="flex items-start justify-between gap-4">
-                        <span class="text-slate-400 group-hover:text-indigo-700 transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
-                        </span>
-                    </div>
-                    <div>
-                        <h4 class="text-base font-bold text-slate-900 group-hover:text-indigo-700 transition-colors">
-                            2. ศูนย์ห้องสอบ & ควบคุมการสอบสด
-                        </h4>
-                        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                            เปิดห้องสอบตามรายวิชา ฉายรหัส PIN 6 หลักและ QR Code ขึ้นจอฉาย เริ่ม/หยุดสอบ และติดตามจำนวนนักศึกษาที่เข้าห้องสอบแบบเรียลไทม์
-                        </p>
-                    </div>
-                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-indigo-700">
-                        <span>เปิดห้องสอบและคุมสอบสด</span>
-                        <span class="group-hover:translate-x-1 transition-transform">→</span>
-                    </div>
-                </a>
-
-                <!-- 3. จัดการรายวิชาและนักศึกษา -->
-                <a href="admin-courses.html" class="academic-card p-6 flex flex-col justify-between space-y-4 group">
-                    <div class="flex items-start justify-between gap-4">
-                        <span class="text-slate-400 group-hover:text-purple-700 transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
-                        </span>
-                    </div>
-                    <div>
-                        <h4 class="text-base font-bold text-slate-900 group-hover:text-purple-700 transition-colors">
-                            3. จัดการรายวิชาและรายชื่อนักศึกษา
-                        </h4>
-                        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                            ลงทะเบียนรายวิชา กำหนดห้องเรียน/กลุ่มเรียน นำเข้ารายชื่อนักศึกษาเพื่อจำกัดสิทธิ์เข้าสอบเฉพาะผู้มีรายชื่อในวิชา
-                        </p>
-                    </div>
-                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-purple-700">
-                        <span>จัดการรายวิชาและนักศึกษา</span>
-                        <span class="group-hover:translate-x-1 transition-transform">→</span>
-                    </div>
-                </a>
-
-                <!-- 4. ตรวจสอบผลสอบ & วิเคราะห์ข้อสอบ -->
-                <a href="admin-results.html" class="academic-card p-6 flex flex-col justify-between space-y-4 group">
-                    <div class="flex items-start justify-between gap-4">
-                        <span class="text-slate-400 group-hover:text-emerald-700 transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
-                        </span>
-                    </div>
-                    <div>
-                        <h4 class="text-base font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">
-                            4. ตรวจสอบผลการสอบและวิเคราะห์ผลสัมฤทธิ์
-                        </h4>
-                        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                            รายงานคะแนนรายบุคคล คำนวณค่าสถิติวิชาการ Z-Score, T-Score, วิเคราะห์ความยากของข้อสอบ (p/r) และส่งออกรายงาน Excel ได้ทันที
-                        </p>
-                    </div>
-                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-emerald-700">
-                        <span>ดูผลการสอบและรายงานสถิติ</span>
-                        <span class="group-hover:translate-x-1 transition-transform">→</span>
-                    </div>
-                </a>
-
-            </div>
-        </div>
-
+        <!-- 5) ตัวเลขสรุป -->
+        <section class="db-stats" aria-label="สรุปตัวเลข">
+            <a href="admin-courses.html" class="db-st"><span class="db-ic db-ic-bl"><svg viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2Zm0 0A2 2 0 0 0 6 21h12"/></svg></span><div><b id="stat-total-courses">-</b><span>รายวิชา</span></div></a>
+            <a href="admin-library.html" class="db-st"><span class="db-ic db-ic-or"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg></span><div><b id="stat-total-templates">-</b><span>ชุดข้อสอบในคลัง</span></div></a>
+            <a href="admin-students.html" class="db-st"><span class="db-ic db-ic-gr"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M21.5 20a6.5 6.5 0 0 0-4-6"/></svg></span><div><b id="stat-total-students">-</b><span>นักศึกษา</span></div></a>
+            <a href="admin-rooms.html" class="db-st"><span class="db-ic db-ic-nv"><svg viewBox="0 0 24 24"><path d="M4 21V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16M2 21h20M15 12h.01"/></svg></span><div><b id="stat-rooms">-</b><span>ห้องสอบที่ตั้งไว้</span></div></a>
+        </section>
+      </div>
     </main>
+
+    <!-- ค้นหาด่วน (Ctrl K) -->
+    <div id="finder" class="db-finder" hidden role="dialog" aria-modal="true" aria-label="ค้นหาด่วน" onclick="if(event.target===this)closeFinder()">
+        <div class="db-finder-box">
+            <input id="finder-q" type="search" placeholder="พิมพ์ชื่อวิชา รหัสวิชา ห้องสอบ หรือเมนู" autocomplete="off" oninput="renderFinder()" onkeydown="finderKey(event)">
+            <ul id="finder-list" role="listbox"></ul>
+            <div class="db-finder-foot">↑ ↓ เลือก · Enter เปิด · Esc ปิด</div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="border-t border-slate-200 bg-white py-3.5 px-8 text-center">
@@ -588,193 +434,242 @@
     </footer>
 </div>
 
-<!-- Toast notification for copy PIN -->
-<div id="toast" class="fixed bottom-6 right-6 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-lg text-xs font-semibold opacity-0 transition-opacity pointer-events-none z-50">
-    คัดลอกรหัส PIN แล้ว
-</div>
-
 <script>
-    // 1. Teacher Information & Welcome Header
-    const rawTeacherName = localStorage.getItem('teacher_name') || localStorage.getItem('teacherName') || 'ภควันต์ แสนเสริม';
-    const cleanTeacherName = rawTeacherName.replace(/^(อาจารย์[:\s]*|อ\.\s*)/, '');
-    const teacherName = cleanTeacherName;
+    // ===== ข้อมูลอาจารย์ =====
+    const rawTeacherName = localStorage.getItem('teacher_name') || localStorage.getItem('teacherName') || '';
+    const teacherName = rawTeacherName.replace(/^(อาจารย์[:\s]*|อ\.\s*)/, '').trim();
     const teacherUsername = localStorage.getItem('teacher_username') || localStorage.getItem('teacherUsername') || 'admin';
-
-    const welcomeEl = document.getElementById('welcome-text');
-    if (welcomeEl) {
-        welcomeEl.textContent = `ยินดีต้อนรับ อาจารย์${teacherName} `;
-    }
     const sidebarTeacherEl = document.getElementById('sidebar-teacher-name');
-    if (sidebarTeacherEl) {
-        sidebarTeacherEl.textContent = `อาจารย์: ${teacherName}`;
-    }
+    if (sidebarTeacherEl && teacherName) sidebarTeacherEl.textContent = `อาจารย์: ${teacherName}`;
 
-    // 2. Thai Date Display
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('th-TH', { 
-        weekday: 'short', 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric' 
-    });
     const dateEl = document.getElementById('date-display');
-    if (dateEl) dateEl.textContent = dateStr;
+    if (dateEl) dateEl.textContent = new Date().toLocaleDateString('th-TH', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
 
-    // Toast Notification
-    function showToast(msg) {
-        const toast = document.getElementById('toast');
-        if (!toast) return;
-        toast.textContent = msg;
-        toast.style.opacity = '1';
-        setTimeout(() => { toast.style.opacity = '0'; }, 2000);
-    }
+    (function greet() {
+        const h = Number(new Date().toLocaleString('en-GB', { timeZone: 'Asia/Bangkok', hour: '2-digit', hour12: false }));
+        const part = h < 12 ? 'สวัสดีตอนเช้า' : h < 17 ? 'สวัสดีตอนบ่าย' : 'สวัสดีตอนเย็น';
+        const first = teacherName.split(/\s+/)[0];
+        document.getElementById('db-greet').textContent = part + (first ? ' อาจารย์' + first : '');
+    })();
 
+    function showToast(msg) { if (window.uiToast) return uiToast(msg); }
     function copyPin(pin) {
-        navigator.clipboard.writeText(pin).then(() => {
-            showToast(`คัดลอกรหัส PIN: ${pin} เรียบร้อยแล้ว`);
-        }).catch(() => {
-            alert(`รหัส PIN: ${pin}`);
-        });
+        navigator.clipboard.writeText(pin).then(() => showToast('คัดลอกรหัสเข้าสอบ ' + pin + ' แล้ว')).catch(() => showToast('รหัสเข้าสอบ: ' + pin));
     }
-
-    // Escape HTML helper
     function escapeHtml(text) {
-        if (!text) return '';
-        return String(text)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
+        if (text === null || text === undefined) return '';
+        return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
+    const esc = escapeHtml;
 
-    // 3. Load Actual Database Metrics & Rooms
+    // ไอคอนเส้น (ใช้ในการ์ด)
+    const IC = {
+        file: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z"/><path d="M14 3v6h6M12 13v3M12 19h.01"/>',
+        eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
+        users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M19 8v6M16 11h6"/>',
+        book: '<path d="M4 19.5V5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2Zm0 0A2 2 0 0 0 6 21h12"/>',
+        door: '<path d="M4 21V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16M2 21h20M15 12h.01"/>',
+        check: '<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',
+        swap: '<path d="M4 8h13l-3-3M20 16H7l3 3"/>',
+        login: '<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>',
+        copy: '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+        search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>'
+    };
+    const ic = (name, tone) => `<span class="db-ic db-ic-${tone}"><svg viewBox="0 0 24 24">${IC[name]}</svg></span>`;
+    const J = u => fetch(u).then(r => r.ok ? r.json() : null).catch(() => null);
+    const arr = x => Array.isArray(x) ? x : [];
+
+    // ห้องที่อาจารย์ตั้งค่าไว้จริง (ไม่นับห้องว่างที่ระบบสร้างอัตโนมัติ)
+    const isSetUp = r => r.is_published === 1 || Number(r.courseId) > 0 || (r.exam_title && !String(r.exam_title).startsWith('ห้องสอบที่')) || (r.roomId && String(r.roomId).includes('_room_'));
+    const roomTitle = r => r.exam_title || r.roomName || 'ห้องสอบ';
+
+    let DB = { courses: [], rooms: [] };
+    let refreshTimer = null;
+
     async function loadDashboardData() {
-        // A. Load Courses & Templates Count
-        try {
-            const courseRes = await fetch(`/api/teacher/courses?username=${encodeURIComponent(teacherUsername)}`);
-            if (courseRes.ok) {
-                const courses = await courseRes.json();
-                document.getElementById('stat-total-courses').textContent = courses.length;
+        const u = encodeURIComponent(teacherUsername);
+        const [coursesR, roomsR, studentsR, liveR, resultsR, cheatsR] = await Promise.all([
+            J(`/api/teacher/courses?username=${u}`), J(`/api/teacher/rooms?username=${u}`), J('/api/students'),
+            J(`/api/teacher/active-students?username=${u}`), J('/api/exam-results?roomId=ALL'), J('/api/cheat-logs?roomId=ALL')
+        ]);
+        const courses = arr(coursesR), rooms = arr(roomsR), results = arr(resultsR), cheats = arr(cheatsR);
+        const liveMap = (liveR && liveR.rooms) || {};
+        DB = { courses, rooms };
 
-                // Total templates from courses
-                const totalTemplates = courses.reduce((sum, c) => sum + (parseInt(c.examCount) || 0), 0);
-                document.getElementById('stat-total-templates').textContent = totalTemplates;
-            }
-        } catch(e) {
-            console.error('โหลดข้อมูลรายวิชาล้มเหลว:', e);
-        }
+        const setUp = rooms.filter(isSetUp);
+        const live = setUp.filter(r => r.is_published === 1);
+        const others = setUp.filter(r => r.is_published !== 1);
+        const templates = courses.reduce((s, c) => s + (parseInt(c.examCount) || 0), 0);
+        const courseOf = id => courses.find(c => Number(c.id) === Number(id));
 
-        // B. Load Total Enrolled Students
-        try {
-            const studentRes = await fetch('/api/students');
-            if (studentRes.ok) {
-                const students = await studentRes.json();
-                document.getElementById('stat-total-students').textContent = students.length;
-            }
-        } catch(e) {
-            console.error('โหลดข้อมูลนักศึกษาล้มเหลว:', e);
-        }
+        // ตัวเลขสรุป
+        document.getElementById('stat-total-courses').textContent = coursesR ? courses.length : '-';
+        document.getElementById('stat-total-templates').textContent = coursesR ? templates : '-';
+        document.getElementById('stat-total-students').textContent = studentsR ? arr(studentsR).length : '-';
+        document.getElementById('stat-rooms').textContent = roomsR ? setUp.length : '-';
 
-        // C. Load Active Exam Rooms
-        try {
-            const roomRes = await fetch(`/api/teacher/rooms?username=${encodeURIComponent(teacherUsername)}`);
-            if (roomRes.ok) {
-                const rooms = await roomRes.json();
-                const activeRooms = (rooms || []).filter(r => {
-                    const isPub = r.is_published === 1;
-                    const hasTitle = r.exam_title && !r.exam_title.startsWith('ห้องสอบที่');
-                    const isCustom = r.roomId && r.roomId.includes('_room_');
-                    return isPub || hasTitle || isCustom;
-                });
-
-                document.getElementById('stat-active-rooms').textContent = activeRooms.length;
-
-                // Render Active Rooms Section
-                renderActiveRooms(activeRooms);
-            }
-        } catch(e) {
-            console.error('โหลดข้อมูลห้องสอบล้มเหลว:', e);
-        }
-    }
-
-    // Render Active Rooms Card
-    function renderActiveRooms(rooms) {
-        const container = document.getElementById('live-rooms-container');
-        if (!container) return;
-
-        if (!rooms || rooms.length === 0) {
-            container.innerHTML = `
-                <div class="academic-card p-6 text-center space-y-3 bg-slate-50/50 border-dashed border-2 border-slate-200">
-                    <div>
-                        <div class="font-bold text-slate-800 text-sm">ยังไม่มีห้องสอบที่กำลังดำเนินการอยู่ในขณะนี้</div>
-                        <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-                            อาจารย์สามารถเลือกรายวิชาและเปิดห้องสอบใหม่เพื่อรับรหัส PIN 6 หลัก และฉายจอให้นักศึกษาเข้าสอบได้ทันที
-                        </p>
-                    </div>
-                    <div>
-                        <a href="admin-rooms.html" class="inline-flex items-center gap-2 bg-blue-900 hover:bg-blue-800 text-white font-semibold px-4 py-2 rounded-xl text-xs shadow-xs transition">
-                            <span>เปิดห้องสอบใหม่</span>
-                        </a>
-                    </div>
-                </div>
-            `;
-            return;
-        }
-
-        container.innerHTML = `
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                ${rooms.map(room => {
-                    const isPub = room.is_published === 1;
-                    const courseText = room.courseName ? `[${room.courseCode || 'วิชา'}] ${room.courseName}` : 'ห้องสอบทั่วไป';
-                    const classText = room.studentClasses || room.courseClassroom || 'ห้องเรียนตามรายวิชา';
-                    const titleText = room.exam_title || room.roomName || 'สอบเก็บคะแนน';
-                    const pin = room.exam_code || '------';
-
-                    return `
-                        <div class="academic-card p-5 space-y-3.5 border-l-4 ${isPub ? 'border-l-emerald-500' : 'border-l-amber-500'}">
-                            <div class="flex items-center justify-between">
-                                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full ${isPub ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-                                    ${isPub ? 'กำลังเปิดสอบ' : 'ห้องรอสอบ'}
-                                </span>
-                                <span class="text-[11px] font-mono font-semibold text-slate-400">#${escapeHtml(room.roomId)}</span>
-                            </div>
-
-                            <div>
-                                <div class="text-xs font-semibold text-blue-700 truncate">${escapeHtml(courseText)}</div>
-                                <div class="text-sm font-bold text-slate-900 mt-0.5 truncate">${escapeHtml(titleText)}</div>
-                                <div class="text-[11px] text-slate-500 mt-0.5">กลุ่ม: ${escapeHtml(classText)}</div>
-                            </div>
-
-                            <!-- PIN Code box -->
-                            <div onclick="copyPin('${pin}')" class="p-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl flex items-center justify-between cursor-pointer transition">
-                                <div>
-                                    <div class="text-[9px] text-cyan-300 font-bold uppercase tracking-wider">รหัส PIN เข้าสอบ</div>
-                                    <div class="text-xl font-bold font-mono tracking-widest">${escapeHtml(pin)}</div>
-                                </div>
-                                <span class="text-xs bg-white/10 px-2 py-1 rounded-md text-slate-200">คัดลอก</span>
-                            </div>
-
-                            <!-- Action buttons -->
-                            <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-100">
-                                <a href="admin-rooms.html" class="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold text-center transition">
-                                    คุมห้องสอบ
-                                </a>
-                                <a href="admin-monitoring.html?room=${encodeURIComponent(room.roomId)}" class="py-1.5 px-2 bg-orange-50 hover:bg-orange-100 text-orange-800 border border-orange-200 rounded-lg text-xs font-semibold text-center transition">
-                                    เฝ้าระวัง
-                                </a>
-                            </div>
+        // ===== ห้องที่กำลังสอบ =====
+        let sumSub = 0, sumAll = 0;
+        const liveBox = document.getElementById('db-live');
+        if (!live.length) {
+            const hasRoomReady = others.some(r => Number(r.questionCount) > 0);
+            liveBox.innerHTML = `<div class="db-card db-none">
+                <b>ยังไม่มีห้องที่กำลังสอบ</b>
+                <p>${hasRoomReady ? 'มีห้องสอบที่พร้อมแล้ว เปิดห้องเพื่อรับรหัสเข้าสอบ 6 หลัก แล้วให้นักศึกษากรอกเพื่อเข้าสอบ' : 'เปิดห้องสอบเพื่อรับรหัสเข้าสอบ 6 หลัก แล้วให้นักศึกษากรอกเพื่อเข้าสอบได้ทันที'}</p>
+                <a href="admin-rooms.html" class="db-btn db-pri">เปิดห้องสอบ</a></div>`;
+        } else {
+            liveBox.innerHTML = live.map(r => {
+                const c = courseOf(r.courseId);
+                const st = liveMap[r.roomId] || {};
+                const sub = Number(st.submitted) || 0, act = Number(st.active) || 0;
+                const enrolled = c ? Number(c.studentCount) || 0 : 0;
+                const total = Math.max(enrolled, sub + act);
+                const notIn = Math.max(0, total - sub - act);
+                sumSub += sub; sumAll += total;
+                const sw = new Set(cheats.filter(x => x.roomId === r.roomId).map(x => x.studentId)).size;
+                const pct = n => total ? (n / total * 100) : 0;
+                const sub2 = [r.courseCode, r.studentClasses ? 'กลุ่ม ' + r.studentClasses : '', Number(r.questionCount) + ' ข้อ', r.duration ? 'เวลาสอบ ' + r.duration + ' นาที' : ''].filter(Boolean).join(' · ');
+                const pin = r.exam_code || '------';
+                return `<section class="db-card db-live" aria-label="ห้องที่กำลังสอบ">
+                    <div class="db-live-top">
+                        <div style="min-width:0">
+                            <span class="db-pill db-pill-gr"><span class="db-dot"></span>กำลังสอบ</span>
+                            <div class="db-live-t">${esc(roomTitle(r))}</div>
+                            <div class="db-sub">${esc(sub2)}</div>
                         </div>
-                    `;
-                }).join('')}
-            </div>
-        `;
+                        <div class="db-pin-box">
+                            <div class="db-sub" style="margin:0">รหัสเข้าสอบ</div>
+                            <div class="db-pin">${esc(pin)}</div>
+                            <button type="button" class="db-btn db-sm" onclick="copyPin('${esc(pin)}')"><svg viewBox="0 0 24 24" class="db-i" style="width:15px;height:15px">${IC.copy}</svg>คัดลอก</button>
+                        </div>
+                    </div>
+                    <div class="db-bar" role="img" aria-label="ส่งแล้ว ${sub} กำลังทำ ${act} ยังไม่เข้า ${notIn} จาก ${total} คน">
+                        <i style="width:${pct(sub)}%;background:var(--gr)"></i><i style="width:${pct(act)}%;background:var(--bl)"></i>
+                    </div>
+                    <div class="db-legend">
+                        <span><b style="color:var(--gr)">${sub}</b>ส่งแล้ว</span>
+                        <span><b style="color:var(--bl)">${act}</b>กำลังทำ</span>
+                        ${enrolled ? `<span><b>${notIn}</b>ยังไม่เข้า</span>` : ''}
+                        ${sw ? `<span style="color:#c2410c"><b style="color:#c2410c">${sw}</b>คนสลับหน้าจอ</span>` : '<span>ยังไม่มีใครสลับหน้าจอ</span>'}
+                    </div>
+                    <div class="db-live-act">
+                        <a class="db-btn db-orb" href="admin-monitoring.html?room=${encodeURIComponent(r.roomId)}">เฝ้าระวังสด</a>
+                        <a class="db-btn" href="admin-results.html">ดูคะแนน</a>
+                        <a class="db-btn db-push" href="admin-rooms.html">จัดการห้องสอบ</a>
+                    </div>
+                </section>`;
+            }).join('');
+        }
+
+        // ===== ห้องสอบอื่น (ยังไม่เปิด) =====
+        document.getElementById('db-rooms').innerHTML = others.slice(0, 4).map(r => {
+            const q = Number(r.questionCount) || 0;
+            const pill = q ? `<span class="db-pill db-pill-bl">พร้อมเปิด</span>` : `<span class="db-pill db-pill-or">ยังไม่มีข้อสอบ</span>`;
+            const sub = [r.courseCode, r.studentClasses ? 'กลุ่ม ' + r.studentClasses : '', q ? q + ' ข้อ' : ''].filter(Boolean).join(' · ') || 'ยังไม่ได้เลือกรายวิชา';
+            return `<a class="db-room" href="admin-rooms.html"><div class="db-room-h"><b>${esc(roomTitle(r))}</b>${pill}</div><div class="db-sub">${esc(sub)}</div></a>`;
+        }).join('');
+
+        // ===== สิ่งที่ต้องทำ =====
+        const todo = [];
+        if (coursesR && !courses.length) todo.push({ i: 'book', t: 'bl', h: 'สร้างรายวิชาแรก', s: 'เริ่มจากรายวิชา แล้วค่อยเพิ่มรายชื่อและข้อสอบ', go: 'สร้างรายวิชา', href: 'admin-courses.html' });
+        live.forEach(r => {
+            const per = {};
+            cheats.filter(x => x.roomId === r.roomId).forEach(x => { per[x.studentId] = (per[x.studentId] || 0) + 1; });
+            const n = Object.values(per).filter(v => v >= 2).length;
+            if (n) todo.push({ i: 'eye', t: 'rd', h: `${n} คนสลับหน้าจอ 2 ครั้งขึ้นไป`, s: roomTitle(r), go: 'ตรวจสอบ', href: 'admin-monitoring.html?room=' + encodeURIComponent(r.roomId) });
+        });
+        others.filter(r => !Number(r.questionCount)).slice(0, 3).forEach(r =>
+            todo.push({ i: 'file', t: 'or', h: `ห้อง "${roomTitle(r)}" ยังไม่มีข้อสอบ`, s: r.courseCode || 'เลือกชุดข้อสอบให้ห้องนี้', go: 'เพิ่มข้อสอบ', href: 'admin-rooms.html' }));
+        courses.filter(c => !Number(c.studentCount)).slice(0, 3).forEach(c =>
+            todo.push({ i: 'users', t: 'bl', h: `วิชา ${c.courseCode || c.courseName} ยังไม่มีรายชื่อ`, s: 'นำเข้าจาก Excel หรือเพิ่มทีละคน', go: 'เพิ่มรายชื่อ', href: 'admin-courses.html' }));
+        if (courses.length && !templates && !rooms.some(r => Number(r.questionCount) > 0))
+            todo.push({ i: 'file', t: 'or', h: 'ยังไม่มีชุดข้อสอบ', s: 'พิมพ์เอง วางข้อความจาก AI หรือนำเข้า Excel', go: 'สร้างข้อสอบ', href: 'admin-questions.html' });
+        if (courses.length && templates && !setUp.length)
+            todo.push({ i: 'door', t: 'nv', h: 'เปิดห้องสอบแรก', s: 'ได้รหัสเข้าสอบ 6 หลักให้นักศึกษา', go: 'เปิดห้องสอบ', href: 'admin-rooms.html' });
+        const todoBox = document.getElementById('db-todo'), todoN = document.getElementById('db-todo-n');
+        if (!todo.length) {
+            todoBox.innerHTML = `<div class="db-ok">${ic('check', 'gr')}<span>ไม่มีงานค้าง ทุกอย่างพร้อมแล้ว</span></div>`;
+            todoN.hidden = true;
+        } else {
+            todoBox.innerHTML = todo.slice(0, 6).map(x => `<a class="db-row" href="${x.href}">${ic(x.i, x.t)}<span class="db-row-t">${esc(x.h)}<small>${esc(x.s)}</small></span><span class="db-go">${x.go} →</span></a>`).join('');
+            todoN.textContent = todo.length + ' รายการ'; todoN.hidden = false;
+        }
+
+        // ===== กิจกรรมล่าสุด =====
+        const nameOfRoom = id => { const r = rooms.find(x => x.roomId === id); return r ? roomTitle(r) : ''; };
+        const latestDate = results[0] ? results[0].date : null;
+        const evRes = results.slice(0, 8).map(x => ({ k: (x.date === latestDate ? '1' : '0') + (x.time || ''), html: `${ic('check', 'gr')}<span class="db-row-t">${esc(x.name)} ส่งข้อสอบ · ได้ ${x.score}/${x.maxScore}<small>${esc(nameOfRoom(x.roomId))}</small></span><span class="db-t">${esc(x.date === latestDate ? x.time : x.date)}</span>` }));
+        const evCh = cheats.slice(0, 5).map(x => ({ k: '1' + (x.time || ''), html: `${ic('swap', 'or')}<span class="db-row-t">${esc(x.name)} สลับหน้าจอ<small>${esc(nameOfRoom(x.roomId))}</small></span><span class="db-t">${esc(x.time)}</span>` }));
+        const feed = evRes.concat(evCh).sort((a, b) => b.k.localeCompare(a.k)).slice(0, 6);
+        document.getElementById('db-feed').innerHTML = feed.length
+            ? feed.map(x => `<div class="db-row">${x.html}</div>`).join('')
+            : '<div class="db-empty">ยังไม่มีกิจกรรม เมื่อนักศึกษาเข้าสอบหรือส่งข้อสอบ จะแสดงที่นี่</div>';
+
+        // ===== ผลสอบล่าสุด =====
+        const scoreBox = document.getElementById('db-score');
+        if (!results.length) {
+            scoreBox.innerHTML = '<div class="db-empty">ยังไม่มีผลสอบ หลังนักศึกษาส่งข้อสอบ ระบบจะสรุปคะแนนเฉลี่ยให้ที่นี่</div>';
+        } else {
+            const rid = results[0].roomId;
+            const rs = results.filter(x => x.roomId === rid && Number(x.maxScore) > 0);
+            const pcts = rs.map(x => Number(x.score) / Number(x.maxScore) * 100);
+            const avg = pcts.length ? Math.round(pcts.reduce((a, b) => a + b, 0) / pcts.length) : 0;
+            const b = [0, 0, 0, 0, 0]; pcts.forEach(p => b[Math.min(4, Math.floor(p / 20))]++);
+            const mx = Math.max(1, ...b);
+            scoreBox.innerHTML = `<div class="db-avg"><b>${avg}%</b><span class="db-sub" style="margin:0">คะแนนเฉลี่ย · ส่งแล้ว ${rs.length} คน</span></div>
+                <div class="db-sub">${esc(nameOfRoom(rid) || 'ห้องสอบล่าสุด')}</div>
+                <div class="db-hist" role="img" aria-label="จำนวนนักศึกษาตามช่วงคะแนน ${b.join(', ')}">${b.map(n => `<i class="${n === mx && n ? 'top' : ''}" style="height:${n / mx * 100}%" title="${n} คน"></i>`).join('')}</div>
+                <div class="db-hist-l"><span>0–19%</span><span>20–39%</span><span>40–59%</span><span>60–79%</span><span>80–100%</span></div>`;
+        }
+
+        // ===== สรุปบรรทัดบน =====
+        const sumEl = document.getElementById('db-summary');
+        if (live.length) sumEl.textContent = `ตอนนี้มีสอบ ${live.length} ห้อง · นักศึกษาส่งแล้ว ${sumSub}${sumAll ? ' จาก ' + sumAll : ''} คน`;
+        else if (todo.length) sumEl.textContent = `ยังไม่มีห้องที่กำลังสอบ · มี ${todo.length} เรื่องที่ควรทำต่อ`;
+        else sumEl.textContent = 'ยังไม่มีห้องที่กำลังสอบ · ทุกอย่างพร้อมแล้ว';
+
+        // ห้องกำลังสอบ → อัปเดตทุก 20 วินาที
+        clearTimeout(refreshTimer);
+        if (live.length) refreshTimer = setTimeout(() => { if (!document.hidden) loadDashboardData(); else refreshTimer = setTimeout(loadDashboardData, 20000); }, 20000);
     }
 
-    // Initial Load
-    document.addEventListener('DOMContentLoaded', () => {
-        loadDashboardData();
+    // ===== ค้นหาด่วน (Ctrl K) =====
+    let finderSel = 0, finderItems = [];
+    function finderSource() {
+        const pages = [...document.querySelectorAll('#sidebar a[href]')].map(a => ({ t: a.textContent.trim().replace(/\s+/g, ' '), s: 'เมนู', href: a.getAttribute('href') })).filter(x => x.t && x.href && x.href !== '#');
+        const cs = DB.courses.map(c => ({ t: [c.courseCode, c.courseName].filter(Boolean).join(' '), s: 'รายวิชา' + (c.description ? ' · กลุ่ม ' + c.description : ''), href: 'admin-courses.html' }));
+        const rs = DB.rooms.filter(isSetUp).map(r => ({ t: roomTitle(r) + (r.exam_code ? ' · ' + r.exam_code : ''), s: r.is_published === 1 ? 'ห้องสอบ · กำลังสอบ' : 'ห้องสอบ', href: 'admin-rooms.html' }));
+        const seen = new Set();
+        return pages.filter(p => !seen.has(p.href + p.t) && seen.add(p.href + p.t)).concat(cs, rs);
+    }
+    function renderFinder() {
+        const q = document.getElementById('finder-q').value.trim().toLowerCase();
+        finderItems = finderSource().filter(x => !q || (x.t + ' ' + x.s).toLowerCase().includes(q)).slice(0, 12);
+        finderSel = Math.min(finderSel, Math.max(0, finderItems.length - 1));
+        document.getElementById('finder-list').innerHTML = finderItems.length
+            ? finderItems.map((x, i) => `<li><a href="${esc(x.href)}" class="${i === finderSel ? 'on' : ''}" role="option" aria-selected="${i === finderSel}">${esc(x.t)}<small>${esc(x.s)}</small></a></li>`).join('')
+            : '<li class="db-empty" style="padding:14px 12px">ไม่พบ ลองพิมพ์คำอื่น</li>';
+    }
+    function openFinder() {
+        const f = document.getElementById('finder'); f.hidden = false;
+        const q = document.getElementById('finder-q'); q.value = ''; finderSel = 0; renderFinder(); q.focus();
+    }
+    function closeFinder() { document.getElementById('finder').hidden = true; }
+    function finderKey(e) {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            finderSel = (finderSel + (e.key === 'ArrowDown' ? 1 : -1) + finderItems.length) % Math.max(1, finderItems.length);
+            renderFinder();
+            const on = document.querySelector('#finder-list a.on'); if (on) on.scrollIntoView({ block: 'nearest' });
+        } else if (e.key === 'Enter' && finderItems[finderSel]) { location.href = finderItems[finderSel].href; }
+        else if (e.key === 'Escape') closeFinder();
+    }
+    document.addEventListener('keydown', e => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openFinder(); }
+        else if (e.key === 'Escape' && !document.getElementById('finder').hidden) closeFinder();
     });
+
+    document.addEventListener('DOMContentLoaded', loadDashboardData);
 </script>
 </body>
 </html>

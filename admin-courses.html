@@ -585,7 +585,7 @@
             if (t === '3') b.hidden = count('3') === 0 && termFilter !== '3';
             b.setAttribute('aria-selected', String(t === termFilter));
             const label = t === 'all' ? 'ทั้งหมด' : t === '3' ? 'ภาคฤดูร้อน' : 'เทอม ' + t;
-            b.innerHTML = label + '<small>' + count(t) + '</small>';
+            b.innerHTML = label + ' <small>(' + count(t) + ')</small>';
             b.onclick = () => setTermFilter(t);
         });
     }
