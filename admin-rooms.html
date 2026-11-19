@@ -465,7 +465,7 @@
                     <span id="pub-modal-icon" class="text-2xl"></span>
                     <div>
                         <div class="flex items-center gap-2">
-                            <h3 id="pub-modal-title" class="font-bold text-slate-800 text-base">ห้องรอสอบ (Waiting Lounge)</h3>
+                            <h3 id="pub-modal-title" class="font-bold text-slate-800 text-base">ห้องรอสอบ</h3>
                             <span id="pub-modal-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">รอกดเริ่มสอบ</span>
                         </div>
                         <p id="pub-modal-room-info" class="text-[11px] text-slate-500 font-bold">ห้องสอบ...</p>
@@ -548,7 +548,7 @@
                 <div class="flex items-center gap-3">
                     <div>
                         <div class="flex items-center gap-2">
-                            <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">แดชบอร์ดสรุปผลสอบสด (Real-time Exam Dashboard)</h3>
+                            <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">แดชบอร์ดสรุปผลสอบสด</h3>
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-xs">
                                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                                 <span>อัปเดตสดทุก 2.5 วินาที</span>
@@ -592,7 +592,7 @@
                     <span>รายชื่อและสถานะสด</span>
                 </button>
                 <button type="button" onclick="switchDashboardTab('histogram')" id="dtab-btn-histogram" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl cursor-pointer font-bold transition flex items-center gap-1.5">
-                    <span>การกระจายคะแนน (Histogram)</span>
+                    <span>การกระจายคะแนน</span>
                 </button>
                 <button type="button" onclick="switchDashboardTab('wrong_questions')" id="dtab-btn-wrong-questions" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl cursor-pointer font-bold transition flex items-center gap-1.5">
                     <span>ข้อที่นักศึกษาตอบผิดเยอะที่สุด</span>
@@ -892,7 +892,7 @@
                                 ${isPub 
                                     ? `<span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 flex items-center gap-1.5 shadow-xs">
                                          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                         <span>กำลังเปิดสอบ (LIVE)</span>
+                                         <span>กำลังเปิดสอบ</span>
                                        </span>`
                                     : `<span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700 flex items-center gap-1.5 shadow-xs">
                                          <span class="w-2 h-2 rounded-full bg-amber-500"></span>
@@ -1269,7 +1269,7 @@
 
                 if (roomData.is_published === 1) {
                     if (icon) icon.textContent = '';
-                    if (title) title.textContent = 'การสอบกำลังดำเนินการอยู่ (LIVE)';
+                    if (title) title.textContent = 'การสอบกำลังดำเนินการอยู่';
                     if (badge) {
                         badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700';
                         badge.textContent = 'กำลังเปิดสอบ';
@@ -1278,7 +1278,7 @@
                     if (stopBtn) stopBtn.classList.remove('hidden');
                 } else {
                     if (icon) icon.textContent = '';
-                    if (title) title.textContent = 'ห้องรอสอบ (Waiting Lounge)';
+                    if (title) title.textContent = 'ห้องรอสอบ';
                     if (badge) {
                         badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700';
                         badge.textContent = 'รอกดเริ่มสอบ';

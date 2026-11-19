@@ -1,4 +1,79 @@
 // theme.js — ใส่โลโก้ ExamPro และปรับหน้าตาเล็กน้อย (ไม่แตะการทำงานของหน้า)
+
+// ===== แจ้งเตือนแบบเป็นมิตร: แทนกล่อง alert() ของเบราว์เซอร์ =====
+// ข้อความสั้น → แถบแจ้งเตือนเลื่อนลงจากด้านบนแล้วหายเอง · ข้อความยาว → กล่องกลางจอมีปุ่ม "ตกลง"
+// แจ้งเตือนที่ยังแสดงอยู่ตอนเปลี่ยนหน้า จะแสดงต่อในหน้าถัดไป (เช่น "บันทึกสำเร็จ" แล้วพาไปหน้าอื่น)
+(function () {
+  if (window.uiToast) return;
+  const KEY = '__uiToasts';
+  const kindOf = m => /ไม่สำเร็จ|ผิดพลาด|ไม่สามารถ|ล้มเหลว|ปฏิเสธ|ไม่พบ|หมดอายุ|ไม่ถูกต้อง|ไม่ตรงกัน|ห้าม|error/i.test(m) ? 'err'
+    : /สำเร็จ|เรียบร้อย|บันทึกแล้ว|คัดลอก|ส่งแล้ว|เพิ่ม.*แล้ว|ลบ.*แล้ว/.test(m) ? 'ok' : 'info';
+  const css = `
+  .ui-toasts{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:2147483600;display:flex;flex-direction:column;gap:8px;width:min(440px,calc(100vw - 24px));pointer-events:none}
+  .ui-toast{pointer-events:auto;display:flex;align-items:flex-start;gap:10px;padding:12px 14px 12px 12px;border-radius:14px;background:#fff;color:#0f172a;box-shadow:0 14px 34px -12px rgba(2,11,38,.35),0 0 0 1px rgba(15,23,42,.06);font:500 14.5px/1.55 'Noto Sans Thai Looped',Tahoma,sans-serif;white-space:pre-line;animation:uiIn .26s cubic-bezier(.2,.9,.3,1.15);cursor:pointer}
+  .ui-toast.out{animation:uiOut .18s ease-in forwards}
+  .ui-toast i{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:13px;color:#fff;margin-top:1px}
+  .ui-toast.ok i{background:#16a34a}.ui-toast.err i{background:#dc2626}.ui-toast.info i{background:#1557e0}
+  .ui-toast.err{box-shadow:0 14px 34px -12px rgba(220,38,38,.35),0 0 0 1px rgba(220,38,38,.25)}
+  .ui-dlg{position:fixed;inset:0;z-index:2147483601;background:rgba(2,11,38,.55);display:flex;align-items:center;justify-content:center;padding:18px;animation:uiFade .15s ease-out}
+  .ui-dlg>div{width:100%;max-width:440px;max-height:80vh;overflow:auto;background:#fff;border-radius:20px;padding:22px 20px 16px;box-shadow:0 30px 70px -20px rgba(0,0,0,.5);font:500 15px/1.65 'Noto Sans Thai Looped',Tahoma,sans-serif;color:#0f172a;white-space:pre-line;animation:uiIn .22s cubic-bezier(.2,.9,.3,1.15)}
+  .ui-dlg button{display:block;width:100%;margin-top:14px;padding:12px;border:0;border-radius:12px;background:#0b2a7a;color:#fff;font:700 15px 'Noto Sans Thai Looped',Tahoma,sans-serif;cursor:pointer}
+  @keyframes uiIn{from{opacity:0;transform:translateY(-10px) scale(.98)}to{opacity:1;transform:none}}
+  @keyframes uiOut{to{opacity:0;transform:translateY(-6px) scale(.98)}}
+  @keyframes uiFade{from{opacity:0}to{opacity:1}}
+  @media (prefers-reduced-motion:reduce){.ui-toast,.ui-dlg,.ui-dlg>div{animation:none!important}}`;
+  let box = null; const live = new Map();
+  const ready = fn => (document.body ? fn() : document.addEventListener('DOMContentLoaded', fn));
+  const save = () => { try { sessionStorage.setItem(KEY, JSON.stringify([...live.values()].map(t => ({ m: t.m, k: t.k, until: t.until })))); } catch (e) {} };
+  function mount() {
+    if (box && document.body.contains(box)) return;
+    const st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+    box = document.createElement('div'); box.className = 'ui-toasts'; box.setAttribute('role', 'status'); box.setAttribute('aria-live', 'polite');
+    document.body.appendChild(box);
+  }
+  function toast(msg, kind, ms) {
+    msg = String(msg == null ? '' : msg).trim(); if (!msg) return;
+    ready(() => {
+      mount();
+      const k = kind || kindOf(msg);
+      const dur = ms || (k === 'err' ? 7000 : Math.min(6500, 2600 + msg.length * 35));
+      const el = document.createElement('div'); el.className = 'ui-toast ' + k;
+      el.innerHTML = `<i>${k === 'ok' ? '✓' : k === 'err' ? '!' : 'i'}</i><span></span>`;
+      el.querySelector('span').textContent = msg;
+      const id = Math.random().toString(36).slice(2);
+      const close = () => { if (!live.has(id)) return; live.delete(id); save(); el.classList.add('out'); setTimeout(() => el.remove(), 200); };
+      el.addEventListener('click', close);
+      box.appendChild(el); while (box.children.length > 3) box.firstChild.remove();
+      live.set(id, { m: msg, k, until: Date.now() + dur }); save();
+      setTimeout(close, dur);
+    });
+  }
+  function dialog(msg) {
+    ready(() => {
+      mount();
+      const d = document.createElement('div'); d.className = 'ui-dlg'; d.setAttribute('role', 'alertdialog');
+      d.innerHTML = '<div><span></span><button type="button">ตกลง</button></div>';
+      d.querySelector('span').textContent = String(msg);
+      try { sessionStorage.setItem(KEY + 'Dlg', String(msg)); } catch (e) {}
+      const close = () => { d.remove(); try { sessionStorage.removeItem(KEY + 'Dlg'); } catch (e) {} };
+      d.querySelector('button').addEventListener('click', close);
+      d.addEventListener('keydown', e => { if (e.key === 'Escape' || e.key === 'Enter') { e.preventDefault(); close(); } });
+      document.body.appendChild(d); setTimeout(() => d.querySelector('button').focus(), 20);
+    });
+  }
+  window.uiToast = toast; window.uiDialog = dialog;
+  window.alert = function (m) {
+    const s = String(m == null ? '' : m);
+    if (s.length > 160 || /\n\s*\n/.test(s)) dialog(s); else toast(s);
+  };
+  // แจ้งเตือนที่ค้างจากหน้าก่อน
+  try {
+    const q = JSON.parse(sessionStorage.getItem(KEY) || '[]'); sessionStorage.removeItem(KEY);
+    q.filter(t => t.until > Date.now()).forEach(t => toast(t.m, t.k, Math.max(1500, t.until - Date.now())));
+    const dl = sessionStorage.getItem(KEY + 'Dlg'); if (dl) dialog(dl);
+  } catch (e) {}
+})();
+
 (function () {
 
   const pageNow = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
@@ -116,4 +191,35 @@
     new MutationObserver(() => { if (!pending) { pending = true; requestAnimationFrame(tick); } }).observe(document.body, { childList: true, subtree: true, characterData: true });
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+})();
+
+// ===== หน้าว่างที่บอกทางต่อ: ยังไม่มีรายวิชา/ชุดข้อสอบ → แถบบอกขั้นถัดไปพร้อมปุ่มพาไป =====
+(function () {
+  const page = (location.pathname.split('/').pop() || '').toLowerCase();
+  const NEED_COURSE = ['admin-students.html', 'admin-results.html', 'admin-rooms.html', 'admin-library.html', 'admin-monitoring.html', 'trinetra-report.html'];
+  const NEED_EXAM = ['admin-rooms.html', 'admin-library.html'];
+  if (!NEED_COURSE.includes(page)) return;
+  const go = async () => {
+    let courses = [];
+    try { const r = await fetch('/api/teacher/courses'); if (!r.ok) return; courses = await r.json(); } catch (e) { return; }
+    if (!Array.isArray(courses)) return;
+    let b = null;
+    if (courses.length === 0) b = { t: 'ยังไม่มีรายวิชา', d: 'เริ่มจากสร้างรายวิชาและเพิ่มรายชื่อนักศึกษาก่อน แล้วค่อยสร้างข้อสอบและเปิดห้องสอบ', href: 'admin-courses.html', cta: 'สร้างรายวิชา' };
+    else if (NEED_EXAM.includes(page) && !courses.some(c => Number(c.examCount) > 0)) b = { t: 'ยังไม่มีชุดข้อสอบ', d: 'ห้องสอบต้องใช้ชุดข้อสอบ สร้างชุดข้อสอบให้รายวิชาก่อน', href: 'admin-questions.html', cta: 'สร้างข้อสอบ' };
+    if (!b) return;
+    const host = document.querySelector('main') || document.body;
+    const el = document.createElement('div');
+    el.className = 'ui-next';
+    el.innerHTML = '<div><b></b><span></span></div><a></a>';
+    el.querySelector('b').textContent = b.t; el.querySelector('span').textContent = b.d;
+    const a = el.querySelector('a'); a.href = b.href; a.textContent = b.cta + ' →';
+    const st = document.createElement('style');
+    st.textContent = '.ui-next{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:0 0 18px;padding:16px 18px;border-radius:18px;background:#fff7ed;border:1.5px solid #fdba74;font-family:inherit;animation:uiIn .25s ease-out}' +
+      '.ui-next b{display:block;font-size:16px;color:#9a3412}.ui-next span{display:block;margin-top:2px;font-size:14px;color:#7c2d12;line-height:1.55}' +
+      '.ui-next a{flex:none;padding:11px 18px;border-radius:12px;background:#ff7a1a;color:#fff!important;font-weight:700;font-size:14.5px;text-decoration:none;box-shadow:0 10px 20px -10px rgba(255,122,26,.7)}' +
+      '.ui-next a:hover{filter:brightness(1.05)}';
+    document.head.appendChild(st);
+    host.prepend(el);
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
 })();

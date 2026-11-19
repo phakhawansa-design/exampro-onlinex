@@ -401,7 +401,7 @@
                 const isLive = r.is_published === 1;
                 return `
                 <button onclick="selectRoom('${r.roomId}')" id="tab-${r.roomId}" class="room-tab mn-tab ${r.roomId === currentRoomId ? 'on' : ''}">
-                    ${isLive ? '<span class="mn-live" title="กำลังเปิดสอบ (LIVE)"></span>' : ''}
+                    ${isLive ? '<span class="mn-live" title="กำลังเปิดสอบ"></span>' : ''}
                     <span>${escapeHtml(displayName)}</span>
                     <span id="active-student-badge-${r.roomId}" class="hidden mn-tab-act">0 คน</span>
                     ${count > 0 ? `<span class="mn-tab-n" title="พบพฤติกรรมน่าสงสัย ${count} คน">${count}</span>` : ''}

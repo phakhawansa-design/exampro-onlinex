@@ -745,6 +745,38 @@ app.post('/api/admin/create-teacher', (req, res) => {
     });
 });
 
+// ผู้ดูแลระบบเพิ่มบัญชีอาจารย์เอง → ใช้งานได้ทันที ไม่ต้องรออนุมัติ (เส้นทาง /api/superadmin/* ใช้ได้เฉพาะแอดมิน)
+app.post('/api/superadmin/create-teacher', (req, res) => {
+    const u = req.authUser;
+    if (!u || u.typ !== 'teacher' || u.role !== 'admin') return res.status(403).json({ success: false, message: 'เฉพาะผู้ดูแลระบบ' });
+    const uname = String((req.body && req.body.newUsername) || '').trim();
+    const name = String((req.body && req.body.name) || '').trim();
+    const phone = String((req.body && req.body.phone) || '').trim() || '-';
+    const password = String((req.body && req.body.password) || '');
+    if (!uname || !name || !password) return res.status(400).json({ success: false, message: 'กรุณากรอกชื่อ-นามสกุล ชื่อผู้ใช้ และรหัสผ่าน' });
+    if (!/^[A-Za-z0-9._-]{3,30}$/.test(uname)) return res.status(400).json({ success: false, message: 'ชื่อผู้ใช้ใช้ได้เฉพาะ a-z, 0-9, จุด, ขีด และยาว 3–30 ตัว' });
+    if (password.length < 8 || password === 'admin123' || password.toLowerCase() === uname.toLowerCase()) return res.status(400).json({ success: false, message: 'รหัสผ่านต้องยาวอย่างน้อย 8 ตัว และห้ามซ้ำกับชื่อผู้ใช้' });
+    const unameNorm = uname.replace(/[^0-9a-zA-Z]/g, '');
+    db.get(`SELECT studentId FROM students WHERE studentId = ? OR REPLACE(studentId, '-', '') = ?
+            UNION SELECT studentId FROM course_students WHERE studentId = ? OR REPLACE(studentId, '-', '') = ? LIMIT 1`,
+        [uname, unameNorm, uname, unameNorm], (sErr, clash) => {
+        if (clash) return res.status(400).json({ success: false, message: 'ชื่อผู้ใช้นี้ตรงกับรหัสนักศึกษาในระบบ กรุณาใช้ชื่ออื่น' });
+        const created_at = new Date().toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        db.run('INSERT INTO teachers (username, password, name, phone, status, role, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [uname, hashTeacherPassword(password), name, phone, 'approved', 'teacher', created_at], function (err) {
+            if (err) {
+                if (/UNIQUE|duplicate/i.test(err.message)) return res.status(400).json({ success: false, message: 'ชื่อผู้ใช้นี้มีในระบบแล้ว' });
+                return res.status(500).json({ success: false, message: err.message });
+            }
+            const stmt = db.prepare('INSERT OR IGNORE INTO teacher_rooms (teacherUsername, roomId, roomName) VALUES (?, ?, ?)');
+            for (let i = 1; i <= 10; i++) stmt.run(uname, `${uname}_r${i}`, `ห้องสอบที่ ${i}`);
+            stmt.finalize();
+            console.log(`ผู้ดูแลระบบ ${u.u} เพิ่มบัญชีอาจารย์: ${uname} (${name})`);
+            res.json({ success: true, message: `เพิ่มบัญชีอาจารย์ ${name} เรียบร้อย ใช้งานได้ทันที` });
+        });
+    });
+});
+
 // API สำหรับให้อาจารย์ล็อกอินเข้าสู่ระบบ (ตรวจสอบสถานะ approved ก่อน)
 app.post('/api/teacher/login', (req, res) => {
     const { username, password } = req.body;

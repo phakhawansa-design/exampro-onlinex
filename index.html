@@ -643,6 +643,7 @@ void main(){vec2 uv=(gl_FragCoord.xy-.5*r)/r.y;uv/=1.+w*2.4;
       <p class="lead">จัดสอบปรนัย ติดตามพฤติกรรมผู้เข้าสอบแบบเรียลไทม์ ตรวจคะแนนอัตโนมัติ และส่งออกผลเป็น Excel</p>
       <div class="cta">
         <a class="btn btn-or" href="login.html"><svg class="ic "><use href="#i-cap"/></svg> เข้าสู่ระบบ</a>
+        <button class="btn btn-ol" type="button" onclick="openSignup()">สมัครสมาชิก</button>
       </div>
       <form class="pin" onsubmit="event.preventDefault();const v=this.pin.value.replace(/\s/g,'');if(v)location.href='Student-login.html?pin='+encodeURIComponent(v);">
         <span>มีรหัส PIN ห้องสอบ?</span>
@@ -706,7 +707,7 @@ void main(){vec2 uv=(gl_FragCoord.xy-.5*r)/r.y;uv/=1.+w*2.4;
     <div class="ico hex i-or" style="margin:0 auto 14px"><svg class="ic "><use href="#i-cap"/></svg></div>
     <h2>พร้อมเข้าสอบแล้วหรือยัง?</h2>
     <p class="sub">เตรียมรหัสนักศึกษาและรหัส PIN จากอาจารย์ให้พร้อม</p>
-    <div class="cta"><a class="btn btn-or" href="login.html">เข้าสู่ระบบ</a></div>
+    <div class="cta"><a class="btn btn-or" href="login.html">เข้าสู่ระบบ</a><button class="btn btn-navy" type="button" onclick="openSignup()">สมัครสมาชิก</button></div>
     <div class="bottom">
       <span>© 2026 ExamPro · ทีม TEC Hope</span>
       <span><a href="register-teacher.html">สมัครบัญชีอาจารย์</a></span>
@@ -717,6 +718,48 @@ void main(){vec2 uv=(gl_FragCoord.xy-.5*r)/r.y;uv/=1.+w*2.4;
 <script>
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .15 });
   document.querySelectorAll('.reveal').forEach((el, i) => { el.style.transitionDelay = (i % 4) * 80 + 'ms'; io.observe(el); });
+</script>
+
+<!-- เลือกประเภทการสมัครสมาชิก -->
+<div id="signup-modal" class="su-ov" hidden onclick="if(event.target===this)closeSignup()">
+  <div class="su-box" role="dialog" aria-modal="true" aria-labelledby="su-title">
+    <button class="su-x" type="button" onclick="closeSignup()" aria-label="ปิด">✕</button>
+    <h3 id="su-title">สมัครสมาชิกในฐานะ</h3>
+    <p class="su-sub">เลือกประเภทบัญชีของคุณ</p>
+    <a class="su-opt" href="Student-login.html?register=1">
+      <b>นักศึกษา</b>
+      <span>ใช้รหัสนักศึกษาสมัคร แล้วเข้าสอบได้ทันที</span>
+    </a>
+    <a class="su-opt su-t" href="register-teacher.html">
+      <b>อาจารย์</b>
+      <span>สมัครแล้วรอผู้ดูแลระบบอนุมัติก่อนใช้งาน</span>
+    </a>
+    <p class="su-note">มีบัญชีแล้ว? <a href="login.html">เข้าสู่ระบบ</a></p>
+  </div>
+</div>
+<style>
+.su-ov{position:fixed;inset:0;z-index:1000;background:rgba(2,11,38,.6);display:flex;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(3px);animation:suFade .18s ease-out}
+.su-ov[hidden]{display:none}
+.su-box{position:relative;width:100%;max-width:420px;background:#fff;border-radius:22px;padding:26px 22px 20px;box-shadow:0 30px 70px -20px rgba(0,0,0,.5);animation:suPop .22s cubic-bezier(.2,.9,.3,1.2)}
+.su-box h3{margin:0;font-size:21px;color:#0b2a7a;text-align:center}
+.su-sub{margin:4px 0 18px;text-align:center;color:#64748b;font-size:14px}
+.su-opt{display:block;padding:16px 18px;margin-bottom:10px;border:1.5px solid #e2e8f0;border-radius:16px;text-decoration:none;transition:border-color .15s,background .15s,transform .15s}
+.su-opt:hover,.su-opt:focus-visible{border-color:#ff7a1a;background:#fff7ef;transform:translateY(-1px);outline:none}
+.su-opt b{display:block;font-size:17px;color:#0f172a}
+.su-opt span{display:block;margin-top:2px;font-size:13.5px;color:#64748b}
+.su-opt.su-t:hover,.su-opt.su-t:focus-visible{border-color:#1557e0;background:#eff5ff}
+.su-x{position:absolute;top:10px;right:12px;border:0;background:none;font-size:18px;color:#94a3b8;cursor:pointer;padding:6px 8px;border-radius:10px}
+.su-x:hover{background:#f1f5f9;color:#334155}
+.su-note{margin:8px 0 0;text-align:center;font-size:13.5px;color:#64748b}
+.su-note a{color:#1557e0;font-weight:600}
+@keyframes suFade{from{opacity:0}to{opacity:1}}
+@keyframes suPop{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.su-ov,.su-box{animation:none}}
+</style>
+<script>
+function openSignup(){const m=document.getElementById('signup-modal');m.hidden=false;setTimeout(()=>m.querySelector('.su-opt').focus(),30);}
+function closeSignup(){document.getElementById('signup-modal').hidden=true;}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSignup();});
 </script>
 </body>
 </html>

@@ -604,7 +604,26 @@
         window.addEventListener('DOMContentLoaded', async () => {
             await loadTeacherCourses();
             await loadExistingExamForCourse();
-            showCourseCheckModal();
+            // ระบบรู้อยู่แล้วว่ามีรายวิชาหรือยัง → ไม่ต้องถามผู้ใช้
+            const realCourses = (courses || []).filter(c => c && c.id);
+            if (realCourses.length === 0) {
+                // ยังไม่มีรายวิชา: บอกตรง ๆ ว่าต้องสร้างรายวิชาก่อน (ซ่อนปุ่ม "มีแล้ว")
+                const card = document.getElementById('course-check-modal-card');
+                if (card) {
+                    const h = card.querySelector('h3'), p = card.querySelector('h3 + p');
+                    if (h) h.textContent = 'ยังไม่มีรายวิชา';
+                    if (p) p.textContent = 'ข้อสอบต้องเก็บไว้ในรายวิชา กรุณาสร้างรายวิชาก่อน แล้วกลับมาสร้างข้อสอบได้เลย';
+                    const yes = card.querySelector('button[onclick="confirmHasCourse()"]'); if (yes) yes.style.display = 'none';
+                    const go = card.querySelector('a[href="admin-courses.html"]');
+                    if (go) { go.style.width = '100%'; const sp = go.querySelector('span'); if (sp) sp.textContent = 'ไปสร้างรายวิชา →'; }
+                }
+                showCourseCheckModal();
+            } else if (realCourses.length === 1 && !activeCourseId && !new URLSearchParams(location.search).get('templateId')) {
+                // มีวิชาเดียว: เลือกให้เลย
+                const sel = document.getElementById('top-course-selector');
+                if (sel) sel.value = String(realCourses[0].id);
+                await onCourseChanged(String(realCourses[0].id));
+            }
         });
 
         function showCourseCheckModal() {

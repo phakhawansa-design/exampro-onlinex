@@ -193,6 +193,7 @@
                         <div class="w-full bg-slate-100 border border-slate-205 h-2 rounded-full overflow-hidden">
                             <div id="progress-bar-fill" class="progress-bar h-full rounded-full" style="width:0%"></div>
                         </div>
+                        <div id="save-state" aria-live="polite" style="font-size:11.5px;font-weight:600;color:#64748b;min-height:16px">คำตอบจะถูกบันทึกอัตโนมัติ</div>
                     </div>
                 </div>
 
@@ -290,11 +291,11 @@
 
             <div class="space-y-3 text-left">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">รหัสผ่านใหม่ (New Password)</label>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">รหัสผ่านใหม่</label>
                     <input type="password" id="modal-new-password" placeholder="อย่างน้อย 6 ตัวอักษร (ห้ามใช้ 1234)..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-medium outline-none focus:border-indigo-500 transition">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">ยืนยันรหัสผ่านใหม่ (Confirm Password)</label>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">ยืนยันรหัสผ่านใหม่</label>
                     <input type="password" id="modal-confirm-password" placeholder="พิมพ์รหัสผ่านใหม่อีกครั้ง..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-medium outline-none focus:border-indigo-500 transition">
                 </div>
             </div>
@@ -359,6 +360,8 @@
             const codeParam = urlParams.get('pin') || urlParams.get('code');
             const roomParam = urlParams.get('roomId') || urlParams.get('room');
             const autostartParam = urlParams.get('autostart');
+            // มาจากปุ่ม "สมัครสมาชิก" หน้าแรก → เปิดแท็บสมัครสมาชิกให้เลย
+            if (urlParams.get('register') === '1' && !codeParam && !roomParam) { try { switchAuthTab('register'); } catch (e) {} }
 
             currentUrlPin = codeParam || '';
             currentUrlRoomId = roomParam || '';
@@ -801,11 +804,17 @@
                 }));
             } catch (e) {}
             clearTimeout(progressTimer);
+            const st = Object.keys(answers || {}).length ? document.getElementById('save-state') : null; // ยังไม่ได้ตอบ → คงข้อความเดิม
+            if (st) { st.textContent = 'กำลังบันทึก...'; st.dataset.s = 'busy'; }
             progressTimer = setTimeout(() => {
                 fetch('/api/student/progress', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ roomId: currentRoomId, studentId: currentStudentId, answers })
-                }).catch(() => {});
+                }).then(r => {
+                    if (!st) return;
+                    if (r.ok) { st.textContent = '✓ บันทึกคำตอบแล้ว'; st.dataset.s = 'ok'; }
+                    else { st.textContent = 'เก็บคำตอบไว้ในเครื่องแล้ว'; st.dataset.s = 'local'; }
+                }).catch(() => { if (st) { st.textContent = 'เน็ตหลุด · เก็บคำตอบไว้ในเครื่องแล้ว'; st.dataset.s = 'local'; } });
             }, 700);
         }
         // ตอบ/แก้คำตอบภายใน 90 วินาทีหลังกลับจากการสลับหน้าจอ → บันทึกให้อาจารย์เห็น (สูงสุด 5 ข้อต่อการกลับมา 1 ครั้ง)
@@ -1107,10 +1116,10 @@
                 else unansweredCount++;
             });
             if (!isAutoSubmit) {
-                const ok = unansweredCount > 0
-                    ? confirm(`ยังเหลือข้อที่ยังไม่ได้ตอบอีก ${unansweredCount} ข้อ\nต้องการยืนยันส่งคำตอบเลยหรือไม่?`)
-                    : confirm("ยืนยันส่งคำตอบสอบของท่าน?");
-                window.__fsQuietUntil = Date.now() + 1500; // กล่องยืนยันของเบราว์เซอร์อาจทำให้หลุดเต็มจอ ไม่นับเป็นการออก
+                // หน้าตรวจทานก่อนส่ง: บอกข้อที่ยังไม่ได้ตอบ แตะเพื่อไปที่ข้อนั้นได้ (ไม่ใช้กล่องยืนยันของเบราว์เซอร์ ซึ่งบางแอปปิดเองได้)
+                const blocks = [...document.querySelectorAll('#questions-container [data-qid]')];
+                const missing = blocks.map((b, i) => ({ b, no: i + 1 })).filter(x => !x.b.querySelector('input[type=radio]:checked'));
+                const ok = await reviewBeforeSubmit(missing, blocks.length);
                 if (!ok) return;
             }
             stopStudentHeartbeat();
@@ -1155,7 +1164,19 @@
                 const s = timeLeftSeconds%60;
                 const clockEl = document.getElementById('countdown-clock');
                 clockEl.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-                if (timeLeftSeconds <= 60) { clockEl.style.color = '#ef4444'; } else { clockEl.style.color = '#2f6bec'; }
+                if (timeLeftSeconds <= 60) { clockEl.style.color = '#ef4444'; } else if (timeLeftSeconds <= 600) { clockEl.style.color = '#d97706'; } else { clockEl.style.color = '#2f6bec'; }
+                // เตือนเวลาใกล้หมด (ครั้งเดียวต่อช่วง) ถ้าเหลือเวลาตอนเริ่มมากกว่าช่วงนั้น
+                const banner = document.getElementById('timer-banner');
+                if (timeLeftSeconds <= 600 && timeLeftSeconds > 60 && !window.__warn10 && durationMinutes > 10) {
+                    window.__warn10 = true;
+                    if (window.uiToast) uiToast('เหลือเวลาอีก 10 นาที ตรวจคำตอบที่ยังไม่ได้ทำได้จากแถบเลขข้อด้านบน', 'info', 7000);
+                    if (banner) { banner.style.background = '#fffbeb'; banner.style.borderColor = '#fcd34d'; }
+                }
+                if (timeLeftSeconds <= 60 && !window.__warn1) {
+                    window.__warn1 = true;
+                    if (window.uiToast) uiToast('เหลือเวลาอีก 1 นาที! เมื่อหมดเวลา ระบบจะส่งคำตอบให้อัตโนมัติ', 'err', 8000);
+                    if (banner) { banner.style.background = '#fef2f2'; banner.style.borderColor = '#fca5a5'; }
+                }
             };
             updateClock();
             examTimerInterval = setInterval(() => {
@@ -1343,5 +1364,112 @@
         window.addEventListener('pagehide', notifyLeaveRoom);
     </script>
 <script>/* แสดงตัวอย่าง 4 หลักท้ายจากรหัสที่กรอก (ไม่นับขีด) */(function(){var i=document.getElementById('student-id'),h=document.getElementById('pw-last4-hint');if(!i||!h)return;function u(){var d=(i.value||'').replace(/[^0-9]/g,'');h.textContent=d.length>=4?' (ของคุณคือ '+d.slice(-4)+')':'';}i.addEventListener('input',u);u();setTimeout(u,800);})();</script>
+
+    <!-- ===== ตัวช่วยระหว่างทำข้อสอบ: แถบเลขข้อ, ตรวจทานก่อนส่ง, ปุ่มลัด 1–4 ===== -->
+    <style>
+        .qnav{position:sticky;top:0;z-index:30;margin:0 0 12px;padding:10px 12px;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 8px 20px -14px rgba(15,23,42,.35)}
+        .qnav-h{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:#475569;margin-bottom:8px}
+        .qnav-h span:last-child{font-weight:600;color:#94a3b8}
+        @media (max-width:640px),(pointer:coarse){.qnav-h span:last-child{display:none}}
+        .qnav-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
+        .qnav-row button{flex:none;min-width:36px;height:36px;padding:0 6px;border-radius:10px;border:1.5px solid #cbd5e1;background:#fff;color:#334155;font:700 13.5px ui-monospace,Consolas,monospace;cursor:pointer;transition:background .15s,border-color .15s,color .15s,transform .1s}
+        .qnav-row button:active{transform:scale(.94)}
+        .qnav-row button.done{background:#0d9488;border-color:#0d9488;color:#fff}
+        .qnav-row button.cur{box-shadow:0 0 0 2px #fff,0 0 0 4px #ff7a1a}
+        .qflash{animation:qflash 1.2s ease-out}
+        @keyframes qflash{0%{background:rgba(255,122,26,.18)}100%{background:transparent}}
+        .rv-ov{position:fixed;inset:0;z-index:2147483602;background:rgba(2,11,38,.6);display:flex;align-items:flex-end;justify-content:center;padding:12px;animation:uiFade .15s ease-out}
+        @media (min-width:640px){.rv-ov{align-items:center}}
+        .rv{width:100%;max-width:460px;max-height:86vh;overflow:auto;background:#fff;border-radius:22px;padding:22px 20px 16px;box-shadow:0 30px 70px -20px rgba(0,0,0,.5);font-family:inherit;animation:uiIn .22s cubic-bezier(.2,.9,.3,1.15)}
+        .rv h3{margin:0;font-size:20px;color:#0f172a}
+        .rv p{margin:6px 0 12px;font-size:14.5px;color:#475569;line-height:1.6}
+        .rv-miss{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+        .rv-miss button{min-width:40px;height:40px;border-radius:10px;border:1.5px solid #fca5a5;background:#fef2f2;color:#b91c1c;font:700 14px ui-monospace,Consolas,monospace;cursor:pointer}
+        .rv-ok{display:flex;align-items:center;gap:8px;padding:12px;border-radius:12px;background:#f0fdf4;color:#15803d;font-weight:700;font-size:14.5px;margin-bottom:14px}
+        .rv-btns{display:flex;flex-direction:column;gap:8px}
+        .rv-btns button{padding:13px;border-radius:12px;font:700 15.5px inherit;font-family:inherit;cursor:pointer}
+        .rv-send{border:0;background:#059669;color:#fff}
+        .rv-back{border:1.5px solid #e2e8f0;background:#fff;color:#334155}
+        @media (prefers-reduced-motion:reduce){.qflash,.rv,.rv-ov{animation:none}}
+    </style>
+    <script>
+    // ตรวจทานก่อนส่ง → คืนค่า true เมื่อยืนยันส่ง
+    function reviewBeforeSubmit(missing, total) {
+        return new Promise(done => {
+            window.__fsQuietUntil = Date.now() + 60000; // ระหว่างเปิดหน้าตรวจทาน ไม่นับเป็นการออกจากเต็มจอ
+            const ov = document.createElement('div'); ov.className = 'rv-ov';
+            const answered = total - missing.length;
+            ov.innerHTML = '<div class="rv" role="dialog" aria-modal="true"><h3>ตรวจทานก่อนส่ง</h3>' +
+                '<p>ตอบแล้ว <b>' + answered + '</b> จาก <b>' + total + '</b> ข้อ' + (missing.length ? ' · ยังไม่ได้ตอบ <b style="color:#b91c1c">' + missing.length + '</b> ข้อ (แตะเลขข้อเพื่อกลับไปทำ)' : '') + '</p>' +
+                (missing.length ? '<div class="rv-miss"></div>' : '<div class="rv-ok">✓ ตอบครบทุกข้อแล้ว</div>') +
+                '<p style="margin-top:0;font-size:13.5px">ส่งแล้วจะกลับมาแก้คำตอบไม่ได้</p>' +
+                '<div class="rv-btns"><button type="button" class="rv-send">ยืนยันส่งคำตอบ</button><button type="button" class="rv-back">กลับไปทำต่อ</button></div></div>';
+            const close = v => { ov.remove(); window.__fsQuietUntil = Date.now() + 1500; done(v); };
+            const box = ov.querySelector('.rv-miss');
+            if (box) missing.forEach(m => { const b = document.createElement('button'); b.type = 'button'; b.textContent = m.no; b.onclick = () => { close(false); goToQuestion(m.b); }; box.appendChild(b); });
+            ov.querySelector('.rv-send').onclick = () => close(true);
+            ov.querySelector('.rv-back').onclick = () => close(false);
+            ov.addEventListener('click', e => { if (e.target === ov) close(false); });
+            document.body.appendChild(ov);
+            setTimeout(() => (ov.querySelector('.rv-miss button') || ov.querySelector('.rv-back')).focus(), 30);
+        });
+    }
+    function goToQuestion(block) {
+        if (!block) return;
+        const nav = document.querySelector('.qnav'); const off = (nav ? nav.offsetHeight : 0) + 16;
+        window.scrollTo({ top: block.getBoundingClientRect().top + window.scrollY - off, behavior: 'smooth' });
+        block.classList.remove('qflash'); void block.offsetWidth; block.classList.add('qflash');
+        window.__qForced = block; // ข้อที่เพิ่งกดไป ถือเป็นข้อปัจจุบันจนกว่าผู้ใช้จะเลื่อนเอง
+        if (window.__qnavPaint) window.__qnavPaint(block);
+    }
+    (function () {
+        const qc = document.getElementById('questions-container'); if (!qc) return;
+        let nav = null, cur = null;
+        const blocks = () => [...qc.querySelectorAll('[data-qid]')];
+        function build() {
+            const bs = blocks();
+            if (!bs.length) { if (nav) nav.remove(); nav = null; return; }
+            if (!nav) {
+                nav = document.createElement('div'); nav.className = 'qnav';
+                nav.innerHTML = '<div class="qnav-h"><span>เลือกข้อ</span><span>บนคอม กด 1–4 เพื่อเลือกคำตอบ</span></div><div class="qnav-row"></div>';
+                const card = qc.closest('.glass') || qc; card.parentNode.insertBefore(nav, card);
+            }
+            const row = nav.querySelector('.qnav-row');
+            row.innerHTML = '';
+            bs.forEach((b, i) => { const x = document.createElement('button'); x.type = 'button'; x.textContent = i + 1; x.title = 'ไปที่ข้อ ' + (i + 1); x.onclick = () => goToQuestion(b); row.appendChild(x); });
+            paint();
+        }
+        function paint() {
+            if (!nav) return;
+            const bs = blocks(), btns = nav.querySelectorAll('.qnav-row button');
+            bs.forEach((b, i) => { if (!btns[i]) return; btns[i].classList.toggle('done', !!b.querySelector('input[type=radio]:checked')); btns[i].classList.toggle('cur', b === cur); });
+        }
+        function current() {
+            const bs = blocks();
+            if (window.__qForced && bs.includes(window.__qForced)) return window.__qForced;
+            // เลื่อนจนสุดหน้าแล้ว → ข้อสุดท้ายที่เห็นบนจอ
+            if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) { const vis = bs.filter(b => b.getBoundingClientRect().top < window.innerHeight * 0.85); if (vis.length) return vis[vis.length - 1]; }
+            const mid = window.innerHeight * 0.35; let best = bs[0], d = Infinity;
+            bs.forEach(b => { const r = b.getBoundingClientRect(); const dd = r.top <= mid && r.bottom >= mid ? 0 : Math.min(Math.abs(r.top - mid), Math.abs(r.bottom - mid)); if (dd < d) { d = dd; best = b; } });
+            return best;
+        }
+        ['wheel', 'touchstart'].forEach(ev => window.addEventListener(ev, () => { window.__qForced = null; }, { passive: true }));
+        window.addEventListener('keydown', e => { if (/^(ArrowUp|ArrowDown|PageUp|PageDown|Home|End| )$/.test(e.key)) window.__qForced = null; });
+        window.__qnavPaint = b => { cur = b; paint(); };
+        new MutationObserver(build).observe(qc, { childList: true });
+        qc.addEventListener('change', paint);
+        let raf = 0; window.addEventListener('scroll', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { const c = current(); if (c !== cur) { cur = c; paint(); const i = blocks().indexOf(c); const btn = nav && nav.querySelectorAll('.qnav-row button')[i]; if (btn) btn.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } }); }, { passive: true });
+        // ปุ่มลัดบนคอม: 1–9 เลือกคำตอบของข้อที่อยู่กลางจอ
+        document.addEventListener('keydown', e => {
+            if (e.ctrlKey || e.metaKey || e.altKey || !/^[1-9]$/.test(e.key)) return;
+            const ex = document.getElementById('exam-screen'); if (!ex || ex.classList.contains('hidden')) return;
+            if (/INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || '') && document.activeElement.type !== 'radio') return;
+            const b = current(); if (!b) return;
+            const r = b.querySelectorAll('input[type=radio]')[Number(e.key) - 1]; if (!r) return;
+            e.preventDefault(); r.click(); r.focus({ preventScroll: true });
+        });
+        build();
+    })();
+    </script>
 </body>
 </html>

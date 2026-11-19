@@ -270,27 +270,27 @@
                 <div class="space-y-3.5 max-w-3xl">
                     <div class="inline-flex items-center gap-2 bg-blue-900/60 border border-blue-400/30 px-3 py-1 rounded-lg text-xs font-semibold text-blue-200">
                         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span>ระบบควบคุมและป้องกันการทุจริตการสอบ</span>
+                        <span>ระบบสอบออนไลน์</span>
                     </div>
 
                     <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
-                        ศูนย์อำนวยการและประเมินผลการสอบออนไลน์
+                        หน้าหลักอาจารย์
                     </h2>
 
                     <p class="text-slate-300 text-sm md:text-base leading-relaxed font-normal">
-                        บริหารจัดการห้องสอบ ตรวจจับการสลับหน้าจอ ตรวจจับพฤติกรรมสุ่มเสี่ยงระหว่างสอบ และประมวลผลคะแนนวิชาการ Z-Score / T-Score อย่างแม่นยำตามเกณฑ์มาตรฐานมหาวิทยาลัย
+                        สร้างข้อสอบ เปิดห้องสอบ ดูคะแนน และประวัติการสลับหน้าจอของนักศึกษาได้ในที่เดียว
                     </p>
 
                     <!-- Quick Operation Shortcuts -->
                     <div class="flex flex-wrap items-center gap-3 pt-2">
                         <a href="admin-rooms.html" class="inline-flex items-center gap-2 bg-white hover:bg-slate-100 text-slate-900 font-bold px-5 py-2.5 rounded-xl text-xs sm:text-sm transition shadow-sm active:scale-95">
-                            <span>เปิดห้องสอบ / คุมสอบสด</span>
+                            <span>เปิดห้องสอบ</span>
                         </a>
                         <a href="admin-questions.html" class="inline-flex items-center gap-2 bg-blue-800/80 hover:bg-blue-700 text-white font-semibold px-4 py-2.5 rounded-xl text-xs sm:text-sm border border-blue-600/40 transition active:scale-95">
-                            <span>จัดการคลังข้อสอบ</span>
+                            <span>สร้างข้อสอบ</span>
                         </a>
                         <a href="admin-results.html" class="inline-flex items-center gap-2 bg-slate-800/80 hover:bg-slate-700 text-slate-200 font-semibold px-4 py-2.5 rounded-xl text-xs sm:text-sm border border-slate-700 transition active:scale-95">
-                            <span>สรุปผลการสอบ</span>
+                            <span>ดูผลสอบ</span>
                         </a>
                     </div>
                 </div>
@@ -311,6 +311,67 @@
 
             </div>
         </div>
+
+        <!-- ===== เริ่มต้นใช้งาน 4 ขั้น (แสดงจนกว่าจะทำครบ) ===== -->
+        <section id="gs-card" class="gs" hidden aria-labelledby="gs-title">
+            <div class="gs-head">
+                <div>
+                    <h3 id="gs-title">เริ่มต้นใช้งาน</h3>
+                    <p id="gs-sub">ทำตาม 4 ขั้นนี้ แล้วนักศึกษาจะเข้าสอบได้</p>
+                </div>
+                <div class="gs-bar" aria-hidden="true"><i id="gs-fill"></i></div>
+            </div>
+            <ol class="gs-list" id="gs-list"></ol>
+        </section>
+        <style>
+            .gs{background:#fff;border:1.5px solid #fed7aa;border-radius:22px;padding:20px 20px 14px;box-shadow:0 10px 30px -18px rgba(255,122,26,.45)}
+            .gs[hidden]{display:none}
+            .gs-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:12px}
+            .gs h3{margin:0;font-size:19px;font-weight:800;color:#0f172a}
+            .gs-head p{margin:2px 0 0;font-size:14px;color:#64748b}
+            .gs-bar{flex:0 1 220px;height:8px;border-radius:99px;background:#f1f5f9;overflow:hidden}
+            .gs-bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#ff7a1a,#ffb347);transition:width .5s cubic-bezier(.2,.8,.2,1)}
+            .gs-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));gap:10px}
+            .gs-item{display:flex;align-items:flex-start;gap:12px;padding:14px;border-radius:16px;border:1.5px solid #e2e8f0;background:#fff;text-decoration:none;color:inherit;transition:border-color .15s,background .15s,transform .15s}
+            a.gs-item:hover{border-color:#ff7a1a;background:#fff7ef;transform:translateY(-1px)}
+            .gs-num{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:14px;background:#f1f5f9;color:#475569}
+            .gs-item.now{border-color:#ff7a1a;background:#fff7ef}
+            .gs-item.now .gs-num{background:#ff7a1a;color:#fff}
+            .gs-item.done{background:#f0fdf4;border-color:#bbf7d0}
+            .gs-item.done .gs-num{background:#16a34a;color:#fff}
+            .gs-item b{display:block;font-size:15px;color:#0f172a}
+            .gs-item div > span{display:block;margin-top:2px;font-size:13px;color:#64748b;line-height:1.5}
+            .gs-item em{display:inline-block;margin-top:6px;font-style:normal;font-size:12.5px;font-weight:700;color:#c2410c}
+            .gs-item.done em{color:#15803d}
+            .gs-item.wait{opacity:.6}
+        </style>
+        <script>
+        (async function () {
+            const card = document.getElementById('gs-card'); if (!card) return;
+            const J = u => fetch(u).then(r => r.ok ? r.json() : []).catch(() => []);
+            const [courses, rooms] = await Promise.all([J('/api/teacher/courses'), J('/api/teacher/rooms')]);
+            const cs = Array.isArray(courses) ? courses : [], rs = Array.isArray(rooms) ? rooms : [];
+            const steps = [
+                { t: 'สร้างรายวิชา', d: 'ตั้งชื่อวิชาที่จะสอบ', href: 'admin-courses.html', done: cs.length > 0, cta: 'ไปสร้างรายวิชา' },
+                { t: 'เพิ่มรายชื่อนักศึกษา', d: 'นำเข้าจาก Excel หรือเพิ่มทีละคน', href: 'admin-courses.html', done: cs.some(c => Number(c.studentCount) > 0), cta: 'ไปเพิ่มรายชื่อ' },
+                { t: 'สร้างชุดข้อสอบ', d: 'พิมพ์เอง วางข้อความ หรือนำเข้า Excel', href: 'admin-questions.html', done: cs.some(c => Number(c.examCount) > 0), cta: 'ไปสร้างข้อสอบ' },
+                { t: 'เปิดห้องสอบ', d: 'ได้รหัส PIN และ QR ให้นักศึกษาเข้าสอบ', href: 'admin-rooms.html', done: rs.some(r => Number(r.courseId) > 0 && Number(r.questionCount) > 0), cta: 'ไปเปิดห้องสอบ' }
+            ];
+            const n = steps.filter(x => x.done).length;
+            if (n === steps.length) return; // ทำครบแล้ว ไม่ต้องแสดง
+            const next = steps.findIndex(x => !x.done);
+            document.getElementById('gs-sub').textContent = n === 0 ? 'ทำตาม 4 ขั้นนี้ แล้วนักศึกษาจะเข้าสอบได้' : 'ทำไปแล้ว ' + n + ' จาก 4 ขั้น · ขั้นต่อไป: ' + steps[next].t;
+            document.getElementById('gs-list').innerHTML = steps.map((x, i) => {
+                const cls = x.done ? 'done' : i === next ? 'now' : 'wait';
+                const tag = i === next ? 'a href="' + x.href + '"' : 'div';
+                const end = i === next ? 'a' : 'div';
+                return '<li><' + tag + ' class="gs-item ' + cls + '"><span class="gs-num">' + (x.done ? '✓' : i + 1) + '</span><div><b>' + x.t + '</b><span>' + x.d + '</span>' +
+                    (x.done ? '<em>เสร็จแล้ว</em>' : i === next ? '<em>' + x.cta + ' →</em>' : '') + '</div></' + end + '></li>';
+            }).join('');
+            card.hidden = false;
+            requestAnimationFrame(() => { document.getElementById('gs-fill').style.width = (n / steps.length * 100) + '%'; });
+        })();
+        </script>
 
         <!-- ===== LIVE KPI CARDS (CONNECTED TO ACTUAL DATABASE) ===== -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -394,7 +455,7 @@
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2.5">
                     <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <h3 class="text-base font-bold text-slate-900">ห้องสอบที่กำลังเปิดอยู่ในขณะนี้ (Live Rooms)</h3>
+                    <h3 class="text-base font-bold text-slate-900">ห้องสอบที่กำลังเปิดอยู่ในขณะนี้</h3>
                 </div>
                 <a href="admin-rooms.html" class="text-xs font-semibold text-blue-700 hover:text-blue-800 flex items-center gap-1">
                     <span>จัดการห้องสอบทั้งหมด</span>
@@ -439,7 +500,7 @@
                     </div>
                     <div>
                         <h4 class="text-base font-bold text-slate-900 group-hover:text-blue-700 transition-colors">
-                            1. ระบบจัดการคลังข้อสอบ (Question Bank)
+                            1. ระบบจัดการคลังข้อสอบ
                         </h4>
                         <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
                             สร้างและแก้ไขข้อสอบตามรายวิชา รองรับการนำเข้าไฟล์ Excel (.xlsx), แนบรูปภาพประกอบ และใช้งานระบบผู้ช่วยสร้างข้อสอบอัตโนมัติ
@@ -460,7 +521,7 @@
                     </div>
                     <div>
                         <h4 class="text-base font-bold text-slate-900 group-hover:text-indigo-700 transition-colors">
-                            2. ศูนย์ห้องสอบ & ควบคุมการสอบสด (Exam Rooms)
+                            2. ศูนย์ห้องสอบ & ควบคุมการสอบสด
                         </h4>
                         <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
                             เปิดห้องสอบตามรายวิชา ฉายรหัส PIN 6 หลักและ QR Code ขึ้นจอฉาย เริ่ม/หยุดสอบ และติดตามจำนวนนักศึกษาที่เข้าห้องสอบแบบเรียลไทม์
@@ -481,7 +542,7 @@
                     </div>
                     <div>
                         <h4 class="text-base font-bold text-slate-900 group-hover:text-purple-700 transition-colors">
-                            3. จัดการรายวิชาและรายชื่อนักศึกษา (Course Roster)
+                            3. จัดการรายวิชาและรายชื่อนักศึกษา
                         </h4>
                         <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
                             ลงทะเบียนรายวิชา กำหนดห้องเรียน/กลุ่มเรียน นำเข้ารายชื่อนักศึกษาเพื่อจำกัดสิทธิ์เข้าสอบเฉพาะผู้มีรายชื่อในวิชา
@@ -502,7 +563,7 @@
                     </div>
                     <div>
                         <h4 class="text-base font-bold text-slate-900 group-hover:text-teal-700 transition-colors">
-                            4. ตรวจสอบผลการสอบและวิเคราะห์ผลสัมฤทธิ์ (Results)
+                            4. ตรวจสอบผลการสอบและวิเคราะห์ผลสัมฤทธิ์
                         </h4>
                         <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
                             รายงานคะแนนรายบุคคล คำนวณค่าสถิติวิชาการ Z-Score, T-Score, วิเคราะห์ความยากของข้อสอบ (p/r) และส่งออกรายงาน Excel ได้ทันที
@@ -674,7 +735,7 @@
                         <div class="academic-card p-5 space-y-3.5 border-l-4 ${isPub ? 'border-l-emerald-500' : 'border-l-amber-500'}">
                             <div class="flex items-center justify-between">
                                 <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full ${isPub ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-                                    ${isPub ? 'กำลังเปิดสอบ (LIVE)' : 'ห้องรอสอบ'}
+                                    ${isPub ? 'กำลังเปิดสอบ' : 'ห้องรอสอบ'}
                                 </span>
                                 <span class="text-[11px] font-mono font-semibold text-slate-400">#${escapeHtml(room.roomId)}</span>
                             </div>
