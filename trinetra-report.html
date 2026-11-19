@@ -46,7 +46,7 @@ tr.flag td:first-child{box-shadow:inset 4px 0 0 var(--red)}
 .nm b{font-weight:500}.nm small{display:block;color:var(--mut);font-size:12px}
 .chips{display:flex;gap:4px;flex-wrap:wrap}
 .chip{font-size:12px;padding:2px 8px;border-radius:99px;white-space:nowrap}
-.c-multi{background:#fde2f1;color:#a3195b}.c-ans{background:#e6f4ff;color:#0b5cad}.c-switch{background:#fde8e8;color:var(--red)}.c-fs{background:#efe7ff;color:#6a3fc2}.c-gap{background:#fff1dc;color:var(--amber)}.c-other{background:#eef1f5;color:var(--mut)}.c-ok{background:#e2f6ee;color:var(--green)}
+.c-multi{background:#ffedd5;color:#9a3412}.c-ans{background:#e6f4ff;color:#0b5cad}.c-switch{background:#fde8e8;color:#b42318}.c-fs{background:#e0f2fe;color:#075985}.c-gap{background:#fff1dc;color:#92400e}.c-other{background:#eef1f5;color:var(--mut)}.c-ok{background:#e2f6ee;color:var(--green)}
 .xb{font:inherit;font-size:12.5px;border:0;background:none;color:var(--navy);cursor:pointer;padding:2px 4px;white-space:nowrap}
 tr.det td{background:#fbfcff;padding:4px 14px 14px}
 .ev{display:grid;grid-template-columns:72px 1fr;gap:4px 12px;font-size:13.5px;margin-top:8px;position:sticky;left:14px;max-width:min(1100px,calc(100vw - 80px))}
@@ -55,6 +55,7 @@ tr.det td{background:#fbfcff;padding:4px 14px 14px}
 .empty{padding:40px 10px;text-align:center;color:var(--mut)}
 @media(max-width:820px){.cards{grid-template-columns:repeat(2,1fr)}header{padding-bottom:58px}.top h1{font-size:18px}.ev{grid-template-columns:1fr}.ev time{margin-top:6px}}
 @media print{header,.tools .btn,.back,#course,.noprint{display:none!important}main{margin:0;padding:0}.panel{box-shadow:none;padding:0}body{background:#fff}tr.det{display:table-row!important}}
+@media (max-width:640px){input,select,textarea{font-size:16px!important}}
 </style>
 </head>
 <body>
@@ -105,7 +106,7 @@ tr.det td{background:#fbfcff;padding:4px 14px 14px}
       const cs = await api(`/api/teacher/courses?username=${encodeURIComponent(U)}`);
       const want = new URLSearchParams(location.search).get('courseId');
       $('course').innerHTML = cs.length
-        ? cs.map(c => `<option value="${c.id}" ${String(c.id) === want ? 'selected' : ''}>${esc(c.courseCode || '')} ${esc(c.courseName || '')}${c.semester ? ' · ' + esc(c.semester) : ''}</option>`).join('')
+        ? cs.map(c => `<option value="${c.id}" ${String(c.id) === want ? 'selected' : ''}>${esc(c.courseCode || '')} ${esc(c.courseName || '')}${c.semester ? ' · ' + esc(c.semester) : ''}${c.description ? ' · กลุ่ม ' + esc(c.description) : ''}</option>`).join('')
         : '<option value="">ยังไม่มีรายวิชา</option>';
       if (cs.length) load();
     } catch (e) { $('tw').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }

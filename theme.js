@@ -205,7 +205,13 @@
     if (!Array.isArray(courses)) return;
     let b = null;
     if (courses.length === 0) b = { t: 'ยังไม่มีรายวิชา', d: 'เริ่มจากสร้างรายวิชาและเพิ่มรายชื่อนักศึกษาก่อน แล้วค่อยสร้างข้อสอบและเปิดห้องสอบ', href: 'admin-courses.html', cta: 'สร้างรายวิชา' };
-    else if (NEED_EXAM.includes(page) && !courses.some(c => Number(c.examCount) > 0)) b = { t: 'ยังไม่มีชุดข้อสอบ', d: 'ห้องสอบต้องใช้ชุดข้อสอบ สร้างชุดข้อสอบให้รายวิชาก่อน', href: 'admin-questions.html', cta: 'สร้างข้อสอบ' };
+    else if (NEED_EXAM.includes(page) && !courses.some(c => Number(c.examCount) > 0)) {
+      // ห้องที่มีข้อสอบอยู่แล้ว (สร้างแบบเดิม) ถือว่ามีข้อสอบแล้ว ไม่ต้องเตือน
+      let rooms = [];
+      try { const rr = await fetch('/api/teacher/rooms'); if (rr.ok) rooms = await rr.json(); } catch (e) {}
+      if (!(Array.isArray(rooms) && rooms.some(r => Number(r.questionCount) > 0)))
+        b = { t: 'ยังไม่มีชุดข้อสอบ', d: 'ห้องสอบต้องใช้ชุดข้อสอบ สร้างชุดข้อสอบให้รายวิชาก่อน', href: 'admin-questions.html', cta: 'สร้างข้อสอบ' };
+    }
     if (!b) return;
     const host = document.querySelector('main') || document.body;
     const el = document.createElement('div');
@@ -221,5 +227,20 @@
     document.head.appendChild(st);
     host.prepend(el);
   };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
+})();
+
+// ===== ปุ่มที่ว่างเปล่าบนมือถือ (ไอคอนถูกลบ เหลือข้อความที่ซ่อนไว้บนจอเล็ก) → ให้ข้อความแสดงทุกขนาดจอ =====
+(function () {
+  const fix = () => {
+    document.querySelectorAll('button, a[href], [role="button"]').forEach(b => {
+      const own = [...b.childNodes].filter(n => !(n.nodeType === 1 && /(^|\s)hidden(\s|$)/.test(n.className || ''))).map(n => n.textContent).join('').trim();
+      if (own) return;
+      const sp = [...b.querySelectorAll('span')].find(s => /(^|\s)hidden(\s|$)/.test(s.className) && s.textContent.trim());
+      if (sp) { sp.classList.remove('hidden'); return; }
+      if (b.id === 'mobile-menu-btn' && !b.textContent.trim()) { b.textContent = 'เมนู'; b.setAttribute('aria-label', 'เปิดเมนู'); b.style.fontWeight = '700'; b.style.fontSize = '14px'; }
+    });
+  };
+  const go = () => { fix(); setTimeout(fix, 1500); };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
 })();

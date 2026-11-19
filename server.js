@@ -2103,15 +2103,37 @@ app.post('/api/teacher/courses', (req, res) => {
         year: 'numeric', month: 'short', day: 'numeric'
     });
 
-    db.run(
-        'INSERT INTO courses (teacherUsername, courseCode, courseName, semester, description, created_at) VALUES (?, ?, ?, ?, ?, ?)',
-        [username, courseCode.trim(), courseName.trim(), (semester || '').trim(), (description || '').trim(), now],
-        function(err) {
-            if (err) return res.status(500).json({ success: false, message: err.message });
-            res.json({ success: true, courseId: this.lastID, message: "สร้างรายวิชาใหม่เรียบร้อยแล้ว" });
-        }
-    );
+    findDuplicateCourse(username, courseCode, courseName, semester, description, 0, (dErr, dup) => {
+        if (dErr) return res.status(500).json({ success: false, message: dErr.message });
+        if (dup) return res.status(409).json({ success: false, duplicate: true, message: duplicateCourseMsg(dup) });
+        db.run(
+            'INSERT INTO courses (teacherUsername, courseCode, courseName, semester, description, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+            [username, courseCode.trim(), courseName.trim(), (semester || '').trim(), (description || '').trim(), now],
+            function(err) {
+                if (err) return res.status(500).json({ success: false, message: err.message });
+                res.json({ success: true, courseId: this.lastID, message: "สร้างรายวิชาใหม่เรียบร้อยแล้ว" });
+            }
+        );
+    });
 });
+
+// รายวิชาซ้ำ = อาจารย์คนเดียวกัน รหัสวิชา + ชื่อวิชา + ภาคเรียน + กลุ่มเรียน เหมือนกัน (ไม่สนช่องว่าง/ตัวพิมพ์เล็กใหญ่)
+// ภาคเรียนต่างกัน (1/2568 กับ 1/2569) หรือกลุ่มเรียนต่างกัน (VC/R กับ VC/S) สร้างได้ — เป็นคนละรายวิชา ข้อมูลแยกกันตามรหัสรายวิชาในระบบ
+function normCourseText(v) { return String(v || '').replace(/\s+/g, ' ').trim().toLowerCase(); }
+const normCompact = v => normCourseText(v).replace(/\s/g, '');
+function findDuplicateCourse(username, code, name, semester, group, exceptId, cb) {
+    db.all('SELECT id, courseCode, courseName, semester, description FROM courses WHERE teacherUsername = ?', [username], (err, rows) => {
+        if (err) return cb(err);
+        const c = normCourseText(code), n = normCourseText(name), s = normCompact(semester), g = normCompact(group);
+        cb(null, (rows || []).find(r => Number(r.id) !== Number(exceptId) &&
+            normCourseText(r.courseCode) === c && normCourseText(r.courseName) === n &&
+            normCompact(r.semester) === s && normCompact(r.description) === g) || null);
+    });
+}
+function duplicateCourseMsg(dup) {
+    return `มีรายวิชา [${dup.courseCode}] ${dup.courseName}${dup.semester ? ' ภาคเรียน ' + dup.semester : ''}${dup.description ? ' กลุ่ม ' + dup.description : ''} อยู่แล้ว ไม่สามารถสร้างซ้ำได้ ` +
+        `(ถ้าเป็นคนละภาคเรียนหรือคนละกลุ่มเรียน ให้ใส่ภาคเรียนหรือกลุ่มเรียนให้ต่างจากเดิม)`;
+}
 
 // แก้ไขข้อมูลรายวิชา
 app.put('/api/teacher/courses/:id', (req, res) => {
@@ -2121,14 +2143,23 @@ app.put('/api/teacher/courses/:id', (req, res) => {
         return res.status(400).json({ success: false, message: "กรุณาระบุรหัสวิชาและชื่อวิชา" });
     }
 
-    db.run(
-        'UPDATE courses SET courseCode = ?, courseName = ?, semester = ?, description = ? WHERE id = ?',
-        [courseCode.trim(), courseName.trim(), (semester || '').trim(), (description || '').trim(), courseId],
-        function(err) {
-            if (err) return res.status(500).json({ success: false, message: err.message });
-            res.json({ success: true, message: "แก้ไขข้อมูลรายวิชาเรียบร้อย" });
-        }
-    );
+    db.get('SELECT teacherUsername FROM courses WHERE id = ?', [courseId], (oErr, owner) => {
+        if (oErr) return res.status(500).json({ success: false, message: oErr.message });
+        if (!owner) return res.status(404).json({ success: false, message: "ไม่พบรายวิชานี้" });
+        // แก้ไขแล้วไปซ้ำกับรายวิชาอื่นของตัวเองไม่ได้
+        findDuplicateCourse(owner.teacherUsername, courseCode, courseName, semester, description, courseId, (dErr, dup) => {
+            if (dErr) return res.status(500).json({ success: false, message: dErr.message });
+            if (dup) return res.status(409).json({ success: false, duplicate: true, message: duplicateCourseMsg(dup) });
+            db.run(
+                'UPDATE courses SET courseCode = ?, courseName = ?, semester = ?, description = ? WHERE id = ?',
+                [courseCode.trim(), courseName.trim(), (semester || '').trim(), (description || '').trim(), courseId],
+                function(err) {
+                    if (err) return res.status(500).json({ success: false, message: err.message });
+                    res.json({ success: true, message: "แก้ไขข้อมูลรายวิชาเรียบร้อย" });
+                }
+            );
+        });
+    });
 });
 
 // ลบรายวิชา
@@ -2271,6 +2302,47 @@ app.post('/api/courses/:courseId/students/import', (req, res) => {
 });
 
 // เพิ่มนักศึกษาเดี่ยวในรายวิชา
+// คัดลอกนักศึกษาที่เลือกจากรายวิชาหนึ่งไปอีกรายวิชา (ทั้งสองวิชาต้องเป็นของอาจารย์คนนี้)
+// เก็บคำนำหน้า ชื่อภาษาอังกฤษ และชั้น/กลุ่มเดิมไว้ · ข้ามคนที่อยู่ในวิชาปลายทางแล้ว · ไม่ลบออกจากวิชาเดิม
+app.post('/api/courses/:courseId/students/copy-from', (req, res) => {
+    const toId = parseInt(req.params.courseId, 10);
+    const fromId = parseInt(req.body && req.body.fromCourseId, 10);
+    const ids = Array.isArray(req.body && req.body.studentIds) ? [...new Set(req.body.studentIds.map(x => String(x || '').trim()).filter(Boolean))] : [];
+    if (!toId || !fromId) return res.status(400).json({ success: false, message: 'กรุณาเลือกรายวิชาต้นทางและปลายทาง' });
+    if (toId === fromId) return res.status(400).json({ success: false, message: 'รายวิชาต้นทางและปลายทางต้องไม่ใช่วิชาเดียวกัน' });
+    if (!ids.length) return res.status(400).json({ success: false, message: 'กรุณาเลือกนักศึกษาอย่างน้อย 1 คน' });
+    if (ids.length > 500) return res.status(400).json({ success: false, message: 'เลือกได้ครั้งละไม่เกิน 500 คน' });
+    const v = viewer(req);
+    db.all('SELECT id, teacherUsername FROM courses WHERE id IN (?, ?)', [fromId, toId], (cErr, cs) => {
+        if (cErr) return res.status(500).json({ success: false, message: cErr.message });
+        const from = (cs || []).find(c => Number(c.id) === fromId), to = (cs || []).find(c => Number(c.id) === toId);
+        if (!from || !to) return res.status(404).json({ success: false, message: 'ไม่พบรายวิชา' });
+        if (!v.adm && (from.teacherUsername !== v.user || to.teacherUsername !== v.user)) return res.status(403).json({ success: false, message: 'รายวิชานี้ไม่ใช่ของคุณ' });
+        const marks = ids.map(() => '?').join(',');
+        db.all(`SELECT studentId, prefix, firstName, lastName, class, fullNameEn FROM course_students WHERE courseId = ? AND studentId IN (${marks})`, [fromId, ...ids], (sErr, src) => {
+            if (sErr) return res.status(500).json({ success: false, message: sErr.message });
+            db.all(`SELECT studentId FROM course_students WHERE courseId = ? AND studentId IN (${marks})`, [toId, ...ids], (tErr, have) => {
+                if (tErr) return res.status(500).json({ success: false, message: tErr.message });
+                const already = new Set((have || []).map(r => String(r.studentId)));
+                const add = (src || []).filter(r => !already.has(String(r.studentId)));
+                const now = new Date().toISOString();
+                let i = 0;
+                const next = () => {
+                    if (i >= add.length) {
+                        console.log(`[คัดลอกรายชื่อ] วิชา ${fromId} → ${toId}: เพิ่ม ${add.length} คน ข้าม ${already.size} คน`);
+                        return res.json({ success: true, added: add.length, skipped: already.size, notFound: ids.length - (src || []).length });
+                    }
+                    const r = add[i++];
+                    db.run(`INSERT INTO course_students (courseId, studentId, prefix, firstName, lastName, class, fullNameEn, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                        [toId, r.studentId, r.prefix || '', r.firstName || '', r.lastName || '', r.class || '', r.fullNameEn || '', now],
+                        err => err ? res.status(500).json({ success: false, message: err.message }) : next());
+                };
+                next();
+            });
+        });
+    });
+});
+
 app.post('/api/courses/:courseId/students', (req, res) => {
     const courseId = req.params.courseId;
     const { studentId, firstName, lastName, prefix, class: cls, fullNameEn } = req.body;
@@ -2981,17 +3053,16 @@ app.get('/api/exam-results', (req, res) => {
     if (courseId) {
         const cIdNum = parseInt(courseId, 10);
         const validId = !isNaN(cIdNum) ? cIdNum : -1;
-        const cCodeStr = String(courseId).trim();
-
         // ผลสอบของรายวิชา = รายวิชาที่บันทึกไว้ตอนส่งข้อสอบ (ถ้าไม่มี ใช้รายวิชาของห้องสอบ) — กติกาเดียวกับหน้าประวัตินักศึกษา
+        // จับคู่ด้วยเลขรายวิชาในระบบเท่านั้น (เดิมจับคู่รหัสวิชาด้วย ทำให้ผลสอบของวิชาที่รหัสตรงกับเลขนี้ปนเข้ามา)
         const sql = `
             SELECT er.id, er.studentId, er.name, er.class, er.score, er.maxScore, er.time, er.date, er.roomId, er.answers_json, er.courseId
             FROM exam_results er
-            WHERE COALESCE(NULLIF(er.courseId, 0), (SELECT NULLIF(t9.courseId, 0) FROM teacher_rooms t9 WHERE t9.roomId = er.roomId)) IN (SELECT id FROM courses WHERE id = ? OR courseCode = ?)
+            WHERE COALESCE(NULLIF(er.courseId, 0), (SELECT NULLIF(t9.courseId, 0) FROM teacher_rooms t9 WHERE t9.roomId = er.roomId)) = ?
               AND (? = 1 OR er.roomId IN (${MY_ROOMS}))
             ORDER BY er.id DESC
         `;
-        const params = [validId, cCodeStr, viewer(req).adm, viewer(req).user];
+        const params = [validId, viewer(req).adm, viewer(req).user];
         db.all(sql, params, (err, rows) => {
             if (err) return res.status(500).json({ message: err.message });
             res.json(rows || []);

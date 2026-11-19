@@ -914,7 +914,7 @@
                 '' +
                 '<h3 id="fs-title" style="margin:0 0 8px;font-size:20px;font-weight:700;color:#0d3b8e">เข้าสู่โหมดเต็มจอเพื่อทำข้อสอบ</h3>' +
                 '<p id="fs-desc" style="margin:0 0 16px;font-size:14px;line-height:1.65;color:#475569">การสอบบนคอมพิวเตอร์ต้องทำในโหมดเต็มจอ ห้ามแบ่งหน้าจอหรือเปิดหน้าต่างอื่นซ้อน<br>การออกจากโหมดเต็มจอจะถูกบันทึกและแจ้งอาจารย์</p>' +
-                '<button id="fs-btn" type="button" style="width:100%;padding:13px;border:0;border-radius:14px;background:#e8663d;color:#fff;font-size:15.5px;font-weight:700;cursor:pointer">เข้าสู่โหมดเต็มจอ</button></div>';
+                '<button id="fs-btn" type="button" style="width:100%;padding:13px;border:0;border-radius:14px;background:#c2410c;color:#fff;font-size:15.5px;font-weight:700;cursor:pointer">เข้าสู่โหมดเต็มจอ</button></div>';
             document.body.appendChild(gate);
             const show = (again) => {
                 if (isExamFinished) return;
@@ -1170,7 +1170,7 @@
                 if (timeLeftSeconds <= 600 && timeLeftSeconds > 60 && !window.__warn10 && durationMinutes > 10) {
                     window.__warn10 = true;
                     if (window.uiToast) uiToast('เหลือเวลาอีก 10 นาที ตรวจคำตอบที่ยังไม่ได้ทำได้จากแถบเลขข้อด้านบน', 'info', 7000);
-                    if (banner) { banner.style.background = '#fffbeb'; banner.style.borderColor = '#fcd34d'; }
+                    if (banner) { banner.style.background = '#fff7ed'; banner.style.borderColor = '#fdba74'; }
                 }
                 if (timeLeftSeconds <= 60 && !window.__warn1) {
                     window.__warn1 = true;
@@ -1369,7 +1369,7 @@
     <style>
         .qnav{position:sticky;top:0;z-index:30;margin:0 0 12px;padding:10px 12px;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 8px 20px -14px rgba(15,23,42,.35)}
         .qnav-h{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:#475569;margin-bottom:8px}
-        .qnav-h span:last-child{font-weight:600;color:#94a3b8}
+        .qnav-h span:last-child{font-weight:600;color:#64748b}
         @media (max-width:640px),(pointer:coarse){.qnav-h span:last-child{display:none}}
         .qnav-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
         .qnav-row button{flex:none;min-width:36px;height:36px;padding:0 6px;border-radius:10px;border:1.5px solid #cbd5e1;background:#fff;color:#334155;font:700 13.5px ui-monospace,Consolas,monospace;cursor:pointer;transition:background .15s,border-color .15s,color .15s,transform .1s}

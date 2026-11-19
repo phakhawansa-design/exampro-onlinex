@@ -81,7 +81,7 @@
 .qx-tools-h { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 16px 18px 12px; border-bottom: 1px solid var(--qx-line); }
 .qx-tools-h h2 { margin: 0; font-size: 16px; font-weight: 800; color: var(--qx-ink); }
 .qx-tools-h p { margin: 2px 0 0; font-size: 12px; color: var(--qx-mute); }
-.qx-x { font-size: 18px; color: #94a3b8; padding: 2px 8px; border-radius: 8px; }
+.qx-x { font-size: 18px; color:#64748b; padding: 2px 8px; border-radius: 8px; }
 .qx-tools-b { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; background: #f8fafc; }
 .qx-tool { position: relative; background: #fff; border: 1px solid var(--qx-line); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px; transition: .2s; box-shadow: 0 2px 8px rgba(15, 23, 42, .03); }
 .qx-tool:hover { border-color: #cbd5e1; box-shadow: 0 8px 20px rgba(15, 23, 42, .06); }
@@ -200,3 +200,11 @@
 @media (min-width: 1600px) {
   #choices-grid-container { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 }
+
+/* ปุ่ม "สำเนา / ลบ" ในรายการข้อสอบ: ขยายพื้นที่กดให้นิ้วกดง่าย (อย่างน้อย 32px) */
+.qx-mini { min-height: 32px; min-width: 40px; padding: 4px 10px !important; display: inline-flex; align-items: center; justify-content: center; }
+
+/* เฉลยที่เลือก: พื้นเขียวเข้มขึ้นให้ตัวอักษรขาวอ่านชัด (เดิม #10b981 ตัดกันแค่ 2.5:1) */
+.choice-card.is-correct .choice-badge, .correct-toggle-btn.active { background-color: #047857 !important; border-color: #047857 !important; }
+/* ช่องพิมพ์ตัวเลือก: สูงพอให้นิ้วแตะง่าย */
+.choice-card input[type="text"] { min-height: 36px; }

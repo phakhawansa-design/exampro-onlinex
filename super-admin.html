@@ -172,10 +172,6 @@
         <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap">
             <button onclick="resetTeacherPw(localStorage.getItem('admin_username') || 'admin')" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">เปลี่ยนรหัสแอดมิน</button>
             <button id="btn-backup" onclick="downloadBackup(this)" class="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 text-xs font-bold" title="ดาวน์โหลดข้อมูลทั้งหมดเก็บไว้ (แนะนำหลังสอบทุกครั้ง)">ดาวน์โหลดข้อมูลสำรอง</button>
-            <a href="admin-monitoring.html" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5 active:scale-95">
-                <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-                ตรวจจับพฤติกรรมสด
-            </a>
             <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-200 text-[10px] text-rose-600 font-semibold">
                 <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
                 ADMIN MODE
@@ -192,7 +188,7 @@
     <main class="max-w-6xl mx-auto p-6 md:p-8 space-y-6">
 
         <!-- Stats Cards -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
             <div class="bg-white border border-rose-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition">
                 <div class="min-w-0">
                     <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider truncate">อาจารย์ทั้งหมด</div>
@@ -205,16 +201,7 @@
                     <div class="text-lg font-semibold text-amber-600" id="stat-pending">0</div>
                 </div>
             </div>
-            <div onclick="switchTab('students')" class="bg-white border border-rose-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition cursor-pointer group relative overflow-hidden">
-                <div class="min-w-0">
-                    <div class="text-[10px] font-bold text-rose-600 uppercase tracking-wider truncate flex items-center gap-1">
-                        นักศึกษารออนุมัติ
-                        <span id="card-pending-pulse" class="hidden w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
-                    </div>
-                    <div class="text-lg font-semibold text-rose-600" id="stat-pending-students">0</div>
-                </div>
-            </div>
-            <div onclick="switchTab('students')" class="bg-white border border-rose-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition cursor-pointer">
+            <div class="bg-white border border-rose-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition">
                 <div class="min-w-0">
                     <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider truncate">นักศึกษาในระบบ</div>
                     <div class="text-lg font-semibold text-emerald-600" id="stat-unique-students">0</div>
@@ -233,11 +220,6 @@
             <button onclick="switchTab('teachers')" id="tab-teachers"
                 class="tab-btn active px-5 py-2.5 rounded-xl text-xs font-bold transition duration-300 border flex items-center gap-2">
                 <span>จัดการบัญชีอาจารย์</span>
-            </button>
-            <button onclick="switchTab('students')" id="tab-students"
-                class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition duration-300 border flex items-center gap-2">
-                <span>อนุมัติ & จัดการบัญชีนักศึกษา</span>
-                <span id="badge-pending-students" class="hidden px-2 py-0.5 rounded-full text-[10px] bg-rose-500 text-white font-bold animate-pulse">0</span>
             </button>
             <button onclick="switchTab('storage')" id="tab-storage"
                 class="tab-btn px-5 py-2.5 rounded-xl text-xs font-bold transition duration-300 border flex items-center gap-2">
@@ -287,66 +269,6 @@
                     </thead>
                     <tbody id="teachers-table-body">
                         <tr><td colspan="8" class="py-8 text-center text-xs text-slate-550">กำลังโหลด...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Tab 2: Students Management & Approvals -->
-        <div id="panel-students" class="hidden bg-white/80 backdrop-blur-sm border border-rose-150 rounded-3xl p-6 space-y-5 shadow-md">
-            <!-- Header & Action Buttons -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-                <div>
-                    <h2 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
-                        <span>ระบบอนุมัติและจัดการบัญชีนักศึกษา</span>
-                    </h2>
-                    <p class="text-[11px] text-slate-500 mt-0.5">ตรวจสอบและอนุมัติคำขอสมัครสมาชิกของนักศึกษาก่อนอนุญาตให้เข้าห้องสอบ</p>
-                </div>
-
-                <div class="flex items-center gap-2 flex-wrap">
-                    <button onclick="approveAllStudents()" id="btn-approve-all-students" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition shadow-sm active:scale-95 flex items-center gap-1.5">
-                        อนุมัติคำขอทั้งหมด
-                    </button>
-                    <button onclick="loadStudentsData()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-1">
-                        รีเฟรช
-                    </button>
-                </div>
-            </div>
-
-            <!-- Subtabs & Search Bar -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                <div class="inline-flex p-1 bg-slate-100 rounded-xl gap-1">
-                    <button onclick="setStudentFilter('pending')" id="filter-pending-btn" class="px-4 py-1.5 rounded-lg text-xs font-bold transition bg-white text-slate-800 shadow-sm flex items-center gap-1.5">
-                        <span>รออนุมัติ</span>
-                        <span id="subtab-pending-count" class="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-500 text-white font-bold">0</span>
-                    </button>
-                    <button onclick="setStudentFilter('all')" id="filter-all-btn" class="px-4 py-1.5 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900 flex items-center gap-1.5">
-                        <span>นักศึกษาทั้งหมด</span>
-                        <span id="subtab-all-count" class="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-200 text-slate-700 font-bold">0</span>
-                    </button>
-                </div>
-
-                <div class="relative min-w-[260px]">
-                    <input type="text" id="student-search-input" oninput="filterStudentTable()" placeholder="ค้นหารหัสนักศึกษา, ชื่อ, ชั้นเรียน..." class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-rose-400 outline-none">
-                </div>
-            </div>
-
-            <!-- Students Table -->
-            <div class="overflow-x-auto rounded-2xl border border-slate-100">
-                <table class="w-full text-left">
-                    <thead>
-                        <tr class="border-b border-slate-100 bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                            <th class="py-3.5 px-4">#</th>
-                            <th class="py-3.5 px-4">รหัสนักศึกษา</th>
-                            <th class="py-3.5 px-4">ชื่อ - นามสกุล</th>
-                            <th class="py-3.5 px-4">ชั้นเรียน / แผนก</th>
-                            <th class="py-3.5 px-4">วันที่สมัคร</th>
-                            <th class="py-3.5 px-4 text-center">สถานะบัญชี</th>
-                            <th class="py-3.5 px-4 text-center">การดำเนินการ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="students-table-body">
-                        <tr><td colspan="7" class="py-8 text-center text-xs text-slate-400">กำลังโหลดข้อมูลนักศึกษา...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -412,13 +334,12 @@
         window.addEventListener('DOMContentLoaded', () => {
             loadStats();
             loadTeachers();
-            loadStudentsData();
         });
 
         // Tab Switching
         function switchTab(tab) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            ['teachers','students','storage'].forEach(p => {
+            ['teachers','storage'].forEach(p => {
                 const el = document.getElementById('panel-' + p);
                 if (el) el.classList.add('hidden');
             });
@@ -428,7 +349,6 @@
             if (activePanel) activePanel.classList.remove('hidden');
 
             if (tab === 'storage') loadStorageStats();
-            if (tab === 'students') loadStudentsData();
             if (tab === 'teachers') loadTeachers();
         }
 
@@ -523,7 +443,7 @@
                     }
 
                     const pendingStudentsCount = stats.pendingStudents ?? (stats.students ? stats.students.pending : 0) ?? 0;
-                    document.getElementById('stat-pending-students').textContent = pendingStudentsCount;
+                    { const el = document.getElementById('stat-pending-students'); if (el) el.textContent = pendingStudentsCount; }
                     
                     const badge = document.getElementById('badge-pending-students');
                     const pulse = document.getElementById('card-pending-pulse');

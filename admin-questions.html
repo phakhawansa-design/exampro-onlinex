@@ -141,7 +141,7 @@
             </a>
             <div class="qx-title">
                 <div>
-                    <h1>5. สร้างและแก้ไขข้อสอบ</h1>
+                    <h1>สร้างและแก้ไขข้อสอบ</h1>
                     <span id="header-teacher-name">ExamPro</span>
                 </div>
             </div>
@@ -443,7 +443,7 @@
                 <button onclick="saveQuestionsToCourse()" class="qx-save qx-save-lg">
                     <span>บันทึกข้อสอบเข้าสู่วิชา</span>
                 </button>
-                <p>ข้อสอบจะถูกเก็บในรายวิชาที่เลือก นำไปเปิดห้องสอบได้ที่เมนู 6</p>
+                <p>ข้อสอบจะถูกเก็บในรายวิชาที่เลือก นำไปเปิดห้องสอบได้ที่เมนู "ห้องสอบ"</p>
             </div>
         </aside>
 
@@ -604,26 +604,8 @@
         window.addEventListener('DOMContentLoaded', async () => {
             await loadTeacherCourses();
             await loadExistingExamForCourse();
-            // ระบบรู้อยู่แล้วว่ามีรายวิชาหรือยัง → ไม่ต้องถามผู้ใช้
-            const realCourses = (courses || []).filter(c => c && c.id);
-            if (realCourses.length === 0) {
-                // ยังไม่มีรายวิชา: บอกตรง ๆ ว่าต้องสร้างรายวิชาก่อน (ซ่อนปุ่ม "มีแล้ว")
-                const card = document.getElementById('course-check-modal-card');
-                if (card) {
-                    const h = card.querySelector('h3'), p = card.querySelector('h3 + p');
-                    if (h) h.textContent = 'ยังไม่มีรายวิชา';
-                    if (p) p.textContent = 'ข้อสอบต้องเก็บไว้ในรายวิชา กรุณาสร้างรายวิชาก่อน แล้วกลับมาสร้างข้อสอบได้เลย';
-                    const yes = card.querySelector('button[onclick="confirmHasCourse()"]'); if (yes) yes.style.display = 'none';
-                    const go = card.querySelector('a[href="admin-courses.html"]');
-                    if (go) { go.style.width = '100%'; const sp = go.querySelector('span'); if (sp) sp.textContent = 'ไปสร้างรายวิชา →'; }
-                }
-                showCourseCheckModal();
-            } else if (realCourses.length === 1 && !activeCourseId && !new URLSearchParams(location.search).get('templateId')) {
-                // มีวิชาเดียว: เลือกให้เลย
-                const sel = document.getElementById('top-course-selector');
-                if (sel) sel.value = String(realCourses[0].id);
-                await onCourseChanged(String(realCourses[0].id));
-            }
+            // เข้ามาครั้งแรก: ถามว่ามีรายวิชาหรือยัง แล้วให้เลือกรายวิชาในหน้าต่างเดียวกัน
+            if (!activeCourseId && !new URLSearchParams(location.search).get('templateId')) showCourseCheckModal();
         });
 
         function showCourseCheckModal() {
@@ -636,6 +618,43 @@
                 card.classList.remove('scale-95');
                 card.classList.add('scale-100');
             }, 300);
+        }
+
+        // ===== หน้าต่างเลือกรายวิชา (มี/ไม่มี → เลือกรายวิชาในหน้าต่างเดียวกัน) =====
+        let ccPicked = null;
+        function ccShowPicker() {
+            const list = (courses || []).filter(c => c && c.id);
+            document.getElementById('cc-step1').hidden = true;
+            document.getElementById('cc-step2').hidden = false;
+            const box = document.getElementById('cc-list');
+            document.getElementById('cc-empty').hidden = list.length > 0;
+            box.hidden = list.length === 0;
+            ccPicked = list.length === 1 ? String(list[0].id) : (activeCourseId ? String(activeCourseId) : null);
+            box.innerHTML = list.map(c => `<button type="button" class="cc-item" role="radio" aria-checked="${String(c.id) === ccPicked}" data-id="${c.id}">
+                    <span class="cc-dot"></span>
+                    <span><b>[${escapeHtml(c.courseCode || 'วิชา')}] ${escapeHtml(c.courseName || '')}</b>
+                    <small>${c.semester ? 'ภาคเรียน ' + escapeHtml(c.semester) + ' · ' : ''}${c.description ? 'กลุ่ม ' + escapeHtml(c.description) + ' · ' : ''}${Number(c.examCount) || 0} ชุดข้อสอบ · ${Number(c.studentCount) || 0} คน</small></span>
+                </button>`).join('');
+            box.querySelectorAll('.cc-item').forEach(b => b.addEventListener('click', () => {
+                ccPicked = b.dataset.id;
+                box.querySelectorAll('.cc-item').forEach(x => x.setAttribute('aria-checked', String(x === b)));
+                document.getElementById('cc-go').disabled = false;
+            }));
+            box.addEventListener('dblclick', e => { if (e.target.closest('.cc-item')) ccStart(); });
+            const go = document.getElementById('cc-go');
+            go.disabled = !ccPicked; go.hidden = list.length === 0;
+            setTimeout(() => (box.querySelector('[aria-checked="true"]') || box.querySelector('.cc-item') || go).focus(), 30);
+        }
+        function ccBack() {
+            document.getElementById('cc-step2').hidden = true;
+            document.getElementById('cc-step1').hidden = false;
+        }
+        async function ccStart() {
+            if (!ccPicked) return;
+            const sel = document.getElementById('top-course-selector');
+            if (sel) sel.value = ccPicked;
+            confirmHasCourse();
+            await onCourseChanged(ccPicked);
         }
 
         function confirmHasCourse() {
@@ -665,7 +684,7 @@
 
             // Build options list with unselected default option
             select.innerHTML = '<option value="" disabled selected>-- กรุณาคลิกเลือกรายวิชา --</option>' + 
-                courses.map(c => `<option value="${c.id}">[${escapeHtml(c.courseCode || 'วิชา')}] ${escapeHtml(c.courseName)}</option>`).join('');
+                courses.map(c => `<option value="${c.id}">[${escapeHtml(c.courseCode || 'วิชา')}] ${escapeHtml(c.courseName)}${c.semester ? ' · ' + escapeHtml(c.semester) : ''}${c.description ? ' · กลุ่ม ' + escapeHtml(c.description) : ''}</option>`).join('');
 
             // Check if courseId is passed in URL
             const urlParams = new URLSearchParams(window.location.search);
@@ -835,8 +854,8 @@
                         <div class="flex items-center justify-between mb-1">
                             <span class="text-[11px] font-bold ${isActive ? 'text-indigo-700' : 'text-slate-500'}">ข้อที่ ${idx + 1}</span>
                             <div class="flex items-center gap-1">
-                                <button onclick="event.stopPropagation(); duplicateQuestion(${idx})" title="ทำสำเนาข้อนี้" class="px-1.5 py-0.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded text-[11px] font-semibold">สำเนา</button>
-                                <button onclick="event.stopPropagation(); deleteQuestion(${idx})" title="ลบข้อนี้" class="px-1.5 py-0.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded text-[11px] font-semibold">ลบ</button>
+                                <button onclick="event.stopPropagation(); duplicateQuestion(${idx})" title="ทำสำเนาข้อนี้" class="qx-mini px-1.5 py-0.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded text-[11px] font-semibold">สำเนา</button>
+                                <button onclick="event.stopPropagation(); deleteQuestion(${idx})" title="ลบข้อนี้" class="qx-mini px-1.5 py-0.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded text-[11px] font-semibold">ลบ</button>
                             </div>
                         </div>
 
@@ -1713,7 +1732,7 @@
                         <button type="button" onclick="copyPromptAndOpenAI('gemini')" class="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer">
                             <span>คัดลอกแล้วเปิด Gemini AI →</span>
                         </button>
-                        <button type="button" onclick="copyPromptAndOpenAI('chatgpt')" class="px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer">
+                        <button type="button" onclick="copyPromptAndOpenAI('chatgpt')" class="px-3 py-1.5 bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-1.5 cursor-pointer">
                             <span>คัดลอกแล้วเปิด ChatGPT →</span>
                         </button>
                     </div>
@@ -1786,42 +1805,69 @@
         <div class="bg-white/95 border border-pink-200 p-6 sm:p-8 rounded-3xl shadow-2xl max-w-md w-full mx-4 text-center space-y-6 transform scale-95 transition-all duration-300 relative overflow-hidden" id="course-check-modal-card">
             
             <!-- Top Gradient Accent bar -->
-            <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-pink-500 via-rose-500 to-sky-500"></div>
+            <div class="absolute top-0 left-0 right-0 h-2" style="background:linear-gradient(90deg,#ff7a1a,#ffb347,#34d399)"></div>
 
-            <!-- Header Icon -->
-            <div class="relative inline-block mt-2">
+            <!-- ขั้นที่ 1: มีรายวิชาแล้วหรือยัง -->
+            <div id="cc-step1" class="cc-step">
+                <h3 class="cc-h">คุณมีรายวิชาแล้วหรือยัง?</h3>
+                <p class="cc-p">ข้อสอบจะถูกเก็บไว้ในรายวิชา</p>
+                <div class="cc-choice">
+                    <button type="button" class="cc-opt cc-yes" onclick="ccShowPicker()"><b>มีรายวิชาแล้ว</b><span>เลือกรายวิชา แล้วเริ่มสร้างข้อสอบ</span></button>
+                    <a class="cc-opt cc-no" href="admin-courses.html"><b>ยังไม่มี</b><span>ไปสร้างรายวิชาก่อน</span></a>
+                </div>
             </div>
 
-            <!-- Message Header -->
-            <div class="space-y-2">
-                <h3 class="text-xl font-bold text-slate-800 tracking-normal">
-                    คุณมีรายวิชาของคุณหรือยัง?
-                </h3>
-                <p class="text-xs sm:text-sm text-slate-500 font-normal leading-relaxed">
-                    ก่อนเริ่มสร้างข้อสอบ กรุณายืนยันว่าคุณมีรายวิชาในระบบแล้ว<br class="hidden sm:inline"> หรือหากยังไม่มีสามารถสร้างรายวิชาใหม่ได้ทันที
-                </p>
+            <!-- ขั้นที่ 2: เลือกรายวิชาในหน้าต่างเดียวกัน -->
+            <div id="cc-step2" class="cc-step" hidden>
+                <h3 class="cc-h">เลือกรายวิชา</h3>
+                <p class="cc-p">ข้อสอบที่สร้างจะถูกเก็บในรายวิชานี้</p>
+                <div id="cc-list" class="cc-list" role="radiogroup" aria-label="รายวิชา"></div>
+                <div id="cc-empty" class="cc-empty" hidden>
+                    ยังไม่พบรายวิชาในบัญชีของคุณ
+                    <a href="admin-courses.html">ไปสร้างรายวิชา →</a>
+                </div>
+                <button type="button" id="cc-go" class="cc-go" onclick="ccStart()" disabled>เริ่มสร้างข้อสอบ</button>
+                <button type="button" class="cc-back" onclick="ccBack()">ย้อนกลับ</button>
             </div>
 
-            <!-- Choice Action Buttons -->
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-                <button onclick="confirmHasCourse()" class="w-full sm:w-1/2 py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium rounded-2xl text-sm transition-all duration-200 shadow-md shadow-emerald-500/20 active:scale-95 flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap">
-                    <span>มีแล้ว (สร้างข้อสอบ)</span>
-                </button>
-                
-                <a href="admin-courses.html" class="w-full sm:w-1/2 py-3 px-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium rounded-2xl text-sm transition-all duration-200 shadow-md shadow-indigo-500/20 active:scale-95 flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap">
-                    <span>ยังไม่มี (สร้างรายวิชา)</span>
-                </a>
-            </div>
-
+            <style>
+                #course-check-modal-card{text-align:center}
+                .cc-step[hidden]{display:none}
+                .cc-h{margin:6px 0 0;font-size:21px;font-weight:800;color:#0f172a}
+                .cc-p{margin:4px 0 18px;font-size:14px;color:#64748b}
+                .cc-choice{display:grid;gap:10px}
+                .cc-opt{display:block;text-align:left;padding:15px 16px;border-radius:16px;border:1.5px solid #e2e8f0;background:#fff;cursor:pointer;text-decoration:none;font-family:inherit;transition:border-color .15s,background .15s,transform .15s}
+                .cc-opt b{display:block;font-size:16.5px;color:#0f172a}
+                .cc-opt span{display:block;margin-top:2px;font-size:13.5px;color:#64748b}
+                .cc-yes:hover,.cc-yes:focus-visible{border-color:#10b981;background:#ecfdf5;outline:none;transform:translateY(-1px)}
+                .cc-no:hover,.cc-no:focus-visible{border-color:#ff7a1a;background:#fff7ed;outline:none;transform:translateY(-1px)}
+                .cc-list{display:grid;gap:8px;max-height:46vh;overflow-y:auto;text-align:left;padding:2px}
+                .cc-item{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:14px;border:1.5px solid #e2e8f0;background:#fff;cursor:pointer;font-family:inherit;text-align:left;width:100%;transition:border-color .15s,background .15s}
+                .cc-item:hover{border-color:#94a3b8}
+                .cc-item[aria-checked="true"]{border-color:#10b981;background:#ecfdf5}
+                .cc-dot{flex:none;width:20px;height:20px;border-radius:50%;border:2px solid #cbd5e1;display:grid;place-items:center}
+                .cc-item[aria-checked="true"] .cc-dot{border-color:#10b981}
+                .cc-item[aria-checked="true"] .cc-dot::after{content:"";width:10px;height:10px;border-radius:50%;background:#10b981}
+                .cc-item b{display:block;font-size:15px;color:#0f172a;line-height:1.4}
+                .cc-item small{display:block;font-size:12.5px;color:#64748b;margin-top:1px}
+                .cc-empty{padding:16px;border-radius:14px;background:#fff7ed;border:1.5px solid #fdba74;color:#9a3412;font-size:14.5px;font-weight:600}
+                .cc-empty[hidden]{display:none}
+                .cc-empty a{display:block;margin-top:6px;color:#c2410c}
+                .cc-go{display:block;width:100%;margin-top:14px;padding:13px;border:0;border-radius:14px;background:#ff7a1a;color:#fff;font:700 15.5px inherit;font-family:inherit;cursor:pointer;box-shadow:0 12px 22px -12px rgba(255,122,26,.8)}
+                .cc-go:disabled{background:#cbd5e1;box-shadow:none;cursor:not-allowed}
+                .cc-go[hidden],.cc-list[hidden]{display:none}
+                .cc-back{display:block;width:100%;margin-top:8px;padding:10px;border:0;background:none;color:#64748b;font:600 14px inherit;font-family:inherit;cursor:pointer}
+                .cc-back:hover{color:#0f172a}
+            </style>
         </div>
     </div>
 
     <!-- 4. Modal: แจ้งเตือนยังไม่ได้บันทึกข้อสอบ (Unsaved Changes Modal) -->
     <div id="unsaved-confirm-modal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-all duration-300 opacity-0 pointer-events-none" style="font-family: 'Noto Sans Thai Looped', sans-serif;">
-        <div class="bg-white border-2 border-amber-300 p-6 sm:p-8 rounded-3xl shadow-2xl max-w-md w-full mx-4 text-center space-y-6 transform scale-95 transition-all duration-300 relative overflow-hidden" id="unsaved-confirm-modal-card">
+        <div class="bg-white border-2 border-orange-300 p-6 sm:p-8 rounded-3xl shadow-2xl max-w-md w-full mx-4 text-center space-y-6 transform scale-95 transition-all duration-300 relative overflow-hidden" id="unsaved-confirm-modal-card">
             
             <!-- Top Gradient Accent bar -->
-            <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-amber-500 via-rose-500 to-pink-500"></div>
+            <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-orange-500 via-orange-400 to-sky-500"></div>
 
             <!-- Header Icon -->
             <div class="relative inline-block mt-2">
@@ -1845,7 +1891,7 @@
                 </button>
                 
                 <!-- ปุ่ม 2: สร้างข้อสอบต่อ -->
-                <button type="button" onclick="handleContinueEditing()" class="w-full sm:w-1/2 py-3 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-2xl text-xs sm:text-sm transition-all duration-200 shadow-md shadow-emerald-600/25 active:scale-95 flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap">
+                <button type="button" onclick="handleContinueEditing()" class="w-full sm:w-1/2 py-3 px-4 bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 text-white font-bold rounded-2xl text-xs sm:text-sm transition-all duration-200 shadow-md shadow-emerald-600/25 active:scale-95 flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap">
                     <span>สร้างข้อสอบต่อ</span>
                 </button>
             </div>

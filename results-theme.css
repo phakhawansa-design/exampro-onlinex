@@ -28,7 +28,7 @@
 .rs-ic { width: 44px; height: 44px; flex: none; border-radius: 13px; display: grid; place-items: center; font-size: 20px; }
 .rs-kpi small { display: block; font-size: 12.5px; color: var(--rs-mute); font-weight: 500; }
 .rs-kpi b { display: block; font-size: 22px; font-weight: 800; line-height: 1.2; }
-.rs-kpi em { display: block; font-style: normal; font-size: 11px; color: #94a3b8; }
+.rs-kpi em { display: block; font-style: normal; font-size: 11px; color:#64748b; }
 
 /* การ์ดทั่วไป */
 .rs-card { background: #fff; border: 1px solid var(--rs-line); border-radius: 20px; box-shadow: 0 2px 10px rgba(15, 23, 42, .03); overflow: hidden; }
@@ -64,7 +64,7 @@
 .rs-table td { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
 .rs-table tbody tr:hover td { background: #f8fbff; }
 .rs-table .c { text-align: center; }
-.rs-no { color: #94a3b8; font-weight: 700; width: 48px; }
+.rs-no { color:#64748b; font-weight: 700; width: 48px; }
 .rs-name { font-weight: 700; color: var(--rs-ink); }
 .rs-id { font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; color: #1d4ed8; margin-top: 1px; }
 .rs-cls { display: inline-block; padding: 3px 10px; border-radius: 8px; background: #eff6ff; color: #1e40af; font-weight: 700; font-size: 12.5px; white-space: nowrap; }
@@ -80,7 +80,7 @@
 .rs-pass, .rs-fail { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
 .rs-pass { background: #dcfce7; color: #166534; } .rs-fail { background: #ffe4e6; color: #9f1239; }
 .rs-zt b { display: block; font-family: ui-monospace, Consolas, monospace; font-size: 13px; color: #334155; }
-.rs-zt span, .rs-time span { display: block; font-size: 11px; color: #94a3b8; }
+.rs-zt span, .rs-time span { display: block; font-size: 11px; color:#64748b; }
 .rs-time b { display: block; font-family: ui-monospace, Consolas, monospace; font-size: 13px; color: #334155; font-weight: 600; }
 .rs-row-act { display: flex; gap: 6px; justify-content: center; }
 .rs-view { padding: 7px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; background: var(--rs-navy); color: #fff; border: 0; cursor: pointer; white-space: nowrap; }

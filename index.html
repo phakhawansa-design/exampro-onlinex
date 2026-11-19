@@ -22,7 +22,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root{--navy:#0b2a7a;--blue:#1557e0;--cyan:#22c3e6;--orange:#ff7a1a;--orange2:#ff9a3c;--bg:#f3f6fb;--ink:#1b2540;--muted:#6b7895;--line:#e3e9f3;
+    :root{--navy:#0b2a7a;--blue:#1557e0;--cyan:#22c3e6;--orange:#ff7a1a;--orange2:#ff9a3c;--bg:#f3f6fb;--ink:#1b2540;--muted:#5b6782;--line:#e3e9f3;
       --hex:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104'%3E%3Cpath d='M30 2h60l30 50-30 50H30L0 52z' fill='none' stroke='%23ffffff' stroke-opacity='.07' stroke-width='2'/%3E%3C/svg%3E")}
     *{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth;overflow-x:hidden}@supports(overflow:clip){html{overflow-x:clip}}
@@ -224,7 +224,7 @@
 @keyframes inPower2{0%{opacity:0}15%{opacity:.85}100%{opacity:0}}
 #intro .ibr{position:relative;text-align:center;color:#fff;opacity:0;transform:translateY(14px);animation:inUp .7s 2.3s ease-out forwards;font-family:'Noto Sans Thai Looped', "Leelawadee UI",Tahoma,sans-serif;text-shadow:0 0 18px rgba(95,216,255,.6)}
 #intro .ibr b{display:block;font-size:clamp(30px,5.2vmin,56px);font-weight:600;letter-spacing:.5px;line-height:1.15}
-#intro .ibr span{color:#ffcf4a}
+#intro .ibr span{color:#ff9a3c}
 #intro .ibr small{font-size:clamp(14px,2vmin,20px);opacity:.85}
 
 @keyframes inOpen2{to{transform:scaleY(1)}}
@@ -243,32 +243,32 @@
 
 /* ===== intro scene 2: side HUD + rings + hex grid ===== */
 #intro .ibr b{font-size:clamp(30px,5.4vmin,58px)!important}
-#intro .ibr b span{color:#ffcf4a}
+#intro .ibr b span{color:#ff9a3c}
 #intro .ichips{display:none;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
 #intro .ichips i{display:inline-flex;align-items:center;gap:6px;font:500 13px 'Noto Sans Thai Looped',sans-serif;font-style:normal;padding:5px 12px;border-radius:99px;background:rgba(95,216,255,.12);border:1px solid rgba(95,216,255,.45);color:#cdf3ff}
-#intro .ichips i.g{background:rgba(246,184,24,.12);border-color:rgba(246,184,24,.5);color:#ffe7a3}
+#intro .ichips i.g{background:rgba(255,122,26,.12);border-color:rgba(255,122,26,.5);color:#ffe7a3}
 #intro .ichips svg{width:15px;height:15px}
 #intro .ihex{position:absolute;inset:0;z-index:-1;opacity:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='97' viewBox='0 0 56 97'%3E%3Cpath d='M28 1 55 16.5v31L28 63 1 47.5v-31z M28 63v34' fill='none' stroke='%235fd8ff' stroke-width='1'/%3E%3C/svg%3E");
   -webkit-mask:radial-gradient(ellipse 60% 55% at 50% 48%,#000 0,transparent 75%);mask:radial-gradient(ellipse 60% 55% at 50% 48%,#000 0,transparent 75%);animation:hexIn 1.4s 1.5s ease-out forwards}
 @keyframes hexIn{to{opacity:.16}}
 #intro .iorb{position:absolute;left:50%;top:52%;width:118%;aspect-ratio:1;transform:translate(-50%,-50%) scale(.6);fill:none;stroke:#7fdcff;stroke-width:.8;opacity:0;animation:orbIn 1s 1.45s cubic-bezier(.2,.8,.2,1) forwards;pointer-events:none}
 #intro .iorb circle{transform-origin:100px 100px;animation:spinR 22s linear infinite}
-#intro .iorb .o2{stroke:#ffcf4a;stroke-width:1.1;animation:spinL 16s linear infinite}
+#intro .iorb .o2{stroke:#ff9a3c;stroke-width:1.1;animation:spinL 16s linear infinite}
 #intro .iorb .o3{animation-duration:30s}
 @keyframes orbIn{to{opacity:.55;transform:translate(-50%,-50%) scale(1)}}
 @keyframes spinR{to{transform:rotate(360deg)}}@keyframes spinL{to{transform:rotate(-360deg)}}
 #intro .hud{position:absolute;top:50%;width:250px;padding:16px 16px 14px;border-radius:18px;color:#e9f6ff;font-family:'Noto Sans Thai Looped', sans-serif;
   background:linear-gradient(160deg,rgba(13,59,142,.55),rgba(5,24,74,.55));border:1px solid rgba(95,216,255,.45);box-shadow:0 0 30px -6px rgba(95,216,255,.45),inset 0 0 24px rgba(95,216,255,.08);backdrop-filter:blur(6px);opacity:0}
 #intro .hud.l{right:calc(50% + min(39vw,320px) + 40px);transform:translate(-40px,-50%);animation:hudIn .8s 1.9s cubic-bezier(.2,1.2,.4,1) forwards}
-#intro .hud.r{left:calc(50% + min(39vw,320px) + 40px);transform:translate(40px,-50%);border-color:rgba(246,184,24,.5);box-shadow:0 0 30px -6px rgba(246,184,24,.4),inset 0 0 24px rgba(246,184,24,.06);animation:hudIn .8s 2.1s cubic-bezier(.2,1.2,.4,1) forwards}
+#intro .hud.r{left:calc(50% + min(39vw,320px) + 40px);transform:translate(40px,-50%);border-color:rgba(255,122,26,.5);box-shadow:0 0 30px -6px rgba(255,122,26,.4),inset 0 0 24px rgba(255,122,26,.06);animation:hudIn .8s 2.1s cubic-bezier(.2,1.2,.4,1) forwards}
 #intro .hud::after{content:"";position:absolute;top:50%;height:1.5px;width:0;background:linear-gradient(90deg,transparent,#7fdcff);animation:wire .6s 2.5s ease-out forwards}
 #intro .hud.l::after{left:100%}
-#intro .hud.r::after{right:100%;background:linear-gradient(270deg,transparent,#ffcf4a)}
+#intro .hud.r::after{right:100%;background:linear-gradient(270deg,transparent,#ff9a3c)}
 @keyframes wire{to{width:40px}}
 @keyframes hudIn{to{opacity:1;transform:translate(0,-50%)}}
 #intro .hh{display:flex;align-items:center;gap:10px}
 #intro .hi{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:rgba(95,216,255,.15);color:#7fdcff;flex:none}
-#intro .hi.g{background:rgba(246,184,24,.15);color:#ffcf4a}
+#intro .hi.g{background:rgba(255,122,26,.15);color:#ff9a3c}
 #intro .hi svg{width:21px;height:21px}
 #intro .hh b{display:block;font-size:17px;font-weight:600;line-height:1.2}
 #intro .hh small{display:block;font-size:12px;opacity:.7}
@@ -289,11 +289,11 @@
 #intro .hp{position:relative;margin:12px 0 10px;height:74px;border-radius:8px;background:#f4f1ea;padding:10px 12px;overflow:hidden}
 #intro .hp i{display:block;height:4px;border-radius:2px;background:#9aa6bb;margin-bottom:9px}
 #intro .hp i:nth-child(2){width:82%}#intro .hp i:nth-child(3){width:90%}#intro .hp i:nth-child(4){width:64%}#intro .hp i:nth-child(5){width:75%}
-#intro .hp .beam{position:absolute;left:0;right:0;top:-10%;height:18px;background:linear-gradient(transparent,rgba(246,184,24,.55));border-bottom:2px solid #f6b818;box-shadow:0 4px 14px rgba(246,184,24,.7);animation:beam2 1.4s 2.4s ease-in-out infinite alternate}
+#intro .hp .beam{position:absolute;left:0;right:0;top:-10%;height:18px;background:linear-gradient(transparent,rgba(255,122,26,.55));border-bottom:2px solid #ff7a1a;box-shadow:0 4px 14px rgba(255,122,26,.7);animation:beam2 1.4s 2.4s ease-in-out infinite alternate}
 @keyframes beam2{to{top:85%}}
-#intro .hg{display:flex;justify-content:space-between;font-size:12px;opacity:.85}#intro .hg b{font-size:14px;color:#ffcf4a}
+#intro .hg{display:flex;justify-content:space-between;font-size:12px;opacity:.85}#intro .hg b{font-size:14px;color:#ff9a3c}
 #intro .hbar{height:7px;border-radius:9px;background:rgba(255,255,255,.12);margin-top:5px;overflow:hidden}
-#intro .hbar i{display:block;height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,#f6b818,#ffcf4a);animation:fillW 1.4s 2.4s cubic-bezier(.2,.8,.2,1) forwards}
+#intro .hbar i{display:block;height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,#ff7a1a,#ff9a3c);animation:fillW 1.4s 2.4s cubic-bezier(.2,.8,.2,1) forwards}
 @keyframes fillW{to{width:87.5%}}
 @media (max-width:1179px){#intro .hud{display:none}#intro .ichips{display:flex;opacity:0;animation:show .5s 2.5s forwards}}
 
@@ -302,7 +302,7 @@
 .nlogo svg{width:40px;height:20px;overflow:visible}.nlogo img{width:100%;height:100%;border-radius:inherit;display:block}
 .nlogo.land{animation:land .7s cubic-bezier(.2,1.6,.4,1)}
 @keyframes land{0%{transform:scale(1.25);box-shadow:0 0 0 2px #fff,0 0 30px 10px rgba(95,216,255,.8)}100%{transform:none}}
-.brand b i{font-style:normal;color:#ffcf4a}
+.brand b i{font-style:normal;color:#ff9a3c}
 #intro{background:none!important}
 #intro .ibg{position:absolute;inset:0;z-index:-2;background:radial-gradient(ellipse at 50% 45%,#0b2f7a 0,#05184a 50%,#020b26 100%);transition:opacity .85s ease}
 #intro.out .ibg,#intro.fly .ibg{opacity:0}
