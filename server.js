@@ -58,7 +58,7 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 // กันไม่ให้ดาวน์โหลดไฟล์ฝั่งเซิร์ฟเวอร์ (ฐานข้อมูล, โค้ด, สคริปต์) ผ่านเว็บ
 app.use((req, res, next) => {
     const p = decodeURIComponent(req.path).toLowerCase();
-    if (/\.(db|db-journal|sqlite|bat|env|log|md)$/.test(p) || /^\/(server|auth|backup|check_storage|make_pdf|exam-guard|trinetra-link|backup-export)\.js$/.test(p) || /^\/(package(-lock)?\.json|\.npmrc|\.gitignore)$/.test(p) || p.startsWith('/_backup') || p.startsWith('/routes/') || p.startsWith('/node_modules') || p.startsWith('/.')) {
+    if (/\.(db|db-journal|sqlite|bat|env|log|md)$/.test(p) || /^\/(server|auth|backup|check_storage|make_pdf|exam-guard|trinetra-link|backup-export)\.js$/.test(p) || /^\/(package(-lock)?\.json|\.npmrc|\.gitignore)$/.test(p) || p.startsWith('/_backup') || p.startsWith('/exam-converter/server/') || p.startsWith('/routes/') || p.startsWith('/node_modules') || p.startsWith('/.')) {
         return res.status(404).end();
     }
     next();
@@ -4314,6 +4314,20 @@ app.get('/api/admin/storage-stats', (req, res) => {
 })(app, routeCtx);
 
 // รายงานรวมรายคนของรายวิชา
+// ===== ตัวแปลงข้อสอบด้วย AI (โฟลเดอร์ exam-converter) =====
+// API Key อยู่ใน environment ของเซิร์ฟเวอร์ (GEMINI_API_KEY) เท่านั้น · ใช้ได้เฉพาะอาจารย์/แอดมินที่ล็อกอิน
+// โควตาต่อคนต่อวัน: EXAM_AI_DAILY_LIMIT (ค่าเริ่มต้น 30 ไฟล์)
+import('./exam-converter/server/exam-converter-router.js').then(({ createExamConverterRouter }) => {
+    const requireTeacher = (req, res, next) => {
+        const u = req.authUser;
+        if (!u) return res.status(401).json({ error: 'กรุณาเข้าสู่ระบบ ExamPro ก่อนใช้งาน' });
+        if (u.typ !== 'teacher') return res.status(403).json({ error: 'ตัวแปลงข้อสอบใช้ได้เฉพาะอาจารย์' });
+        next();
+    };
+    app.use('/api/ai', createExamConverterRouter({ requireAuth: requireTeacher, getUserId: req => req.authUser.u }));
+    console.log('ตัวแปลงข้อสอบ AI พร้อมใช้งานที่ /api/ai' + (process.env.GEMINI_API_KEY ? '' : ' (ยังไม่ได้ตั้งค่า GEMINI_API_KEY)'));
+}).catch(e => console.error('โหลดตัวแปลงข้อสอบ AI ไม่สำเร็จ:', e.message));
+
 try { require('./trinetra-link')(app, db); } catch (e) { console.error('โหลดรายงานรวม ExamPro ไม่สำเร็จ:', e.message); }
 // ดาวน์โหลดข้อมูลสำรองทั้งหมด (สำคัญเมื่อใช้ Neon แผนฟรี)
 try { require('./backup-export')(app, db); } catch (e) { console.error('โหลดระบบดาวน์โหลดข้อมูลสำรองไม่สำเร็จ:', e.message); }

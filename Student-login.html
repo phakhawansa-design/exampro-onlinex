@@ -1179,17 +1179,12 @@
                 };
             });
 
-            // สำรอง: บางเบราว์เซอร์ไม่ส่งเหตุการณ์ (หน้าถูกพักโดยไม่แจ้ง) → ดูจากเวลาที่ขาดหาย (นานตั้งแต่ 15 วินาทีขึ้นไปเท่านั้น)
-            const JUMP_MS = 15000;
+            // ไม่นับ "เวลาขาดหาย" เป็นการออกจากหน้าข้อสอบแล้ว: หน้าสอบค้างหรือเครื่องอืดทำให้เวลากระโดดได้
+            // ทั้งที่นักศึกษาไม่ได้ออกไปไหน (การออกจริงจับจากการซ่อนหน้าแล้ว · เบราว์เซอร์ในแอปแชตถูกกันไม่ให้เข้าสอบ)
             let lastTick = Date.now();
             setInterval(() => {
                 if (isExamFinished) return;
-                const now = Date.now(), gap = now - lastTick;
-                lastTick = now;
-                if (gap > JUMP_MS && !awaySince && now - gap > lastReportedTime && !(lastReturn && lastReturn.at > now - gap)) {
-                    lastLeave = { at: now - gap, what: 'หน้าสอบหยุดทำงาน' };
-                    countLeave(Math.round(gap / 1000), 'หน้าสอบหยุดทำงาน (พับแอป/ล็อกจอ)');
-                }
+                lastTick = Date.now();
                 // คอมพิวเตอร์: บางเบราว์เซอร์ไม่ส่ง blur
                 if (!isTouchDevice && document.visibilityState === 'visible') {
                     if (!document.hasFocus()) startAway('คลิกไปหน้าต่างอื่น');

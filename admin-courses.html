@@ -698,7 +698,7 @@
     async function loadCourses() {
         try {
             const res = await fetch(`/api/teacher/courses?username=${encodeURIComponent(currentUsername)}`);
-            coursesList = await res.json();
+            const cl = await res.json(); coursesList = Array.isArray(cl) ? cl : []; // เซสชันหมดอายุ/ผิดพลาด → ไม่ให้หน้าค้าง
             await loadGroupCounts();
             renderCourses();
         } catch(e) {
