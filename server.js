@@ -17,6 +17,13 @@ function viewer(req) {
     return { admin: n === 'admin', user: n, adm: n === 'admin' ? 1 : 0 };
 }
 const MY_ROOMS = 'SELECT roomId FROM teacher_rooms WHERE teacherUsername = ?';
+// เฉลย/คำตอบให้อยู่รูปแบบเดียวกัน: "B", " b ", "ข", "ข." → "b" (เดิมเฉลยที่บันทึกเป็นตัวอักษรไทยจะไม่มีใครตอบถูก)
+const THAI_CHOICE = { 'ก': 'a', 'ข': 'b', 'ค': 'c', 'ง': 'd', 'จ': 'e', 'ฉ': 'f', 'ช': 'g', 'ซ': 'h', 'ฌ': 'i', 'ญ': 'j' };
+function normAnswer(v) {
+    const s = String(v === undefined || v === null ? '' : v).trim().replace(/[.)\s]+$/, '').trim();
+    if (THAI_CHOICE[s]) return THAI_CHOICE[s];
+    return s.toLowerCase();
+}
 // ห้องสอบเปิดเฉพาะบางกลุ่มเรียน (allowed_classes เช่น "TEC3R,TEC2N") · ว่าง = ทุกกลุ่มในรายวิชา
 function splitGroupList(s) { return String(s || '').split(/\s*[,|]\s*/).map(x => x.trim().toLowerCase()).filter(Boolean); }
 function outsideAllowedGroups(allowed, studentClass) {
@@ -439,6 +446,12 @@ db.serialize(() => {
 
     // ห้องสอบที่อาจารย์ลบ = เก็บเข้าคลัง (archived = 1) ไม่ลบแถวจริง
     //   เดิมลบแถวห้องสอบทิ้ง → ผลสอบและประวัติสลับหน้าจอของห้องนั้นยังอยู่ แต่ไม่มีเจ้าของ จึงหายจากทุกหน้า
+    // ค่าตั้งของระบบ (แอดมินตั้ง) เช่น ปีการศึกษา/ภาคเรียนเริ่มต้นของทุกบัญชี
+    // มีคอลัมน์ id เพราะตัวแปลงคำสั่งของ PostgreSQL เติม RETURNING id ให้ทุก INSERT
+    db.run("CREATE TABLE IF NOT EXISTS app_settings (id INTEGER PRIMARY KEY AUTOINCREMENT, skey VARCHAR(100) UNIQUE, svalue TEXT, updated_at TEXT)");
+    db.run("ALTER TABLE teacher_rooms ADD COLUMN max_leaves INTEGER DEFAULT 3", (err) => {
+        if (!err) console.log("✔ Added column 'max_leaves' to teacher_rooms table");
+    });
     db.run("ALTER TABLE teacher_rooms ADD COLUMN allowed_classes TEXT DEFAULT ''", (err) => {
         if (!err) console.log("✔ Added column 'allowed_classes' to teacher_rooms table");
     });
@@ -889,7 +902,7 @@ app.get('/api/teacher/rooms', (req, res) => {
     // หากเป็น admin ให้ดึงห้องของอาจารย์ทุกคน
     if (username === 'admin') {
         const sqlQuery = `
-            SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published, tr.duration, tr.courseId, tr.teacherUsername, tr.announcement, tr.allowed_classes,
+            SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published, tr.duration, tr.courseId, tr.teacherUsername, tr.announcement, tr.allowed_classes, tr.max_leaves,
                    c.courseCode, c.courseName, c.description as courseClassroom,
                    (SELECT GROUP_CONCAT(DISTINCT cs.class) FROM course_students cs WHERE cs.courseId = tr.courseId AND cs.class != '' AND cs.class IS NOT NULL) as studentClasses,
                    (SELECT COUNT(*) FROM questions q WHERE q.roomId = tr.roomId) as questionCount
@@ -905,7 +918,7 @@ app.get('/api/teacher/rooms', (req, res) => {
     }
 
     const sqlQuery = `
-        SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published, tr.duration, tr.courseId, tr.announcement, tr.allowed_classes,
+        SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published, tr.duration, tr.courseId, tr.announcement, tr.allowed_classes, tr.max_leaves,
                c.courseCode, c.courseName, c.description as courseClassroom,
                (SELECT GROUP_CONCAT(DISTINCT cs.class) FROM course_students cs WHERE cs.courseId = tr.courseId AND cs.class != '' AND cs.class IS NOT NULL) as studentClasses,
                (SELECT COUNT(*) FROM questions q WHERE q.roomId = tr.roomId) as questionCount
@@ -936,6 +949,91 @@ app.get('/api/teacher/rooms', (req, res) => {
 });
 
 // API สร้างห้องสอบใหม่ พร้อมรหัส PIN 6 หลักและเปิดห้องรอสอบทันที
+// ===== ปีการศึกษา/ภาคเรียนเริ่มต้นของระบบ (แอดมินตั้ง ทุกบัญชีอาจารย์เริ่มที่ค่านี้ แล้วเปลี่ยนเองได้) =====
+const TERM_YEARS = []; for (let y = 2567; y <= 2580; y++) TERM_YEARS.push(String(y));
+function readTermDefault(cb) {
+    db.get("SELECT svalue FROM app_settings WHERE skey = 'term_default'", [], (err, row) => {
+        let v = { y: 'all', t: 'all', v: 0 };
+        try { if (row && row.svalue) v = Object.assign(v, JSON.parse(row.svalue)); } catch (e) {}
+        cb(v);
+    });
+}
+app.get('/api/settings/term-default', (req, res) => readTermDefault(v => res.json(v)));
+app.post('/api/superadmin/term-default', (req, res) => {
+    const u = req.authUser;
+    if (!u || u.typ !== 'teacher' || u.role !== 'admin') return res.status(403).json({ success: false, message: 'เฉพาะผู้ดูแลระบบ' });
+    const y = String((req.body && req.body.y) || 'all'), t = String((req.body && req.body.t) || 'all');
+    if (!(y === 'all' || TERM_YEARS.includes(y)) || !['all', '1', '2', '3', '4'].includes(t)) return res.status(400).json({ success: false, message: 'ปีการศึกษาหรือภาคเรียนไม่ถูกต้อง' });
+    const val = JSON.stringify({ y, t, v: Date.now() }), now = new Date().toISOString();
+    db.run("UPDATE app_settings SET svalue = ?, updated_at = ? WHERE skey = 'term_default'", [val, now], function (err) {
+        if (err) return res.status(500).json({ success: false, message: err.message });
+        const done = () => readTermDefault(v => res.json({ success: true, ...v }));
+        if (this.changes) return done();
+        db.run("INSERT INTO app_settings (skey, svalue, updated_at) VALUES ('term_default', ?, ?)", [val, now], (e2) => {
+            if (e2) return res.status(500).json({ success: false, message: e2.message });
+            done();
+        });
+    });
+});
+
+// ===== ออกจากหน้าข้อสอบ: จำนวนครั้งที่นับแล้ว (นักศึกษารีเฟรชหน้าแล้วตัวนับไม่เริ่มใหม่) =====
+const LEAVE_PREFIX = 'ออกจากหน้าข้อสอบ';
+app.get('/api/student/leave-count', (req, res) => {
+    const u = req.authUser;
+    if (!u || u.typ !== 'student') return res.status(401).json({ message: 'กรุณาเข้าสู่ระบบ' });
+    const roomId = String(req.query.roomId || '');
+    if (!roomId) return res.status(400).json({ message: 'กรุณาระบุห้องสอบ' });
+    db.get(`SELECT COUNT(*) as n FROM cheat_logs WHERE roomId = ? AND (studentId = ? OR REPLACE(studentId, '-', '') = REPLACE(?, '-', '')) AND action LIKE ?`,
+        [roomId, u.u, u.u, LEAVE_PREFIX + '%'], (err, row) => {
+            if (err) return res.status(500).json({ message: err.message });
+            res.json({ count: Number(row && row.n) || 0 });
+        });
+});
+// อาจารย์ตั้งจำนวนครั้งที่ออกจากหน้าข้อสอบได้ก่อนส่งอัตโนมัติ (0 = ไม่ส่งอัตโนมัติ) · ความเป็นเจ้าของห้องตรวจที่ auth.js
+app.post('/api/teacher/room-leave-limit', (req, res) => {
+    const { roomId } = req.body || {};
+    const n = parseInt(req.body && req.body.maxLeaves, 10);
+    if (!roomId || isNaN(n) || n < 0 || n > 50) return res.status(400).json({ success: false, message: 'ค่าไม่ถูกต้อง' });
+    db.run('UPDATE teacher_rooms SET max_leaves = ? WHERE roomId = ?', [n, roomId], function (err) {
+        if (err) return res.status(500).json({ success: false, message: err.message });
+        res.json({ success: true, maxLeaves: n });
+    });
+});
+
+// ===== ผลสอบรายข้อของนักศึกษา: ถูก/ผิดทันที · เฉลยหลังอาจารย์ปิดห้อง · เคารพการตั้งค่า "ไม่แสดงคะแนน" =====
+app.get('/api/student/result-detail', (req, res) => {
+    const u = req.authUser;
+    if (!u || u.typ !== 'student') return res.status(401).json({ message: 'กรุณาเข้าสู่ระบบ' });
+    const roomId = String(req.query.roomId || '');
+    if (!roomId) return res.status(400).json({ message: 'กรุณาระบุห้องสอบ' });
+    db.get(`SELECT er.score, er.maxScore, er.answers_json, er.date, er.time, tr.show_score, tr.is_published, tr.exam_title, tr.roomName, c.courseCode, c.courseName
+            FROM exam_results er LEFT JOIN teacher_rooms tr ON tr.roomId = er.roomId LEFT JOIN courses c ON c.id = tr.courseId
+            WHERE er.roomId = ? AND (er.studentId = ? OR REPLACE(er.studentId, '-', '') = REPLACE(?, '-', '')) ORDER BY er.id DESC LIMIT 1`,
+        [roomId, u.u, u.u], (err, r) => {
+            if (err) return res.status(500).json({ message: err.message });
+            if (!r) return res.status(404).json({ message: 'ไม่พบผลสอบของคุณในห้องนี้' });
+            const head = { examTitle: r.exam_title || r.roomName || '', courseCode: r.courseCode || '', courseName: r.courseName || '', date: r.date, time: r.time };
+            if (Number(r.show_score) === 0) return res.json({ ...head, hidden: true, message: 'อาจารย์ตั้งค่าไม่แสดงคะแนนของห้องสอบนี้' });
+            const closed = Number(r.is_published) !== 1;
+            let mine = {}; try { mine = JSON.parse(r.answers_json || '{}') || {}; } catch (e) {}
+            db.all('SELECT * FROM questions WHERE roomId = ? ORDER BY id ASC', [roomId], (qErr, qs) => {
+                if (qErr) return res.status(500).json({ message: qErr.message });
+                if (!qs || !qs.length) return res.json({ ...head, score: r.score, maxScore: r.maxScore, unavailable: true, message: 'ข้อสอบของห้องนี้ถูกลบไปแล้ว จึงแสดงรายละเอียดรายข้อไม่ได้' });
+                const keys = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
+                const items = qs.map((q, i) => {
+                    const ans = normAnswer(mine[q.id]), key = normAnswer(q.answer);
+                    return {
+                        no: i + 1, question: q.question || '', image: q.question_img || '',
+                        choices: keys.filter(k => q[k] !== null && q[k] !== undefined && String(q[k]).trim() !== '').map(k => ({ key: k, text: String(q[k]) })),
+                        mine: ans || null, correct: !!ans && ans === key,
+                        answer: closed ? key : null
+                    };
+                });
+                res.json({ ...head, score: r.score, maxScore: r.maxScore, closed, items });
+            });
+        });
+});
+
 // จำนวนนักศึกษาแต่ละกลุ่มเรียนของทุกรายวิชาของอาจารย์ (การ์ดรายวิชา / เลือกกลุ่มตอนเปิดห้องสอบ)
 app.get('/api/teacher/course-groups', (req, res) => {
     const v = viewer(req);
@@ -2408,6 +2506,8 @@ app.post('/api/courses/:courseId/students/copy-from', (req, res) => {
     if (toId === fromId) return res.status(400).json({ success: false, message: 'รายวิชาต้นทางและปลายทางต้องไม่ใช่วิชาเดียวกัน' });
     if (!ids.length) return res.status(400).json({ success: false, message: 'กรุณาเลือกนักศึกษาอย่างน้อย 1 คน' });
     if (ids.length > 500) return res.status(400).json({ success: false, message: 'เลือกได้ครั้งละไม่เกิน 500 คน' });
+    // targetClass (ไม่บังคับ): ใส่ทุกคนเข้ากลุ่มเรียนนี้ของวิชาปลายทาง · ว่าง = ใช้กลุ่มเดิมจากวิชาต้นทาง
+    const tClass = String((req.body && req.body.targetClass) || '').trim();
     const v = viewer(req);
     db.all('SELECT id, teacherUsername FROM courses WHERE id IN (?, ?)', [fromId, toId], (cErr, cs) => {
         if (cErr) return res.status(500).json({ success: false, message: cErr.message });
@@ -2430,7 +2530,7 @@ app.post('/api/courses/:courseId/students/copy-from', (req, res) => {
                     }
                     const r = add[i++];
                     db.run(`INSERT INTO course_students (courseId, studentId, prefix, firstName, lastName, class, fullNameEn, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-                        [toId, r.studentId, r.prefix || '', r.firstName || '', r.lastName || '', r.class || '', r.fullNameEn || '', now],
+                        [toId, r.studentId, r.prefix || '', r.firstName || '', r.lastName || '', tClass || r.class || '', r.fullNameEn || '', now],
                         err => err ? res.status(500).json({ success: false, message: err.message }) : next());
                 };
                 next();
@@ -3097,9 +3197,13 @@ app.post('/api/submit-exam', (req, res) => {
                 if (!questions || questions.length === 0) return res.status(400).json({ message: "ไม่พบข้อสอบในห้องนี้" });
 
                 let score = 0;
+                // เดิมถ้าไม่ได้ตอบข้อใด จะไปหยิบ answers[ลำดับข้อ] มาแทน ซึ่งอาจเป็นคำตอบของข้ออื่น (เลขข้อซ้ำกับลำดับ) → ตรวจผิด
+                // ตอนนี้ใช้เลขข้อจริงเท่านั้น (ยกเว้นข้อมูลแบบเก่าที่ส่งมาเป็นรายการตามลำดับ)
+                const byOrder = Array.isArray(answers);
                 questions.forEach((q, index) => {
-                    const studentAns = (answers[q.id] !== undefined ? answers[q.id] : answers[index] || "").trim().toLowerCase();
-                    const correctAns = (q.answer || "").trim().toLowerCase();
+                    const raw = byOrder ? answers[index] : answers[q.id];
+                    const studentAns = normAnswer(raw);
+                    const correctAns = normAnswer(q.answer);
                     if (studentAns === correctAns && correctAns !== "") score++;
                 });
 
@@ -3312,7 +3416,7 @@ app.get('/api/room-settings', (req, res) => {
     if (!roomId) return res.status(400).json({ message: "กรุณาระบุ roomId" });
 
     const sql = `
-        SELECT tr.randomize, tr.duration, tr.announcement, tr.show_score, tr.show_leaderboard,
+        SELECT tr.randomize, tr.duration, tr.announcement, tr.show_score, tr.show_leaderboard, tr.max_leaves,
                tr.exam_title, tr.exam_code, tr.roomName, tr.is_published, tr.courseId,
                c.courseCode, c.courseName,
                (SELECT COUNT(*) FROM questions q WHERE q.roomId = tr.roomId) as questionCount
@@ -3326,6 +3430,7 @@ app.get('/api/room-settings', (req, res) => {
         res.json({
             randomize: row ? row.randomize : 1,
             duration: row ? row.duration : 0,
+            maxLeaves: row && row.max_leaves !== null && row.max_leaves !== undefined ? Number(row.max_leaves) : 3,
             announcement: row ? row.announcement : '',
             showScore: row ? (row.show_score !== undefined ? row.show_score : 1) : 1,
             showLeaderboard: row ? (row.show_leaderboard !== undefined ? row.show_leaderboard : 1) : 1,

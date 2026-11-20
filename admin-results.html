@@ -186,6 +186,16 @@
         .sd-bar i { display: block; height: 100%; border-radius: 99px; transition: width .6s cubic-bezier(.2,.8,.2,1); }
         @media (max-width: 760px) { .sd-body { grid-template-columns: 1fr; justify-items: center; } .sd-legend { width: 100%; } .sd-ring { width: 230px; height: 230px; } }
     </style>
+    <style>
+        /* ช่องเลือกรายวิชา (บนแถบด้านบน) ให้เด่น */
+        #course-selector { min-width: 380px !important; padding: 11px 44px 11px 16px !important; border: 2px solid #ff9a3c !important; border-radius: 14px !important;
+            background-color: #fff7ef !important; color: #0b2a7a !important; font-size: 16px !important; font-weight: 800 !important;
+            box-shadow: 0 8px 20px -12px rgba(255,122,26,.75) !important; cursor: pointer; }
+        #course-selector:hover { border-color: #ff7a1a !important; background-color: #ffefe0 !important; }
+        #course-selector:focus { outline: none !important; border-color: #1d5fd6 !important; box-shadow: 0 0 0 4px rgba(29,95,214,.18) !important; }
+        .cs-label { font-size: 14px !important; font-weight: 800 !important; color: #0b2a7a !important; }
+        @media (max-width: 760px) { #course-selector { min-width: 0 !important; width: 100% !important; } }
+    </style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
@@ -295,7 +305,7 @@
             </div>
             <div class="flex items-center gap-3 flex-wrap sm:flex-nowrap">
                 <div class="flex items-center gap-2">
-                    <span class="text-xs font-bold text-slate-700 whitespace-nowrap shrink-0 hidden sm:inline">เลือกรายวิชา:</span>
+                    <span class="cs-label text-xs font-bold text-slate-700 whitespace-nowrap shrink-0 hidden sm:inline">เลือกรายวิชา:</span>
                     <select id="course-selector" aria-label="เลือกรายวิชา" onchange="onCourseChange()" class="dark-select min-w-[200px] max-w-[280px]">
                         <option value="">-- กำลังโหลดรายวิชา... --</option>
                     </select>
@@ -567,7 +577,10 @@
                 const k = x.roomId || '(ไม่ระบุห้อง)';
                 if (!map[k]) {
                     const tr = (teacherRoomsCache || []).find(r => r.roomId === x.roomId);
-                    map[k] = { id: k, title: tr ? (tr.exam_title || tr.roomName) : `ห้อง ${k}`, live: false, n: 0, maxId: 0, date: '' };
+                    // ห้องที่ลบไปแล้ว (ไม่มีในรายการห้อง) → แสดงชื่อวิชาแทนรหัสห้อง
+                    const csel = document.getElementById('course-selector');
+                    const courseTitle = csel && csel.selectedIndex >= 0 ? csel.options[csel.selectedIndex].text.split(' · ')[0].replace(/^\[[^\]]*\]\s*/, '').trim() : '';
+                    map[k] = { id: k, title: tr ? (tr.exam_title || tr.roomName) : (courseTitle || 'ชุดข้อสอบเดิม'), live: false, n: 0, maxId: 0, date: '' };
                 }
                 map[k].n++; if (x.id > map[k].maxId) { map[k].maxId = x.id; map[k].date = String(x.date || '').replace(/^วัน\S*ที่\s*/, ''); }
             });
@@ -1080,8 +1093,8 @@
 
                 contentEl.innerHTML = questions.map((q, idx) => {
                     // หาคำตอบของเด็ก
-                    const studentAns = (studentAnswers[q.id] !== undefined ? studentAnswers[q.id] : studentAnswers[idx] || '').trim().toLowerCase();
-                    const correctAns = (q.answer || '').trim().toLowerCase();
+                    const studentAns = normAns(Array.isArray(studentAnswers) ? studentAnswers[idx] : studentAnswers[q.id]);
+                    const correctAns = normAns(q.answer);
                     const isCorrect = studentAns === correctAns;
 
                     // สถิติข้อนี้
@@ -1166,6 +1179,42 @@
             }
         }
 
+        // คำตอบ/เฉลยรูปแบบเดียวกับที่เซิร์ฟเวอร์ใช้ตรวจ: "B", " b ", "ข", "ข." → "b"
+        const TH_CHOICE = { 'ก': 'a', 'ข': 'b', 'ค': 'c', 'ง': 'd', 'จ': 'e', 'ฉ': 'f', 'ช': 'g', 'ซ': 'h', 'ฌ': 'i', 'ญ': 'j' };
+        function normAns(v) {
+            const s = String(v === undefined || v === null ? '' : v).trim().replace(/[.)\s]+$/, '').trim();
+            return TH_CHOICE[s] || s.toLowerCase();
+        }
+
+        // ห้องที่ลบไปแล้ว: จับคู่โจทย์จากคลังข้อสอบของวิชา (จำนวนข้อต้องเท่ากับเลขข้อที่นักศึกษาตอบ)
+        // ลำดับเลขข้อในคำตอบ (เรียงน้อย→มาก) = ลำดับข้อในชุดข้อสอบที่ใช้เปิดห้อง
+        async function questionsFromBank(list) {
+            try {
+                const ids = [...new Set(list.flatMap(st => { try { return Object.keys(JSON.parse(st.answers_json || '{}')); } catch (e) { return []; } }))]
+                    .map(Number).filter(n => n > 0).sort((a, b) => a - b);
+                const maxScore = Number((list[0] || {}).maxScore) || 0;
+                if (!ids.length || ids.length !== maxScore) return null;
+                const courseId = document.getElementById('course-selector').value;
+                const u = encodeURIComponent(localStorage.getItem('teacher_username') || '');
+                const r = await fetch(`/api/courses/${encodeURIComponent(courseId)}/exams?username=${u}`);
+                const sets = r.ok ? await r.json() : [];
+                const same = (Array.isArray(sets) ? sets : []).filter(s => Number(s.questionCount) === ids.length);
+                if (same.length !== 1) return null; // ไม่มี หรือมีหลายชุดที่จำนวนข้อเท่ากัน → เลือกไม่ได้แน่ชัด ไม่เดา
+                const qr = await fetch(`/api/library/get-template-questions?templateId=${same[0].id}&username=${u}`);
+                const qs = qr.ok ? await qr.json() : [];
+                if (!Array.isArray(qs) || qs.length !== ids.length) return null;
+                return { name: same[0].templateName || 'ชุดข้อสอบ', questions: qs.map((q, i) => ({ ...q, id: ids[i] })) };
+            } catch (e) { return null; }
+        }
+        function showItemAnalysisMessage(msg) {
+            const box = document.getElementById('item-analysis-box');
+            document.getElementById('ia-sub').textContent = msg;
+            document.getElementById('ia-sum').innerHTML = '';
+            box.querySelector('.ia-legend').hidden = true;
+            box.querySelector('.ia-wrap').hidden = true;
+            box.classList.remove('hidden');
+        }
+
         // ฟังก์ชันคำนวณและวาดตารางวิเคราะห์คุณภาพข้อสอบ (Item Analysis)
         async function runItemAnalysis(filteredList) {
             const analysisBox = document.getElementById('item-analysis-box');
@@ -1183,13 +1232,16 @@
                 filteredList = filteredList.filter(r => r.roomId === itemRoom);
                 // ดึงรายการข้อสอบทั้งหมดของห้องเพื่อรู้ตัวโจทย์และเฉลยที่ถูกต้อง
                 const res = await fetch(`/api/teacher/get-questions?roomId=${encodeURIComponent(itemRoom)}`);
-                if (!res.ok) {
-                    analysisBox.classList.add('hidden');
-                    return;
-                }
-                const questions = await res.json();
+                let questions = res.ok ? await res.json() : [];
+                if (!Array.isArray(questions)) questions = [];
+                let iaNote = '';
                 if (questions.length === 0) {
-                    analysisBox.classList.add('hidden');
+                    // ห้องสอบถูกลบไปพร้อมข้อสอบ (ระบบเวอร์ชันก่อน) → หาชุดข้อสอบในคลังของวิชาที่จำนวนข้อเท่ากัน
+                    const fb = await questionsFromBank(filteredList);
+                    if (fb) { questions = fb.questions; iaNote = ' · ห้องสอบถูกลบแล้ว ใช้โจทย์จากคลังข้อสอบ "' + fb.name + '"'; }
+                }
+                if (questions.length === 0) {
+                    showItemAnalysisMessage('ไม่พบโจทย์ของชุดข้อสอบนี้ (ห้องสอบถูกลบไปพร้อมข้อสอบ) จึงวิเคราะห์รายข้อไม่ได้ · คะแนนและผลสอบด้านล่างยังครบถ้วน');
                     return;
                 }
 
@@ -1205,13 +1257,13 @@
                 const highGroup = sortedList.slice(0, M);
                 const lowGroup = sortedList.slice(-M);
                 const correctIn = (group, qId, key) => group.reduce((n, st) => {
-                    try { const a = JSON.parse(st.answers_json || '{}'); const v = (a[qId] !== undefined ? String(a[qId]) : '').trim().toLowerCase(); return n + (key !== '' && v === key ? 1 : 0); }
+                    try { const a = JSON.parse(st.answers_json || '{}'); const v = normAns(a[qId]); return n + (key !== '' && v === key ? 1 : 0); }
                     catch (e) { return n; }
                 }, 0);
                 const tally = { good: 0, ok: 0, fix: 0, key: 0 };
 
                 analysisBody.innerHTML = questions.map((q, idx) => {
-                    const key = (q.answer || '').trim().toLowerCase();
+                    const key = normAns(q.answer);
                     const p = correctIn(filteredList, q.id, key) / N;          // ค่าความยากง่าย
                     const r = correctIn(highGroup, q.id, key) / M - correctIn(lowGroup, q.id, key) / M; // ค่าอำนาจจำแนก
 
@@ -1239,7 +1291,9 @@
 
                 const opt = [...document.getElementById('rs-room').options].find(o => o.value === itemRoom);
                 const setName = opt ? opt.textContent.split(' · ')[0].trim() : '';
-                document.getElementById('ia-sub').textContent = (setName ? 'ชุดข้อสอบ: ' + setName + ' · ' : '') + questions.length + ' ข้อ · วิเคราะห์จากนักศึกษา ' + N + ' คน';
+                document.getElementById('ia-sub').textContent = (setName ? 'ชุดข้อสอบ: ' + setName + ' · ' : '') + questions.length + ' ข้อ · วิเคราะห์จากนักศึกษา ' + N + ' คน' + iaNote;
+                document.querySelector('#item-analysis-box .ia-legend').hidden = false;
+                document.querySelector('#item-analysis-box .ia-wrap').hidden = false;
                 document.getElementById('ia-sum').innerHTML =
                     '<div class="ia-s good"><b>' + tally.good + '</b><small>ข้อดีเยี่ยม</small></div>' +
                     '<div class="ia-s ok"><b>' + tally.ok + '</b><small>ข้อพอใช้</small></div>' +

@@ -18,11 +18,19 @@
     const YEARS = []; for (let y = 2567; y <= 2580; y++) YEARS.push(String(y));
     const TERMS = { '1': 'ภาคการศึกษาที่ 1', '2': 'ภาคการศึกษาที่ 2', '3': 'ภาคการศึกษาฤดูร้อน', '4': 'ภาคการศึกษาพิเศษ' };
 
+    const DEF_KEY = 'exampro_term_default';
+    const clean = v => ({ y: YEARS.includes(String(v && v.y)) ? String(v.y) : 'all', t: TERMS[String(v && v.t)] ? String(v.t) : 'all' });
+    function readJSON(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }
+    // ค่าเริ่มต้นที่แอดมินตั้ง (เก็บสำเนาไว้ในเครื่อง แล้วตรวจกับเซิร์ฟเวอร์ทุกครั้งที่เปิดหน้า)
+    const def = (() => { const d = readJSON(DEF_KEY); return { ...clean(d), v: Number(d && d.v) || 0 }; })();
     function load() {
-        try { const v = JSON.parse(localStorage.getItem(KEY) || '{}'); return { y: YEARS.includes(v.y) ? v.y : 'all', t: TERMS[v.t] ? v.t : 'all' }; }
-        catch (e) { return { y: 'all', t: 'all' }; }
+        const own = readJSON(KEY);
+        // อาจารย์เลือกเองหลังจากแอดมินตั้งค่ารอบล่าสุด → ใช้ค่าของอาจารย์ · ไม่งั้นใช้ค่าเริ่มต้นของแอดมิน
+        if (own && Number(own.v || 0) === def.v) return clean(own);
+        return clean(def);
     }
     const scope = load();
+    const isDefault = () => scope.y === def.y && scope.t === def.t;
     const active = () => scope.y !== 'all' || scope.t !== 'all';
 
     // "2/2569" → { t:'2', y:'2569' } · "1/68" → ปี 2568 · "ฤดูร้อน/2569" → t:'3' · "พิเศษ/2569" → t:'4'
@@ -49,11 +57,11 @@
         return [scope.t !== 'all' ? TERMS[scope.t] : 'ทุกภาค', scope.y !== 'all' ? 'ปีการศึกษา ' + scope.y : 'ทุกปีการศึกษา'].join(' · ');
     }
     function set(y, t) {
-        try { localStorage.setItem(KEY, JSON.stringify({ y, t })); } catch (e) {}
+        try { localStorage.setItem(KEY, JSON.stringify({ y, t, v: def.v })); } catch (e) {}
         location.reload();
     }
 
-    window.ExamTerm = { active, label, parseSem, courseInScope, scope: () => ({ ...scope }), set, reset: () => set('all', 'all'), terms: TERMS, years: YEARS };
+    window.ExamTerm = { active, label, parseSem, courseInScope, scope: () => ({ ...scope }), set, reset: () => set('all', 'all'), useDefault: () => set(def.y, def.t), defaults: () => ({ ...def }), terms: TERMS, years: YEARS };
 
     // ===== กรองข้อมูลที่ดึงจากเซิร์ฟเวอร์ =====
     const orig = window.fetch.bind(window);
@@ -100,7 +108,8 @@
             '.ts-sel{appearance:none;-webkit-appearance:none;padding:4px 26px 4px 10px;border:1.5px solid #cbd5e1;border-radius:9px;background:#fff url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23334155\' stroke-width=\'2.6\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpath d=\'m6 9 6 6 6-6\'/%3E%3C/svg%3E") no-repeat right 8px center/12px;' +
             'font-family:inherit;font-size:13px;font-weight:700;color:#0f172a;cursor:pointer;line-height:1.5}' +
             '.ts-sel:hover{border-color:#94a3b8}.ts-sel:focus{outline:none;border-color:#1d5fd6;box-shadow:0 0 0 3px rgba(29,95,214,.18)}' +
-            '.ts-bar.on .ts-sel{border-color:#ff9a3c;background-color:#fff7ef;color:#9a3412}' +
+            
+            '.ts-def{border:0;background:#fff1e4;border-radius:8px;padding:3px 8px;font-family:inherit;font-size:12px;font-weight:700;color:#b4500c;cursor:pointer}.top .ts-def{background:rgba(255,255,255,.15);color:#ffd0a6}' +
             '.ts-clear{border:0;background:none;padding:2px 4px;font-family:inherit;font-size:12px;font-weight:700;color:#1d5fd6;text-decoration:underline;cursor:pointer}' +
             '@media (max-width:640px){.ts-sel{font-size:16px;padding:6px 28px 6px 10px}}';
         document.head.appendChild(st);
@@ -112,12 +121,15 @@
         box.innerHTML =
             '<label for="ts-year">ปีการศึกษา</label><select id="ts-year" class="ts-sel"><option value="all">ทุกปี</option>' + YEARS.map(y => '<option value="' + y + '">' + y + '</option>').join('') + '</select>' +
             '<label for="ts-term">ภาค</label><select id="ts-term" class="ts-sel"><option value="all">ทุกภาค</option>' + Object.keys(TERMS).map(k => '<option value="' + k + '">' + TERMS[k] + '</option>').join('') + '</select>' +
+            (!isDefault() && (def.y !== 'all' || def.t !== 'all') ? '<button type="button" class="ts-def" title="กลับไปใช้ปี/ภาคที่ผู้ดูแลระบบตั้งไว้">ค่าเริ่มต้น</button>' : '') +
             (active() ? '<button type="button" class="ts-clear">ดูทั้งหมด</button>' : '');
         box.querySelector('#ts-year').value = scope.y;
         box.querySelector('#ts-term').value = scope.t;
         box.querySelector('#ts-year').onchange = e => set(e.target.value, scope.t);
         box.querySelector('#ts-term').onchange = e => set(scope.y, e.target.value);
         const clr = box.querySelector('.ts-clear'); if (clr) clr.onclick = () => set('all', 'all');
+        const dft = box.querySelector('.ts-def'); if (dft) dft.onclick = () => set(def.y, def.t);
+        if (isDefault() && (def.y !== 'all' || def.t !== 'all')) box.title = 'ปี/ภาคเริ่มต้นที่ผู้ดูแลระบบตั้งไว้ · เปลี่ยนเองได้';
         return box;
     }
     function mount() {
@@ -132,4 +144,17 @@
         if (h1) { (h1.parentElement.matches('header, .top') ? h1 : h1.parentElement).insertAdjacentElement('afterend', bar); }
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
+
+    orig('/api/settings/term-default').then(r => r.ok ? r.json() : null).then(d => {
+        if (!d || Number(d.v || 0) === def.v) return;
+        try { localStorage.setItem(DEF_KEY, JSON.stringify({ ...clean(d), v: Number(d.v) || 0 })); } catch (e) { return; }
+        const nd = clean(d);
+        const own = readJSON(KEY);
+        const ownStillValid = own && Number(own.v || 0) === (Number(d.v) || 0);
+        const next = ownStillValid ? clean(own) : nd;
+        if ((next.y !== scope.y || next.t !== scope.t) && !sessionStorage.getItem('ts_reloaded_' + d.v)) {
+            try { sessionStorage.setItem('ts_reloaded_' + d.v, '1'); } catch (e) {}
+            location.reload();
+        }
+    }).catch(() => {});
 })();

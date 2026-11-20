@@ -595,6 +595,7 @@
                             <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">
                                 ✔ ส่งเรียบร้อย
                             </span>
+                            ${hasScore ? `<a href="finish.html?roomId=${encodeURIComponent(item.roomId)}&score=${encodeURIComponent(item.score)}&maxScore=${encodeURIComponent(item.maxScore)}&showScore=1&studentName=${encodeURIComponent(currentStudent.name || ((currentStudent.firstName || '') + ' ' + (currentStudent.lastName || '')).trim())}&studentId=${encodeURIComponent(currentStudent.studentId)}#rv" style="display:block;margin-top:6px;font-size:12px;font-weight:700;color:#1d5fd6;text-decoration:underline">ดูผลรายข้อ</a>` : ''}
                         </td>
                     </tr>
                 `;

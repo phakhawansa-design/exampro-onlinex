@@ -215,6 +215,41 @@
             </div>
         </div>
 
+        <!-- ปีการศึกษา/ภาคเรียนเริ่มต้นของทุกบัญชีอาจารย์ -->
+        <section class="td-card" aria-labelledby="td-title">
+            <div class="td-l">
+                <h2 id="td-title">ปีการศึกษาและภาคเรียนปัจจุบันของระบบ</h2>
+                <p>ทุกบัญชีอาจารย์จะเริ่มต้นที่ค่านี้ทุกครั้งที่เข้าสู่ระบบ (อาจารย์เปลี่ยนดูภาคอื่นเองได้)</p>
+            </div>
+            <div class="td-r">
+                <label>ปีการศึกษา
+                    <select id="td-year"><option value="all">ทุกปี</option><option value="2567">2567</option><option value="2568">2568</option><option value="2569">2569</option><option value="2570">2570</option><option value="2571">2571</option><option value="2572">2572</option><option value="2573">2573</option><option value="2574">2574</option><option value="2575">2575</option><option value="2576">2576</option><option value="2577">2577</option><option value="2578">2578</option><option value="2579">2579</option><option value="2580">2580</option></select>
+                </label>
+                <label>ภาค
+                    <select id="td-term">
+                        <option value="all">ทุกภาค</option>
+                        <option value="1">ภาคการศึกษาที่ 1</option>
+                        <option value="2">ภาคการศึกษาที่ 2</option>
+                        <option value="3">ภาคการศึกษาฤดูร้อน</option>
+                        <option value="4">ภาคการศึกษาพิเศษ</option>
+                    </select>
+                </label>
+                <button type="button" id="td-save" onclick="saveTermDefault()">บันทึก</button>
+                <span id="td-msg" role="status"></span>
+            </div>
+        </section>
+        <style>
+            .td-card { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding: 18px 20px; border-radius: 22px; background: linear-gradient(120deg, #0b2a7a, #1d5fd6); color: #fff; box-shadow: 0 16px 34px -22px rgba(11,42,122,.7); }
+            .td-l h2 { margin: 0; font-size: 16px; font-weight: 800; }
+            .td-l p { margin: 3px 0 0; font-size: 13px; color: #c8d8ff; }
+            .td-r { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; }
+            .td-r label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 700; color: #dbe6ff; }
+            .td-r select { padding: 9px 12px; border-radius: 12px; border: 0; font: inherit; font-size: 15px; font-weight: 700; color: #0f172a; min-width: 150px; }
+            #td-save { padding: 10px 20px; border-radius: 12px; border: 0; background: #ff7a1a; color: #fff; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
+            #td-save:hover { background: #ec6a0c; } #td-save:disabled { opacity: .6; cursor: wait; }
+            #td-msg { font-size: 13px; font-weight: 700; color: #a7f3d0; align-self: center; }
+        </style>
+
         <!-- Tab Navigation -->
         <div class="flex gap-2 flex-wrap items-center">
             <button onclick="switchTab('teachers')" id="tab-teachers"
@@ -334,7 +369,30 @@
         window.addEventListener('DOMContentLoaded', () => {
             loadStats();
             loadTeachers();
+            loadTermDefault();
         });
+
+        // ===== ปีการศึกษา/ภาคเรียนเริ่มต้นของระบบ =====
+        async function loadTermDefault() {
+            try {
+                const r = await fetch('/api/settings/term-default');
+                const d = r.ok ? await r.json() : {};
+                document.getElementById('td-year').value = d.y || 'all';
+                document.getElementById('td-term').value = d.t || 'all';
+            } catch (e) {}
+        }
+        async function saveTermDefault() {
+            const btn = document.getElementById('td-save'), msg = document.getElementById('td-msg');
+            btn.disabled = true; msg.textContent = '';
+            try {
+                const r = await fetch('/api/superadmin/term-default', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ y: document.getElementById('td-year').value, t: document.getElementById('td-term').value }) });
+                const d = await r.json().catch(() => ({}));
+                if (!r.ok || !d.success) throw new Error(d.message || 'HTTP ' + r.status);
+                msg.textContent = 'บันทึกแล้ว · ทุกบัญชีอาจารย์จะเริ่มที่ค่านี้';
+            } catch (e) { msg.style.color = '#fecaca'; msg.textContent = 'บันทึกไม่สำเร็จ: ' + e.message; }
+            finally { btn.disabled = false; }
+        }
 
         // Tab Switching
         function switchTab(tab) {

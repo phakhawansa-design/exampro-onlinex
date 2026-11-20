@@ -140,6 +140,39 @@
         .rg-imp { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #334155; }
         .rg-imp select { padding: 8px 10px; border: 1.5px solid #cbd5e1; border-radius: 12px; font: inherit; font-size: 14px; font-weight: 700; background: #fff; }
         .rg-sel { padding: 5px 8px; border: 1.5px solid #e2e8f0; border-radius: 10px; font: inherit; font-size: 13px; font-weight: 700; background: #fff; color: #0f172a; max-width: 140px; }
+        /* ===== ดึงรายชื่อจากวิชาอื่น ===== */
+        .pm-box { background: #fff; width: 100%; max-width: 860px; max-height: 90vh; display: flex; flex-direction: column; border-radius: 24px; overflow: hidden; box-shadow: 0 30px 60px -20px rgba(15,23,42,.45); }
+        .pm-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 20px 24px 14px; border-bottom: 1px solid #e2e8f0; }
+        .pm-head h3 { margin: 0; font-size: 21px; font-weight: 800; color: #0f172a; }
+        .pm-head p { margin: 3px 0 0; font-size: 14px; color: #64748b; }
+        .pm-x { width: 38px; height: 38px; border-radius: 12px; border: 1px solid #e2e8f0; background: #fff; font-size: 22px; cursor: pointer; color: #475569; }
+        .pm-body { padding: 16px 24px; overflow-y: auto; flex: 1; display: grid; gap: 12px; align-content: start; }
+        .pm-field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 700; color: #334155; }
+        .pm-field select { padding: 11px 14px; border: 2px solid #cbd5e1; border-radius: 14px; font: inherit; font-size: 15px; font-weight: 700; color: #0f172a; background: #fff; }
+        .pm-field select:focus { outline: none; border-color: #1d5fd6; }
+        .pm-tools { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+        .pm-tools input { flex: 1 1 220px; min-width: 0; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 12px; font: inherit; font-size: 15px; }
+        .pm-all { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #0b2a7a; cursor: pointer; }
+        .pm-all input, .pm-row input { width: 18px; height: 18px; accent-color: #ff7a1a; flex: none; }
+        .pm-list { border: 1.5px solid #e2e8f0; border-radius: 14px; max-height: 44vh; overflow-y: auto; }
+        .pm-row { display: grid; grid-template-columns: 22px 150px minmax(0,1fr) auto; align-items: center; gap: 12px; padding: 10px 14px; border-top: 1px solid #f1f5f9; cursor: pointer; font-size: 14px; }
+        .pm-row:first-child { border-top: 0; }
+        .pm-row:hover { background: #fafcff; }
+        .pm-row.on { background: #fff7ef; }
+        .pm-row.has { color: #94a3b8; cursor: default; background: #f8fafc; }
+        .pm-id { font-family: ui-monospace, Consolas, monospace; font-weight: 700; color: #0e7490; }
+        .pm-row.has .pm-id { color: #94a3b8; }
+        .pm-nm { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .pm-tag { font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 99px; background: #eef4ff; color: #0b2a7a; white-space: nowrap; }
+        .pm-tag.has { background: #e2e8f0; color: #64748b; }
+        .pm-empty { padding: 30px 10px; text-align: center; color: #64748b; font-size: 14px; }
+        .pm-foot { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; flex-wrap: wrap; padding: 14px 24px 18px; border-top: 1px solid #e2e8f0; background: #fafbfe; }
+        .pm-target { min-width: 220px; }
+        .pm-acts { display: flex; gap: 8px; }
+        .pm-cancel { padding: 11px 18px; border: 1.5px solid #e2e8f0; border-radius: 12px; background: #fff; font: inherit; font-weight: 700; color: #334155; cursor: pointer; }
+        .pm-go { padding: 11px 22px; border: 0; border-radius: 12px; background: #0b2a7a; color: #fff; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
+        .pm-go:disabled { background: #cbd5e1; cursor: not-allowed; }
+        @media (max-width: 640px) { .pm-row { grid-template-columns: 22px minmax(0,1fr) auto; } .pm-row .pm-id { grid-column: 2; } .pm-row .pm-nm { grid-column: 2; } .pm-foot { flex-direction: column; align-items: stretch; } }
         /* ===== การ์ดเส้นประ สร้างรายวิชาใหม่ ===== */
         .cc-add { min-height: 300px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 28px; border: 2.5px dashed #b9c7dd; border-radius: 24px; background: rgba(255,255,255,.55); color: #0b2a7a; font-family: inherit; cursor: pointer; transition: border-color .15s, background .15s, transform .15s; }
         .cc-add:hover { border-color: #ff7a1a; background: #fff7ef; transform: translateY(-2px); }
@@ -429,6 +462,11 @@
                     class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-xs sm:text-sm font-bold transition flex items-center gap-2 shadow-md shadow-emerald-500/20 active:scale-95 cursor-pointer">
                     นำเข้า Excel / CSV
                 </button>
+                <!-- ดึงรายชื่อจากวิชาอื่น -->
+                <button onclick="openPullModal()"
+                    class="px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition flex items-center gap-2 active:scale-95 cursor-pointer text-white" style="background:#ff7a1a;box-shadow:0 8px 18px -10px rgba(255,122,26,.8)">
+                    ดึงรายชื่อจากวิชาอื่น
+                </button>
                 <!-- Download Template -->
                 <button onclick="downloadRosterTemplate()"
                     class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-2xl text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 active:scale-95 cursor-pointer">
@@ -482,6 +520,42 @@
                     <tr><td colspan="6" class="text-center py-12 text-slate-400 font-bold">ยังไม่มีรายชื่อนักศึกษาในวิชานี้</td></tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: ดึงรายชื่อจากวิชาอื่น (เลือกรายคนได้) -->
+<div id="pull-modal" class="modal-overlay hidden" style="z-index: 65;" onclick="if(event.target===this)closePullModal()">
+    <div class="pm-box" role="dialog" aria-modal="true" aria-labelledby="pm-title">
+        <div class="pm-head">
+            <div>
+                <h3 id="pm-title">ดึงรายชื่อจากวิชาอื่น</h3>
+                <p id="pm-to">เข้าสู่วิชา …</p>
+            </div>
+            <button type="button" class="pm-x" onclick="closePullModal()" aria-label="ปิด">&times;</button>
+        </div>
+        <div class="pm-body">
+            <label class="pm-field">วิชาต้นทาง
+                <select id="pm-from" onchange="loadPullSource()"></select>
+            </label>
+            <div id="pm-src" hidden>
+                <div class="pm-tools">
+                    <div class="rg-tabs" id="pm-tabs"></div>
+                    <input type="search" id="pm-q" placeholder="ค้นหารหัส หรือชื่อ" oninput="renderPullList()">
+                </div>
+                <label class="pm-all"><input type="checkbox" id="pm-all" onchange="pullToggleAll(this.checked)"> <span id="pm-all-t">เลือกทั้งหมดที่แสดง</span></label>
+                <div class="pm-list" id="pm-list"></div>
+            </div>
+            <div id="pm-empty" class="pm-empty">เลือกวิชาต้นทางด้านบน แล้วติ๊กนักศึกษาที่ต้องการ</div>
+        </div>
+        <div class="pm-foot">
+            <label class="pm-field pm-target">ใส่เข้ากลุ่มเรียน
+                <select id="pm-target"></select>
+            </label>
+            <div class="pm-acts">
+                <button type="button" class="pm-cancel" onclick="closePullModal()">ยกเลิก</button>
+                <button type="button" class="pm-go" id="pm-go" onclick="submitPull()" disabled>เพิ่มเข้าวิชานี้</button>
+            </div>
         </div>
     </div>
 </div>
@@ -1110,6 +1184,102 @@
                 </td>
             </tr>
         `).join('');
+    }
+
+    // ===== ดึงรายชื่อจากวิชาอื่น =====
+    let pullSrc = [], pullPicked = new Set(), pullGroup = 'ALL';
+    const normSid = s => String(s || '').replace(/[^0-9a-zA-Z]/g, '');
+    function pullHave() { return new Set((currentRosterList || []).map(s => normSid(s.studentId))); }
+    function openPullModal() {
+        const me = coursesList.find(x => x.id === currentCourseId) || {};
+        document.getElementById('pm-to').textContent = 'เข้าสู่วิชา [' + (me.courseCode || '') + '] ' + (me.courseName || '') + (me.semester ? ' · ' + me.semester : '');
+        const others = coursesList.filter(c => c.id !== currentCourseId)
+            .sort((a, b) => (String(b.semester) === String(me.semester)) - (String(a.semester) === String(me.semester)) || (Number(b.studentCount) || 0) - (Number(a.studentCount) || 0));
+        const sel = document.getElementById('pm-from');
+        sel.innerHTML = '<option value="">— เลือกวิชาต้นทาง —</option>' + others.map(c =>
+            `<option value="${c.id}" ${Number(c.studentCount) ? '' : 'disabled'}>[${escapeHtml(c.courseCode)}] ${escapeHtml(c.courseName)}${c.semester ? ' · ' + escapeHtml(c.semester) : ''} · ${Number(c.studentCount) || 0} คน</option>`).join('');
+        const groups = rosterGroupsOf();
+        document.getElementById('pm-target').innerHTML = '<option value="">ใช้กลุ่มเดิมจากวิชาต้นทาง</option>' + groups.map(g => `<option value="${escapeHtml(g)}">${escapeHtml(g)}</option>`).join('');
+        if (rosterGroup !== 'ALL' && rosterGroup !== '' && groups.includes(rosterGroup)) document.getElementById('pm-target').value = rosterGroup;
+        pullSrc = []; pullPicked = new Set(); pullGroup = 'ALL';
+        document.getElementById('pm-q').value = '';
+        document.getElementById('pm-src').hidden = true;
+        document.getElementById('pm-empty').hidden = false;
+        document.getElementById('pm-empty').textContent = others.length ? 'เลือกวิชาต้นทางด้านบน แล้วติ๊กนักศึกษาที่ต้องการ' : 'ยังไม่มีวิชาอื่นให้ดึงรายชื่อ';
+        updatePullGo();
+        document.getElementById('pull-modal').classList.remove('hidden');
+    }
+    function closePullModal() { document.getElementById('pull-modal').classList.add('hidden'); }
+    async function loadPullSource() {
+        const id = document.getElementById('pm-from').value;
+        pullSrc = []; pullPicked = new Set(); pullGroup = 'ALL';
+        if (!id) { document.getElementById('pm-src').hidden = true; document.getElementById('pm-empty').hidden = false; updatePullGo(); return; }
+        document.getElementById('pm-empty').hidden = false; document.getElementById('pm-empty').textContent = 'กำลังโหลดรายชื่อ…';
+        try {
+            const r = await fetch(`/api/courses/${encodeURIComponent(id)}/students`);
+            const d = r.ok ? await r.json() : [];
+            pullSrc = Array.isArray(d) ? d : [];
+        } catch (e) { pullSrc = []; }
+        document.getElementById('pm-src').hidden = !pullSrc.length;
+        document.getElementById('pm-empty').hidden = !!pullSrc.length;
+        document.getElementById('pm-empty').textContent = 'วิชานี้ยังไม่มีรายชื่อนักศึกษา';
+        renderPullList();
+    }
+    function pullVisible() {
+        const q = document.getElementById('pm-q').value.trim().toLowerCase();
+        return pullSrc.filter(s => (pullGroup === 'ALL' || splitGroups(s.class).includes(pullGroup) || (pullGroup === '' && !splitGroups(s.class).length)) &&
+            (!q || (s.studentId + ' ' + (s.prefix || '') + ' ' + s.firstName + ' ' + (s.lastName || '')).toLowerCase().includes(q)));
+    }
+    function renderPullList() {
+        const have = pullHave();
+        // แท็บกลุ่มของวิชาต้นทาง
+        const groups = []; pullSrc.forEach(s => splitGroups(s.class).forEach(g => { if (!groups.includes(g)) groups.push(g); }));
+        const noGroup = pullSrc.filter(s => !splitGroups(s.class).length).length;
+        const tabs = ['ALL', ...groups].concat(noGroup ? [''] : []);
+        const cnt = g => g === 'ALL' ? pullSrc.length : g === '' ? noGroup : pullSrc.filter(s => splitGroups(s.class).includes(g)).length;
+        document.getElementById('pm-tabs').innerHTML = tabs.length > 1 ? tabs.map(g =>
+            `<button type="button" class="rg-tab" aria-pressed="${g === pullGroup}" onclick="pullGroup=${JSON.stringify(g).replace(/"/g, '&quot;')};renderPullList()">${g === 'ALL' ? 'ทุกกลุ่ม' : g === '' ? 'ไม่ระบุกลุ่ม' : escapeHtml(g)} (${cnt(g)})</button>`).join('') : '';
+        const list = pullVisible();
+        document.getElementById('pm-list').innerHTML = list.length ? list.map(s => {
+            const dup = have.has(normSid(s.studentId)), on = pullPicked.has(s.studentId);
+            return `<label class="pm-row ${dup ? 'has' : on ? 'on' : ''}">
+                <input type="checkbox" ${dup ? 'disabled' : ''} ${on ? 'checked' : ''} onchange="pullPick(${JSON.stringify(s.studentId).replace(/"/g, '&quot;')}, this.checked)">
+                <span class="pm-id">${escapeHtml(s.studentId)}</span>
+                <span class="pm-nm">${escapeHtml(((s.prefix ? s.prefix + ' ' : '') + s.firstName + ' ' + (s.lastName || '')).trim())}</span>
+                ${dup ? '<span class="pm-tag has">มีในวิชานี้แล้ว</span>' : (s.class ? `<span class="pm-tag">${escapeHtml(s.class)}</span>` : '')}
+            </label>`;
+        }).join('') : '<div class="pm-empty">ไม่พบนักศึกษาที่ตรงกับการค้นหา</div>';
+        const can = list.filter(s => !have.has(normSid(s.studentId)));
+        const all = document.getElementById('pm-all');
+        all.checked = can.length > 0 && can.every(s => pullPicked.has(s.studentId));
+        all.disabled = !can.length;
+        document.getElementById('pm-all-t').textContent = `เลือกทั้งหมดที่แสดง (${can.length} คน)`;
+        updatePullGo();
+    }
+    function pullPick(id, on) { if (on) pullPicked.add(id); else pullPicked.delete(id); renderPullList(); }
+    function pullToggleAll(on) {
+        const have = pullHave();
+        pullVisible().filter(s => !have.has(normSid(s.studentId))).forEach(s => on ? pullPicked.add(s.studentId) : pullPicked.delete(s.studentId));
+        renderPullList();
+    }
+    function updatePullGo() {
+        const b = document.getElementById('pm-go');
+        b.disabled = !pullPicked.size;
+        b.textContent = pullPicked.size ? `เพิ่ม ${pullPicked.size} คนเข้าวิชานี้` : 'เพิ่มเข้าวิชานี้';
+    }
+    async function submitPull() {
+        const from = document.getElementById('pm-from').value;
+        if (!from || !pullPicked.size) return;
+        const btn = document.getElementById('pm-go'); btn.disabled = true; btn.textContent = 'กำลังเพิ่ม…';
+        try {
+            const r = await fetch(`/api/courses/${currentCourseId}/students/copy-from`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fromCourseId: Number(from), studentIds: [...pullPicked], targetClass: document.getElementById('pm-target').value }) });
+            const d = await r.json().catch(() => ({}));
+            if (!r.ok || !d.success) throw new Error(d.message || 'HTTP ' + r.status);
+            closePullModal();
+            if (window.uiToast) uiToast(`เพิ่มนักศึกษา ${d.added} คนเข้าวิชานี้แล้ว` + (d.skipped ? ` (ข้าม ${d.skipped} คนที่มีอยู่แล้ว)` : ''), 'ok');
+            await loadCourseStudents();
+        } catch (e) { alert('ดึงรายชื่อไม่สำเร็จ: ' + e.message); updatePullGo(); }
     }
 
     // แท็บกลุ่มเรียนในหน้ารายชื่อ

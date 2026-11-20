@@ -127,7 +127,103 @@
 
     </div>
 
+    <!-- ผลรายข้อ: ถูก/ผิดทันที · เฉลยหลังอาจารย์ปิดห้องสอบ -->
+    <section id="rv" class="rvx" hidden aria-labelledby="rv-title">
+        <div class="rvx-h">
+            <div>
+                <h2 id="rv-title">ผลรายข้อ</h2>
+                <p id="rv-sub"></p>
+            </div>
+            <div class="rvx-sum" id="rv-sum"></div>
+        </div>
+        <div class="rvx-tabs" id="rv-tabs" role="group" aria-label="กรองรายข้อ">
+            <button type="button" data-f="all" aria-pressed="true">ทั้งหมด</button>
+            <button type="button" data-f="wrong" aria-pressed="false">ข้อที่ผิด / ไม่ได้ตอบ</button>
+        </div>
+        <ol class="rvx-list" id="rv-list"></ol>
+    </section>
+    <style>
+        .rvx { max-width: 760px; margin: 18px auto 28px; padding: 22px 20px; background: #fff; border-radius: 24px; border: 1px solid #e5eaf2; box-shadow: 0 20px 50px -24px rgba(11,42,122,.35); position: relative; z-index: 10; }
+        .rvx[hidden] { display: none; }
+        .rvx-h { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+        .rvx-h h2 { margin: 0; font-size: 20px; font-weight: 800; color: #0f172a; }
+        .rvx-h p { margin: 2px 0 0; font-size: 13.5px; color: #64748b; line-height: 1.5; }
+        .rvx-sum { display: flex; gap: 8px; flex-wrap: wrap; }
+        .rvx-sum span { padding: 6px 12px; border-radius: 12px; font-size: 13px; font-weight: 800; }
+        .rvx-sum .ok { background: #e7f8ee; color: #15803d; } .rvx-sum .no { background: #fdecea; color: #b91c1c; } .rvx-sum .skip { background: #f1f5f9; color: #475569; }
+        .rvx-tabs { display: flex; gap: 6px; margin: 14px 0 6px; }
+        .rvx-tabs button { padding: 7px 14px; border-radius: 99px; border: 1.5px solid #cbd5e1; background: #fff; font: inherit; font-size: 13.5px; font-weight: 700; color: #334155; cursor: pointer; }
+        .rvx-tabs button[aria-pressed="true"] { background: #0b2a7a; border-color: #0b2a7a; color: #fff; }
+        .rvx-list { list-style: none; margin: 0; padding: 0; }
+        .rvx-q { padding: 14px 0; border-top: 1px solid #eef2f7; }
+        .rvx-q:first-child { border-top: 0; }
+        .rvx-qh { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; font-weight: 600; color: #0f172a; line-height: 1.55; }
+        .rvx-no { flex: none; min-width: 64px; text-align: center; padding: 3px 8px; border-radius: 10px; font-size: 12.5px; font-weight: 800; }
+        .rvx-no.ok { background: #e7f8ee; color: #15803d; } .rvx-no.no { background: #fdecea; color: #b91c1c; } .rvx-no.skip { background: #f1f5f9; color: #475569; }
+        .rvx-img { max-width: 100%; max-height: 220px; border-radius: 12px; border: 1px solid #e2e8f0; margin: 8px 0 0 74px; }
+        .rvx-ch { list-style: none; margin: 8px 0 0 74px; padding: 0; display: grid; gap: 6px; }
+        .rvx-ch li { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 12px; border: 1.5px solid #e2e8f0; font-size: 14px; color: #334155; }
+        .rvx-ch li b { flex: none; width: 24px; height: 24px; border-radius: 8px; display: grid; place-items: center; background: #f1f5f9; font-size: 12.5px; }
+        .rvx-ch li em { margin-left: auto; font-style: normal; font-size: 12px; font-weight: 800; white-space: nowrap; }
+        .rvx-ch li.mine-ok { border-color: #16a34a; background: #effaf3; } .rvx-ch li.mine-ok em { color: #15803d; }
+        .rvx-ch li.mine-no { border-color: #dc2626; background: #fef2f2; } .rvx-ch li.mine-no em { color: #b91c1c; }
+        .rvx-ch li.key { border-color: #16a34a; border-style: dashed; } .rvx-ch li.key em { color: #15803d; }
+        .rvx-note { margin: 10px 0 0; padding: 10px 14px; border-radius: 12px; background: #fff7ef; color: #9a3412; font-size: 13.5px; line-height: 1.6; }
+        @media (max-width: 560px) { .rvx { margin: 14px 12px 24px; padding: 18px 14px; } .rvx-ch, .rvx-img { margin-left: 0; } .rvx-qh { flex-direction: column; gap: 6px; } }
+    </style>
+
     <script>
+        // ===== ผลรายข้อ =====
+        (function () {
+            const p = new URLSearchParams(location.search);
+            const roomId = p.get('roomId');
+            if (!roomId || p.get('showScore') === '0') return;
+            const TH = { a: 'ก', b: 'ข', c: 'ค', d: 'ง', e: 'จ', f: 'ฉ', g: 'ช', h: 'ซ', i: 'ฌ', j: 'ญ' };
+            const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+            let data = null, filter = 'all';
+            function render() {
+                const list = data.items.filter(it => filter === 'all' || !it.correct);
+                document.getElementById('rv-list').innerHTML = list.length ? list.map(it => {
+                    const st = it.correct ? 'ok' : it.mine ? 'no' : 'skip';
+                    const tag = it.correct ? 'ข้อ ' + it.no + ' ถูก' : it.mine ? 'ข้อ ' + it.no + ' ผิด' : 'ข้อ ' + it.no + ' ไม่ได้ตอบ';
+                    const ch = it.choices.map(c => {
+                        const mine = it.mine === c.key, key = it.answer && it.answer === c.key;
+                        const cls = mine ? (it.correct ? 'mine-ok' : 'mine-no') : key ? 'key' : '';
+                        const em = mine ? (it.correct ? 'คำตอบของคุณ ✓' : 'คำตอบของคุณ ✗') : key ? 'เฉลย' : '';
+                        return '<li class="' + cls + '"><b>' + (TH[c.key] || c.key) + '</b><span>' + esc(c.text) + '</span>' + (em ? '<em>' + em + '</em>' : '') + '</li>';
+                    }).join('');
+                    return '<li class="rvx-q"><div class="rvx-qh"><span class="rvx-no ' + st + '">' + tag + '</span><span>' + esc(it.question) + '</span></div>' +
+                        (it.image ? '<img class="rvx-img" src="' + esc(it.image) + '" alt="">' : '') + '<ul class="rvx-ch">' + ch + '</ul></li>';
+                }).join('') : '<li class="rvx-q" style="color:#15803d;font-weight:700">ถูกทุกข้อ ยอดเยี่ยมมาก</li>';
+            }
+            document.getElementById('rv-tabs').addEventListener('click', e => {
+                const b = e.target.closest('button'); if (!b || !data) return;
+                filter = b.dataset.f;
+                document.querySelectorAll('#rv-tabs button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+                render();
+            });
+            fetch('/api/student/result-detail?roomId=' + encodeURIComponent(roomId)).then(r => r.ok ? r.json() : null).then(d => {
+                if (!d) return;
+                // ชื่อห้องสอบ: แสดงชื่อข้อสอบแทนรหัสห้อง
+                const room = document.getElementById('display-room');
+                if (room && (d.examTitle || d.courseName)) room.textContent = d.examTitle || d.courseName;
+                if (d.hidden) return;
+                const box = document.getElementById('rv');
+                if (d.unavailable || !Array.isArray(d.items)) {
+                    document.getElementById('rv-sub').textContent = d.message || 'ไม่มีรายละเอียดรายข้อ';
+                    document.getElementById('rv-tabs').hidden = true;
+                    box.hidden = false; return;
+                }
+                data = d;
+                const ok = d.items.filter(i => i.correct).length, skip = d.items.filter(i => !i.mine).length, no = d.items.length - ok - skip;
+                document.getElementById('rv-sum').innerHTML = '<span class="ok">ถูก ' + ok + '</span><span class="no">ผิด ' + no + '</span>' + (skip ? '<span class="skip">ไม่ได้ตอบ ' + skip + '</span>' : '');
+                document.getElementById('rv-sub').textContent = [d.courseCode, d.courseName].filter(Boolean).join(' ') + (d.examTitle ? ' · ' + d.examTitle : '');
+                box.hidden = false;
+                render();
+                if (!d.closed) box.insertAdjacentHTML('beforeend', '<p class="rvx-note">เฉลยของแต่ละข้อจะแสดงหลังอาจารย์ปิดห้องสอบ (เพื่อไม่ให้เฉลยไปถึงเพื่อนที่ยังสอบอยู่) · กลับมาดูได้ที่หน้าหลักนักศึกษา › ประวัติการสอบ</p>');
+            }).catch(() => {});
+        })();
+
         function getUrlParams() {
             const params = {};
             const search = window.location.search.substring(1);

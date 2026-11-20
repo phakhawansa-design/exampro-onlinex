@@ -340,3 +340,16 @@ select.dark-select:focus, input.dark-input:focus, textarea.dark-input:focus,
 .to-emerald-600 { --tw-gradient-to: #059669 var(--tw-gradient-to-position); }
 .hover\:from-emerald-600:hover { --tw-gradient-from: #059669 var(--tw-gradient-from-position); --tw-gradient-to: rgb(5 150 105 / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
 .hover\:to-emerald-500:hover { --tw-gradient-to: #10b981 var(--tw-gradient-to-position); }
+
+/* ---------- การเลื่อนหน้า (หน้าอาจารย์) ----------
+   เดิม <main> ที่จำกัดความกว้างเป็นตัวเลื่อน → แถบเลื่อนลอยอยู่กลางจอ ใกล้เนื้อหา จับยาก
+   ตอนนี้ทั้งพื้นที่ด้านขวาเป็นตัวเลื่อน แถบเลื่อนชิดขอบขวาของจอ · แถบหัวหน้าติดอยู่ด้านบน */
+#main-area { height: 100vh; overflow-y: auto !important; overflow-x: hidden !important; }
+#main-area > main { overflow: visible !important; flex: 1 0 auto !important; }
+#top-header { position: sticky; top: 0; z-index: 40; }
+/* แถบเลื่อนกว้างขึ้น เห็นชัด จับง่าย */
+::-webkit-scrollbar { width: 12px !important; height: 12px !important; }
+::-webkit-scrollbar-track { background: transparent !important; }
+::-webkit-scrollbar-thumb { background: #a9b8d0 !important; border-radius: 99px !important; border: 3px solid transparent !important; background-clip: padding-box !important; }
+::-webkit-scrollbar-thumb:hover { background: #7f93b5 !important; border: 3px solid transparent !important; background-clip: padding-box !important; }
+* { scrollbar-color: #a9b8d0 transparent; }

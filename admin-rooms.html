@@ -148,6 +148,8 @@
         .rg-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 800; padding: 2px 10px; border-radius: 8px; }
         .rg-badge.only { color: #9a3412; background: #fff1e4; border: 1px solid #ffd2ad; }
         .rg-badge.all { color: #6b21a8; background: #f3e8ff; border: 1px solid #e9d5ff; }
+        .rg-badge.ll { color: #0b2a7a; background: #eef4ff; border: 1px solid #d6e4ff; }
+        .rg-badge.ll select { border: 0; background: transparent; font: inherit; font-weight: 800; color: #b4500c; cursor: pointer; padding: 0 2px; }
         .rg-edit { font-size: 11.5px; font-weight: 700; color: #1d4ed8; text-decoration: underline; background: none; border: 0; cursor: pointer; padding: 0 2px; }
     </style>
 </head>
@@ -950,6 +952,9 @@
                                 ${splitG(room.allowed_classes).length
                                     ? `<span class="rg-badge only">เฉพาะกลุ่ม: ${escapeHtml(splitG(room.allowed_classes).join(', '))}</span>`
                                     : (groupsOfCourse(room.courseId).length > 1 ? `<span class="rg-badge all">ทุกกลุ่ม</span>` : '')}
+                                <label class="rg-badge ll" title="ออกจากหน้าข้อสอบ (สลับแอป/แท็บ นานเกิน 3 วินาที) ครบจำนวนนี้ ระบบส่งคำตอบให้อัตโนมัติ">ส่งอัตโนมัติเมื่อออก
+                                    <select onchange="setLeaveLimit('${escapeHtml(room.roomId)}', this)">${[0, 1, 2, 3, 5, 10].map(n => `<option value="${n}" ${Number(room.max_leaves ?? 3) === n ? 'selected' : ''}>${n ? n + ' ครั้ง' : 'ปิด'}</option>`).join('')}</select>
+                                </label>
                                 ${room.courseId && groupsOfCourse(room.courseId).length > 1 ? `<button type="button" class="rg-edit" onclick="openRoomGroups('${escapeHtml(room.roomId)}')">เปลี่ยนกลุ่ม</button>` : ''}
                                 ${!splitG(room.allowed_classes).length && groupsOfCourse(room.courseId).length < 2 && classNameStr ? `
                                     <span class="text-[11px] font-extrabold text-purple-700 bg-purple-100 border border-purple-200 px-2.5 py-0.5 rounded-lg flex items-center gap-1 shadow-2xs">
@@ -1127,6 +1132,17 @@
             document.getElementById('rgm-sub').textContent = (room.exam_title || room.roomName || '') + (room.exam_code ? ' · PIN ' + room.exam_code : '');
             document.getElementById('rgm-list').innerHTML = list.length ? groupPickHtml(list, splitG(room.allowed_classes)) : '<p class="text-sm text-slate-500">รายวิชานี้ยังไม่มีกลุ่มเรียน (ตั้งได้ที่หน้าจัดการรายวิชา)</p>';
             document.getElementById('room-groups-modal').classList.remove('hidden');
+        }
+        async function setLeaveLimit(roomId, sel) {
+            sel.disabled = true;
+            try {
+                const r = await fetch('/api/teacher/room-leave-limit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ roomId, maxLeaves: Number(sel.value) }) });
+                const d = await r.json().catch(() => ({}));
+                if (!r.ok || !d.success) throw new Error(d.message || 'HTTP ' + r.status);
+                const room = (allRooms || []).find(x => x.roomId === roomId); if (room) room.max_leaves = d.maxLeaves;
+                if (window.uiToast) uiToast(d.maxLeaves ? `นักศึกษาออกจากหน้าข้อสอบครบ ${d.maxLeaves} ครั้ง ระบบจะส่งคำตอบให้อัตโนมัติ` : 'ปิดการส่งอัตโนมัติแล้ว (ยังบันทึกและเตือนนักศึกษาทุกครั้ง)', 'ok');
+            } catch (e) { alert('บันทึกไม่สำเร็จ: ' + e.message); }
+            finally { sel.disabled = false; }
         }
         function closeRoomGroups() { document.getElementById('room-groups-modal').classList.add('hidden'); rgmRoomId = null; }
         async function saveRoomGroups() {

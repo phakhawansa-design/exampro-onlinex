@@ -80,7 +80,8 @@ const STUDENT_ONLY = [
     'POST /api/student/leave-room', 'POST /api/student/check-exam-access', 'GET /api/student/my-exam-history',
     'POST /api/student/update-profile', 'GET /api/get-warnings', 'POST /api/mark-warning-read',
     'POST /api/report-cheat', 'POST /api/log-student-login', 'POST /api/submit-exam', 'GET /api/get-questions',
-    'GET /api/student/progress', 'POST /api/student/progress', 'POST /api/student/answer-event'
+    'GET /api/student/progress', 'POST /api/student/progress', 'POST /api/student/answer-event',
+    'GET /api/student/leave-count', 'GET /api/student/result-detail'
 ];
 // รหัสผ่านเริ่มต้นของบัญชีผู้ดูแลระบบ (ตั้งเองได้ด้วย ADMIN_PASSWORD ใน .env) — ถ้ายังใช้ค่านี้อยู่ ระบบบังคับเปลี่ยนก่อนใช้งาน
 const DEFAULT_ADMIN_PASSWORD = 'admin123';

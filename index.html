@@ -351,7 +351,46 @@
 #intro .ialert{animation:alertIn .5s 1.25s cubic-bezier(.2,1.4,.4,1) forwards,alertOut .3s 2.2s ease-in forwards,alert3d .6s 1.25s cubic-bezier(.2,1.3,.4,1) both!important}
 @keyframes alert3d{from{rotate:x -80deg;translate:0 0 180px}to{rotate:x 0deg;translate:0 0 40px}}
 </style>
-<style>/* ไม่ใช้ไอคอนประดับ เหลือแต่ตัวหนังสือ */ svg.ic,.ico,.sec-ico{display:none!important}.hero .wrap{grid-template-columns:1fr;max-width:860px}</style>
+<style>/* ไม่ใช้ไอคอนประดับ เหลือแต่ตัวหนังสือ */ svg.ic,.ico,.sec-ico{display:none!important}</style>
+<style>
+/* ===== ส่วนบน: 2 คอลัมน์ ข้อความซ้าย · ภาพตัวอย่างระบบขวา ===== */
+.hero .wrap{max-width:1180px;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:56px}
+.hv{position:relative;padding:34px 30px 46px;min-height:470px}
+.hv-glow{position:absolute;inset:6% 4% 10% 8%;border-radius:40px;background:radial-gradient(circle at 70% 30%,rgba(255,154,60,.45),transparent 60%),radial-gradient(circle at 25% 80%,rgba(52,211,153,.32),transparent 55%);filter:blur(30px);pointer-events:none}
+.hv-card{position:relative;background:#fff;color:#0f172a;border-radius:24px;padding:22px 22px 14px;box-shadow:0 40px 80px -30px rgba(3,14,48,.65),0 0 0 1px rgba(255,255,255,.4);transform:rotate(-1.5deg);animation:hvFloat 7s ease-in-out infinite}
+.hv-top{display:flex;justify-content:space-between;align-items:center}
+.hv-live{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:#166534;background:#e7f8ee;padding:4px 11px;border-radius:99px}
+.hv-live i{width:8px;height:8px;border-radius:50%;background:#16a34a;box-shadow:0 0 0 4px rgba(22,163,74,.2);animation:hvPulse 1.6s infinite}
+.hv-time{font-size:12.5px;font-weight:700;color:#b4500c;background:#fff1e4;padding:4px 10px;border-radius:99px}
+.hv-title{font-size:19px;font-weight:700;margin-top:12px}
+.hv-sub{font-size:13px;color:#64748b;margin-top:2px}
+.hv-pin{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding:10px 14px;border-radius:14px;background:linear-gradient(120deg,#0b2a7a,#1546b8);color:#fff}
+.hv-pin small{font-size:12px;color:#c8d8ff}
+.hv-pin b{font-family:ui-monospace,Consolas,monospace;font-size:24px;letter-spacing:4px}
+.hv-bar{display:flex;height:9px;border-radius:99px;background:#eef2f7;overflow:hidden;margin:14px 0 8px}
+.hv-bar i{display:block;height:100%}.hv-bar i:first-child{background:#16a34a}.hv-bar i:last-child{background:#1d5fd6}
+.hv-leg{display:flex;gap:14px;font-size:12.5px;color:#64748b}.hv-leg b{color:#0f172a;font-size:15px}.hv-leg b.g{color:#16a34a}.hv-leg b.bl{color:#1d5fd6}
+.hv-list{list-style:none;margin:12px 0 0;padding:0}
+.hv-list li{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid #eef2f7}
+.hv-av{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;font-weight:700;font-size:14px;background:#e7f8ee;color:#16a34a;flex:none}
+.hv-av.o{background:#fff1e4;color:#ff7a1a}.hv-av.b{background:#e8f1ff;color:#1d5fd6}
+.hv-n{flex:1;min-width:0;font-size:13.5px;font-weight:600;line-height:1.35}.hv-n small{display:block;font-size:11.5px;font-weight:400;color:#64748b}
+.hv-s{font-size:12px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.hv-s.ok{background:#e7f8ee;color:#15803d}.hv-s.warn{background:#fdecea;color:#b91c1c}.hv-s.doing{background:#e8f1ff;color:#1d4ed8}
+.hv-chip{position:absolute;display:flex;align-items:center;gap:10px;background:#fff;color:#0f172a;border-radius:16px;padding:10px 14px;box-shadow:0 22px 40px -18px rgba(3,14,48,.6);font-size:12.5px;line-height:1.35;animation:hvFloat 6s ease-in-out infinite}
+.hv-chip b{display:block;font-size:13.5px}
+.hv-chip-a{left:-14px;top:4px;animation-delay:-2s}
+.hv-chip-b{right:-10px;bottom:4px;animation-delay:-4s}
+.hv-chip-b b{font-size:22px;color:#16a34a;line-height:1}
+.hv-dot{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;font-weight:800}
+.hv-dot.o{background:#fff1e4;color:#ff7a1a}
+.hv-mini{display:flex;align-items:flex-end;gap:4px;height:34px}
+.hv-mini i{width:8px;border-radius:3px;background:#c9dbfa}.hv-mini i:nth-child(3){background:#1d5fd6}
+@keyframes hvFloat{0%,100%{translate:0 0}50%{translate:0 -8px}}
+@keyframes hvPulse{50%{box-shadow:0 0 0 7px rgba(22,163,74,.05)}}
+@media (prefers-reduced-motion: reduce){.hv-card,.hv-chip,.hv-live i{animation:none}}
+@media (max-width:960px){.hero .wrap{grid-template-columns:1fr;max-width:760px}.hv{display:none}}
+</style>
 </head>
 <body>
 <div id="intro" aria-hidden="true">
@@ -639,7 +678,7 @@ void main(){vec2 uv=(gl_FragCoord.xy-.5*r)/r.y;uv/=1.+w*2.4;
   <div class="wrap">
     <div>
       <div class="tag"><i></i>ระบบสอบออนไลน์</div>
-      <h1>สอบออนไลน์อย่างมั่นใจ<br><em>ป้องกันทุจริต</em> ได้แบบเรียลไทม์</h1>
+      <h1>สอบออนไลน์อย่างมั่นใจ<br><em>ป้องกันทุจริต</em> <span style="white-space:nowrap">ได้แบบเรียลไทม์</span></h1>
       <p class="lead">จัดสอบปรนัย ติดตามพฤติกรรมผู้เข้าสอบแบบเรียลไทม์ ตรวจคะแนนอัตโนมัติ และส่งออกผลเป็น Excel</p>
       <div class="cta">
         <a class="btn btn-or" href="login.html"><svg class="ic "><use href="#i-cap"/></svg> เข้าสู่ระบบ</a>
@@ -650,6 +689,32 @@ void main(){vec2 uv=(gl_FragCoord.xy-.5*r)/r.y;uv/=1.+w*2.4;
         <input name="pin" inputmode="numeric" maxlength="7" placeholder="000 000" aria-label="รหัส PIN ห้องสอบ">
         <button class="btn btn-or" type="submit">เข้าห้องสอบ</button>
       </form>
+    </div>
+
+    <!-- ภาพตัวอย่างหน้าจอระบบ (ตกแต่ง ไม่ใช่ข้อมูลจริง) -->
+    <div class="hv" aria-hidden="true">
+      <div class="hv-glow"></div>
+      <div class="hv-card">
+        <div class="hv-top">
+          <span class="hv-live"><i></i>กำลังสอบ</span>
+          <span class="hv-time">เหลือ 32 นาที</span>
+        </div>
+        <div class="hv-title">แบบทดสอบท้ายบทที่ 1</div>
+        <div class="hv-sub">SW-101 · กลุ่ม TEC3R · 20 ข้อ</div>
+        <div class="hv-pin"><small>รหัสเข้าสอบ</small><b>704 103</b></div>
+        <div class="hv-bar"><i style="width:60%"></i><i style="width:27%"></i></div>
+        <div class="hv-leg"><span><b class="g">18</b> ส่งแล้ว</span><span><b class="bl">8</b> กำลังทำ</span><span><b>4</b> ยังไม่เข้า</span></div>
+        <ul class="hv-list">
+          <li><span class="hv-av">ส</span><span class="hv-n">สมชาย ใจดี<small>ส่งแล้ว · 2 นาทีที่แล้ว</small></span><span class="hv-s ok">17/20</span></li>
+          <li><span class="hv-av o">ม</span><span class="hv-n">มานี รักเรียน<small>สลับหน้าจอ 2 ครั้ง</small></span><span class="hv-s warn">ตรวจสอบ</span></li>
+          <li><span class="hv-av b">ว</span><span class="hv-n">วิชัย มั่นคง<small>กำลังทำข้อ 14</small></span><span class="hv-s doing">กำลังทำ</span></li>
+        </ul>
+      </div>
+      <div class="hv-chip hv-chip-a"><span class="hv-dot o">!</span><span><b>ตรวจพบสลับหน้าจอ</b>แจ้งอาจารย์ทันที</span></div>
+      <div class="hv-chip hv-chip-b">
+        <span><b>72%</b>คะแนนเฉลี่ย</span>
+        <span class="hv-mini"><i style="height:30%"></i><i style="height:55%"></i><i style="height:100%"></i><i style="height:70%"></i></span>
+      </div>
     </div>
   </div>
 </header>
