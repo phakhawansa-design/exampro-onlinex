@@ -407,7 +407,7 @@
 
         <!-- ---------------------------------------------------- -->
         <!-- 2.3 RIGHT SIDEBAR: เมนูเครื่องมือสร้างข้อสอบ (3 เครื่องมือ) -->
-        <!-- เรียงตามลำดับ: 1. Excel -> 2. AI สร้างให้ -> 3. แปลงจาก ChatGPT -> 4. คลังข้อสอบ -->
+        <!-- เรียงตามลำดับ: 1. Excel -> 2. AI สร้างให้ -> 3. แปลงข้อสอบด้วย AI (Gem) -> 4. คลังข้อสอบ -->
         <!-- ---------------------------------------------------- -->
         <aside id="settings-sidebar" class="qx-tools">
             <div class="qx-tools-h">
@@ -426,9 +426,9 @@
                     <button onclick="downloadSampleExcel()" class="qx-link">ดาวน์โหลดไฟล์ตัวอย่าง .xlsx</button>
                 </div>
 
-                <!-- 3. แปลงข้อความจาก ChatGPT / Claude -->
+                <!-- 3. แปลงข้อสอบด้วย AI (Gem ExamPro บน Gemini) -->
                 <div class="qx-tool">
-                    <div class="qx-tool-h">                        <div><b>แปลงจาก ChatGPT / Claude</b><small>คัดลอกคำสั่งไปใช้ แล้วนำผลกลับมา</small></div></div>
+                    <div class="qx-tool-h">                        <div><b>แปลงข้อสอบด้วย AI</b><small>ใช้ Gem ExamPro แปลงไฟล์ข้อสอบ แล้วนำผลกลับมา</small></div></div>
                     <button onclick="openAiModal()" class="qx-tbtn">เปิดตัวแปลงข้อสอบ</button>
                 </div>
 
@@ -1423,8 +1423,8 @@
         // ถ้าสร้าง Gem ใหม่ หรือ Google ย้าย Gem ไปเป็น Skills แล้วลิงก์เปลี่ยน → แก้ลิงก์ที่บรรทัดนี้บรรทัดเดียว
         const EXAMPRO_GEM_URL = 'https://gemini.google.com/gem/1aEVffVXcZNe78G77zEjNEJGMNc3ScqwZ';
         const AIX_HINTS = {
-            text: '<b>Gem ExamPro (แนะนำ):</b> เปิดแล้ว<b>แนบไฟล์หรือรูปข้อสอบ</b> แล้วกดส่งได้เลย ไม่ต้องวางคำสั่ง<br><b>ChatGPT:</b> ระบบคัดลอกคำสั่งให้ <b>วาง (Ctrl+V) ในช่องแชท</b> แล้วแนบไฟล์ข้อสอบ แล้วกดส่ง',
-            gen: '<b>Gem ExamPro (แนะนำ):</b> เปิดแล้ว<b>พิมพ์หัวข้อ จำนวนข้อ และระดับ</b> เช่น "ระบบสุริยะ 10 ข้อ ระดับ ปวช." แล้วกดส่ง<br><b>ChatGPT:</b> ระบบคัดลอกคำสั่งให้ <b>วาง (Ctrl+V) ในช่องแชท</b> แล้วพิมพ์หัวข้อ จำนวนข้อ และระดับต่อท้าย แล้วกดส่ง'
+            text: 'กดปุ่มด้านล่าง แล้ว<b>แนบไฟล์หรือรูปข้อสอบ</b>ในช่องแชทของ Gem แล้วกดส่ง ไม่ต้องวางคำสั่ง (ต้องล็อกอินบัญชี Google)',
+            gen: 'กดปุ่มด้านล่าง แล้ว<b>พิมพ์หัวข้อ จำนวนข้อ และระดับ</b> เช่น "ระบบสุริยะ 10 ข้อ ระดับ ปวช." แล้วกดส่ง (ต้องล็อกอินบัญชี Google)'
         };
         function openExamProGem() {
             // Gem มีคำสั่งอยู่แล้ว · คัดลอกคำสั่งไว้ด้วยเผื่อเปิด Gem ไม่ได้ จะได้วางใน Gemini ปกติได้ทันที
@@ -1450,7 +1450,7 @@
                 const btnText = document.getElementById('copy-ai-prompt-btn-text');
                 if (btnText) btnText.textContent = 'คัดลอกแล้ว ✓';
                 setTimeout(() => {
-                    if (btnText) btnText.textContent = 'คัดลอกคำสั่งอย่างเดียว';
+                    if (btnText) btnText.textContent = 'เปิด Gem ไม่ได้? คัดลอกคำสั่งไปใช้ใน Gemini';
                 }, 2500);
             }).catch(() => {
                 const el = document.createElement('textarea');
@@ -1698,13 +1698,13 @@
     <!-- MODALS FOR AI EXAM & QUESTION LIBRARY                    -->
     <!-- ======================================================== -->
     
-    <!-- 1. แปลงข้อสอบด้วย AI (ฟรี: คัดลอกคำสั่งไปใช้กับ ChatGPT / Gemini บนเว็บ แล้ววางคำตอบกลับมา) -->
+    <!-- 1. แปลงข้อสอบด้วย AI (ฟรี: เปิด Gem ExamPro บน Gemini แล้ววางคำตอบกลับมา) -->
     <div id="ai-exam-modal" class="aix-ov fixed inset-0 z-50 hidden" onclick="if(event.target===this)closeAiModal()">
         <div class="aix" role="dialog" aria-modal="true" aria-labelledby="aix-title">
             <header class="aix-head">
                 <div>
                     <h3 id="aix-title">แปลงข้อสอบด้วย AI</h3>
-                    <p>ใช้ ChatGPT หรือ Gemini ได้ฟรี · ทำตาม 3 ขั้นตอน</p>
+                    <p>ใช้ Gem ExamPro บน Gemini ได้ฟรี · ทำตาม 3 ขั้นตอน</p>
                 </div>
                 <button type="button" class="aix-x" onclick="closeAiModal()" aria-label="ปิด">✕</button>
             </header>
@@ -1733,11 +1733,10 @@
                         <h4>เปิด AI</h4>
                         <p class="aix-hint" id="aix-hint2"></p>
                         <div class="aix-ai">
-                            <button type="button" class="aix-btn aix-gem" onclick="openExamProGem()">เปิด Gem ExamPro <small>Gemini · ไม่ต้องวางคำสั่ง</small></button>
-                            <button type="button" class="aix-btn aix-gpt" onclick="copyPromptAndOpenAI('chatgpt')">คัดลอกแล้วเปิด ChatGPT <small>ต้องวางคำสั่ง (Ctrl+V)</small></button>
+                            <button type="button" class="aix-btn aix-gem" onclick="openExamProGem()">เปิด Gem ExamPro <small>บน Gemini · ไม่ต้องวางคำสั่ง</small></button>
                         </div>
                         <div class="aix-row2">
-                            <button type="button" class="aix-link" id="copy-ai-prompt-btn" onclick="copyAiPrompt()"><span id="copy-ai-prompt-btn-text">คัดลอกคำสั่งอย่างเดียว</span></button>
+                            <button type="button" class="aix-link" id="copy-ai-prompt-btn" onclick="copyAiPrompt()"><span id="copy-ai-prompt-btn-text">เปิด Gem ไม่ได้? คัดลอกคำสั่งไปใช้ใน Gemini</span></button>
                             <details class="aix-details"><summary>ดูคำสั่งที่จะคัดลอก</summary><pre id="ai-prompt-box"></pre></details>
                         </div>
                     </div>
