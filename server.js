@@ -387,12 +387,50 @@ db.serialize(() => {
     )`);
 
     // ==========================================
+    // กู้ห้องสอบที่ถูกลบไปก่อนหน้านี้: ผลสอบ/ประวัติสลับหน้าจอที่ห้องหายไปแล้ว → สร้างห้องกลับมาแบบซ่อน (archived)
+    //   เจ้าของห้อง = อาจารย์เจ้าของรายวิชาของผลสอบ หรือดูจากรหัสห้อง (เช่น somchai_room_xxx, somchai_r3)
+    function recoverDeletedRooms() {
+        const orphanSql = (t) => `SELECT roomId, MAX(courseId) as courseId FROM ${t} WHERE roomId IS NOT NULL AND roomId NOT IN (SELECT roomId FROM teacher_rooms) GROUP BY roomId`;
+        db.all(orphanSql('exam_results'), [], (e1, a) => {
+            db.all(orphanSql('cheat_logs'), [], (e2, b) => {
+                if (e1 && e2) return console.error('ตรวจห้องสอบที่ถูกลบไม่สำเร็จ:', (e1 || e2).message);
+                const map = new Map();
+                [...(a || []), ...(b || [])].forEach(r => { if (r.roomId && !map.has(r.roomId)) map.set(r.roomId, Number(r.courseId) || 0); });
+                if (!map.size) return;
+                db.all('SELECT id, teacherUsername FROM courses', [], (e3, courses) => {
+                    db.all('SELECT username FROM teachers', [], (e4, teachers) => {
+                        const owners = new Set((teachers || []).map(t => t.username));
+                        const courseOwner = new Map((courses || []).map(c => [Number(c.id), c.teacherUsername]));
+                        let n = 0;
+                        map.forEach((courseId, roomId) => {
+                            let owner = courseOwner.get(courseId);
+                            if (!owner) { const m = String(roomId).match(/^(.+?)(?:_room_[a-z0-9]+|_rd+)$/i); if (m && owners.has(m[1])) owner = m[1]; }
+                            if (!owner) return;
+                            n++;
+                            db.run(`INSERT INTO teacher_rooms (teacherUsername, roomId, roomName, exam_title, exam_code, is_published, courseId, archived)
+                                    VALUES (?, ?, ?, ?, '', 0, ?, 1)`, [owner, roomId, 'ห้องสอบที่ลบแล้ว', 'ห้องสอบที่ลบแล้ว', courseId || 0],
+                                (err) => { if (err) console.error('กู้ห้องสอบ ' + roomId + ' ไม่สำเร็จ:', err.message); });
+                        });
+                        if (n) console.log(`✔ กู้ห้องสอบที่ถูกลบ ${n} ห้อง (ผลสอบและประวัติกลับมาแสดงแล้ว)`);
+                    });
+                });
+            });
+        });
+    }
+
     // ระบบ Auto-Migrations (เพิ่มคอลัมน์ใหม่สำหรับตารางเดิมที่มีอยู่แล้ว)
     // ==========================================
     
     // ผูกห้องสอบกับรายวิชา (courseId)
     db.run("ALTER TABLE teacher_rooms ADD COLUMN courseId INTEGER DEFAULT 0", (err) => {
         if (!err) console.log("✔ Added column 'courseId' to teacher_rooms table");
+    });
+
+    // ห้องสอบที่อาจารย์ลบ = เก็บเข้าคลัง (archived = 1) ไม่ลบแถวจริง
+    //   เดิมลบแถวห้องสอบทิ้ง → ผลสอบและประวัติสลับหน้าจอของห้องนั้นยังอยู่ แต่ไม่มีเจ้าของ จึงหายจากทุกหน้า
+    db.run("ALTER TABLE teacher_rooms ADD COLUMN archived INTEGER DEFAULT 0", (err) => {
+        if (!err) console.log("✔ Added column 'archived' to teacher_rooms table");
+        setTimeout(recoverDeletedRooms, 4000);
     });
     
     // ผูกชุดข้อสอบในคลังกับรายวิชา (courseId)
@@ -839,6 +877,7 @@ app.get('/api/teacher/rooms', (req, res) => {
                    (SELECT COUNT(*) FROM questions q WHERE q.roomId = tr.roomId) as questionCount
             FROM teacher_rooms tr
             LEFT JOIN courses c ON c.id = tr.courseId
+            WHERE COALESCE(tr.archived, 0) = 0
             ORDER BY tr.is_published DESC, tr.id ASC
         `;
         return db.all(sqlQuery, [], (err, rows) => {
@@ -854,7 +893,7 @@ app.get('/api/teacher/rooms', (req, res) => {
                (SELECT COUNT(*) FROM questions q WHERE q.roomId = tr.roomId) as questionCount
         FROM teacher_rooms tr
         LEFT JOIN courses c ON c.id = tr.courseId
-        WHERE tr.teacherUsername = ?
+        WHERE tr.teacherUsername = ? AND COALESCE(tr.archived, 0) = 0
         ORDER BY tr.id ASC
     `;
 
@@ -2056,7 +2095,7 @@ app.get('/api/teacher/courses', (req, res) => {
     const sql = `
         SELECT c.*,
             (SELECT COUNT(*) FROM course_students cs WHERE cs.courseId = c.id) as studentCount,
-            (SELECT COUNT(*) FROM teacher_rooms tr WHERE tr.courseId = c.id) as roomCount,
+            (SELECT COUNT(*) FROM teacher_rooms tr WHERE tr.courseId = c.id AND COALESCE(tr.archived, 0) = 0) as roomCount,
             (SELECT COUNT(*) FROM exam_templates et WHERE et.courseId = c.id) as examCount,
             (SELECT GROUP_CONCAT(DISTINCT cs.class) FROM course_students cs WHERE cs.courseId = c.id AND cs.class != '' AND cs.class IS NOT NULL) as studentClasses
         FROM courses c
@@ -2612,7 +2651,8 @@ app.delete('/api/teacher/room', (req, res) => {
     if (!roomId) return res.status(400).json({ message: "กรุณาระบุรหัสห้องสอบ (roomId)" });
 
     db.serialize(() => {
-        let deleteRoomSql = "DELETE FROM teacher_rooms WHERE roomId = ?";
+        // ไม่ลบแถวห้องจริง: ซ่อนห้อง ปิดสอบ และยกเลิกรหัสเข้าสอบ (ผลสอบ/ประวัติยังเป็นของอาจารย์คนนี้ จึงยังแสดงในหน้าผลสอบและประวัติ)
+        let deleteRoomSql = "UPDATE teacher_rooms SET archived = 1, is_published = 0, exam_code = '' WHERE roomId = ?";
         let params = [roomId];
 
         if (username && username !== 'admin') {
@@ -2623,8 +2663,7 @@ app.delete('/api/teacher/room', (req, res) => {
         db.run(deleteRoomSql, params, function(err) {
             if (err) return res.status(500).json({ message: err.message });
 
-            // ลบเฉพาะข้อมูลชั่วคราวของห้องสอบ (คงผลคะแนนและประวัติความประพฤติไว้จนกว่าอาจารย์จะล้างเอง)
-            db.run('DELETE FROM questions WHERE roomId = ?', [roomId]);
+            // ลบเฉพาะข้อมูลชั่วคราวของห้องสอบ (คงข้อสอบ ผลคะแนน และประวัติความประพฤติไว้ ใช้ดูรายละเอียดคำตอบย้อนหลัง)
             db.run('DELETE FROM student_warnings WHERE roomId = ?', [roomId]);
             db.run('DELETE FROM student_logins WHERE roomId = ?', [roomId]);
 
