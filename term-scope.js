@@ -21,10 +21,13 @@
     const DEF_KEY = 'exampro_term_default';
     const clean = v => ({ y: YEARS.includes(String(v && v.y)) ? String(v.y) : 'all', t: TERMS[String(v && v.t)] ? String(v.t) : 'all' });
     function readJSON(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }
+    // ค่าที่อาจารย์เลือกเอง ใช้เฉพาะรอบการใช้งานนี้ (แท็บนี้) · เปิดเว็บใหม่/เข้าสู่ระบบใหม่ → กลับไปใช้ค่าที่แอดมินตั้งทุกครั้ง
+    function readOwn() { try { return JSON.parse(sessionStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+    try { localStorage.removeItem(KEY); } catch (e) {}
     // ค่าเริ่มต้นที่แอดมินตั้ง (เก็บสำเนาไว้ในเครื่อง แล้วตรวจกับเซิร์ฟเวอร์ทุกครั้งที่เปิดหน้า)
     const def = (() => { const d = readJSON(DEF_KEY); return { ...clean(d), v: Number(d && d.v) || 0 }; })();
     function load() {
-        const own = readJSON(KEY);
+        const own = readOwn();
         // อาจารย์เลือกเองหลังจากแอดมินตั้งค่ารอบล่าสุด → ใช้ค่าของอาจารย์ · ไม่งั้นใช้ค่าเริ่มต้นของแอดมิน
         if (own && Number(own.v || 0) === def.v) return clean(own);
         return clean(def);
@@ -57,7 +60,7 @@
         return [scope.t !== 'all' ? TERMS[scope.t] : 'ทุกภาค', scope.y !== 'all' ? 'ปีการศึกษา ' + scope.y : 'ทุกปีการศึกษา'].join(' · ');
     }
     function set(y, t) {
-        try { localStorage.setItem(KEY, JSON.stringify({ y, t, v: def.v })); } catch (e) {}
+        try { sessionStorage.setItem(KEY, JSON.stringify({ y, t, v: def.v })); } catch (e) {}
         location.reload();
     }
 
@@ -149,7 +152,7 @@
         if (!d || Number(d.v || 0) === def.v) return;
         try { localStorage.setItem(DEF_KEY, JSON.stringify({ ...clean(d), v: Number(d.v) || 0 })); } catch (e) { return; }
         const nd = clean(d);
-        const own = readJSON(KEY);
+        const own = readOwn();
         const ownStillValid = own && Number(own.v || 0) === (Number(d.v) || 0);
         const next = ownStillValid ? clean(own) : nd;
         if ((next.y !== scope.y || next.t !== scope.t) && !sessionStorage.getItem('ts_reloaded_' + d.v)) {

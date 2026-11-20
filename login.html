@@ -291,7 +291,7 @@
         if (data.success && data.teacher) {
           // อาจารย์ / แอดมิน
           // เริ่มที่ปี/ภาคเริ่มต้นที่ผู้ดูแลระบบตั้งไว้ทุกครั้งที่เข้าสู่ระบบ (อาจารย์เปลี่ยนเองได้หลังจากนี้)
-          try { localStorage.removeItem('exampro_term_scope'); localStorage.removeItem('exampro_term_default'); } catch (e) {}
+          try { localStorage.removeItem('exampro_term_scope'); localStorage.removeItem('exampro_term_default'); sessionStorage.removeItem('exampro_term_scope'); } catch (e) {}
           localStorage.setItem('teacher_username', data.teacher.username);
           localStorage.setItem('teacher_name', data.teacher.name);
           localStorage.setItem('teacher_role', data.teacher.role);

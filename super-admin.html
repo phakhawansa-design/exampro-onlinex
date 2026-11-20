@@ -188,10 +188,10 @@
     <main class="max-w-6xl mx-auto p-6 md:p-8 space-y-6">
 
         <!-- Stats Cards -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div class="grid gap-3.5" style="grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr))">
             <div class="bg-white border border-rose-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition">
                 <div class="min-w-0">
-                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider truncate">อาจารย์ทั้งหมด</div>
+                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider truncate">อาจารย์ที่อนุมัติแล้ว</div>
                     <div class="text-lg font-semibold text-slate-800" id="stat-total-teachers">0</div>
                 </div>
             </div>
@@ -205,12 +205,6 @@
                 <div class="min-w-0">
                     <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider truncate">นักศึกษาในระบบ</div>
                     <div class="text-lg font-semibold text-emerald-600" id="stat-unique-students">0</div>
-                </div>
-            </div>
-            <div class="bg-white border border-rose-100 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition">
-                <div class="min-w-0">
-                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider truncate">ครั้งที่เข้าสอบ</div>
-                    <div class="text-lg font-semibold text-cyan-600" id="stat-total-logins">0</div>
                 </div>
             </div>
         </div>
@@ -496,7 +490,7 @@
                 if (res.ok) {
                     const stats = await res.json();
                     if (stats.teachers) {
-                        document.getElementById('stat-total-teachers').textContent = stats.teachers.total || 0;
+                        document.getElementById('stat-total-teachers').textContent = stats.teachers.approved || 0;
                         document.getElementById('stat-pending').textContent = stats.teachers.pending || 0;
                     }
 
@@ -518,7 +512,6 @@
 
                     const totalStudents = stats.totalStudents ?? (stats.students ? stats.students.total : 0) ?? (stats.uniqueStudents ?? stats.unique_students ?? 0);
                     document.getElementById('stat-unique-students').textContent = totalStudents;
-                    document.getElementById('stat-total-logins').textContent = stats.studentLogins ?? 0;
                 }
             } catch(e) { console.error('loadStats error:', e); }
         }
@@ -561,9 +554,9 @@
                 }
 
                 // อัปเดตตัวเลขการ์ดทันทีจากรายการอาจารย์จริง
-                const totalTeachers = teachers.length;
+                const approvedTeachers = teachers.filter(t => t.status === 'approved' && t.role !== 'admin').length;
                 const pendingTeachers = teachers.filter(t => t.status === 'pending').length;
-                document.getElementById('stat-total-teachers').textContent = totalTeachers;
+                document.getElementById('stat-total-teachers').textContent = approvedTeachers;
                 document.getElementById('stat-pending').textContent = pendingTeachers;
 
                 tbody.innerHTML = teachers.map((t, i) => {

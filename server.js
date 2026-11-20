@@ -1387,58 +1387,29 @@ app.post('/api/student/register', (req, res) => {
     const passwordHash = hashPassword(password);
     const now = new Date().toISOString();
 
-    // ตรวจสอบว่ามีรหัสนักศึกษานี้อยู่แล้วหรือไม่
-    db.get('SELECT id, status, approved_by, password_hash, class, firstName, lastName FROM students WHERE studentId = ?', [cleanStudentId], (err, existing) => {
+    // สมัครได้เฉพาะรหัสนักศึกษาที่ยังไม่มีในระบบ
+    //  - มีบัญชีแล้ว (สมัครเอง/เคยเข้าสู่ระบบ/อาจารย์เพิ่มให้) หรือมีชื่อในรายวิชาแล้ว → ให้เข้าสู่ระบบแทน
+    //  - เดิมบัญชีที่อาจารย์นำเข้าถูก "สมัครทับ" ได้: ตั้งรหัสผ่านใหม่และเขียนชื่อ/กลุ่มเรียนทับรายชื่อทุกวิชา
+    //    (กลุ่มเรียนที่อาจารย์จัดไว้เปลี่ยนตามที่พิมพ์ → ห้องที่เปิดเฉพาะกลุ่มไม่ให้เข้าสอบ) และใครรู้รหัสเพื่อนก็สมัครแทนได้
+    const normId = cleanStudentId.replace(/[^0-9a-zA-Z]/g, '');
+    db.get("SELECT approved_by FROM students WHERE studentId = ? OR REPLACE(studentId, '-', '') = ?", [cleanStudentId, normId], (err, existing) => {
         if (err) return res.status(500).json({ success: false, message: err.message });
-        
-        // หากมีรหัสนี้ในระบบอยู่แล้ว ตรวจสอบว่าเป็นบัญชีที่อาจารย์นำเข้าไว้ล่วงหน้าหรือไม่ (ยังไม่เคยลงทะเบียนเอง)
         if (existing) {
-            const isImportedOrPending = existing.approved_by === 'teacher_import' || 
-                                       existing.approved_by === 'teacher_manual' || 
-                                       existing.approved_by === 'admin_import' ||
-                                       !existing.approved_by || 
-                                       existing.approved_by === '' ||
-                                       (existing.approved_by !== 'registered' && existing.approved_by !== 'system_auto');
-
-            if (isImportedOrPending) {
-                // อัปเดตข้อมูลและตั้งรหัสผ่านจริงตามที่นักศึกษาสมัคร
-                db.run(
-                    `UPDATE students 
-                     SET firstName = ?, lastName = ?, class = COALESCE(NULLIF(?, ''), class), 
-                         password_hash = ?, status = 'approved', approved_by = 'registered', approved_at = ?
-                     WHERE studentId = ?`,
-                    [cleanFirstName, cleanLastName, cleanClass, passwordHash, now, cleanStudentId],
-                    function(updateErr) {
-                        if (updateErr) return res.status(500).json({ success: false, message: updateErr.message });
-
-                        // ซิงค์ชื่อและห้องเรียนไปยัง course_students ด้วย
-                        db.run(
-                            `UPDATE course_students 
-                             SET firstName = ?, lastName = ?, class = COALESCE(NULLIF(?, ''), class)
-                             WHERE studentId = ?`,
-                            [cleanFirstName, cleanLastName, cleanClass, cleanStudentId]
-                        );
-
-                        return res.json({
-                            success: true,
-                            message: "ยืนยันการลงทะเบียนสำเร็จ! บัญชีของคุณเปิดใช้งานเรียบร้อย สามารถเข้าสู่ระบบได้ทันทีครับ",
-                            student: {
-                                studentId: cleanStudentId,
-                                firstName: cleanFirstName,
-                                lastName: cleanLastName,
-                                name: `${cleanFirstName} ${cleanLastName}`.trim(),
-                                class: cleanClass || existing.class || ''
-                            }
-                        });
-                    }
-                );
-                return;
-            } else {
-                return res.status(400).json({ 
-                    success: false, 
-                    message: "รหัสนักศึกษานี้เคยลงทะเบียนแล้ว กรุณาเข้าสู่ระบบด้วยรหัสผ่านของคุณ (หากลืมรหัสผ่าน กรุณาแจ้งอาจารย์ผู้สอน)"
-                });
-            }
+            const self = existing.approved_by === 'registered' || existing.approved_by === 'system_auto';
+            return res.status(409).json({
+                success: false, hasAccount: true,
+                message: self
+                    ? 'รหัสนักศึกษานี้มีบัญชีอยู่แล้ว กรุณาเข้าสู่ระบบด้วยรหัสผ่านของคุณ (ถ้าลืมรหัสผ่าน ให้แจ้งอาจารย์รีเซ็ตให้)'
+                    : 'คุณมีบัญชีอยู่แล้ว (อาจารย์เพิ่มรายชื่อไว้ให้) ไม่ต้องสมัครใหม่ กรุณาเข้าสู่ระบบด้วยรหัสนักศึกษา และรหัสผ่านเริ่มต้น 1234 แล้วระบบจะให้ตั้งรหัสผ่านใหม่'
+            });
+        }
+        db.get("SELECT id FROM course_students WHERE studentId = ? OR REPLACE(studentId, '-', '') = ? LIMIT 1", [cleanStudentId, normId], (cErr, rostered) => {
+        if (cErr) return res.status(500).json({ success: false, message: cErr.message });
+        if (rostered) {
+            return res.status(409).json({
+                success: false, hasAccount: true,
+                message: 'คุณมีรายชื่ออยู่ในรายวิชาแล้ว ไม่ต้องสมัครใหม่ กรุณาเข้าสู่ระบบด้วยรหัสนักศึกษา และรหัสผ่านเริ่มต้น 1234 แล้วระบบจะให้ตั้งรหัสผ่านใหม่'
+            });
         }
 
         db.run(
@@ -1460,6 +1431,7 @@ app.post('/api/student/register', (req, res) => {
                 });
             }
         );
+        });
     });
 });
 

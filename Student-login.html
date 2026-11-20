@@ -521,6 +521,13 @@
                     document.getElementById('student-id').value = studentId;
                     document.getElementById('student-password').value = '';
                     document.getElementById('student-password').focus();
+                } else if (data.hasAccount) {
+                    // มีบัญชีหรือมีชื่อในรายวิชาอยู่แล้ว → พาไปแท็บเข้าสู่ระบบ ใส่รหัสนักศึกษาไว้ให้
+                    alert(data.message);
+                    switchAuthTab('login');
+                    document.getElementById('student-id').value = studentId;
+                    document.getElementById('student-password').value = '';
+                    document.getElementById('student-password').focus();
                 } else {
                     alert(`${data.message || 'เกิดข้อผิดพลาดในการลงทะเบียน'}`);
                 }
@@ -680,9 +687,8 @@
             const settings = await settingsRes.json();
             showScoreSetting = settings.showScore;
 
-            // หน้าเตรียมตัว: เวลาสอบเริ่มนับเมื่อกด "เริ่มทำข้อสอบ" (และได้สิทธิ์เปิดโหมดเต็มจอจากการกดปุ่มนี้)
-            await showReadyScreen(settings);
-
+            // ดึงข้อสอบก่อน: ส่งคำตอบห้องนี้ไปแล้ว / ไม่มีสิทธิ์ / เปิดซ้อน → แจ้งทันที ไม่ต้องผ่านหน้าเตรียมตัว
+            // (เวลาสอบยังไม่เริ่ม: เริ่มนับตอนบันทึกความคืบหน้าครั้งแรก ซึ่งเกิดหลังกด "เริ่มทำข้อสอบ")
             const res = await fetch(`/api/get-questions?roomId=${currentRoomId}&sid=${encodeURIComponent(EXAM_SID)}`);
             const data = await res.json();
             if (!res.ok && (data.concurrent || data.inApp || data.accessDenied || data.alreadySubmitted)) {
@@ -713,10 +719,13 @@
                 examTitle = data.examTitle || '';
             }
 
-            if (questions.length === 0) { 
-                alert("ไม่พบข้อสอบในห้องรหัสนี้"); 
-                return; 
+            if (questions.length === 0) {
+                alert("ไม่พบข้อสอบในห้องรหัสนี้");
+                return;
             }
+
+            // หน้าเตรียมตัว: เวลาสอบเริ่มนับเมื่อกด "เริ่มทำข้อสอบ" (และได้สิทธิ์เปิดโหมดเต็มจอจากการกดปุ่มนี้)
+            await showReadyScreen(Object.assign({}, settings, { questionCount: questions.length }));
 
             if (examTitle) {
                 const badge = document.getElementById('exam-title-display');
