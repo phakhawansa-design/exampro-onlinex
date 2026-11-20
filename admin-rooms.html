@@ -2,6 +2,7 @@
 <html lang="th">
 <head>
     <script src="auth-client.js"></script>
+    <script src="term-scope.js"></script>
     <script src="qr-lite.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -132,6 +133,23 @@
     <link rel="stylesheet" href="theme.css">
     <script src="theme.js" defer></script>
     <link rel="stylesheet" href="tailwind.css">
+    <style>
+        .gp { margin-top: 12px; padding: 14px 16px; border-radius: 18px; background: #fff7ef; border: 1.5px solid #ffd2ad; }
+        .gp.hidden { display: none; }
+        .gp-h { font-weight: 800; color: #9a3412; font-size: 14.5px; margin-bottom: 8px; }
+        .gp-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .gp-item { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 99px; background: #fff; border: 1.5px solid #e2e8f0; font-weight: 700; font-size: 14px; color: #0f172a; cursor: pointer; user-select: none; }
+        .gp-item:hover { border-color: #ff9a3c; }
+        .gp-item input { width: 18px; height: 18px; accent-color: #ff7a1a; }
+        .gp-item small { color: #64748b; font-weight: 600; }
+        .gp-item:has(input:checked) { background: #ff7a1a; border-color: #ff7a1a; color: #fff; }
+        .gp-item:has(input:checked) small { color: #ffe7d1; }
+        .gp-note { margin: 8px 2px 0; font-size: 12.5px; color: #7c2d12; line-height: 1.5; }
+        .rg-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 800; padding: 2px 10px; border-radius: 8px; }
+        .rg-badge.only { color: #9a3412; background: #fff1e4; border: 1px solid #ffd2ad; }
+        .rg-badge.all { color: #6b21a8; background: #f3e8ff; border: 1px solid #e9d5ff; }
+        .rg-edit { font-size: 11.5px; font-weight: 700; color: #1d4ed8; text-decoration: underline; background: none; border: 0; cursor: pointer; padding: 0 2px; }
+    </style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
@@ -176,14 +194,6 @@
                         <span class="nav-section-title">หมวดการจัดการสอบ</span>
                     </div>
                     <div class="space-y-1 mt-1">
-                        <a href="admin-library.html" class="nav-link">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
-                            <span>คลังข้อสอบ</span>
-                        </a>
-                        <a href="admin-questions.html" class="nav-link">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
-                            <span>สร้างข้อสอบ</span>
-                        </a>
                         <a href="admin-rooms.html" class="nav-link active">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 21h18M4.5 21V5.25A2.25 2.25 0 0 1 6.75 3h10.5a2.25 2.25 0 0 1 2.25 2.25V21" /></svg>
                             <span>ห้องสอบ</span>
@@ -330,6 +340,21 @@
     <!-- ======================================================== -->
     <!-- 1. POPUP: สร้างห้องสอบ (เลือกวิชา -> เลือกข้อสอบ -> ตั้งค่า) -->
     <!-- ======================================================== -->
+    <div id="room-groups-modal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4" onclick="if(event.target===this)closeRoomGroups()">
+        <div class="bg-white rounded-3xl w-full shadow-2xl p-6 space-y-4" style="max-width:520px" role="dialog" aria-modal="true" aria-labelledby="rgm-title">
+            <div>
+                <h3 id="rgm-title" class="text-lg font-bold text-slate-900">กลุ่มเรียนที่เข้าสอบได้</h3>
+                <p id="rgm-sub" class="text-sm text-slate-500 mt-0.5"></p>
+            </div>
+            <div id="rgm-list" class="gp-list"></div>
+            <p class="gp-note">ไม่เลือกเลย = เปิดให้ทุกกลุ่มในรายวิชา</p>
+            <div class="flex justify-end gap-2 pt-2">
+                <button type="button" onclick="closeRoomGroups()" class="px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-100">ยกเลิก</button>
+                <button type="button" id="rgm-save" onclick="saveRoomGroups()" class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-900 hover:bg-blue-800">บันทึก</button>
+            </div>
+        </div>
+    </div>
+
     <div id="create-room-modal" class="fixed inset-0 bg-slate-950/75 backdrop-blur-md z-50 flex items-center justify-center hidden p-4 sm:p-6 md:p-8">
         <div class="bg-white rounded-3xl w-full max-w-4xl lg:max-w-5xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[94vh]">
             
@@ -373,6 +398,12 @@
                         <span class="flex items-center gap-1.5">รหัสวิชา: <b id="banner-course-code" class="text-blue-900 font-extrabold text-base">-</b></span>
                         <span class="flex items-center gap-1.5">กลุ่ม/ชั้นเรียน: <b id="banner-course-class" class="text-slate-800 font-extrabold text-base">-</b></span>
                         <span class="flex items-center gap-1.5">นักศึกษาในรายวิชา: <b id="banner-course-students" class="text-blue-900 font-extrabold text-base">0</b> คน</span>
+                    </div>
+                    <!-- กลุ่มเรียนที่เข้าสอบได้ (วิชาเดียวหลายกลุ่ม) -->
+                    <div id="modal-group-pick" class="gp hidden">
+                        <div class="gp-h">กลุ่มเรียนที่เข้าสอบห้องนี้ได้</div>
+                        <div id="modal-group-list" class="gp-list"></div>
+                        <p class="gp-note">ไม่เลือกเลย = เปิดให้ทุกกลุ่มในรายวิชา · เลือกบางกลุ่ม = นักศึกษากลุ่มอื่นใช้รหัสนี้เข้าสอบไม่ได้</p>
                     </div>
                 </div>
 
@@ -805,6 +836,7 @@
         // 2. ดึงข้อมูลห้องสอบทั้งหมดของอาจารย์
         async function refreshAllRoomsData() {
             try {
+                await loadCourseGroupRows(true); // จำนวนคนต่อกลุ่ม ใช้บนการ์ดห้องสอบ
                 const res = await fetch(`/api/teacher/rooms?username=${encodeURIComponent(username)}`);
                 if (res.ok) {
                     const rawRooms = await res.json();
@@ -915,7 +947,11 @@
                                 <div class="text-xs font-bold text-indigo-600 uppercase tracking-wider truncate">
                                     ${escapeHtml(courseNameStr)}
                                 </div>
-                                ${classNameStr ? `
+                                ${splitG(room.allowed_classes).length
+                                    ? `<span class="rg-badge only">เฉพาะกลุ่ม: ${escapeHtml(splitG(room.allowed_classes).join(', '))}</span>`
+                                    : (groupsOfCourse(room.courseId).length > 1 ? `<span class="rg-badge all">ทุกกลุ่ม</span>` : '')}
+                                ${room.courseId && groupsOfCourse(room.courseId).length > 1 ? `<button type="button" class="rg-edit" onclick="openRoomGroups('${escapeHtml(room.roomId)}')">เปลี่ยนกลุ่ม</button>` : ''}
+                                ${!splitG(room.allowed_classes).length && groupsOfCourse(room.courseId).length < 2 && classNameStr ? `
                                     <span class="text-[11px] font-extrabold text-purple-700 bg-purple-100 border border-purple-200 px-2.5 py-0.5 rounded-lg flex items-center gap-1 shadow-2xs">
                                         <span>ห้อง/กลุ่ม: ${escapeHtml(classNameStr)}</span>
                                     </span>
@@ -1049,7 +1085,66 @@
             document.getElementById('create-room-modal').classList.add('hidden');
         }
 
+        // ===== กลุ่มเรียนของรายวิชา (วิชาเดียวหลายกลุ่ม) =====
+        let courseGroupRows = null;
+        const splitG = s => [...new Set(String(s || '').split(/\s*[,|]\s*/).map(x => x.trim()).filter(Boolean))];
+        async function loadCourseGroupRows(force) {
+            if (courseGroupRows && !force) return courseGroupRows;
+            try { const r = await fetch('/api/teacher/course-groups'); courseGroupRows = r.ok ? await r.json() : []; } catch (e) { courseGroupRows = []; }
+            if (!Array.isArray(courseGroupRows)) courseGroupRows = [];
+            return courseGroupRows;
+        }
+        // [{ g: 'TEC3R', n: 27 }, ...] จากกลุ่มที่ตั้งไว้ในรายวิชา + กลุ่มในรายชื่อนักศึกษา
+        function groupsOfCourse(courseId) {
+            const c = (courses || []).find(x => String(x.id) === String(courseId)) || {};
+            const names = splitG(c.description);
+            const counts = {};
+            (courseGroupRows || []).filter(r => String(r.courseId) === String(courseId)).forEach(r => splitG(r.class).forEach(g => {
+                counts[g] = (counts[g] || 0) + Number(r.n || 0); if (!names.includes(g)) names.push(g);
+            }));
+            return names.map(g => ({ g, n: counts[g] || 0 }));
+        }
+        function groupPickHtml(list, checked) {
+            return list.map(x => `<label class="gp-item"><input type="checkbox" value="${escapeHtml(x.g)}" ${checked.includes(x.g) ? 'checked' : ''}>${escapeHtml(x.g)} <small>${x.n} คน</small></label>`).join('');
+        }
+        async function renderModalGroupPick(courseId) {
+            const box = document.getElementById('modal-group-pick');
+            await loadCourseGroupRows();
+            const list = groupsOfCourse(courseId);
+            box.classList.toggle('hidden', list.length < 2);
+            document.getElementById('modal-group-list').innerHTML = groupPickHtml(list, []);
+        }
+        const checkedIn = id => [...document.querySelectorAll('#' + id + ' input:checked')].map(i => i.value);
+
+        // เปลี่ยนกลุ่มของห้องที่สร้างแล้ว
+        let rgmRoomId = null;
+        async function openRoomGroups(roomId) {
+            const room = (allRooms || []).find(r => r.roomId === roomId);
+            if (!room) return;
+            rgmRoomId = roomId;
+            await loadCourseGroupRows(true);
+            const list = groupsOfCourse(room.courseId);
+            document.getElementById('rgm-sub').textContent = (room.exam_title || room.roomName || '') + (room.exam_code ? ' · PIN ' + room.exam_code : '');
+            document.getElementById('rgm-list').innerHTML = list.length ? groupPickHtml(list, splitG(room.allowed_classes)) : '<p class="text-sm text-slate-500">รายวิชานี้ยังไม่มีกลุ่มเรียน (ตั้งได้ที่หน้าจัดการรายวิชา)</p>';
+            document.getElementById('room-groups-modal').classList.remove('hidden');
+        }
+        function closeRoomGroups() { document.getElementById('room-groups-modal').classList.add('hidden'); rgmRoomId = null; }
+        async function saveRoomGroups() {
+            if (!rgmRoomId) return;
+            const btn = document.getElementById('rgm-save'); btn.disabled = true;
+            try {
+                const r = await fetch('/api/teacher/room-groups', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ roomId: rgmRoomId, allowedClasses: checkedIn('rgm-list') }) });
+                const d = await r.json().catch(() => ({}));
+                if (!r.ok || d.success === false) throw new Error(d.message || 'HTTP ' + r.status);
+                closeRoomGroups();
+                if (window.uiToast) uiToast('บันทึกกลุ่มเรียนที่เข้าสอบแล้ว');
+                await refreshAllRoomsData();
+            } catch (e) { alert('บันทึกไม่สำเร็จ: ' + e.message); }
+            finally { btn.disabled = false; }
+        }
+
         function onModalCourseChanged(courseId) {
+            renderModalGroupPick(courseId);
             const banner = document.getElementById('modal-course-info-banner');
             const courseObj = courses.find(c => String(c.id) === String(courseId));
             if (courseObj) {
@@ -1188,7 +1283,8 @@
                         duration,
                         announcement,
                         randomize,
-                        showScore
+                        showScore,
+                        allowedClasses: checkedIn('modal-group-list')
                     })
                 });
                 const cData = await cRes.json();

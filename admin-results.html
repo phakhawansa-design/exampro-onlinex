@@ -2,6 +2,7 @@
 <html lang="th">
 <head>
     <script src="auth-client.js"></script>
+    <script src="term-scope.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จัดการผลสอบและคะแนนนักศึกษา - ExamPro</title>
@@ -128,6 +129,63 @@
     <link rel="stylesheet" href="theme.css">
     <link rel="stylesheet" href="results-theme.css"><script src="theme.js" defer></script>
     <link rel="stylesheet" href="tailwind.css">
+    <style>
+        /* ===== ตารางวิเคราะห์คุณภาพข้อสอบ (เด่น) ===== */
+        .ia { background: #fff; border: 1.5px solid #c9dbfa; border-radius: 22px; overflow: hidden; box-shadow: 0 18px 40px -26px rgba(11,42,122,.55); }
+        .ia.hidden { display: none; }
+        .ia-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; flex-wrap: wrap; padding: 22px 24px; color: #fff;
+            background: linear-gradient(120deg, #0b2a7a 0%, #1546b8 60%, #1d5fd6 100%); position: relative; }
+        .ia-head::after { content: ''; position: absolute; inset: auto 0 0 0; height: 4px; background: linear-gradient(90deg, #ff7a1a, #ffb347, #34d399); }
+        .ia-chip { display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.25); }
+        .ia-head h3 { margin: 8px 0 2px; font-size: 22px; font-weight: 800; line-height: 1.3; }
+        .ia-head p { margin: 0; font-size: 14px; color: #c8d8ff; }
+        .ia-sum { display: flex; gap: 10px; flex-wrap: wrap; }
+        .ia-s { min-width: 104px; padding: 10px 14px; border-radius: 14px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); }
+        .ia-s b { display: block; font-size: 26px; font-weight: 800; line-height: 1.1; }
+        .ia-s small { font-size: 12.5px; color: #dbe6ff; }
+        .ia-s.good b { color: #6ee7a8; } .ia-s.ok b { color: #fff; } .ia-s.fix b { color: #ffc28a; } .ia-s.key b { color: #ff9b9b; }
+        .ia-legend { display: flex; gap: 6px 22px; flex-wrap: wrap; padding: 12px 24px; background: #f5f8ff; border-bottom: 1px solid #e3ebf8; font-size: 13px; color: #475569; }
+        .ia-legend b { color: #0b2a7a; }
+        .ia-wrap { overflow-x: auto; }
+        .ia-table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+        .ia-table th { text-align: left; padding: 12px 14px; font-size: 13px; font-weight: 700; color: #475569; background: #fafbfe; border-bottom: 1px solid #e5eaf2; white-space: nowrap; }
+        .ia-table th.c, .ia-table td.c { text-align: center; }
+        .ia-table td { padding: 12px 14px; border-bottom: 1px solid #eef2f7; vertical-align: middle; }
+        .ia-table tr:hover td { background: #fafcff; }
+        .ia-table tr.warn td:first-child { box-shadow: inset 4px 0 0 #ff7a1a; }
+        .ia-table tr.bad td:first-child { box-shadow: inset 4px 0 0 #dc2626; }
+        .ia-no { font-weight: 800; color: #0b2a7a; font-size: 16px; }
+        .ia-q { max-width: 420px; color: #0f172a; font-weight: 500; line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .ia-p { display: flex; align-items: center; gap: 10px; min-width: 190px; }
+        .ia-p i { flex: 1; height: 8px; border-radius: 99px; background: #eef2f7; overflow: hidden; display: block; }
+        .ia-p i u { display: block; height: 100%; border-radius: 99px; }
+        .ia-b { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+        .ia-b.g { background: #e7f8ee; color: #15803d; } .ia-b.b { background: #e8f1ff; color: #1d4ed8; }
+        .ia-b.o { background: #fff1e4; color: #b4500c; } .ia-b.r { background: #fdecea; color: #b91c1c; }
+        .ia-rec { font-weight: 700; } .ia-rec.g { color: #15803d; } .ia-rec.o { color: #b4500c; } .ia-rec.r { color: #b91c1c; } .ia-rec.n { color: #475569; font-weight: 600; }
+        @media (max-width: 640px) { .ia-head { padding: 18px; } .ia-head h3 { font-size: 19px; } .ia-s { min-width: 0; flex: 1 1 40%; } .ia-legend { padding: 12px 18px; } }
+    </style>
+    <style>
+        /* ===== การกระจายช่วงคะแนน (วงกลม) ===== */
+        .sd-card { padding: 22px 24px; }
+        .sd-h h3 { margin: 0; font-size: 18px; font-weight: 800; color: #0f172a; }
+        .sd-h p { margin: 2px 0 0; font-size: 13.5px; color: #64748b; }
+        .sd-body { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 28px; align-items: center; margin-top: 14px; }
+        .sd-ring { position: relative; width: 260px; height: 260px; }
+        .sd-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
+        .sd-center b { font-size: 40px; font-weight: 800; color: #0b2a7a; line-height: 1; }
+        .sd-center span { font-size: 13px; color: #64748b; margin-top: 4px; }
+        .sd-legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+        .sd-legend li { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; align-items: center; gap: 4px 12px; padding: 12px 14px; border-radius: 14px; background: #f8fafc; border: 1px solid #eef2f7; }
+        .sd-dot { width: 14px; height: 14px; border-radius: 5px; }
+        .sd-name { font-weight: 700; color: #0f172a; font-size: 14.5px; }
+        .sd-name small { display: block; font-weight: 500; color: #64748b; font-size: 12.5px; }
+        .sd-n { text-align: right; font-weight: 800; font-size: 20px; color: #0f172a; line-height: 1.1; }
+        .sd-n small { display: block; font-size: 12px; font-weight: 600; color: #64748b; }
+        .sd-bar { grid-column: 2 / -1; height: 6px; border-radius: 99px; background: #e9eef6; overflow: hidden; }
+        .sd-bar i { display: block; height: 100%; border-radius: 99px; transition: width .6s cubic-bezier(.2,.8,.2,1); }
+        @media (max-width: 760px) { .sd-body { grid-template-columns: 1fr; justify-items: center; } .sd-legend { width: 100%; } .sd-ring { width: 230px; height: 230px; } }
+    </style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
@@ -171,14 +229,6 @@
                         <span class="nav-section-title">หมวดการจัดการสอบ</span>
                     </div>
                     <div class="space-y-1 mt-1">
-                        <a href="admin-library.html" class="nav-link">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
-                            <span>คลังข้อสอบ</span>
-                        </a>
-                        <a href="admin-questions.html" class="nav-link">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
-                            <span>สร้างข้อสอบ</span>
-                        </a>
                         <a href="admin-rooms.html" class="nav-link">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 21h18M4.5 21V5.25A2.25 2.25 0 0 1 6.75 3h10.5a2.25 2.25 0 0 1 2.25 2.25V21" /></svg>
                             <span>ห้องสอบ</span>
@@ -250,9 +300,6 @@
                         <option value="">-- กำลังโหลดรายวิชา... --</option>
                     </select>
                 </div>
-                <button onclick="exportToExcel()" class="flex items-center gap-1.5 px-3.5 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-xl text-xs font-bold shadow-xs transition active:scale-95 cursor-pointer">
-                    <span>ส่งออก Excel</span>
-                </button>
         </header>
 
         <!-- Main Workspace -->
@@ -281,7 +328,7 @@
                 <div class="rs-hero-r">
                     <div class="rs-big"><small>ส่งแล้ว</small><b id="stat-total">0 คน</b></div>
                     <div class="rs-big"><small>ผ่านเกณฑ์</small><b id="rs-pass">-</b></div>
-                    <div class="rs-big"><small>เฉลี่ย</small><b id="rs-avg-pct">-</b></div>
+                    <div class="rs-big" title="คะแนนเฉลี่ยของนักศึกษาที่ผ่านเกณฑ์เท่านั้น"><small>เฉลี่ยคนที่ผ่าน</small><b id="rs-avg-pct">-</b></div>
                 </div>
                 <div class="rs-bar" title="สัดส่วนผู้ผ่านเกณฑ์"><i id="rs-pass-bar" style="width:0%"></i></div>
             </section>
@@ -294,7 +341,37 @@
                 <div class="rs-kpi"><div><small>ส่วนเบี่ยงเบนมาตรฐาน (SD)</small><b id="stat-sd" style="color:#4338ca">-</b><em>ยิ่งน้อย คะแนนยิ่งใกล้กัน</em></div></div>
             </div>
 
-            <!-- ③ ตารางคะแนนรายคน -->
+            <!-- ③ คุณภาพข้อสอบรายข้อ (Item Analysis) -->
+            <section id="item-analysis-box" class="ia hidden" aria-labelledby="ia-title">
+                <div class="ia-head">
+                    <div>
+                        <div class="ia-chip">คำนวณอัตโนมัติจากคำตอบของนักศึกษา</div>
+                        <h3 id="ia-title">ตารางวิเคราะห์คุณภาพข้อสอบรายข้อ</h3>
+                        <p id="ia-sub">ชุดข้อสอบ · วิเคราะห์จากนักศึกษา - คน</p>
+                    </div>
+                    <div class="ia-sum" id="ia-sum"></div>
+                </div>
+                <div class="ia-legend">
+                    <span><b>ค่าความยากง่าย (p)</b> สัดส่วนคนที่ตอบถูก · 0.30–0.80 กำลังดี</span>
+                    <span><b>ค่าอำนาจจำแนก (r)</b> แยกคนเก่งกับคนอ่อนได้แค่ไหน · 0.20 ขึ้นไปใช้ได้ · ติดลบ = ควรตรวจเฉลย</span>
+                </div>
+                <div class="ia-wrap">
+                    <table class="ia-table">
+                        <thead>
+                            <tr>
+                                <th class="c">ข้อ</th>
+                                <th>โจทย์คำถาม</th>
+                                <th>ค่าความยากง่าย (p)</th>
+                                <th class="c">ค่าอำนาจจำแนก (r)</th>
+                                <th>ผลวิเคราะห์สรุป</th>
+                            </tr>
+                        </thead>
+                        <tbody id="item-analysis-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ④ ตารางคะแนนรายคน -->
             <section class="rs-card">
                 <div class="rs-card-h">
                     <h3>คะแนนรายคน <span id="rs-shown" class="rs-count"></span></h3>
@@ -343,17 +420,20 @@
                 </div>
             </section>
 
-            <!-- ④ กราฟภาพรวม -->
-            <div class="rs-charts">
-                <section class="rs-card rs-pad">
-                    <h3 class="rs-h">การกระจายช่วงคะแนน</h3>
-                    <div class="h-60 relative"><canvas id="scoreDistChart"></canvas></div>
-                </section>
-                <section class="rs-card rs-pad">
-                    <h3 class="rs-h">คะแนนเฉลี่ยรายชั้นเรียน</h3>
-                    <div class="h-60 relative"><canvas id="classAvgChart"></canvas></div>
-                </section>
-            </div>
+            <!-- ⑤ กราฟภาพรวม -->
+            <section class="rs-card sd-card" aria-labelledby="sd-title">
+                <div class="sd-h">
+                    <h3 id="sd-title">การกระจายช่วงคะแนน</h3>
+                    <p>นักศึกษาแต่ละช่วงคะแนนมีกี่คน</p>
+                </div>
+                <div class="sd-body">
+                    <div class="sd-ring">
+                        <canvas id="scoreDistChart" aria-label="แผนภูมิวงกลมการกระจายช่วงคะแนน" role="img"></canvas>
+                        <div class="sd-center"><b id="sd-total">0</b><span>คนที่ส่ง</span></div>
+                    </div>
+                    <ul class="sd-legend" id="sd-legend"></ul>
+                </div>
+            </section>
 
             <!-- โซนอันตราย: ลบประวัติ (แยกออกมา ไม่ปนกับปุ่มใช้งานประจำ) -->
             <div class="rs-danger">
@@ -383,37 +463,6 @@
                             ตกลง
                         </button>
                     </div>
-                </div>
-            </div>
-
-            <!-- Item Analysis Table Section -->
-            <div id="item-analysis-box" class="glass-card p-8 space-y-6 shadow-2xl hidden select-none">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-200 pb-3">
-                    <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                        ตารางวิเคราะห์คุณภาพข้อสอบรายข้อ
-                    </h2>
-                    <div class="flex items-center gap-2.5 flex-wrap">
-                        <span class="bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 font-semibold text-xs px-3.5 py-1.5 rounded-xl">คำนวณอัตโนมัติ</span>
-                        <button onclick="clearResults()" class="bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 px-3.5 py-1.5 rounded-xl font-bold text-xs transition active:scale-95 shadow-sm flex items-center gap-1.5 cursor-pointer" title="ลบประวัติคำตอบและคะแนนสอบทั้งหมดเพื่อเริ่มใหม่">
-                            ลบประวัติการสอบ
-                        </button>
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead class="bg-transparent/5 text-slate-500 font-bold uppercase tracking-wider border-b border-white/10">
-                            <tr>
-                                <th class="p-3 text-center w-16">ข้อที่</th>
-                                <th class="p-3">โจทย์คำถาม</th>
-                                <th class="p-3 text-center w-36">ค่าความยากง่าย (p)</th>
-                                <th class="p-3 text-center w-36">ค่าอำนาจจำแนก (r)</th>
-                                <th class="p-3 text-center w-52">ผลวิเคราะห์สรุป</th>
-                            </tr>
-                        </thead>
-                        <tbody id="item-analysis-body" class="divide-y divide-slate-100 bg-white">
-                            <!-- แถวข้อสอบวิเคราะห์จะปรากฏตรงนี้ -->
-                        </tbody>
-                    </table>
                 </div>
             </div><!-- End results-content-area -->
 
@@ -582,9 +631,8 @@
             const csel = document.getElementById('course-selector');
             const cname = csel && csel.selectedIndex >= 0 ? csel.options[csel.selectedIndex].text : '';
             const setT = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
-            const rsel = document.getElementById('rs-room');
-            const rname = rsel && rsel.value && rsel.value !== 'ALL' && rsel.selectedIndex >= 0 ? rsel.options[rsel.selectedIndex].text.split(' · ')[0].replace(/^\s*/, '') : '';
-            setT('rs-course-name', (cname || 'ผลการสอบ') + (rname ? ' · ' + rname : ''));
+            // หัวข้อแบนเนอร์ = [รหัสวิชา] ชื่อวิชา เท่านั้น (ไม่แสดงภาค กลุ่ม หรือรหัสห้อง)
+            setT('rs-course-name', (cname ? cname.split(' · ')[0].trim() : '') || 'ผลการสอบ');
 
             if (count === 0) {
                 document.getElementById('stat-max').textContent = "-";
@@ -599,9 +647,11 @@
             {
                 const cut = passCut();
                 const pass = safeData.filter(s => pctOf(s) >= cut).length;
-                const avgPct = safeData.reduce((t, s) => t + pctOf(s), 0) / count;
+                // เฉลี่ยเฉพาะคนที่ผ่านเกณฑ์ (คะแนนเฉลี่ยของทุกคนอยู่ที่การ์ด "คะแนนเฉลี่ย" ด้านล่าง)
+                const passers = safeData.filter(s => pctOf(s) >= cut);
+                const avgPassPct = passers.length ? passers.reduce((t, s) => t + pctOf(s), 0) / passers.length : null;
                 setT('rs-pass', `${pass} / ${count} คน`);
-                setT('rs-avg-pct', `${avgPct.toFixed(1)}%`);
+                setT('rs-avg-pct', avgPassPct === null ? 'ไม่มีคนผ่าน' : `${avgPassPct.toFixed(1)}%`);
                 setT('rs-summary-line', `ส่งคำตอบแล้ว ${count} คน · ผ่านเกณฑ์ ${cut}% จำนวน ${pass} คน (${Math.round(pass / count * 100)}%) · ไม่ผ่าน ${count - pass} คน`);
                 const pb = document.getElementById('rs-pass-bar'); if (pb) pb.style.width = Math.round(pass / count * 100) + '%';
             }
@@ -774,97 +824,58 @@
         // ฟังก์ชันวาดแผนภูมิสถิติ (Chart.js)
         // ==========================================
         let scoreDistChartInstance = null;
-        let classAvgChartInstance = null;
 
-        function renderCharts(filteredData, allData) {
-            // 1. แผนภูมิการกระจายของช่วงคะแนน (Doughnut Chart)
-            let intervals = { "ต่ำกว่า 50%": 0, "50% - 69%": 0, "70% - 89%": 0, "90% - 100%": 0 };
-            
-            filteredData.forEach(student => {
-                const max = student.maxScore || 10;
-                const percent = (student.score / max) * 100;
-                if (percent < 50) intervals["ต่ำกว่า 50%"]++;
-                else if (percent < 70) intervals["50% - 69%"]++;
-                else if (percent < 90) intervals["70% - 89%"]++;
-                else intervals["90% - 100%"]++;
+        // การกระจายช่วงคะแนน: วงกลม + ตัวเลขกลางวง + รายการช่วงคะแนนพร้อมจำนวนคนและแถบสัดส่วน
+        function renderCharts(filteredData) {
+            const bands = [
+                { name: 'ต่ำกว่า 50%', hint: 'ควรติดตามเป็นพิเศษ', color: '#ef4444', n: 0 },
+                { name: '50% – 69%', hint: 'ผ่านเกณฑ์ขั้นต่ำ', color: '#ff9a3c', n: 0 },
+                { name: '70% – 89%', hint: 'ดี', color: '#1d5fd6', n: 0 },
+                { name: '90% – 100%', hint: 'ดีเยี่ยม', color: '#16a34a', n: 0 }
+            ];
+            (filteredData || []).forEach(st => {
+                const pct = (Number(st.score) || 0) / (Number(st.maxScore) || 10) * 100;
+                bands[pct < 50 ? 0 : pct < 70 ? 1 : pct < 90 ? 2 : 3].n++;
             });
+            const total = bands.reduce((t, b) => t + b.n, 0);
+            document.getElementById('sd-total').textContent = total;
+            document.getElementById('sd-legend').innerHTML = bands.map(b => {
+                const pct = total ? Math.round(b.n / total * 100) : 0;
+                return '<li><span class="sd-dot" style="background:' + b.color + '"></span>' +
+                    '<span class="sd-name">' + b.name + '<small>' + b.hint + '</small></span>' +
+                    '<span class="sd-n">' + b.n + ' คน<small>' + pct + '%</small></span>' +
+                    '<span class="sd-bar"><i style="width:' + pct + '%;background:' + b.color + '"></i></span></li>';
+            }).join('');
 
-            const scoreCtx = document.getElementById('scoreDistChart').getContext('2d');
-            if (scoreDistChartInstance) {
-                scoreDistChartInstance.destroy();
-            }
-            scoreDistChartInstance = new Chart(scoreCtx, {
+            const ctx = document.getElementById('scoreDistChart').getContext('2d');
+            if (scoreDistChartInstance) scoreDistChartInstance.destroy();
+            scoreDistChartInstance = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: Object.keys(intervals),
+                    labels: bands.map(b => b.name),
                     datasets: [{
-                        data: Object.values(intervals),
-                        backgroundColor: [
-                            'rgba(244, 63, 94, 0.75)',  // Rose
-                            'rgba(245, 158, 11, 0.75)', // Amber
-                            'rgba(47,107,236, 0.75)',  // Indigo
-                            'rgba(16, 185, 129, 0.75)'  // Emerald
-                        ],
-                        borderWidth: 1.5,
-                        borderColor: '#ffffff'
+                        data: total ? bands.map(b => b.n) : [1],
+                        backgroundColor: total ? bands.map(b => b.color) : ['#e9eef6'],
+                        hoverOffset: 10,
+                        borderWidth: 0,
+                        borderRadius: total ? 8 : 0,
+                        spacing: total ? 4 : 0
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    cutout: '72%',
+                    layout: { padding: 10 },
+                    animation: { animateRotate: true, duration: 700 },
                     plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                font: { family: 'Noto Sans Thai Looped', size: 10 },
-                                boxWidth: 10
-                            }
-                        }
-                    }
-                }
-            });
-
-            // 2. แผนภูมิเปรียบเทียบคะแนนเฉลี่ยรายห้องเรียน (Bar Chart)
-            const classes = [...new Set(allData.map(item => item.class).filter(Boolean))];
-            const averages = classes.map(c => {
-                const studentsInClass = allData.filter(item => item.class === c);
-                const sum = studentsInClass.reduce((sumVal, item) => sumVal + item.score, 0);
-                const avg = sum / studentsInClass.length;
-                return parseFloat(avg.toFixed(2));
-            });
-
-            const classCtx = document.getElementById('classAvgChart').getContext('2d');
-            if (classAvgChartInstance) {
-                classAvgChartInstance.destroy();
-            }
-            classAvgChartInstance = new Chart(classCtx, {
-                type: 'bar',
-                data: {
-                    labels: classes.map(c => `ชั้นเรียน ${c}`),
-                    datasets: [{
-                        label: 'คะแนนเฉลี่ย',
-                        data: averages,
-                        backgroundColor: 'rgba(47,107,236, 0.75)',
-                        borderColor: 'rgb(21,87,224)',
-                        borderWidth: 1,
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { drawBorder: false, color: 'rgba(0,0,0,0.05)' },
-                            ticks: { font: { family: 'Noto Sans Thai Looped', size: 10 } }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { font: { family: 'Noto Sans Thai Looped', size: 10 } }
+                        legend: { display: false },
+                        tooltip: {
+                            enabled: !!total,
+                            backgroundColor: '#0f172a', padding: 10, cornerRadius: 10,
+                            titleFont: { family: 'Noto Sans Thai Looped', size: 13 },
+                            bodyFont: { family: 'Noto Sans Thai Looped', size: 13 },
+                            callbacks: { label: c => ' ' + c.raw + ' คน (' + Math.round(c.raw / total * 100) + '%)' }
                         }
                     }
                 }
@@ -1193,101 +1204,47 @@
                 const sortedList = [...filteredList].sort((a, b) => b.score - a.score);
                 const highGroup = sortedList.slice(0, M);
                 const lowGroup = sortedList.slice(-M);
+                const correctIn = (group, qId, key) => group.reduce((n, st) => {
+                    try { const a = JSON.parse(st.answers_json || '{}'); const v = (a[qId] !== undefined ? String(a[qId]) : '').trim().toLowerCase(); return n + (key !== '' && v === key ? 1 : 0); }
+                    catch (e) { return n; }
+                }, 0);
+                const tally = { good: 0, ok: 0, fix: 0, key: 0 };
 
                 analysisBody.innerHTML = questions.map((q, idx) => {
-                    const qId = q.id;
-                    const correctAns = (q.answer || "").trim().toLowerCase();
+                    const key = (q.answer || '').trim().toLowerCase();
+                    const p = correctIn(filteredList, q.id, key) / N;          // ค่าความยากง่าย
+                    const r = correctIn(highGroup, q.id, key) / M - correctIn(lowGroup, q.id, key) / M; // ค่าอำนาจจำแนก
 
-                    // คำนวณความถี่ผู้ตอบถูกในภาพรวม
-                    let correctCount = 0;
-                    filteredList.forEach(student => {
-                        try {
-                            const ans = JSON.parse(student.answers_json || '{}');
-                            const studentAns = (ans[qId] !== undefined ? ans[qId] : "").trim().toLowerCase();
-                            if (studentAns === correctAns && correctAns !== "") {
-                                correctCount++;
-                            }
-                        } catch(e) {}
-                    });
+                    const pTone = p >= 0.8 ? 'g' : p >= 0.3 ? 'b' : 'o';
+                    const pText = p >= 0.8 ? 'ง่ายมาก' : p >= 0.3 ? 'ปานกลาง' : 'ยากมาก';
+                    const pColor = { g: '#16a34a', b: '#1d5fd6', o: '#ff7a1a' }[pTone];
+                    const rTone = r >= 0.4 ? 'g' : r >= 0.2 ? 'b' : r >= 0 ? 'o' : 'r';
+                    const rText = r >= 0.4 ? 'ดีมาก' : r >= 0.2 ? 'พอใช้' : r >= 0 ? 'ปรับปรุง' : 'ติดลบ';
 
-                    // คำนวณความถี่ผู้ตอบถูกในกลุ่มเก่ง (High Group)
-                    let highCorrect = 0;
-                    highGroup.forEach(student => {
-                        try {
-                            const ans = JSON.parse(student.answers_json || '{}');
-                            const studentAns = (ans[qId] !== undefined ? ans[qId] : "").trim().toLowerCase();
-                            if (studentAns === correctAns && correctAns !== "") {
-                                highCorrect++;
-                            }
-                        } catch(e) {}
-                    });
+                    let rec, recTone, row = '';
+                    if (r < 0) { rec = 'ค่าติดลบ ควรตรวจเฉลยข้อนี้'; recTone = 'r'; row = 'bad'; tally.key++; }
+                    else if (p < 0.2 && r < 0.15) { rec = 'ยากเกินไป หรือโจทย์มีข้อบกพร่อง'; recTone = 'o'; row = 'warn'; tally.fix++; }
+                    else if (p > 0.85 && r < 0.15) { rec = 'ง่ายเกินไป แยกคนเก่งกับคนอ่อนไม่ได้'; recTone = 'o'; row = 'warn'; tally.fix++; }
+                    else if (p >= 0.3 && p < 0.8 && r >= 0.25) { rec = 'ข้อสอบคุณภาพดีเยี่ยม'; recTone = 'g'; tally.good++; }
+                    else { rec = 'พอใช้ได้ ควรปรับตัวเลือกลวง'; recTone = 'n'; tally.ok++; }
 
-                    // คำนวณความถี่ผู้ตอบถูกในกลุ่มอ่อน (Low Group)
-                    let lowCorrect = 0;
-                    lowGroup.forEach(student => {
-                        try {
-                            const ans = JSON.parse(student.answers_json || '{}');
-                            const studentAns = (ans[qId] !== undefined ? ans[qId] : "").trim().toLowerCase();
-                            if (studentAns === correctAns && correctAns !== "") {
-                                lowCorrect++;
-                            }
-                        } catch(e) {}
-                    });
-
-                    // ค่าความยากง่าย p (Difficulty)
-                    const p = correctCount / N;
-
-                    // ค่าอำนาจจำแนก r (Discrimination)
-                    const pH = highCorrect / M;
-                    const pL = lowCorrect / M;
-                    const r = pH - pL;
-
-                    // ตกแต่งป้ายวิเคราะห์ ค่าความยากง่าย p
-                    let pBadge = '';
-                    if (p >= 0.8) {
-                        pBadge = `<span class="bg-emerald-50 border border-emerald-100 text-emerald-700 px-2 py-1 rounded-xl text-[10px] font-bold">ง่ายมาก (${p.toFixed(2)})</span>`;
-                    } else if (p >= 0.3) {
-                        pBadge = `<span class="bg-blue-50 border border-blue-100 text-blue-700 px-2 py-1 rounded-xl text-[10px] font-bold">ปานกลาง (${p.toFixed(2)})</span>`;
-                    } else {
-                        pBadge = `<span class="bg-orange-50 border border-orange-200 text-orange-800 px-2 py-1 rounded-xl text-[10px] font-bold">ยากมาก (${p.toFixed(2)})</span>`;
-                    }
-
-                    // ตกแต่งป้ายวิเคราะห์ ค่าอำนาจจำแนก r
-                    let rBadge = '';
-                    if (r >= 0.4) {
-                        rBadge = `<span class="bg-emerald-50 border border-emerald-100 text-emerald-700 px-2 py-1 rounded-xl text-[10px] font-bold">ดีมาก (${r.toFixed(2)})</span>`;
-                    } else if (r >= 0.2) {
-                        rBadge = `<span class="bg-amber-50 border border-amber-100 text-amber-700 px-2 py-1 rounded-xl text-[10px] font-bold">พอใช้ (${r.toFixed(2)})</span>`;
-                    } else {
-                        rBadge = `<span class="bg-rose-50 border border-rose-100 text-rose-700 px-2 py-1 rounded-xl text-[10px] font-bold">ปรับปรุง (${r.toFixed(2)})</span>`;
-                    }
-
-                    // บทวิเคราะห์สรุป
-                    let recommendation = '';
-                    if (r < 0) {
-                        recommendation = `<div class="text-rose-600 font-semibold flex items-center gap-1 animate-pulse">ดัชนีติดลบ! เฉลยคีย์ผิดพลาด?</div>`;
-                    } else if (p < 0.2 && r < 0.15) {
-                        recommendation = `<div class="text-rose-600 font-semibold">ยากเกินไป หรือมีข้อบกพร่อง</div>`;
-                    } else if (p > 0.85 && r < 0.15) {
-                        recommendation = `<div class="text-slate-500">ง่ายเกินไป ขาดอำนาจจำแนก</div>`;
-                    } else if (p >= 0.3 && p < 0.8 && r >= 0.25) {
-                        recommendation = `<div class="text-emerald-700 font-bold">ข้อสอบคุณภาพยอดเยี่ยม</div>`;
-                    } else {
-                        recommendation = `<div class="text-slate-500">พอใช้ได้ ควรปรับปรุงช้อยส์ลวง</div>`;
-                    }
-
-                    return `
-                        <tr class="hover:bg-slate-50/80 transition border-b border-slate-100">
-                            <td class="p-3 text-center font-bold text-slate-500 font-mono">${idx + 1}</td>
-                            <td class="p-3 font-semibold text-slate-800 leading-relaxed max-w-xs truncate" title="${escapeHtml(q.question)}">
-                                ${escapeHtml(q.question)}
-                            </td>
-                            <td class="p-3 text-center">${pBadge}</td>
-                            <td class="p-3 text-center">${rBadge}</td>
-                            <td class="p-3">${recommendation}</td>
-                        </tr>
-                    `;
+                    return `<tr class="${row}">
+                            <td class="c"><span class="ia-no">${idx + 1}</span></td>
+                            <td><div class="ia-q" title="${escapeHtml(q.question)}">${escapeHtml(q.question)}</div></td>
+                            <td><div class="ia-p"><i><u style="width:${Math.round(p * 100)}%;background:${pColor}"></u></i><span class="ia-b ${pTone}">${pText} ${p.toFixed(2)}</span></div></td>
+                            <td class="c"><span class="ia-b ${rTone}">${rText} ${r.toFixed(2)}</span></td>
+                            <td><span class="ia-rec ${recTone}">${rec}</span></td>
+                        </tr>`;
                 }).join('');
+
+                const opt = [...document.getElementById('rs-room').options].find(o => o.value === itemRoom);
+                const setName = opt ? opt.textContent.split(' · ')[0].trim() : '';
+                document.getElementById('ia-sub').textContent = (setName ? 'ชุดข้อสอบ: ' + setName + ' · ' : '') + questions.length + ' ข้อ · วิเคราะห์จากนักศึกษา ' + N + ' คน';
+                document.getElementById('ia-sum').innerHTML =
+                    '<div class="ia-s good"><b>' + tally.good + '</b><small>ข้อดีเยี่ยม</small></div>' +
+                    '<div class="ia-s ok"><b>' + tally.ok + '</b><small>ข้อพอใช้</small></div>' +
+                    '<div class="ia-s fix"><b>' + tally.fix + '</b><small>ควรปรับปรุง</small></div>' +
+                    '<div class="ia-s key"><b>' + tally.key + '</b><small>ควรตรวจเฉลย</small></div>';
 
                 analysisBox.classList.remove('hidden');
             } catch(e) {

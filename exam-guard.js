@@ -96,12 +96,18 @@ module.exports = function examGuard(app, db) {
     const normId = v => String(v || '').replace(/[^0-9a-zA-Z]/g, '');
     const deniedAt = new Map();
     async function notOnRoster(roomId, studentId) {
-        const room = await q.get('SELECT courseId FROM teacher_rooms WHERE roomId = ?', [String(roomId)]);
+        const room = await q.get('SELECT courseId, allowed_classes FROM teacher_rooms WHERE roomId = ?', [String(roomId)]);
         if (!room || !room.courseId || Number(room.courseId) <= 0) return false;      // ห้องไม่ผูกรายวิชา = เปิดให้ทุกคน (เหมือนเดิม)
-        const rows = await q.all('SELECT studentId FROM course_students WHERE courseId = ? OR CAST(courseId AS TEXT) = ?', [room.courseId, String(room.courseId)]);
+        const rows = await q.all('SELECT studentId, class FROM course_students WHERE courseId = ? OR CAST(courseId AS TEXT) = ?', [room.courseId, String(room.courseId)]);
         if (!rows.length) return false;                                                 // วิชายังไม่มีรายชื่อ = ไม่จำกัด (เหมือนตอนเข้าสู่ระบบ)
         const sid = String(studentId || '').trim();
-        return !rows.some(r => r.studentId === sid || normId(r.studentId) === normId(sid));
+        const me = rows.find(r => r.studentId === sid || normId(r.studentId) === normId(sid));
+        if (!me) return true;
+        // ห้องสอบเปิดเฉพาะบางกลุ่มเรียน (allowed_classes) → กลุ่มอื่นดึงข้อสอบ/ส่งคำตอบไม่ได้
+        const allowed = String(room.allowed_classes || '').split(/\s*[,|]\s*/).map(x => x.trim().toLowerCase()).filter(Boolean);
+        if (!allowed.length) return false;
+        const mine = String(me.class || '').split(/\s*[,|]\s*/).map(x => x.trim().toLowerCase()).filter(Boolean);
+        return !mine.some(x => allowed.includes(x));
     }
     app.use(async (req, res, next) => {
         const p = req.path;

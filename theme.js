@@ -204,7 +204,8 @@
     try { const r = await fetch('/api/teacher/courses'); if (!r.ok) return; courses = await r.json(); } catch (e) { return; }
     if (!Array.isArray(courses)) return;
     let b = null;
-    if (courses.length === 0) b = { t: 'ยังไม่มีรายวิชา', d: 'เริ่มจากสร้างรายวิชาและเพิ่มรายชื่อนักศึกษาก่อน แล้วค่อยสร้างข้อสอบและเปิดห้องสอบ', href: 'admin-courses.html', cta: 'สร้างรายวิชา' };
+    if (courses.length === 0 && window.ExamTerm && ExamTerm.active()) b = { t: 'ไม่มีรายวิชาใน ' + ExamTerm.label(), d: 'เลือกปีการศึกษาหรือภาคอื่นที่แถบด้านบน หรือกดดูทุกปี', href: '#', cta: 'ดูทุกปี', reset: true };
+    else if (courses.length === 0) b = { t: 'ยังไม่มีรายวิชา', d: 'เริ่มจากสร้างรายวิชาและเพิ่มรายชื่อนักศึกษาก่อน แล้วค่อยสร้างข้อสอบและเปิดห้องสอบ', href: 'admin-courses.html', cta: 'สร้างรายวิชา' };
     else if (NEED_EXAM.includes(page) && !courses.some(c => Number(c.examCount) > 0)) {
       // ห้องที่มีข้อสอบอยู่แล้ว (สร้างแบบเดิม) ถือว่ามีข้อสอบแล้ว ไม่ต้องเตือน
       let rooms = [];
@@ -219,6 +220,7 @@
     el.innerHTML = '<div><b></b><span></span></div><a></a>';
     el.querySelector('b').textContent = b.t; el.querySelector('span').textContent = b.d;
     const a = el.querySelector('a'); a.href = b.href; a.textContent = b.cta + ' →';
+    if (b.reset) a.onclick = e => { e.preventDefault(); ExamTerm.reset(); };
     const st = document.createElement('style');
     st.textContent = '.ui-next{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:0 0 18px;padding:16px 18px;border-radius:18px;background:#fff7ed;border:1.5px solid #fdba74;font-family:inherit;animation:uiIn .25s ease-out}' +
       '.ui-next b{display:block;font-size:16px;color:#9a3412}.ui-next span{display:block;margin-top:2px;font-size:14px;color:#7c2d12;line-height:1.55}' +

@@ -17,6 +17,17 @@ function viewer(req) {
     return { admin: n === 'admin', user: n, adm: n === 'admin' ? 1 : 0 };
 }
 const MY_ROOMS = 'SELECT roomId FROM teacher_rooms WHERE teacherUsername = ?';
+// ห้องสอบเปิดเฉพาะบางกลุ่มเรียน (allowed_classes เช่น "TEC3R,TEC2N") · ว่าง = ทุกกลุ่มในรายวิชา
+function splitGroupList(s) { return String(s || '').split(/\s*[,|]\s*/).map(x => x.trim().toLowerCase()).filter(Boolean); }
+function outsideAllowedGroups(allowed, studentClass) {
+    const a = splitGroupList(allowed);
+    if (!a.length) return false;
+    return !splitGroupList(studentClass).some(x => a.includes(x));
+}
+function groupDeniedMsg(allowed, studentClass) {
+    return `ห้องสอบนี้เปิดให้เฉพาะกลุ่มเรียน ${String(allowed).split(/\s*[,|]\s*/).filter(Boolean).join(', ')} เท่านั้น` +
+        (studentClass ? ` (กลุ่มของคุณ: ${studentClass})` : '') + ' กรุณาตรวจสอบรหัสเข้าสอบกับอาจารย์ผู้คุมสอบ';
+}
 // กฎรหัสผ่านนักศึกษา (ตรงกับหน้าเว็บ): อย่างน้อย 6 ตัว ห้ามเป็น 1234 และห้ามเป็นรหัสนักศึกษา
 const STUDENT_PW_RULE_MSG = 'รหัสผ่านต้องยาวอย่างน้อย 6 ตัวอักษร และห้ามเป็น 1234 หรือรหัสนักศึกษา';
 function weakStudentPw(pw, studentId) {
@@ -428,6 +439,9 @@ db.serialize(() => {
 
     // ห้องสอบที่อาจารย์ลบ = เก็บเข้าคลัง (archived = 1) ไม่ลบแถวจริง
     //   เดิมลบแถวห้องสอบทิ้ง → ผลสอบและประวัติสลับหน้าจอของห้องนั้นยังอยู่ แต่ไม่มีเจ้าของ จึงหายจากทุกหน้า
+    db.run("ALTER TABLE teacher_rooms ADD COLUMN allowed_classes TEXT DEFAULT ''", (err) => {
+        if (!err) console.log("✔ Added column 'allowed_classes' to teacher_rooms table");
+    });
     db.run("ALTER TABLE teacher_rooms ADD COLUMN archived INTEGER DEFAULT 0", (err) => {
         if (!err) console.log("✔ Added column 'archived' to teacher_rooms table");
         setTimeout(recoverDeletedRooms, 4000);
@@ -472,6 +486,10 @@ db.serialize(() => {
     // ล้างบันทึกในหน้า "ตรวจสอบพฤติกรรมน่าสงสัย" = ซ่อนจากหน้านั้นเท่านั้น (แฟ้มประวัติรวมและประวัตินักศึกษายังเก็บไว้ครบ)
     db.run("ALTER TABLE cheat_logs ADD COLUMN monitor_hidden INTEGER DEFAULT 0", (err) => {
         if (!err) console.log("✔ Added column 'monitor_hidden' to cheat_logs table");
+        // หน้า "ตรวจสอบพฤติกรรมน่าสงสัย" แสดงเฉพาะห้องที่กำลังเปิดสอบ → บันทึกของห้องที่ปิดแล้วซ่อนจากหน้านั้น
+        //   (แฟ้มประวัติรวม ประวัตินักศึกษา และหน้าผลสอบยังเห็นครบ)
+        setTimeout(() => db.run("UPDATE cheat_logs SET monitor_hidden = 1 WHERE COALESCE(monitor_hidden, 0) = 0 AND roomId NOT IN (SELECT roomId FROM teacher_rooms WHERE is_published = 1)", [],
+            (e) => { if (e) console.error('ซ่อนบันทึกของห้องที่ปิดแล้วไม่สำเร็จ:', e.message); }), 5000);
     });
 
     // อัปเกรดตารางล็อกทุจริต (cheat_logs)
@@ -871,7 +889,7 @@ app.get('/api/teacher/rooms', (req, res) => {
     // หากเป็น admin ให้ดึงห้องของอาจารย์ทุกคน
     if (username === 'admin') {
         const sqlQuery = `
-            SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published, tr.duration, tr.courseId, tr.teacherUsername, tr.announcement,
+            SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published, tr.duration, tr.courseId, tr.teacherUsername, tr.announcement, tr.allowed_classes,
                    c.courseCode, c.courseName, c.description as courseClassroom,
                    (SELECT GROUP_CONCAT(DISTINCT cs.class) FROM course_students cs WHERE cs.courseId = tr.courseId AND cs.class != '' AND cs.class IS NOT NULL) as studentClasses,
                    (SELECT COUNT(*) FROM questions q WHERE q.roomId = tr.roomId) as questionCount
@@ -887,7 +905,7 @@ app.get('/api/teacher/rooms', (req, res) => {
     }
 
     const sqlQuery = `
-        SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published, tr.duration, tr.courseId, tr.announcement,
+        SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published, tr.duration, tr.courseId, tr.announcement, tr.allowed_classes,
                c.courseCode, c.courseName, c.description as courseClassroom,
                (SELECT GROUP_CONCAT(DISTINCT cs.class) FROM course_students cs WHERE cs.courseId = tr.courseId AND cs.class != '' AND cs.class IS NOT NULL) as studentClasses,
                (SELECT COUNT(*) FROM questions q WHERE q.roomId = tr.roomId) as questionCount
@@ -918,8 +936,34 @@ app.get('/api/teacher/rooms', (req, res) => {
 });
 
 // API สร้างห้องสอบใหม่ พร้อมรหัส PIN 6 หลักและเปิดห้องรอสอบทันที
+// จำนวนนักศึกษาแต่ละกลุ่มเรียนของทุกรายวิชาของอาจารย์ (การ์ดรายวิชา / เลือกกลุ่มตอนเปิดห้องสอบ)
+app.get('/api/teacher/course-groups', (req, res) => {
+    const v = viewer(req);
+    db.all(`SELECT cs.courseId, COALESCE(cs.class, '') as class, COUNT(*) as n
+            FROM course_students cs JOIN courses c ON c.id = cs.courseId
+            WHERE (? = 1 OR c.teacherUsername = ?)
+            GROUP BY cs.courseId, COALESCE(cs.class, '')`, [v.adm, v.user], (err, rows) => {
+        if (err) return res.status(500).json({ message: err.message });
+        res.json(rows || []);
+    });
+});
+
+// ตั้งกลุ่มเรียนที่เข้าห้องสอบนี้ได้ (ว่าง = ทุกกลุ่ม) · ความเป็นเจ้าของห้องตรวจที่ auth.js
+app.post('/api/teacher/room-groups', (req, res) => {
+    const { roomId, allowedClasses } = req.body || {};
+    if (!roomId) return res.status(400).json({ success: false, message: 'กรุณาระบุห้องสอบ' });
+    const clean = (Array.isArray(allowedClasses) ? allowedClasses : String(allowedClasses || '').split(','))
+        .map(x => String(x).trim()).filter(Boolean).join(',');
+    db.run('UPDATE teacher_rooms SET allowed_classes = ? WHERE roomId = ?', [clean, roomId], function (err) {
+        if (err) return res.status(500).json({ success: false, message: err.message });
+        res.json({ success: true, allowed_classes: clean });
+    });
+});
+
 app.post('/api/teacher/create-room', (req, res) => {
-    const { username, roomName, examTitle, courseId, duration, announcement, showScore, randomize } = req.body;
+    const { username, roomName, examTitle, courseId, duration, announcement, showScore, randomize, allowedClasses } = req.body;
+    const cleanAllowed = (Array.isArray(allowedClasses) ? allowedClasses : String(allowedClasses || '').split(','))
+        .map(x => String(x).trim()).filter(Boolean).join(',');
     if (!username) return res.status(400).json({ message: "กรุณาระบุ username ของอาจารย์" });
 
     const cleanRoomName = (roomName || 'ห้องสอบใหม่').trim();
@@ -938,13 +982,13 @@ app.post('/api/teacher/create-room', (req, res) => {
     const insertSql = `
         INSERT INTO teacher_rooms (
             teacherUsername, roomId, roomName, exam_title, exam_code,
-            is_published, duration, announcement, show_score, randomize, courseId
-        ) VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?)
+            is_published, duration, announcement, show_score, randomize, courseId, allowed_classes
+        ) VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?)
     `;
 
     db.run(insertSql, [
         username, roomId, cleanRoomName, cleanExamTitle, examPin,
-        cleanDuration, cleanAnnouncement, cleanShowScore, cleanRandomize, cleanCourseId
+        cleanDuration, cleanAnnouncement, cleanShowScore, cleanRandomize, cleanCourseId, cleanAllowed
     ], function(err) {
         if (err) return res.status(500).json({ message: "ไม่สามารถสร้างห้องสอบได้: " + err.message });
 
@@ -1374,7 +1418,7 @@ app.post('/api/student/login', (req, res) => {
         const cleanCode = (examCode || '').trim().replace(/\s+/g, '');
         const cleanRoomId = (roomId || '').trim();
         const roomSql = `
-            SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published, tr.duration, tr.courseId,
+            SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published, tr.duration, tr.courseId, tr.allowed_classes,
                    t.name as teacherName, c.courseCode, c.courseName
             FROM teacher_rooms tr
             LEFT JOIN teachers t ON t.username = tr.teacherUsername
@@ -1408,6 +1452,11 @@ app.post('/api/student/login', (req, res) => {
                             accessDenied: true,
                             message: `ขออภัย รหัสนักศึกษา (${cleanStudentId}) ไม่มีรายชื่ออยู่ในบัญชีผู้มีสิทธิ์สอบรายวิชา "${room.courseName || room.courseCode || 'วิชานี้'}" จึงไม่สามารถเข้าห้องสอบได้`
                         });
+                    }
+
+                    // ห้องสอบเปิดเฉพาะบางกลุ่มเรียน → นักศึกษากลุ่มอื่นเข้าไม่ได้
+                    if (outsideAllowedGroups(room.allowed_classes, foundInCourse.class)) {
+                        return res.status(403).json({ success: false, accessDenied: true, message: groupDeniedMsg(room.allowed_classes, foundInCourse.class) });
                     }
 
                     // นักศึกษามีสิทธิ์ในวิชานี้ -> ตรวจสอบในตาราง students
@@ -1627,7 +1676,7 @@ app.post('/api/student/check-exam-access', (req, res) => {
 
     // 1. ค้นหาห้องสอบจาก PIN หรือ roomId
     const roomSql = `
-        SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published, tr.duration, tr.courseId,
+        SELECT tr.roomId, tr.roomName, tr.exam_title, tr.exam_code, tr.is_published, tr.duration, tr.courseId, tr.allowed_classes,
                t.name as teacherName, c.courseCode, c.courseName
         FROM teacher_rooms tr
         LEFT JOIN teachers t ON t.username = tr.teacherUsername
@@ -1688,6 +1737,14 @@ app.post('/api/student/check-exam-access', (req, res) => {
                                 accessDenied: true,
                                 message: `ขออภัย รหัสนักศึกษา (${cleanStudentId}) ไม่มีรายชื่ออยู่ในบัญชีผู้มีสิทธิ์สอบรายวิชา "${room.courseName || room.courseCode || 'วิชานี้'}" จึงไม่สามารถเข้ามาร่วมสอบได้`
                             });
+                        }
+                    }
+
+                    // ห้องสอบเปิดเฉพาะบางกลุ่มเรียน
+                    if (enrolledList && enrolledList.length > 0) {
+                        const me = enrolledList.find(s => s.studentId === cleanStudentId || (s.studentId || '').replace(/[^0-9a-zA-Z]/g, '') === normStudentId);
+                        if (me && outsideAllowedGroups(room.allowed_classes, me.class)) {
+                            return res.status(403).json({ success: false, accessDenied: true, message: groupDeniedMsg(room.allowed_classes, me.class) });
                         }
                     }
 
@@ -2382,6 +2439,16 @@ app.post('/api/courses/:courseId/students/copy-from', (req, res) => {
     });
 });
 
+// ย้ายนักศึกษาไปกลุ่มเรียนอื่นในรายวิชาเดียวกัน (ความเป็นเจ้าของรายวิชาตรวจที่ auth.js)
+app.put('/api/courses/:courseId/students/:id/class', (req, res) => {
+    const cls = String((req.body && req.body.class) || '').trim();
+    db.run('UPDATE course_students SET class = ? WHERE courseId = ? AND id = ?', [cls, req.params.courseId, req.params.id], function (err) {
+        if (err) return res.status(500).json({ success: false, message: err.message });
+        if (!this.changes) return res.status(404).json({ success: false, message: 'ไม่พบนักศึกษาในรายวิชานี้' });
+        res.json({ success: true, class: cls });
+    });
+});
+
 app.post('/api/courses/:courseId/students', (req, res) => {
     const courseId = req.params.courseId;
     const { studentId, firstName, lastName, prefix, class: cls, fullNameEn } = req.body;
@@ -2664,6 +2731,7 @@ app.delete('/api/teacher/room', (req, res) => {
             if (err) return res.status(500).json({ message: err.message });
 
             // ลบเฉพาะข้อมูลชั่วคราวของห้องสอบ (คงข้อสอบ ผลคะแนน และประวัติความประพฤติไว้ ใช้ดูรายละเอียดคำตอบย้อนหลัง)
+            db.run('UPDATE cheat_logs SET monitor_hidden = 1 WHERE roomId = ?', [roomId]);
             db.run('DELETE FROM student_warnings WHERE roomId = ?', [roomId]);
             db.run('DELETE FROM student_logins WHERE roomId = ?', [roomId]);
 
@@ -2975,7 +3043,7 @@ app.get('/api/cheat-logs', (req, res) => {
         return db.all('SELECT studentId, name, class, action, time, roomId FROM cheat_logs WHERE roomId = ? AND COALESCE(monitor_hidden, 0) = 0 ORDER BY id DESC', [roomId], send);
     }
     // ทั้งหมด = เฉพาะห้องสอบของอาจารย์คนนี้ (แอดมินเห็นทุกห้อง) · ไม่รวมบันทึกที่ล้างออกจากหน้านี้แล้ว
-    db.all(`SELECT studentId, name, class, action, time, roomId FROM cheat_logs WHERE (? = 1 OR roomId IN (${MY_ROOMS})) AND COALESCE(monitor_hidden, 0) = 0 ORDER BY id DESC`, [v.adm, v.user], send);
+    db.all(`SELECT studentId, name, class, action, time, roomId, COALESCE(NULLIF(courseId, 0), (SELECT NULLIF(t8.courseId, 0) FROM teacher_rooms t8 WHERE t8.roomId = cheat_logs.roomId)) as courseId FROM cheat_logs WHERE (? = 1 OR roomId IN (${MY_ROOMS})) AND COALESCE(monitor_hidden, 0) = 0 ORDER BY id DESC`, [v.adm, v.user], send);
 });
 
 // ล้างประวัติการทุจริตของห้องเรียนนั้นๆ
@@ -3114,7 +3182,7 @@ app.get('/api/exam-results', (req, res) => {
     if (roomId === 'ALL') {
         // ทั้งหมด = เฉพาะห้องสอบของอาจารย์คนนี้ (แอดมินเห็นทุกห้อง)
         const v = viewer(req);
-        db.all(`SELECT id, studentId, name, class, score, maxScore, time, date, roomId, answers_json FROM exam_results WHERE (? = 1 OR roomId IN (${MY_ROOMS})) ORDER BY id DESC`, [v.adm, v.user], (err, rows) => {
+        db.all(`SELECT id, studentId, name, class, score, maxScore, time, date, roomId, answers_json, COALESCE(NULLIF(courseId, 0), (SELECT NULLIF(t9.courseId, 0) FROM teacher_rooms t9 WHERE t9.roomId = exam_results.roomId)) as courseId FROM exam_results WHERE (? = 1 OR roomId IN (${MY_ROOMS})) ORDER BY id DESC`, [v.adm, v.user], (err, rows) => {
             if (err) return res.status(500).json({ message: err.message });
             res.json(rows || []);
         });
@@ -3850,6 +3918,8 @@ app.post('/api/teacher/publish-exam', (req, res) => {
             });
         });
     } else {
+        // ปิดห้องสอบ → บันทึกพฤติกรรมของห้องนี้หายจากหน้า "ตรวจสอบพฤติกรรมน่าสงสัย" (ยังอยู่ในแฟ้มประวัติรวม)
+        db.run('UPDATE cheat_logs SET monitor_hidden = 1 WHERE roomId = ?', [roomId]);
         db.run('UPDATE teacher_rooms SET is_published = 0 WHERE roomId = ?', [roomId], (err) => {
             if (err) return res.status(500).json({ message: err.message });
             res.json({ success: true, is_published: 0, message: "ยกเลิกการเผยแพร่ข้อสอบแล้ว (กลับเข้าสู่สถานะแบบร่าง)" });

@@ -2,6 +2,7 @@
 <html lang="th">
 <head>
     <script src="auth-client.js"></script>
+    <script src="term-scope.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จัดการรายวิชาและนักศึกษา - ExamPro</title>
@@ -119,8 +120,36 @@
     <script src="theme.js" defer></script>
     <link rel="stylesheet" href="tailwind.css">
     <style>
+        /* ===== กลุ่มเรียน (ป้าย) ===== */
+        .grp-box { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-height: 52px; padding: 7px 10px; border: 2px solid #cbd5e1; border-radius: 16px; background: #fff; cursor: text; }
+        .grp-box:focus-within { border-color: #06b6d4; }
+        .grp-chips { display: contents; }
+        .grp-chip { display: inline-flex; align-items: center; gap: 4px; padding: 5px 6px 5px 12px; border-radius: 99px; background: #e8f1ff; color: #0b2a7a; font-weight: 800; font-size: 14px; }
+        .grp-chip button { width: 22px; height: 22px; border: 0; border-radius: 50%; background: rgba(11,42,122,.12); color: #0b2a7a; font-size: 15px; line-height: 1; cursor: pointer; }
+        .grp-chip button:hover { background: #fecaca; color: #b91c1c; }
+        #grp-input { flex: 1 1 200px; min-width: 120px; border: 0; outline: none; font: inherit; font-size: 16px; font-weight: 600; padding: 6px 4px; color: #0f172a; background: transparent; }
+        .grp-hint { margin: 6px 2px 0; font-size: 12.5px; color: #64748b; line-height: 1.5; }
+        .cg-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .cg-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 99px; background: #eef4ff; border: 1px solid #d6e4ff; color: #0b2a7a; font-size: 12.5px; font-weight: 800; white-space: nowrap; }
+        .cg-chip small { font-weight: 600; color: #4b5d7d; font-size: 12px; }
+        .cg-chip.none { background: #f1f5f9; border-color: #e2e8f0; color: #475569; }
+        .rg-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+        .rg-tab { padding: 7px 14px; border-radius: 99px; border: 1.5px solid #cbd5e1; background: #fff; color: #334155; font: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; }
+        .rg-tab:hover { border-color: #94a3b8; }
+        .rg-tab[aria-pressed="true"] { background: #0b2a7a; border-color: #0b2a7a; color: #fff; }
+        .rg-imp { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #334155; }
+        .rg-imp select { padding: 8px 10px; border: 1.5px solid #cbd5e1; border-radius: 12px; font: inherit; font-size: 14px; font-weight: 700; background: #fff; }
+        .rg-sel { padding: 5px 8px; border: 1.5px solid #e2e8f0; border-radius: 10px; font: inherit; font-size: 13px; font-weight: 700; background: #fff; color: #0f172a; max-width: 140px; }
+        /* ===== การ์ดเส้นประ สร้างรายวิชาใหม่ ===== */
+        .cc-add { min-height: 300px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 28px; border: 2.5px dashed #b9c7dd; border-radius: 24px; background: rgba(255,255,255,.55); color: #0b2a7a; font-family: inherit; cursor: pointer; transition: border-color .15s, background .15s, transform .15s; }
+        .cc-add:hover { border-color: #ff7a1a; background: #fff7ef; transform: translateY(-2px); }
+        .cc-add:focus-visible { outline: none; border-color: #1d5fd6; box-shadow: 0 0 0 4px rgba(29,95,214,.18); }
+        .cc-add-plus { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: #e8f1ff; color: #1d5fd6; font-size: 38px; font-weight: 500; line-height: 1; transition: background .15s, color .15s; }
+        .cc-add:hover .cc-add-plus { background: #ff7a1a; color: #fff; }
+        .cc-add b { font-size: 18px; font-weight: 800; }
+        .cc-add small { font-size: 13.5px; color: #64748b; font-weight: 500; text-align: center; }
         /* ===== ป๊อปอัปชุดข้อสอบในรายวิชา ===== */
-        .ce-box { background: #fff; width: 100%; max-width: 760px; max-height: 86vh; display: flex; flex-direction: column; border-radius: 22px; border: 1px solid #e2e8f0; box-shadow: 0 30px 60px -20px rgba(15,23,42,.35); overflow: hidden; }
+        .ce-box { background: #fff; width: 100%; max-width: 1100px; max-height: 88vh; min-height: min(560px, 88vh); display: flex; flex-direction: column; border-radius: 22px; border: 1px solid #e2e8f0; box-shadow: 0 30px 60px -20px rgba(15,23,42,.35); overflow: hidden; }
         .ce-sub { max-width: 680px; }
         .ce-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding: 20px 24px 16px; border-bottom: 1px solid #e2e8f0; }
         .ce-head-t { min-width: 0; }
@@ -227,14 +256,6 @@
                     <span class="nav-section-title">หมวดการจัดการสอบ</span>
                 </div>
                 <div class="space-y-1 mt-1">
-                    <a href="admin-library.html" class="nav-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg>
-                        <span>คลังข้อสอบ</span>
-                    </a>
-                    <a href="admin-questions.html" class="nav-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
-                        <span>สร้างข้อสอบ</span>
-                    </a>
                     <a href="admin-rooms.html" class="nav-link">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 21h18M4.5 21V5.25A2.25 2.25 0 0 1 6.75 3h10.5a2.25 2.25 0 0 1 2.25 2.25V21" /></svg>
                         <span>ห้องสอบ</span>
@@ -297,12 +318,6 @@
                 <p class="text-xs text-slate-500 font-medium">ExamPro &middot; ประจำภาคการศึกษาปัจจุบัน</p>
             </div>
         </div>
-        <div class="flex items-center gap-3">
-            <button onclick="openCourseModal()"
-                class="flex items-center gap-2 px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-xl text-xs sm:text-sm font-bold shadow-xs transition active:scale-95 cursor-pointer">
-                <span>สร้างรายวิชาใหม่</span>
-            </button>
-        </div>
     </header>
 
     <main class="p-6 md:p-8 flex-grow max-w-[1500px] w-full mx-auto space-y-7 overflow-y-auto">
@@ -313,14 +328,6 @@
                     <span>รายการวิชาที่สอน</span>
                     <span id="course-count-badge" class="text-sm md:text-base bg-indigo-100 text-indigo-800 font-bold px-4 py-1 rounded-full border border-indigo-200">0 วิชา</span>
                 </h2>
-                <!-- เลือกเทอม: ดูเฉพาะเลขเทอม (ทุกปีการศึกษารวมกัน) -->
-                <select id="term-filter" class="term-sel" aria-label="เลือกภาคการศึกษา" onchange="setTermFilter(this.value)">
-                    <option value="all">ทุกภาคการศึกษา</option>
-                    <option value="1">ภาคการศึกษาที่ 1</option>
-                    <option value="2">ภาคการศึกษาที่ 2</option>
-                    <option value="3">ภาคการศึกษาฤดูร้อน</option>
-                    <option value="4">ภาคการศึกษาพิเศษ</option>
-                </select>
             </div>
             <style>
                 .term-sel{appearance:none;-webkit-appearance:none;min-width:230px;padding:10px 42px 10px 16px;border:1.5px solid #cbd5e1;border-radius:12px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23334155' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center/16px;color:#0f172a;font-family:inherit;font-weight:600;font-size:16px;cursor:pointer;box-shadow:0 6px 16px -12px rgba(15,23,42,.3)}
@@ -345,7 +352,7 @@
 
 <!-- MODAL: สร้าง / แก้ไข รายวิชา -->
 <div id="course-modal" class="modal-overlay hidden">
-    <div class="bg-white rounded-3xl p-7 sm:p-8 max-w-xl w-full shadow-2xl space-y-5 relative border-2 border-slate-200/80">
+    <div class="bg-white rounded-3xl p-7 sm:p-9 w-full shadow-2xl space-y-5 relative border-2 border-slate-200/80" style="max-width:860px">
         <div class="flex justify-between items-center border-b border-slate-200 pb-4">
             <h3 class="text-xl sm:text-2xl font-bold text-slate-900" id="course-modal-title">สร้างรายวิชาใหม่</h3>
             <button onclick="closeCourseModal()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xl transition">&times;</button>
@@ -374,9 +381,14 @@
                     </div>
                     <input type="hidden" id="modal-course-semester">
                 </div>
-                <div>
-                    <label class="block font-semibold text-slate-800 mb-1.5 text-sm sm:text-base">กลุ่มเรียนเป้าหมาย (เช่น TEC3N)</label>
-                    <input type="text" id="modal-course-desc" placeholder="เช่น TEC3N, DTE1" class="w-full px-4 py-3 border-2 border-slate-300 rounded-2xl text-base font-bold text-slate-900 focus:border-cyan-500 focus:outline-none shadow-xs">
+                <div style="grid-column:1/-1">
+                    <label for="grp-input" class="block font-semibold text-slate-800 mb-1.5 text-sm sm:text-base">กลุ่มเรียน <span class="text-slate-500 font-medium text-xs sm:text-sm">(เพิ่มได้หลายกลุ่ม)</span></label>
+                    <div class="grp-box" onclick="document.getElementById('grp-input').focus()">
+                        <span id="grp-chips" class="grp-chips"></span>
+                        <input type="text" id="grp-input" placeholder="พิมพ์ชื่อกลุ่ม เช่น TEC3R แล้วกด Enter" autocomplete="off" onkeydown="grpKey(event)" onblur="grpCommit()">
+                    </div>
+                    <p class="grp-hint">1 วิชาสอนหลายกลุ่ม: ใส่ทุกกลุ่มไว้ที่นี่ ข้อสอบใช้ร่วมกัน และเลือกได้ว่าเปิดห้องสอบให้กลุ่มไหน</p>
+                    <input type="hidden" id="modal-course-desc">
                 </div>
             </div>
         </div>
@@ -440,6 +452,12 @@
             </div>
         </div>
 
+        <!-- กลุ่มเรียน: แท็บกรอง + เลือกกลุ่มตอนนำเข้า -->
+        <div id="roster-groups-bar" class="flex flex-wrap items-center justify-between gap-3" hidden>
+            <div class="rg-tabs" id="roster-group-tabs" role="group" aria-label="กรองตามกลุ่มเรียน"></div>
+            <label class="rg-imp">นำเข้า / เพิ่มเป็นกลุ่ม <select id="roster-import-group"></select></label>
+        </div>
+
         <!-- Format Helper Banner -->
         <div class="p-4 bg-amber-50 border-2 border-amber-200 rounded-2xl text-xs sm:text-sm text-amber-900 flex items-start gap-3">
             <div class="leading-relaxed font-semibold">
@@ -500,7 +518,7 @@
             </div>
             <div>
                 <label class="block font-semibold text-slate-800 mb-1.5">กลุ่มเรียน / ชั้น</label>
-                <input type="text" id="add-s-class" placeholder="เช่น TEC3N" class="w-full px-4 py-3 border-2 border-slate-300 rounded-2xl text-sm font-bold focus:outline-none focus:border-cyan-500">
+                <datalist id="add-s-groups"></datalist><input type="text" id="add-s-class" list="add-s-groups" placeholder="เช่น TEC3N" class="w-full px-4 py-3 border-2 border-slate-300 rounded-2xl text-sm font-bold focus:outline-none focus:border-cyan-500">
             </div>
         </div>
         <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
@@ -519,7 +537,6 @@
                 <h3 id="exams-modal-title">ข้อสอบในรายวิชา</h3>
             </div>
             <div class="ce-head-a">
-                <a id="btn-create-exam-for-course" href="admin-questions.html" class="ce-btn ce-btn-p">+ สร้างชุดข้อสอบ</a>
                 <button type="button" onclick="closeCourseExamsModal()" class="ce-x" aria-label="ปิด">&times;</button>
             </div>
         </div>
@@ -560,10 +577,55 @@
         loadCourses();
     });
 
+    // ===== กลุ่มเรียน: 1 วิชาหลายกลุ่ม (เก็บในช่อง description เช่น "TEC3R,TEC2N") =====
+    let groupCounts = {}; // courseId -> { กลุ่ม: จำนวนคน }
+    function splitGroups(s) { return [...new Set(String(s || '').split(/\s*[,|]\s*/).map(x => x.trim()).filter(Boolean))]; }
+    function courseGroups(c) {
+        const g = splitGroups(c && c.description);
+        Object.keys(groupCounts[c && c.id] || {}).forEach(k => splitGroups(k).forEach(x => { if (!g.includes(x)) g.push(x); }));
+        return g;
+    }
+    async function loadGroupCounts() {
+        try {
+            const r = await fetch('/api/teacher/course-groups');
+            const rows = r.ok ? await r.json() : [];
+            groupCounts = {};
+            (Array.isArray(rows) ? rows : []).forEach(x => { const m = groupCounts[x.courseId] = groupCounts[x.courseId] || {}; m[x.class || ''] = (m[x.class || ''] || 0) + Number(x.n || 0); });
+        } catch (e) { groupCounts = {}; }
+    }
+    function groupChipsHtml(c) {
+        const counts = groupCounts[c.id] || {};
+        const list = courseGroups(c).map(g => {
+            let n = 0; Object.keys(counts).forEach(k => { if (splitGroups(k).includes(g)) n += counts[k]; });
+            return `<span class="cg-chip">${escapeHtml(g)} <small>· ${n} คน</small></span>`;
+        });
+        if (counts['']) list.push(`<span class="cg-chip none">ไม่ระบุกลุ่ม <small>· ${counts['']} คน</small></span>`);
+        return list.length ? `<div class="cg-chips">${list.join('')}</div>` : '<p class="text-xs sm:text-sm text-slate-500 font-semibold mt-1">ยังไม่ได้ระบุกลุ่มเรียน</p>';
+    }
+
+    // ป้ายกลุ่มในฟอร์มสร้าง/แก้ไขรายวิชา
+    let formGroups = [];
+    function renderGroupChips() {
+        document.getElementById('grp-chips').innerHTML = formGroups.map((g, i) =>
+            `<span class="grp-chip">${escapeHtml(g)}<button type="button" aria-label="ลบกลุ่ม ${escapeHtml(g)}" onclick="event.stopPropagation();formGroups.splice(${i},1);renderGroupChips()">×</button></span>`).join('');
+        document.getElementById('modal-course-desc').value = formGroups.join(',');
+    }
+    function setFormGroups(desc) { formGroups = splitGroups(desc); document.getElementById('grp-input').value = ''; renderGroupChips(); }
+    function grpCommit() {
+        const inp = document.getElementById('grp-input');
+        splitGroups(inp.value).forEach(g => { if (!formGroups.some(x => x.toLowerCase() === g.toLowerCase())) formGroups.push(g); });
+        inp.value = ''; renderGroupChips();
+    }
+    function grpKey(e) {
+        if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); grpCommit(); }
+        else if (e.key === 'Backspace' && !e.target.value && formGroups.length) { formGroups.pop(); renderGroupChips(); }
+    }
+
     async function loadCourses() {
         try {
             const res = await fetch(`/api/teacher/courses?username=${encodeURIComponent(currentUsername)}`);
             coursesList = await res.json();
+            await loadGroupCounts();
             renderCourses();
         } catch(e) {
             console.error(e);
@@ -572,7 +634,8 @@
     }
 
     // ===== กรองตามเทอม: "1/2568" → เทอม 1 (ไม่สนปี) =====
-    let termFilter = (() => { try { return localStorage.getItem('course_term_filter') || 'all'; } catch (e) { return 'all'; } })();
+    // ปี/ภาคเลือกจากแถบด้านบนทุกหน้า (term-scope.js) · หน้านี้ไม่กรองซ้ำ
+    let termFilter = 'all';
     function termOf(sem) {
         const t = String(sem || '');
         if (/^[1-3]$/.test(t.trim())) return t.trim(); // พิมพ์มาแค่เลขเทอม
@@ -612,13 +675,21 @@
             return;
         }
 
-        if (!coursesList || coursesList.length === 0) {
+        if ((!coursesList || coursesList.length === 0) && window.ExamTerm && ExamTerm.active()) {
             container.innerHTML = `
                 <div class="col-span-full py-16 text-center text-slate-400 glass-card space-y-3">
-                    <div class="font-bold text-slate-600">ยังไม่มีรายวิชาที่สร้างไว้</div>
-                    <p class="text-xs text-slate-400">กดปุ่ม "+ สร้างรายวิชาใหม่" ด้านบน เพื่อเริ่มต้นสร้างรายวิชาและนำเข้ารายชื่อนักศึกษา</p>
-                </div>
-            `;
+                    <div class="font-bold text-slate-600">ไม่มีรายวิชาใน ${escapeHtml(ExamTerm.label())}</div>
+                    <p class="text-sm text-slate-500">เลือกปีการศึกษาหรือภาคอื่นที่แถบด้านบน หรือสร้างรายวิชาของภาคนี้</p>
+                    <div class="flex gap-2 justify-center flex-wrap">
+                        <button type="button" onclick="ExamTerm.reset()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold text-sm bg-white hover:bg-slate-50">ดูรายวิชาทุกปี</button>
+                        <button type="button" onclick="openCourseModal()" class="px-4 py-2 rounded-xl bg-blue-900 text-white font-bold text-sm hover:bg-blue-800">สร้างรายวิชา</button>
+                    </div>
+                </div>`;
+            document.getElementById('course-count-badge').textContent = '0 วิชา';
+            return;
+        }
+        if (!coursesList || coursesList.length === 0) {
+            container.innerHTML = addCourseCard(true);
             return;
         }
 
@@ -635,7 +706,7 @@
                     </div>
                     <div>
                         <h3 class="text-lg sm:text-xl font-bold text-slate-900 leading-snug line-clamp-1">${escapeHtml(c.courseName)}</h3>
-                        <p class="text-xs sm:text-sm text-slate-500 font-semibold mt-1 line-clamp-2 leading-relaxed">${escapeHtml(c.description || 'ไม่มีคำอธิบายเพิ่มเติม')}</p>
+                        ${groupChipsHtml(c)}
                     </div>
                     <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-200 text-xs sm:text-sm">
                         <div class="flex items-center gap-1.5 text-slate-700 font-semibold" style="flex-wrap:wrap;min-width:0">
@@ -651,10 +722,18 @@
 
                 <div class="pt-4 mt-4 border-t border-slate-200 space-y-2.5">
                     <!-- ปุ่มกดดูข้อสอบที่มีในวิชา -->
-                    <button onclick="openCourseExamsModal(${c.id})"
-                        class="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-sm sm:text-base font-bold rounded-2xl transition shadow-md shadow-indigo-600/20 active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-                        <span>ดูข้อสอบในวิชานี้ (${c.examCount || 0})</span>
-                    </button>
+                    <div class="flex gap-2.5">
+                        <button onclick="openCourseExamsModal(${c.id})"
+                            class="flex-1 min-w-0 py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-sm sm:text-base font-bold rounded-2xl transition shadow-md shadow-indigo-600/20 active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                            <span class="whitespace-nowrap" title="ดูข้อสอบในวิชานี้">ดูข้อสอบ (${c.examCount || 0})</span>
+                        </button>
+                        <!-- สร้างข้อสอบของวิชานี้ (เปิดหน้าสร้างข้อสอบ เลือกวิชานี้ไว้ให้) -->
+                        <a href="admin-questions.html?courseId=${c.id}" title="สร้างข้อสอบใหม่ในวิชานี้"
+                            style="background:#ff7a1a;box-shadow:0 8px 18px -10px rgba(255,122,26,.8)"
+                            class="flex-none py-3 px-4 hover:brightness-105 text-white text-sm sm:text-base font-bold rounded-2xl transition active:scale-95 flex items-center justify-center gap-1 whitespace-nowrap">
+                            + สร้างข้อสอบ
+                        </a>
+                    </div>
 
                     <div class="flex items-center justify-between gap-2.5" style="flex-wrap:wrap">
                         <button onclick="openRosterModal(${c.id})"
@@ -672,7 +751,16 @@
                     </div>
                 </div>
             </div>
-        `).join('');
+        `).join('') + addCourseCard(false);
+    }
+
+    // การ์ดเส้นประ "+ สร้างรายวิชาใหม่" ต่อท้ายรายวิชาที่มีอยู่ (แทนปุ่มบนแถบด้านบน)
+    function addCourseCard(first) {
+        return `<button type="button" onclick="openCourseModal()" class="cc-add" aria-label="สร้างรายวิชาใหม่">
+                <span class="cc-add-plus" aria-hidden="true">+</span>
+                <b>${first ? 'สร้างรายวิชาแรก' : 'สร้างรายวิชาใหม่'}</b>
+                <small>${first ? 'เริ่มจากสร้างรายวิชา แล้วเพิ่มรายชื่อนักศึกษาและข้อสอบ' : 'เพิ่มวิชาหรือกลุ่มเรียนใหม่'}</small>
+            </button>`;
     }
 
     // ภาคการศึกษาปัจจุบัน (ไทย): มิ.ย.–ต.ค. = 1, พ.ย.–มี.ค. = 2, เม.ย.–พ.ค. = ฤดูร้อน · ปีการศึกษาเริ่ม มิ.ย.
@@ -685,6 +773,9 @@
     }
     function setTermFields(sem) {
         const cur = currentTerm();
+        const sc = window.ExamTerm ? ExamTerm.scope() : null;
+        if (sc && sc.t !== 'all') cur.t = sc.t;
+        if (sc && sc.y !== 'all') cur.y = sc.y;
         const t = sem ? (termOf(sem) || cur.t) : cur.t;
         const ym = String(sem || '').match(/(\d{4})/);
         document.getElementById('modal-course-term').value = t;
@@ -705,6 +796,7 @@
         document.getElementById('modal-course-semester').value = '';
         setTermFields('');
         document.getElementById('modal-course-desc').value = '';
+        setFormGroups('');
         document.getElementById('course-modal').classList.remove('hidden');
     }
 
@@ -718,6 +810,7 @@
         document.getElementById('modal-course-semester').value = c.semester || '';
         setTermFields(c.semester || '');
         document.getElementById('modal-course-desc').value = c.description || '';
+        setFormGroups(c.description || '');
         document.getElementById('course-modal').classList.remove('hidden');
     }
 
@@ -742,7 +835,7 @@
         ceCourse = c;
         document.getElementById('exams-modal-title').textContent = c.courseName;
         document.getElementById('exams-modal-subtitle').textContent = `${c.courseCode} · ${c.semester || 'ภาคเรียนทั่วไป'}`;
-        document.getElementById('btn-create-exam-for-course').href = `admin-questions.html?courseId=${c.id}`;
+        // ปุ่มสร้างข้อสอบอยู่ที่การ์ดรายวิชาแล้ว (ป๊อปอัปนี้ใช้ดูและจัดการชุดข้อสอบ)
         const list = document.getElementById('course-exams-list');
         list.innerHTML = '<div class="ce-empty">กำลังโหลดข้อสอบในวิชานี้...</div>';
         document.getElementById('course-exams-modal').classList.remove('hidden');
@@ -764,11 +857,8 @@
     function renderCourseExams(courseRooms) {
         const c = ceCourse, list = document.getElementById('course-exams-list');
         document.getElementById('exams-modal-subtitle').textContent = `${c.courseCode} · ${c.semester || 'ภาคเรียนทั่วไป'} · ${ceExams.length} ชุดข้อสอบ`;
-        // ยังไม่มีชุดข้อสอบ → ใช้ปุ่มกลางหน้าปุ่มเดียว ซ่อนปุ่มมุมบน
-        const topBtn = document.getElementById('btn-create-exam-for-course');
-        if (topBtn) topBtn.style.display = ceExams.length ? '' : 'none';
         if (!ceExams.length) {
-            list.innerHTML = `<div class="ce-empty"><b>ยังไม่มีชุดข้อสอบในวิชานี้</b>สร้างชุดแรกได้เลย ระบบจะเก็บแยกตามรายวิชาให้อัตโนมัติ<br><a class="ce-btn ce-btn-p" href="admin-questions.html?courseId=${c.id}">สร้างชุดข้อสอบชุดแรก</a></div>`;
+            list.innerHTML = `<div class="ce-empty"><b>ยังไม่มีชุดข้อสอบในวิชานี้</b>ปิดหน้าต่างนี้ แล้วกดปุ่ม "+ สร้างข้อสอบ" ที่การ์ดรายวิชา</div>`;
             return;
         }
         list.innerHTML = ceExams.map(ex => {
@@ -890,6 +980,7 @@
         const courseName = document.getElementById('modal-course-name').value.trim();
         const semester = readTermFields();
         document.getElementById('modal-course-semester').value = semester;
+        grpCommit();
         const description = document.getElementById('modal-course-desc').value.trim();
         const btn = document.getElementById('btn-save-course');
 
@@ -904,7 +995,7 @@
         const compact = v => norm(v).replace(/\s/g, '');
         const dup = coursesList.find(c => String(c.id) !== String(id || '') &&
             norm(c.courseCode) === norm(courseCode) && norm(c.courseName) === norm(courseName) &&
-            compact(c.semester) === compact(semester) && compact(c.description) === compact(description));
+            compact(c.semester) === compact(semester) && splitGroups(c.description).map(compact).sort().join() === splitGroups(description).map(compact).sort().join());
         if (dup) {
             alert(`มีรายวิชา [${dup.courseCode}] ${dup.courseName}${dup.semester ? ' ภาคเรียน ' + dup.semester : ''}${dup.description ? ' กลุ่ม ' + dup.description : ''} อยู่แล้ว ไม่สามารถสร้างซ้ำได้\n\nถ้าเป็นคนละภาคเรียนหรือคนละกลุ่มเรียน ให้ใส่ภาคเรียนหรือกลุ่มเรียนให้ต่างจากเดิม`);
             const el = document.getElementById('modal-course-desc'); if (el) el.focus();
@@ -963,8 +1054,9 @@
         const c = coursesList.find(x => x.id === courseId);
         if (c) {
             document.getElementById('roster-modal-course-title').textContent = `[${c.courseCode}] ${c.courseName}`;
-            document.getElementById('roster-modal-course-subtitle').textContent = `ภาคเรียน: ${c.semester || '-'} • กลุ่มเรียน: ${c.description || '-'}`;
+            document.getElementById('roster-modal-course-subtitle').textContent = `ภาคเรียน: ${c.semester || '-'} • กลุ่มเรียน: ${courseGroups(c).join(', ') || '-'}`;
         }
+        rosterGroup = 'ALL';
         document.getElementById('roster-search-input').value = '';
         document.getElementById('roster-modal').classList.remove('hidden');
         await loadCourseStudents();
@@ -980,10 +1072,19 @@
         try {
             const res = await fetch(`/api/courses/${currentCourseId}/students`);
             currentRosterList = await res.json();
-            renderRosterTable(currentRosterList);
+            paintRosterGroups();
+            filterRoster();
         } catch(e) {
             console.error(e);
         }
+    }
+
+    function rosterGroupCell(s) {
+        const groups = rosterGroupsOf();
+        if (!groups.length) return escapeHtml(s.class || '-');
+        const cur = s.class || '';
+        const opts = (groups.includes(cur) || !cur ? groups : [cur, ...groups]).map(g => `<option value="${escapeHtml(g)}" ${g === cur ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('');
+        return `<select class="rg-sel" aria-label="กลุ่มเรียนของ ${escapeHtml(s.firstName || s.studentId)}" onchange="changeStudentGroup(currentRosterList.find(x => x.id === ${Number(s.id)}), this.value)"><option value="" ${cur ? '' : 'selected'}>ไม่ระบุกลุ่ม</option>${opts}</select>`;
     }
 
     function renderRosterTable(list) {
@@ -1001,7 +1102,7 @@
                 <td class="px-5 py-3.5 font-mono font-bold text-cyan-700 text-sm sm:text-base">${escapeHtml(s.studentId)}</td>
                 <td class="px-5 py-3.5 font-bold text-slate-900 text-sm sm:text-base">${escapeHtml((s.prefix ? s.prefix + ' ' : '') + s.firstName + ' ' + (s.lastName || ''))}</td>
                 <td class="px-5 py-3.5 text-slate-600 font-semibold text-xs sm:text-sm">${escapeHtml(s.fullNameEn || '-')}</td>
-                <td class="px-5 py-3.5 text-slate-700 font-semibold text-xs sm:text-sm">${escapeHtml(s.class || '-')}</td>
+                <td class="px-5 py-3.5 text-slate-700 font-semibold text-xs sm:text-sm">${rosterGroupCell(s)}</td>
                 <td class="px-5 py-3.5 text-center">
                     <button onclick="deleteRosterStudent(${s.id})" title="ลบนักศึกษาออกจากวิชา" class="text-rose-600 hover:text-rose-700 px-3 py-1.5 hover:bg-rose-50 rounded-xl transition text-xs font-bold border border-rose-200 cursor-pointer whitespace-nowrap">
                         ลบ
@@ -1011,13 +1112,47 @@
         `).join('');
     }
 
+    // แท็บกลุ่มเรียนในหน้ารายชื่อ
+    let rosterGroup = 'ALL';
+    function rosterGroupsOf() {
+        const c = coursesList.find(x => x.id === currentCourseId) || {};
+        const g = splitGroups(c.description);
+        (currentRosterList || []).forEach(s => splitGroups(s.class).forEach(x => { if (!g.includes(x)) g.push(x); }));
+        return g;
+    }
+    function paintRosterGroups() {
+        const groups = rosterGroupsOf(), list = currentRosterList || [];
+        const bar = document.getElementById('roster-groups-bar');
+        bar.hidden = groups.length === 0;
+        if (!groups.length) return;
+        const n = g => g === 'ALL' ? list.length : g === '' ? list.filter(s => !splitGroups(s.class).length).length : list.filter(s => splitGroups(s.class).includes(g)).length;
+        const tabs = ['ALL', ...groups].concat(n('') ? [''] : []);
+        if (!tabs.includes(rosterGroup)) rosterGroup = 'ALL';
+        document.getElementById('roster-group-tabs').innerHTML = tabs.map(g =>
+            `<button type="button" class="rg-tab" aria-pressed="${g === rosterGroup}" onclick="rosterGroup=${JSON.stringify(g).replace(/"/g, '&quot;')};paintRosterGroups();filterRoster()">${g === 'ALL' ? 'ทุกกลุ่ม' : g === '' ? 'ไม่ระบุกลุ่ม' : escapeHtml(g)} (${n(g)})</button>`).join('');
+        const sel = document.getElementById('roster-import-group');
+        const keep = rosterGroup !== 'ALL' && rosterGroup !== '' ? rosterGroup : (sel.value || groups[0]);
+        sel.innerHTML = groups.map(g => `<option value="${escapeHtml(g)}">${escapeHtml(g)}</option>`).join('') + '<option value="">ไม่ระบุกลุ่ม</option>';
+        sel.value = groups.includes(keep) ? keep : groups[0];
+    }
+    async function changeStudentGroup(s, cls) {
+        try {
+            const r = await fetch(`/api/courses/${currentCourseId}/students/${s.id}/class`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ class: cls }) });
+            const d = await r.json().catch(() => ({}));
+            if (!r.ok || d.success === false) throw new Error(d.message || 'HTTP ' + r.status);
+            s.class = cls; paintRosterGroups(); filterRoster();
+            if (window.uiToast) uiToast('ย้าย ' + (s.firstName || s.studentId) + ' ไปกลุ่ม ' + (cls || 'ไม่ระบุกลุ่ม') + ' แล้ว');
+        } catch (e) { alert('เปลี่ยนกลุ่มไม่สำเร็จ: ' + e.message); loadCourseStudents(); }
+    }
+
     function filterRoster() {
         const q = document.getElementById('roster-search-input').value.trim().toLowerCase();
+        const base = rosterGroup === 'ALL' ? currentRosterList : currentRosterList.filter(s => rosterGroup === '' ? !splitGroups(s.class).length : splitGroups(s.class).includes(rosterGroup));
         if (!q) {
-            renderRosterTable(currentRosterList);
+            renderRosterTable(base);
             return;
         }
-        const filtered = currentRosterList.filter(s => {
+        const filtered = base.filter(s => {
             const id = (s.studentId || '').toLowerCase();
             const name = `${s.prefix || ''} ${s.firstName || ''} ${s.lastName || ''}`.toLowerCase();
             const en = (s.fullNameEn || '').toLowerCase();
@@ -1058,9 +1193,10 @@
                 }
 
                 const c = coursesList.find(x => x.id === currentCourseId);
-                const defaultClass = c ? c.description : '';
+                const gSel = document.getElementById('roster-import-group');
+                const defaultClass = rosterGroupsOf().length ? (gSel ? gSel.value : '') : (c ? splitGroups(c.description)[0] || '' : '');
 
-                if (!confirm(`ตรวจพบข้อมูลนักศึกษา ${parsedRows.length} รายการ\nต้องการนำเข้าสู่รายวิชานี้หรือไม่?`)) {
+                if (!confirm(`ตรวจพบข้อมูลนักศึกษา ${parsedRows.length} รายการ\nต้องการนำเข้าสู่รายวิชานี้${defaultClass ? ' เป็นกลุ่ม ' + defaultClass : ''} หรือไม่?\n(ถ้าไฟล์มีคอลัมน์ CLASS จะใช้กลุ่มตามไฟล์)`)) {
                     return;
                 }
 
@@ -1164,7 +1300,9 @@
         document.getElementById('add-s-last').value = '';
         document.getElementById('add-s-en').value = '';
         const c = coursesList.find(x => x.id === currentCourseId);
-        document.getElementById('add-s-class').value = c ? c.description : '';
+        const gSel = document.getElementById('roster-import-group');
+        document.getElementById('add-s-class').value = rosterGroupsOf().length ? (gSel ? gSel.value : '') : (c ? splitGroups(c.description)[0] || '' : '');
+        document.getElementById('add-s-groups').innerHTML = rosterGroupsOf().map(g => `<option value="${escapeHtml(g)}"></option>`).join('');
         document.getElementById('add-student-modal').classList.remove('hidden');
     }
 
