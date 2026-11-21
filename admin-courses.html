@@ -245,6 +245,33 @@
             .ce-acts .ce-btn:not(.ce-more) { flex: 1; }
         }
     </style>
+    <style>
+        /* ===== แยกกลุ่มเรียน ===== */
+        .gs { border: 1.5px solid #fed7aa; background: #fff7ed; border-radius: 16px; padding: 12px 16px; }
+        .gs-t { font-size: 15px; font-weight: 800; color: #9a3412; }
+        .gs-t b { font-size: 18px; } .gs-t span { font-weight: 600; font-size: 13px; color: #b45309; }
+        .gs p { margin: 4px 0 0; font-size: 13px; line-height: 1.6; color: #7c2d12; }
+        .gs-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
+        .gs-chips:empty { display: none; }
+        .gs-chips > span { font-size: 12.5px; font-weight: 700; color: #9a3412; }
+        .gs-chips button { border: 1.5px solid #fdba74; background: #fff; color: #9a3412; font-family: ui-monospace, Consolas, monospace; font-size: 13px; font-weight: 700; padding: 5px 10px; border-radius: 10px; cursor: pointer; }
+        .gs-chips button b { font-family: inherit; font-weight: 800; color: #c2410c; margin-left: 4px; }
+        .gs-chips button:hover { background: #ffedd5; }
+        .gb { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid #dbe3ef; background: #f6f8fc; border-radius: 14px; }
+        .gb-n { font-size: 14px; font-weight: 700; color: #0f172a; padding-right: 4px; }
+        .gb-n b { color: #1d5fd6; }
+        .gb-f { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #475569; }
+        .gb-f input, .gb-f select { border: 1.5px solid #dbe3ef; border-radius: 10px; padding: 6px 10px; font-family: inherit; font-size: 13.5px; font-weight: 700; background: #fff; color: #0f172a; min-width: 0; }
+        .gb-f input { width: 130px; }
+        .gb-b { border: 1.5px solid #dbe3ef; background: #fff; color: #0b2a7a; font-family: inherit; font-size: 13.5px; font-weight: 800; padding: 6px 14px; border-radius: 10px; cursor: pointer; }
+        .gb-b.go { background: #1d5fd6; border-color: #1d5fd6; color: #fff; }
+        .gb-b:disabled { opacity: .45; cursor: not-allowed; }
+        .gb-sp { flex: 1; }
+        #roster-table-body tr.is-picked { background: #eff6ff; }
+        .rs-pick, #pick-all { width: 17px; height: 17px; accent-color: #1d5fd6; cursor: pointer; }
+        .rg-sel.rg-multi { border-color: #fdba74; background: #fff7ed; color: #9a3412; }
+        @media (max-width: 640px) { .gb-sp { display: none; } .gb-f input { width: 110px; } }
+    </style>
 </head>
 
 <body class="flex h-screen overflow-hidden">
@@ -496,6 +523,22 @@
             <label class="rg-imp">นำเข้า / เพิ่มเป็นกลุ่ม <select id="roster-import-group"></select></label>
         </div>
 
+        <!-- แยกนักศึกษาที่ยังอยู่หลายกลุ่ม -->
+        <div id="grp-split" class="gs" hidden>
+            <div class="gs-t"><b id="gs-n">0</b> คนยังไม่ได้แยกกลุ่ม <span>(ตอนนี้ระบบนับว่าอยู่ทุกกลุ่ม)</span></div>
+            <p>วิธีแยก: ติ๊กเลือกนักศึกษาแล้วกด <b>ย้าย</b> · หรือกดปุ่มรหัสขึ้นต้นด้านล่างเพื่อเลือกทั้งห้องในครั้งเดียว · หรือนำเข้าไฟล์ Excel ของแต่ละห้องอีกครั้ง โดยเลือก "นำเข้า / เพิ่มเป็นกลุ่ม" ให้ตรงก่อนกดนำเข้า</p>
+            <div class="gs-chips" id="gs-chips"></div>
+        </div>
+        <div id="grp-bulk" class="gb" hidden>
+            <span class="gb-n">เลือกแล้ว <b id="gb-count">0</b> คน</span>
+            <label class="gb-f">รหัสขึ้นต้นด้วย <input id="gb-prefix" inputmode="numeric" placeholder="เช่น 6832211" onkeydown="if(event.key==='Enter')pickByPrefix(this.value)"></label>
+            <button type="button" class="gb-b" onclick="pickByPrefix(document.getElementById('gb-prefix').value)">เลือก</button>
+            <span class="gb-sp"></span>
+            <label class="gb-f">ย้ายไปกลุ่ม <select id="gb-target"></select></label>
+            <button type="button" class="gb-b go" id="gb-go" onclick="bulkMoveGroup()">ย้าย</button>
+            <button type="button" class="gb-b" onclick="clearPicked()">ล้างที่เลือก</button>
+        </div>
+
         <!-- Format Helper Banner -->
         <div class="p-4 bg-amber-50 border-2 border-amber-200 rounded-2xl text-xs sm:text-sm text-amber-900 flex items-start gap-3">
             <div class="leading-relaxed font-semibold">
@@ -508,6 +551,7 @@
             <table class="w-full text-sm">
                 <thead class="sticky top-0 bg-slate-100 border-b-2 border-slate-200 z-10">
                     <tr>
+                        <th class="pl-4 pr-1 py-3.5 w-8"><input type="checkbox" id="pick-all" aria-label="เลือกทุกคนที่แสดงอยู่" onchange="pickAllShown(this.checked)"></th>
                         <th class="text-left px-5 py-3.5 font-bold text-slate-700 uppercase text-xs">ลำดับ</th>
                         <th class="text-left px-5 py-3.5 font-bold text-slate-700 uppercase text-xs">รหัสนักศึกษา</th>
                         <th class="text-left px-5 py-3.5 font-bold text-slate-700 uppercase text-xs">ชื่อ-นามสกุล (ภาษาไทย)</th>
@@ -517,7 +561,7 @@
                     </tr>
                 </thead>
                 <tbody id="roster-table-body">
-                    <tr><td colspan="6" class="text-center py-12 text-slate-400 font-bold">ยังไม่มีรายชื่อนักศึกษาในวิชานี้</td></tr>
+                    <tr><td colspan="7" class="text-center py-12 text-slate-400 font-bold">ยังไม่มีรายชื่อนักศึกษาในวิชานี้</td></tr>
                 </tbody>
             </table>
         </div>
@@ -1157,21 +1201,27 @@
         const groups = rosterGroupsOf();
         if (!groups.length) return escapeHtml(s.class || '-');
         const cur = s.class || '';
+        if (splitGroups(cur).length > 1) {
+            return `<select class="rg-sel rg-multi" aria-label="กลุ่มเรียนของ ${escapeHtml(s.firstName || s.studentId)}" title="อยู่หลายกลุ่ม: ${escapeHtml(cur)}" onchange="changeStudentGroup(currentRosterList.find(x => x.id === ${Number(s.id)}), this.value)"><option value="" selected disabled>ยังไม่แยกกลุ่ม</option>${groups.map(g => `<option value="${escapeHtml(g)}">${escapeHtml(g)}</option>`).join('')}</select>`;
+        }
         const opts = (groups.includes(cur) || !cur ? groups : [cur, ...groups]).map(g => `<option value="${escapeHtml(g)}" ${g === cur ? 'selected' : ''}>${escapeHtml(g)}</option>`).join('');
         return `<select class="rg-sel" aria-label="กลุ่มเรียนของ ${escapeHtml(s.firstName || s.studentId)}" onchange="changeStudentGroup(currentRosterList.find(x => x.id === ${Number(s.id)}), this.value)"><option value="" ${cur ? '' : 'selected'}>ไม่ระบุกลุ่ม</option>${opts}</select>`;
     }
 
     function renderRosterTable(list) {
+        rosterShown = list || [];
         const tbody = document.getElementById('roster-table-body');
         document.getElementById('roster-count-label').textContent = `${list.length} คน`;
 
         if (!list || list.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-16 text-slate-400 font-bold text-base">ยังไม่มีรายชื่อนักศึกษาในวิชานี้ • กด "นำเข้า Excel / CSV" ด้านบน เพื่ออัปโหลดรายชื่อ</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-16 text-slate-400 font-bold text-base">${(currentRosterList || []).length ? 'ไม่พบนักศึกษาในกลุ่มหรือคำค้นนี้' : 'ยังไม่มีรายชื่อนักศึกษาในวิชานี้ • กด "นำเข้า Excel / CSV" ด้านบน เพื่ออัปโหลดรายชื่อ'}</td></tr>`;
+            paintPickBar();
             return;
         }
 
         tbody.innerHTML = list.map((s, idx) => `
-            <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
+            <tr class="border-b border-slate-200 hover:bg-slate-50 transition ${rosterPicked.has(s.id) ? 'is-picked' : ''}">
+                <td class="pl-4 pr-1 py-3.5"><input type="checkbox" class="rs-pick" aria-label="เลือก ${escapeHtml(s.firstName || s.studentId)}" ${rosterPicked.has(s.id) ? 'checked' : ''} onchange="togglePick(${Number(s.id)}, this.checked, this)"></td>
                 <td class="px-5 py-3.5 text-slate-400 font-mono text-center w-14 font-semibold text-xs sm:text-sm">${idx + 1}</td>
                 <td class="px-5 py-3.5 font-mono font-bold text-cyan-700 text-sm sm:text-base">${escapeHtml(s.studentId)}</td>
                 <td class="px-5 py-3.5 font-bold text-slate-900 text-sm sm:text-base">${escapeHtml((s.prefix ? s.prefix + ' ' : '') + s.firstName + ' ' + (s.lastName || ''))}</td>
@@ -1184,6 +1234,7 @@
                 </td>
             </tr>
         `).join('');
+        paintPickBar();
     }
 
     // ===== ดึงรายชื่อจากวิชาอื่น =====
@@ -1295,15 +1346,87 @@
         const bar = document.getElementById('roster-groups-bar');
         bar.hidden = groups.length === 0;
         if (!groups.length) return;
-        const n = g => g === 'ALL' ? list.length : g === '' ? list.filter(s => !splitGroups(s.class).length).length : list.filter(s => splitGroups(s.class).includes(g)).length;
+        const n = g => g === 'ALL' ? list.length : list.filter(s => inRosterGroup(s, g)).length;
         const tabs = ['ALL', ...groups].concat(n('') ? [''] : []);
         if (!tabs.includes(rosterGroup)) rosterGroup = 'ALL';
         document.getElementById('roster-group-tabs').innerHTML = tabs.map(g =>
-            `<button type="button" class="rg-tab" aria-pressed="${g === rosterGroup}" onclick="rosterGroup=${JSON.stringify(g).replace(/"/g, '&quot;')};paintRosterGroups();filterRoster()">${g === 'ALL' ? 'ทุกกลุ่ม' : g === '' ? 'ไม่ระบุกลุ่ม' : escapeHtml(g)} (${n(g)})</button>`).join('');
+            `<button type="button" class="rg-tab" aria-pressed="${g === rosterGroup}" onclick="rosterGroup=${JSON.stringify(g).replace(/"/g, '&quot;')};paintRosterGroups();filterRoster()">${g === 'ALL' ? 'ทุกกลุ่ม' : g === '' ? 'ยังไม่แยกกลุ่ม' : escapeHtml(g)} (${n(g)})</button>`).join('');
+        paintSplitHelp(groups, list);
         const sel = document.getElementById('roster-import-group');
         const keep = rosterGroup !== 'ALL' && rosterGroup !== '' ? rosterGroup : (sel.value || groups[0]);
         sel.innerHTML = groups.map(g => `<option value="${escapeHtml(g)}">${escapeHtml(g)}</option>`).join('') + '<option value="">ไม่ระบุกลุ่ม</option>';
         sel.value = groups.includes(keep) ? keep : groups[0];
+    }
+    // กลุ่มของนักศึกษา: นับว่า "แยกแล้ว" เมื่ออยู่กลุ่มเดียว · ว่าง/หลายกลุ่ม = ยังไม่แยกกลุ่ม
+    function inRosterGroup(s, g) {
+        const gs = splitGroups(s.class);
+        return g === '' ? gs.length !== 1 : gs.length === 1 && gs[0] === g;
+    }
+    let rosterPicked = new Set(), rosterShown = [];
+    function paintSplitHelp(groups, list) {
+        const multi = list.filter(s => splitGroups(s.class).length !== 1);
+        const box = document.getElementById('grp-split');
+        box.hidden = !(groups.length > 1 && multi.length);
+        document.getElementById('gs-n').textContent = multi.length;
+        // รหัสขึ้นต้นที่พบบ่อย (8 ตัวแรก) → เลือกทั้งห้องได้ในคลิกเดียว
+        const cnt = {};
+        multi.forEach(s => { const p = String(s.studentId || '').replace(/[^0-9a-zA-Z]/g, '').slice(0, 8); if (p.length === 8) cnt[p] = (cnt[p] || 0) + 1; });
+        const tops = Object.entries(cnt).filter(([, c]) => c >= 2).sort((a, b) => b[1] - a[1]).slice(0, 6);
+        document.getElementById('gs-chips').innerHTML = tops.length
+            ? '<span>รหัสขึ้นต้น:</span>' + tops.map(([p, c]) => `<button type="button" onclick="pickByPrefix('${p}')">${p}… <b>${c} คน</b></button>`).join('')
+            : '';
+        const bulk = document.getElementById('grp-bulk');
+        bulk.hidden = groups.length < 2;
+        const tg = document.getElementById('gb-target'), keep = tg.value;
+        tg.innerHTML = groups.map(g => `<option value="${escapeHtml(g)}">${escapeHtml(g)}</option>`).join('');
+        if (groups.includes(keep)) tg.value = keep;
+    }
+    function paintPickBar() {
+        const ids = new Set((currentRosterList || []).map(s => s.id));
+        [...rosterPicked].forEach(id => { if (!ids.has(id)) rosterPicked.delete(id); });
+        const n = rosterPicked.size;
+        const c = document.getElementById('gb-count'); if (c) c.textContent = n;
+        const go = document.getElementById('gb-go'); if (go) go.disabled = !n;
+        const all = document.getElementById('pick-all');
+        if (all) { const shown = rosterShown.filter(s => rosterPicked.has(s.id)).length; all.checked = !!rosterShown.length && shown === rosterShown.length; all.indeterminate = shown > 0 && shown < rosterShown.length; }
+    }
+    function togglePick(id, on, el) {
+        on ? rosterPicked.add(id) : rosterPicked.delete(id);
+        if (el) el.closest('tr').classList.toggle('is-picked', on);
+        paintPickBar();
+    }
+    function pickAllShown(on) { rosterShown.forEach(s => on ? rosterPicked.add(s.id) : rosterPicked.delete(s.id)); filterRoster(); }
+    function clearPicked() { rosterPicked.clear(); filterRoster(); }
+    function pickByPrefix(p) {
+        const pre = String(p || '').replace(/[^0-9a-zA-Z]/g, '');
+        if (!pre) return alert('กรุณาพิมพ์รหัสนักศึกษาตัวแรก ๆ ก่อน');
+        const hit = (currentRosterList || []).filter(s => String(s.studentId || '').replace(/[^0-9a-zA-Z]/g, '').startsWith(pre));
+        hit.forEach(s => rosterPicked.add(s.id));
+        document.getElementById('gb-prefix').value = pre;
+        filterRoster();
+        if (window.uiToast) uiToast(hit.length ? `เลือกนักศึกษารหัสขึ้นต้น ${pre} แล้ว ${hit.length} คน` : 'ไม่พบรหัสที่ขึ้นต้นด้วย ' + pre);
+    }
+    async function bulkMoveGroup() {
+        const cls = document.getElementById('gb-target').value;
+        const list = (currentRosterList || []).filter(s => rosterPicked.has(s.id));
+        if (!list.length || !cls) return;
+        if (!confirm(`ย้ายนักศึกษา ${list.length} คน ไปกลุ่ม ${cls}?`)) return;
+        const btn = document.getElementById('gb-go'); btn.disabled = true; btn.textContent = 'กำลังย้าย…';
+        let ok = 0, fail = 0;
+        for (let i = 0; i < list.length; i += 6) {
+            await Promise.all(list.slice(i, i + 6).map(async s => {
+                try {
+                    const r = await fetch(`/api/courses/${currentCourseId}/students/${s.id}/class`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ class: cls }) });
+                    const d = await r.json().catch(() => ({}));
+                    if (!r.ok || d.success === false) throw new Error();
+                    s.class = cls; ok++;
+                } catch (e) { fail++; }
+            }));
+        }
+        btn.textContent = 'ย้าย';
+        rosterPicked.clear(); paintRosterGroups(); filterRoster();
+        if (fail) alert(`ย้ายสำเร็จ ${ok} คน · ไม่สำเร็จ ${fail} คน (ลองอีกครั้ง)`);
+        else if (window.uiToast) uiToast(`ย้าย ${ok} คน ไปกลุ่ม ${cls} แล้ว`);
     }
     async function changeStudentGroup(s, cls) {
         try {
@@ -1317,7 +1440,7 @@
 
     function filterRoster() {
         const q = document.getElementById('roster-search-input').value.trim().toLowerCase();
-        const base = rosterGroup === 'ALL' ? currentRosterList : currentRosterList.filter(s => rosterGroup === '' ? !splitGroups(s.class).length : splitGroups(s.class).includes(rosterGroup));
+        const base = rosterGroup === 'ALL' ? currentRosterList : currentRosterList.filter(s => inRosterGroup(s, rosterGroup));
         if (!q) {
             renderRosterTable(base);
             return;
