@@ -19,6 +19,21 @@ function ensureMammoth() {
   return mammothLoading;
 }
 
+/** รูป (base64) → JPEG ด้านยาวไม่เกิน 1600px · คืน null ถ้าเบราว์เซอร์อ่านรูปไม่ได้ (เช่น EMF/WMF) */
+async function toJpeg(mime, b64, maxSide = 1600) {
+  try {
+    const bin = atob(b64), bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const bmp = await createImageBitmap(new Blob([bytes], { type: mime || "image/png" }));
+    const k = Math.min(1, maxSide / Math.max(bmp.width, bmp.height));
+    const c = document.createElement("canvas");
+    c.width = Math.max(1, Math.round(bmp.width * k)); c.height = Math.max(1, Math.round(bmp.height * k));
+    const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(bmp, 0, 0, c.width, c.height);
+    bmp.close && bmp.close();
+    return { mime: "image/jpeg", data: c.toDataURL("image/jpeg", 0.85).split(",")[1] };
+  } catch (e) { return null; }
+}
+
 export const ACCEPT = ".pdf,.docx,.txt,.png,.jpg,.jpeg,.webp";
 
 function toBase64(buf) {
@@ -60,21 +75,22 @@ export async function fileToParts(file) {
 
   if (e === "docx") {
     const mammoth = await ensureMammoth();
-    const images = [];
+    const rawImages = [];
     const result = await mammoth.convertToHtml(
       { arrayBuffer: buf },
       {
         styleMap: ["u => u", "highlight => mark"],
         convertImage: mammoth.images.imgElement(async (img) => {
-          const data = await img.read("base64");
-          const n = images.length + 1;
-          const okType = /^image\/(png|jpeg|webp|gif)$/.test(img.contentType);
-          if (okType && images.length < 30) images.push({ mime: img.contentType, data });
+          const n = rawImages.length + 1;
+          if (rawImages.length < 30) rawImages.push({ mime: img.contentType, data: await img.read("base64") });
           return { src: "", alt: `[รูปภาพที่ ${n}]` };
         }),
       }
     );
     const html = result.value.replace(/<img [^>]*alt="([^"]*)"[^>]*>/g, "$1");
+    // Gemini รับรูปได้แค่ PNG/JPEG/WEBP · รูปใน Word มักเป็น GIF/EMF หรือใหญ่มาก → แปลงเป็น JPEG ย่อขนาด อ่านไม่ได้ก็ข้าม
+    const images = [];
+    for (const im of rawImages) { const ok = await toJpeg(im.mime, im.data); if (ok) images.push(ok); }
     if (!html.replace(/<[^>]+>/g, "").trim()) {
       throw new Error(`ไม่พบข้อความใน "${file.name}" (อาจเป็นรูปสแกนทั้งหมด ลอง Export เป็น PDF แล้วอัปโหลดแทน)`);
     }

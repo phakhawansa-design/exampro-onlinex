@@ -2889,8 +2889,30 @@ app.delete('/api/teacher/room', (req, res) => {
     const { username, roomId } = req.body;
     if (!roomId) return res.status(400).json({ message: "กรุณาระบุรหัสห้องสอบ (roomId)" });
 
+    // ยังไม่มีใครส่งคำตอบ → ลบห้องทิ้งทั้งหมด ไม่เหลืออะไรค้าง (เดิมเก็บห้องเปล่าไว้ทุกครั้ง)
+    db.get('SELECT COUNT(*) AS n FROM exam_results WHERE roomId = ?', [roomId], (cErr, cRow) => {
+        if (cErr) return res.status(500).json({ message: cErr.message });
+        if (Number(cRow && cRow.n) > 0) return archiveRoom(Number(cRow.n));
+        // มีคนกำลังทำข้อสอบอยู่ (ยังไม่ส่ง) → เก็บไว้ก่อน ไม่ลบข้อสอบใต้มือนักศึกษา
+        db.get('SELECT COUNT(*) AS n FROM exam_progress WHERE room_id = ?', [roomId], (pErr, pRow) => {
+        if (!pErr && Number(pRow && pRow.n) > 0) return archiveRoom(0);
+        let sql = 'DELETE FROM teacher_rooms WHERE roomId = ?', p = [roomId];
+        if (username && username !== 'admin') { sql += ' AND teacherUsername = ?'; p.push(username); }
+        db.run(sql, p, function (dErr) {
+            if (dErr) return res.status(500).json({ message: dErr.message });
+            if (!this.changes) return res.status(404).json({ success: false, message: 'ไม่พบห้องสอบนี้' });
+            ['questions', 'cheat_logs', 'student_warnings', 'student_logins'].forEach(t => db.run(`DELETE FROM ${t} WHERE roomId = ?`, [roomId], () => {}));
+            db.run('DELETE FROM exam_progress WHERE room_id = ?', [roomId], () => {});
+            db.run('DELETE FROM answer_events WHERE room_id = ?', [roomId], () => {});
+            if (typeof waitingStudentsTracker !== 'undefined' && waitingStudentsTracker) waitingStudentsTracker.delete(roomId);
+            console.log(`[ห้อง: ${roomId}] ลบห้องทิ้งทั้งหมด (ยังไม่มีผู้ส่งคำตอบ)`);
+            res.json({ success: true, removed: true, results: 0, message: 'ลบห้องสอบแล้ว' });
+        });
+        });
+    });
+    function archiveRoom(resultCount) {
     db.serialize(() => {
-        // ไม่ลบแถวห้องจริง: ซ่อนห้อง ปิดสอบ และยกเลิกรหัสเข้าสอบ (ผลสอบ/ประวัติยังเป็นของอาจารย์คนนี้ จึงยังแสดงในหน้าผลสอบและประวัติ)
+        // มีผลสอบแล้ว: ไม่ลบแถวห้องจริง ซ่อนห้อง ปิดสอบ และยกเลิกรหัสเข้าสอบ (ผลสอบ/ประวัติยังแสดงในหน้าผลสอบและแฟ้มประวัติรวม)
         let deleteRoomSql = "UPDATE teacher_rooms SET archived = 1, is_published = 0, exam_code = '' WHERE roomId = ?";
         let params = [roomId];
 
@@ -2910,10 +2932,11 @@ app.delete('/api/teacher/room', (req, res) => {
             if (typeof waitingStudentsTracker !== 'undefined' && waitingStudentsTracker) {
                 waitingStudentsTracker.delete(roomId);
             }
-            console.log(`[ห้อง: ${roomId}] ลบห้องสอบสำเร็จ`);
-            res.json({ success: true, message: "ลบห้องสอบเรียบร้อยแล้ว" });
+            console.log(`[ห้อง: ${roomId}] ลบห้องสอบ (เก็บผลสอบไว้)`);
+            res.json({ success: true, removed: false, results: resultCount, message: "ลบห้องสอบแล้ว ผลสอบยังเก็บไว้" });
         });
     });
+    }
 });
 })(app, routeCtx);
 

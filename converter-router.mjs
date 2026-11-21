@@ -195,17 +195,25 @@ export function createExamConverterRouter(opts = {}) {
       res.on("close", () => { if (!res.writableEnded) ctrl.abort(); });
 
       let out;
-      try {
-        out = await generateQuestions({
+      const callAI = (parts) => generateQuestions({
           apiKey,
           model: useModel,
-          parts: cleanParts,
+          parts,
           solveMissing: !!solveMissing,
           signal: ctrl.signal,
           ...(fallbackModel ? { fallbackModel } : {}),
           ...(timeoutMs ? { timeoutMs } : {}),
           ...(fetchImpl ? { fetchImpl } : {}),
           onRetry: (r) => console.warn(`[exam-converter] ${r.type} ${r.model} (status ${r.status})`),
+        });
+      try {
+        out = await callAI(cleanParts).catch(async (e1) => {
+          // Google ปฏิเสธคำขอที่มีรูป (ชนิดรูปไม่รองรับ/ใหญ่เกิน) → ลองอีกครั้งด้วยข้อความอย่างเดียว
+          const hasImg = cleanParts.some(p => p.inline_data && p.inline_data.mime_type !== "application/pdf");
+          if (!(e1 && e1.status === 400 && hasImg && !/API key/i.test(e1.raw || ""))) throw e1;
+          console.warn("[exam-converter] Gemini 400 กับไฟล์ที่มีรูป ลองใหม่แบบไม่ส่งรูป:", String(e1.raw || "").slice(0, 200));
+          const textOnly = cleanParts.filter(p => !(p.inline_data && p.inline_data.mime_type !== "application/pdf"));
+          return callAI(textOnly.length ? textOnly : cleanParts);
         });
       } catch (e) {
         if (e.name === "AbortError") throw e;
