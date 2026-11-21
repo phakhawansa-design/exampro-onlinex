@@ -263,6 +263,26 @@ const CSS = `
 }
 @keyframes xdz-sheet{from{transform:translateY(100%)}}
 @media (prefers-reduced-motion:reduce){.xdz-root *,.xdz-root *::before,.xdz-root *::after{animation:none!important;transition:none!important}}
+/* หน้าจอคอม: หน้าต่างใหญ่ขึ้น อ่านง่ายขึ้น (ExamPro) */
+@media (min-width:760px){
+.xdz-dlg{width:min(820px,94vw)!important;max-height:min(860px,calc(100vh - 32px))!important}
+.xdz-head{padding:28px 30px 8px!important;gap:16px}
+.xdz-head h2,.xdz-head b{font-size:22px!important}
+.xdz-head p,.xdz-head span{font-size:15px!important}
+.xdz-logo{transform:scale(1.15)}
+.xdz-body{padding:18px 30px 8px!important;gap:16px!important}
+.xdz-zone{padding:46px 24px!important;min-height:250px}
+.xdz-zone b{font-size:18px!important}
+.xdz-zone .xdz-bubble{transform:scale(1.15)}
+.xdz-types .xdz-tag{font-size:13px!important;padding:3px 11px!important}
+.xdz-switch{padding:16px 18px!important}
+.xdz-switch b{font-size:16px!important}
+.xdz-note{font-size:14px!important;padding:12px 16px!important}
+.xdz-foot{padding:18px 30px 26px!important}
+.xdz-btn{font-size:16px!important;padding:12px 24px!important}
+.xdz-ch{font-size:15px}
+.xdz-qt{font-size:15.5px}
+}
 `;
 
 function el(html) {
