@@ -1,830 +1,133 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="th">
 <head>
-  <script src="inapp-guard.js" data-soft></script>
-  <script src="auth-client.js"></script>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script>
-    (function() {
-      const p = new URLSearchParams(window.location.search);
-      const pin = p.get('pin') || p.get('code');
-      const room = p.get('roomId') || p.get('room');
-      if (pin || room) {
-        window.location.replace('Student-login.html?pin=' + encodeURIComponent(pin || '') + (room ? '&roomId=' + encodeURIComponent(room) : ''));
-      }
-    })();
-  </script>
-  <title>ExamPro</title>
-  <meta name="description" content="ระบบสอบออนไลน์ ป้องกันการทุจริตแบบเรียลไทม์">
-  <meta name="theme-color" content="#0b2a7a">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="../auth-client.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ตัวแปลงข้อสอบ AI · ExamPro</title>
+  <meta name="description" content="แปลงข้อสอบจาก PDF / Word เป็นไฟล์ Excel สำหรับนำเข้า ExamPro ด้วย Gemini AI" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon points='50,4 92,27 92,73 50,96 8,73 8,27' fill='%231557e0'/><text x='50' y='66' font-size='46' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='700'>A</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
   <style>
-    :root{--navy:#0b2a7a;--blue:#1557e0;--cyan:#22c3e6;--orange:#ff7a1a;--orange2:#ff9a3c;--bg:#f3f6fb;--ink:#1b2540;--muted:#5b6782;--line:#e3e9f3;
-      --hex:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='104' viewBox='0 0 120 104'%3E%3Cpath d='M30 2h60l30 50-30 50H30L0 52z' fill='none' stroke='%23ffffff' stroke-opacity='.07' stroke-width='2'/%3E%3C/svg%3E")}
-    *{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth;overflow-x:hidden}@supports(overflow:clip){html{overflow-x:clip}}
-    body{font-family:'Noto Sans Thai Looped', system-ui, sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden;line-height:1.6}
-    a{color:inherit;text-decoration:none}
-    .wrap{max-width:1140px;margin:0 auto;padding:0 20px}
-    .hex{clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)}
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 26px;border-radius:12px;font-weight:600;font-size:15px;border:0;cursor:pointer;font-family:inherit;transition:.2s}
-    .btn-or{background:linear-gradient(135deg,var(--orange),var(--orange2));color:#fff;box-shadow:0 14px 26px -10px rgba(255,122,26,.65)}
-    .btn-or:hover{transform:translateY(-2px);filter:brightness(1.05)}
-    .btn-ol{border:1.5px solid rgba(255,255,255,.75);color:#fff;background:rgba(255,255,255,.04)}
-    .btn-ol:hover{background:rgba(255,255,255,.14)}
-    .btn-navy{background:var(--navy);color:#fff;box-shadow:0 12px 24px -10px rgba(11,42,122,.6)}
-    .btn-navy:hover{background:var(--blue)}
-
-    /* nav */
-    nav{position:absolute;inset:0 0 auto;z-index:20;padding:18px 0}
-    nav .wrap{display:flex;align-items:center;gap:22px}
-    .brand{display:flex;align-items:center;gap:12px;color:#fff}
-    .brand img{width:46px;height:46px;background:#fff;border-radius:14px;padding:4px;object-fit:contain;box-shadow:0 8px 18px -8px rgba(0,0,0,.4)}
-    .brand b{display:block;font-size:19px;line-height:1.1;letter-spacing:.02em}
-    .brand small{font-size:12px;opacity:.8}
-    .menu{display:flex;gap:6px;margin-left:auto}
-    .menu a{color:rgba(255,255,255,.85);font-size:14px;padding:7px 12px;border-radius:8px}
-    .menu a:hover{background:rgba(255,255,255,.12);color:#fff}
-    .nav-cta{padding:9px 18px;font-size:14px}
-    @media(max-width:860px){.menu{display:none}.nav-cta{margin-left:auto}}
-
-    /* hero */
-    .hero{position:relative;color:#fff;padding:130px 0 190px;background:var(--hex),linear-gradient(135deg,var(--navy) 0%,#0f3fae 48%,var(--blue) 100%);background-size:120px 104px,auto;clip-path:polygon(0 0,100% 0,100% 78%,0 100%)}
-    .hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
-    .tag{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);padding:5px 14px;border-radius:99px;font-size:13px;margin-bottom:18px}
-    .tag i{width:8px;height:8px;border-radius:50%;background:#3cf0a8;box-shadow:0 0 0 4px rgba(60,240,168,.25)}
-    .hero h1{font-size:clamp(32px,4.4vw,50px);line-height:1.22;font-weight:600}
-    .hero h1 em{font-style:normal;color:var(--orange2)}
-    .hero p.lead{font-size:17px;opacity:.85;margin:16px 0 28px;max-width:520px;font-weight:300}
-    .cta{display:flex;flex-wrap:wrap;gap:12px}
-    .pin{margin-top:26px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);padding:10px 10px 10px 18px;border-radius:16px;max-width:460px}
-    .pin span{font-size:14px;opacity:.9}
-    .pin input{flex:1;min-width:140px;border:0;outline:0;border-radius:10px;padding:11px 14px;font-family:inherit;font-size:16px;letter-spacing:.2em;text-align:center;color:var(--ink)}
-    .pin button{padding:11px 18px}
-    .art{position:relative;height:420px}
-    .art .big{position:absolute;inset:10px 30px;background:#fff;overflow:hidden;box-shadow:0 30px 60px -20px rgba(0,0,0,.45)}
-    .art .big img{position:absolute;left:50%;top:6%;width:96%;transform:translateX(-50%) scale(1.06);object-fit:contain}
-    .art .h1{position:absolute;width:74px;height:64px;background:linear-gradient(135deg,var(--cyan),#3aa0ff);right:0;top:20px;animation:float 5s ease-in-out infinite}
-    .art .h2{position:absolute;width:52px;height:45px;background:linear-gradient(135deg,var(--orange),var(--orange2));left:0;bottom:60px;animation:float 6s ease-in-out infinite reverse}
-    .art .h3{position:absolute;width:30px;height:26px;right:40px;bottom:20px;background:rgba(255,255,255,.35)}
-    .badge-live{position:absolute;left:-6px;top:70px;background:#fff;color:var(--ink);border-radius:14px;padding:10px 14px;font-size:13px;box-shadow:0 18px 30px -12px rgba(0,0,0,.35);display:flex;gap:10px;align-items:center;animation:float 7s ease-in-out infinite}
-    .badge-live b{display:block;font-size:14px}
-    .badge-live .dot{width:34px;height:34px;border-radius:10px;background:#fff1e6;display:grid;place-items:center;font-size:18px}
-    .badge-ai{left:auto;right:-6px;top:auto;bottom:90px;animation-delay:-2s}
-    .badge-ai .dot{background:#e8f0ff}
-    @keyframes float{50%{transform:translateY(-12px)}}
-    @media(max-width:860px){.badge-live{left:0;top:auto;bottom:10px;padding:7px 10px;font-size:11px;gap:7px;animation:none}.badge-live b{font-size:12px}.badge-live .dot{width:28px;height:28px}.badge-ai{display:none}.brand small{display:none}body{overflow-x:hidden}.hero{padding:110px 0 150px}.hero .wrap{grid-template-columns:1fr}.art{height:320px;max-width:380px;margin:0 auto;width:100%}}
-
-    /* feature cards */
-    .cards{display:grid;grid-template-columns:repeat(2,1fr);max-width:860px;margin-left:auto;margin-right:auto;gap:22px;margin-top:-150px;position:relative;z-index:5}
-    .card{background:#fff;border-radius:16px;padding:34px 26px 28px;text-align:center;box-shadow:0 22px 50px -24px rgba(11,42,122,.35);border:1px solid var(--line);transition:.25s}
-    .card:hover{transform:translateY(-6px)}
-    .ico{width:84px;height:74px;margin:0 auto 18px;display:grid;place-items:center;color:#fff;font-size:30px;position:relative}
-    .ico::after{content:"";position:absolute;inset:-10px -12px;border:1.5px dashed rgba(21,87,224,.18);clip-path:inherit}
-    .i-or{background:linear-gradient(135deg,var(--orange),var(--orange2))}.i-nv{background:linear-gradient(135deg,var(--navy),var(--blue))}.i-cy{background:linear-gradient(135deg,var(--cyan),#3aa0ff)}
-    .card h3{font-size:19px;font-weight:600;margin-bottom:8px}
-    .card p{font-size:14px;color:var(--muted);font-weight:300}
-    .card a{display:inline-block;margin-top:14px;font-size:14px;color:var(--blue);font-weight:500}
-    @media(max-width:860px){.cards{grid-template-columns:1fr;margin-top:-110px}}
-
-    /* how */
-    section{padding:90px 0}
-    .split{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}
-    .sec-ico{width:44px;height:38px;display:grid;place-items:center;color:#fff;margin-bottom:14px}
-    h2{font-size:clamp(26px,3vw,34px);line-height:1.3;font-weight:600;color:var(--ink)}
-    .checks{list-style:none;margin:22px 0}
-    .checks li{display:flex;gap:12px;margin-bottom:14px;color:#4a5673;font-size:15px}
-    .checks li::before{content:"✓";flex:none;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--cyan);color:var(--cyan);display:grid;place-items:center;font-size:13px;font-weight:700;margin-top:1px}
-    .hexframe{position:relative;max-width:470px;margin:0 auto;aspect-ratio:1.155}
-    .hexframe .ring{position:absolute;inset:-26px;border:1.5px solid #dfe7f5;background:transparent}
-    .hexframe .pic{position:absolute;inset:0;background:#fff;box-shadow:0 30px 60px -24px rgba(11,42,122,.35);overflow:hidden}
-    .hexframe .pic img{width:100%;height:100%;object-fit:cover}
-    .dotdeco{position:absolute;width:12px;height:12px;border-radius:50%;background:var(--blue)}
-    @media(max-width:860px){.split{grid-template-columns:1fr}.hexframe{max-width:300px}}
-
-    /* steps */
-    .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:36px}
-    .step{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 14px 34px -22px rgba(11,42,122,.3)}
-    .step b{display:grid;place-items:center;width:40px;height:35px;color:#fff;font-size:16px;margin-bottom:12px}
-    .step h4{font-size:16px;font-weight:600;margin-bottom:4px}
-    .step p{font-size:13.5px;color:var(--muted);font-weight:300}
-    @media(max-width:860px){.steps{grid-template-columns:1fr 1fr}}
-    .center{text-align:center}
-    .center .sec-ico{margin:0 auto 14px}
-    .sub{color:var(--muted);font-weight:300;margin-top:8px}
-
-    /* faq */
-    .faq{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:36px}
-    .faq details{background:#fff;border-radius:16px;padding:24px;border:1px solid var(--line);box-shadow:0 14px 34px -22px rgba(11,42,122,.3)}
-    .faq summary{cursor:pointer;font-weight:600;font-size:16px;list-style:none;display:flex;justify-content:space-between;gap:10px}
-    .faq summary::after{content:"+";color:var(--blue);font-size:22px;line-height:1}
-    .faq details[open] summary::after{content:"−"}
-    .faq p{margin-top:10px;color:var(--muted);font-size:14px;font-weight:300}
-    @media(max-width:860px){.faq{grid-template-columns:1fr}}
-
-    /* footer cta */
-    .foot{position:relative;color:#fff;text-align:center;padding:150px 0 40px;margin-top:40px;background:var(--hex),linear-gradient(135deg,var(--navy),var(--blue));background-size:120px 104px,auto;clip-path:polygon(0 22%,100% 0,100% 100%,0 100%)}
-    .foot .ico{margin-bottom:14px}
-    .foot h2{color:#fff}
-    .foot p.sub{color:rgba(255,255,255,.8)}
-    .foot .cta{justify-content:center;margin-top:26px}
-    .foot .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-top:70px;padding-top:22px;border-top:1px solid rgba(255,255,255,.15);font-size:13px;color:rgba(255,255,255,.75)}
-    .foot .bottom a{margin-left:16px}
-    .foot .bottom a:hover{color:#fff}
-    .ic{width:34px;height:34px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
-    .ic.sm{width:22px;height:22px;stroke-width:2}
-    .btn .ic{width:19px;height:19px;stroke-width:2}
-    .badge-live .dot .ic{width:20px;height:20px;stroke-width:2}
-    .badge-live .dot{color:var(--orange)}.badge-ai .dot{color:var(--blue)}
-    .reveal{opacity:0;transform:translateY(24px);transition:.7s cubic-bezier(.2,.8,.2,1)}
-    .reveal.in{opacity:1;transform:none}
-    @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
-  
-/* ===== intro: scene 1 tab-switch alert → scene 2 eye opens with lightning ===== */
-#intro{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 45%,#0b2f7a 0,#05184a 50%,#020b26 100%);transition:opacity .9s ease .15s;cursor:pointer;overflow:hidden;font-family:'Noto Sans Thai Looped', "Leelawadee UI",Tahoma,sans-serif}
-#intro.out{opacity:0;pointer-events:none}
-#intro .iskip{position:absolute;right:18px;bottom:16px;z-index:5;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.8);font:500 13px 'Noto Sans Thai Looped',sans-serif;padding:6px 14px;border-radius:99px;cursor:pointer}
-/* scene 1 */
-#intro .s1{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;animation:s1Out .35s 2.6s ease-in forwards}
-#intro .iwin{position:relative;width:min(88vw,620px);aspect-ratio:620/370;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px -20px rgba(0,0,0,.6);transform-origin:50% 50%;
-  animation:winIn .6s cubic-bezier(.2,1.2,.4,1) both,winAlert .9s 1.3s ease-out,winClose .55s 2.25s cubic-bezier(.7,0,.3,1) forwards}
-#intro .wbar{display:flex;align-items:flex-end;gap:6px;height:13%;padding:0 3%;background:#e8eef7}
-#intro .wbar>i{width:9px;height:9px;border-radius:50%;background:#c5d0e0;align-self:center;flex:none}
-#intro .wbar>i:first-child{margin-right:2px}
-#intro .tb{display:flex;align-items:center;gap:6px;font-size:clamp(10px,2.1vmin,14px);color:#5b6b82;padding:7px 14px;border-radius:10px 10px 0 0;background:#d6e0ee;white-space:nowrap;overflow:hidden}
-#intro .tb svg{width:15px;height:15px;flex:none}
-#intro .ta{margin-left:8px;background:#fff;color:#152341;animation:tabOff .01s 1s forwards}
-#intro .tbb{animation:tabOn .01s 1s forwards}
-#intro .wbody{position:relative;height:87%}
-#intro .pA,#intro .pB{position:absolute;inset:0;padding:5% 6%;color:#152341}
-#intro .pA{animation:hide .01s 1s forwards}
-#intro .qh{display:flex;gap:8px;font-size:clamp(11px,2.2vmin,15px);color:#5b6b82}#intro .qh b{color:#0d3b8e}#intro .qh span{margin-left:auto;color:#e8663d;font-weight:500}
-#intro .pA p{font-size:clamp(13px,2.8vmin,19px);font-weight:500;margin:3% 0 3.5%;line-height:1.45}
-#intro .ch{display:flex;align-items:center;gap:10px;font-size:clamp(11px,2.3vmin,15px);padding:2% 3%;border:1.5px solid #e2e9f3;border-radius:10px;margin-bottom:2%}
-#intro .ch i{width:15px;height:15px;border:2px solid #b9c6d8;border-radius:50%;flex:none}
-#intro .pB{opacity:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6%;animation:show .01s 1s forwards}
-#intro .lg{font:600 clamp(28px,7vmin,52px) 'Noto Sans Thai Looped',sans-serif;color:#3b6fd8;letter-spacing:-1px}
-#intro .sb{width:76%;padding:2.6% 4%;border:1px solid #dfe1e5;border-radius:99px;font-size:clamp(11px,2.3vmin,15px);color:#555;box-shadow:0 2px 8px rgba(0,0,0,.08)}
-#intro .sb span{display:inline-block;overflow:hidden;white-space:nowrap;vertical-align:bottom;width:0;border-right:2px solid #555;animation:type .8s 1.15s steps(20) forwards}
-#intro .cur{position:absolute;width:22px;height:22px;left:62%;top:62%;z-index:3;animation:curMove .7s .25s cubic-bezier(.5,0,.3,1) forwards,curClick .2s .95s}
-#intro .ialert{position:absolute;top:max(18px,calc(50% - min(88vw,620px)*.3 - 70px));left:50%;width:min(92vw,470px);display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:16px;background:#fff;border-left:6px solid #e5484d;box-shadow:0 20px 50px -12px rgba(229,72,77,.55),0 0 0 1px rgba(229,72,77,.15);color:#152341;
-  opacity:0;transform:translate(-50%,-30px) scale(.9);animation:alertIn .5s 1.25s cubic-bezier(.2,1.4,.4,1) forwards,alertOut .3s 2.2s ease-in forwards}
-#intro .ai{flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#fdecec;color:#e5484d;animation:ping2 1s 1.3s 2}
-#intro .ai svg{width:22px;height:22px}
-#intro .ialert b{display:block;font-size:15px;color:#c23b3b}
-#intro .ialert small{display:block;font-size:13px;color:#5e6b82;margin-top:1px}
-#intro .ialert em{display:block;font-style:normal;font-size:12.5px;color:#108a59;margin-top:4px;opacity:0;animation:show .3s 1.75s forwards}
-@keyframes winIn{from{opacity:0;transform:translateY(30px) scale(.94)}}
-@keyframes winAlert{0%,100%{box-shadow:0 30px 80px -20px rgba(0,0,0,.6)}30%{box-shadow:0 0 0 4px #e5484d,0 0 60px 10px rgba(229,72,77,.6)}}
-@keyframes winClose{0%{transform:none;filter:none}55%{transform:scale(.97,.06);filter:brightness(2)}100%{transform:scale(.96,.012);filter:brightness(3);background:#9eeaff;box-shadow:0 0 30px 8px #5fd8ff}}
-@keyframes s1Out{to{opacity:0;visibility:hidden}}
-@keyframes hide{to{opacity:0}}
-@keyframes show{to{opacity:1}}
-@keyframes tabOff{to{background:#d6e0ee;color:#5b6b82}}
-@keyframes tabOn{to{background:#fff;color:#152341}}
-@keyframes type{to{width:14em}}
-@keyframes curMove{to{left:44%;top:-8%}}
-@keyframes curClick{50%{transform:scale(.75)}}
-@keyframes alertIn{to{opacity:1;transform:translate(-50%,0) scale(1)}}
-@keyframes alertOut{to{opacity:0;transform:translate(-50%,-14px) scale(.96)}}
-@keyframes ping2{50%{box-shadow:0 0 0 10px rgba(229,72,77,0)}0%{box-shadow:0 0 0 0 rgba(229,72,77,.5)}}
-/* scene 2 (eye) — waits for .go */
-#intro .s2{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3vmin;visibility:hidden}
-#intro.go .s2{visibility:visible}
-#intro:not(.go) .s2,#intro:not(.go) .s2 *{animation-play-state:paused!important}
-#intro .s2 .iclose path{stroke-width:9}
-.intro-on .hero .wrap>*,.intro-on nav{opacity:0}
-.intro-done .hero .wrap>*{animation:heroIn 1s cubic-bezier(.2,.8,.2,1) both}
-.intro-done .hero .wrap>*:nth-child(2){animation-delay:.18s}
-.intro-done nav{animation:navIn .8s ease-out both}
-@keyframes heroIn{from{opacity:0;transform:translateY(34px)}}
-@keyframes navIn{from{opacity:0;transform:translateY(-12px)}}
-
-
-
-#intro #ibolt{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-#intro .iflash{position:absolute;inset:0;background:radial-gradient(circle at 50% 45%,#fff 0,rgba(190,240,255,.9) 25%,rgba(76,201,255,0) 70%);opacity:0;animation:inFlash .7s 1.3s ease-out forwards;pointer-events:none}
-#intro .ist{position:relative;width:min(78vw,640px);aspect-ratio:2/1;transition:transform 1s cubic-bezier(.6,0,.35,1);animation:inShake .5s 1.35s linear}
-#intro.out .ist{transform:scale(6)}
-#intro svg{position:relative;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 26px rgba(95,216,255,.6))}
-#intro .iaura{position:absolute;left:50%;top:52%;width:150%;aspect-ratio:1.5;transform:translate(-50%,-50%) scale(.2);border-radius:50%;background:radial-gradient(ellipse,rgba(220,250,255,.95) 0,rgba(95,216,255,.6) 18%,rgba(21,101,216,.35) 40%,rgba(21,101,216,0) 66%);opacity:0;filter:blur(4px);animation:inAura 1.2s 1.3s cubic-bezier(.2,.8,.2,1) forwards,inPulse 1.6s 2.5s ease-in-out infinite}
-#intro .iring{position:absolute;left:50%;top:52%;width:38%;aspect-ratio:1;border-radius:50%;border:3px solid #9eeaff;box-shadow:0 0 24px #5fd8ff,inset 0 0 18px #5fd8ff;transform:translate(-50%,-50%) scale(.2);opacity:0;animation:inRing 1.1s 1.35s cubic-bezier(.1,.7,.3,1) forwards}
-#intro .iring.r2{animation-delay:1.55s}#intro .iring.r3{animation-delay:1.8s;border-width:2px}
-#intro .iball{transform-box:fill-box;transform-origin:50% 45%;transform:scaleY(.04);animation:inOpen2 .55s 1.0s cubic-bezier(.3,1.3,.5,1) forwards}
-#intro .iopen{opacity:0;transform:translateY(42px);animation:inLid .55s 1.0s cubic-bezier(.3,1.3,.5,1) forwards}
-#intro .iclose{filter:drop-shadow(0 0 8px #5fd8ff) drop-shadow(0 0 18px #4cc9ff);animation:inGlowLid .9s ease-in-out infinite alternate,inHide .25s 1.05s forwards}
-#intro .istreak{transform-box:fill-box;transform-origin:50% 50%;animation:inSpin2 8s linear infinite}
-#intro .ipower{opacity:0;animation:inPower 1.8s 1.3s ease-out forwards}
-/* ดวงตาจากรูป: ใช้เปลือกตา/ขนตาในรูปเอง ซ่อนเส้นเปลือกตาแบบเดิม */
-#intro .iopen{display:none}
-#intro .ipower2{opacity:0;mix-blend-mode:screen;animation:inPower2 1.8s 1.3s ease-out forwards}
-@keyframes inPower2{0%{opacity:0}15%{opacity:.85}100%{opacity:0}}
-#intro .ibr{position:relative;text-align:center;color:#fff;opacity:0;transform:translateY(14px);animation:inUp .7s 2.3s ease-out forwards;font-family:'Noto Sans Thai Looped', "Leelawadee UI",Tahoma,sans-serif;text-shadow:0 0 18px rgba(95,216,255,.6)}
-#intro .ibr b{display:block;font-size:clamp(30px,5.2vmin,56px);font-weight:600;letter-spacing:.5px;line-height:1.15}
-#intro .ibr span{color:#ff9a3c}
-#intro .ibr small{font-size:clamp(14px,2vmin,20px);opacity:.85}
-
-@keyframes inOpen2{to{transform:scaleY(1)}}
-@keyframes inLid{to{opacity:1;transform:none}}
-@keyframes inHide{to{opacity:0}}
-@keyframes inGlowLid{from{stroke:#7fdcff}to{stroke:#e6fbff}}
-@keyframes inFlash{0%{opacity:0}18%{opacity:.9}100%{opacity:0}}
-@keyframes inAura{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}30%{opacity:1}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
-@keyframes inPulse{0%,100%{opacity:1;transform:translate(-50%,-50%) scale(1)}50%{opacity:.7;transform:translate(-50%,-50%) scale(1.06)}}
-@keyframes inRing{0%{opacity:1;transform:translate(-50%,-50%) scale(.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(4.2)}}
-@keyframes inPower{0%{opacity:0}15%{opacity:1}100%{opacity:.4}}
-@keyframes inSpin2{to{transform:rotate(360deg)}}
-@keyframes inShake{0%,100%{translate:0 0}10%{translate:-9px 5px}20%{translate:8px -6px}30%{translate:-7px -4px}40%{translate:6px 6px}50%{translate:-5px 2px}60%{translate:4px -3px}70%{translate:-3px 2px}80%{translate:2px -1px}}
-@keyframes inUp{to{opacity:1;transform:none}}
-
-
-/* ===== intro scene 2: side HUD + rings + hex grid ===== */
-#intro .ibr b{font-size:clamp(30px,5.4vmin,58px)!important}
-#intro .ibr b span{color:#ff9a3c}
-#intro .ichips{display:none;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
-#intro .ichips i{display:inline-flex;align-items:center;gap:6px;font:500 13px 'Noto Sans Thai Looped',sans-serif;font-style:normal;padding:5px 12px;border-radius:99px;background:rgba(95,216,255,.12);border:1px solid rgba(95,216,255,.45);color:#cdf3ff}
-#intro .ichips i.g{background:rgba(255,122,26,.12);border-color:rgba(255,122,26,.5);color:#ffe7a3}
-#intro .ichips svg{width:15px;height:15px}
-#intro .ihex{position:absolute;inset:0;z-index:-1;opacity:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='97' viewBox='0 0 56 97'%3E%3Cpath d='M28 1 55 16.5v31L28 63 1 47.5v-31z M28 63v34' fill='none' stroke='%235fd8ff' stroke-width='1'/%3E%3C/svg%3E");
-  -webkit-mask:radial-gradient(ellipse 60% 55% at 50% 48%,#000 0,transparent 75%);mask:radial-gradient(ellipse 60% 55% at 50% 48%,#000 0,transparent 75%);animation:hexIn 1.4s 1.5s ease-out forwards}
-@keyframes hexIn{to{opacity:.16}}
-#intro .iorb{position:absolute;left:50%;top:52%;width:118%;aspect-ratio:1;transform:translate(-50%,-50%) scale(.6);fill:none;stroke:#7fdcff;stroke-width:.8;opacity:0;animation:orbIn 1s 1.45s cubic-bezier(.2,.8,.2,1) forwards;pointer-events:none}
-#intro .iorb circle{transform-origin:100px 100px;animation:spinR 22s linear infinite}
-#intro .iorb .o2{stroke:#ff9a3c;stroke-width:1.1;animation:spinL 16s linear infinite}
-#intro .iorb .o3{animation-duration:30s}
-@keyframes orbIn{to{opacity:.55;transform:translate(-50%,-50%) scale(1)}}
-@keyframes spinR{to{transform:rotate(360deg)}}@keyframes spinL{to{transform:rotate(-360deg)}}
-#intro .hud{position:absolute;top:50%;width:250px;padding:16px 16px 14px;border-radius:18px;color:#e9f6ff;font-family:'Noto Sans Thai Looped', sans-serif;
-  background:linear-gradient(160deg,rgba(13,59,142,.55),rgba(5,24,74,.55));border:1px solid rgba(95,216,255,.45);box-shadow:0 0 30px -6px rgba(95,216,255,.45),inset 0 0 24px rgba(95,216,255,.08);backdrop-filter:blur(6px);opacity:0}
-#intro .hud.l{right:calc(50% + min(39vw,320px) + 40px);transform:translate(-40px,-50%);animation:hudIn .8s 1.9s cubic-bezier(.2,1.2,.4,1) forwards}
-#intro .hud.r{left:calc(50% + min(39vw,320px) + 40px);transform:translate(40px,-50%);border-color:rgba(255,122,26,.5);box-shadow:0 0 30px -6px rgba(255,122,26,.4),inset 0 0 24px rgba(255,122,26,.06);animation:hudIn .8s 2.1s cubic-bezier(.2,1.2,.4,1) forwards}
-#intro .hud::after{content:"";position:absolute;top:50%;height:1.5px;width:0;background:linear-gradient(90deg,transparent,#7fdcff);animation:wire .6s 2.5s ease-out forwards}
-#intro .hud.l::after{left:100%}
-#intro .hud.r::after{right:100%;background:linear-gradient(270deg,transparent,#ff9a3c)}
-@keyframes wire{to{width:40px}}
-@keyframes hudIn{to{opacity:1;transform:translate(0,-50%)}}
-#intro .hh{display:flex;align-items:center;gap:10px}
-#intro .hi{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:rgba(95,216,255,.15);color:#7fdcff;flex:none}
-#intro .hi.g{background:rgba(255,122,26,.15);color:#ff9a3c}
-#intro .hi svg{width:21px;height:21px}
-#intro .hh b{display:block;font-size:17px;font-weight:600;line-height:1.2}
-#intro .hh small{display:block;font-size:12px;opacity:.7}
-#intro .live{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-style:normal;font-size:11px;color:#ff8a8d;background:rgba(229,72,77,.15);padding:2px 8px;border-radius:99px}
-#intro .live i{width:7px;height:7px;border-radius:50%;background:#ff5b60;animation:blink 1s infinite}
-@keyframes blink{50%{opacity:.2}}
-#intro .hs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 10px}
-#intro .hs div{background:rgba(255,255,255,.06);border-radius:10px;padding:7px 10px}
-#intro .hs b{display:block;font-size:22px;font-weight:600;line-height:1.1;color:#fff}#intro .hs b.r{color:#ff6b70}
-#intro .hs small{font-size:11px;opacity:.7}
-#intro .hb{display:flex;align-items:flex-end;gap:5px;height:40px}
-#intro .hb i{flex:1;height:0;border-radius:3px 3px 0 0;background:linear-gradient(#7fdcff,#2a7de1);animation:barUp .7s 2.4s cubic-bezier(.2,1.3,.4,1) forwards}
-#intro .hb i.r{background:linear-gradient(#ff8a8d,#e5484d)}
-#intro .hb i:nth-child(2){animation-delay:2.48s}#intro .hb i:nth-child(3){animation-delay:2.56s}#intro .hb i:nth-child(4){animation-delay:2.64s}#intro .hb i:nth-child(5){animation-delay:2.72s}#intro .hb i:nth-child(6){animation-delay:2.8s}#intro .hb i:nth-child(7){animation-delay:2.88s}
-@keyframes barUp{to{height:var(--h)}}
-#intro .hf{margin-top:10px;font-size:12px;color:#7ff0c0;opacity:0;animation:show .4s 3s forwards}
-#intro .hf.g{color:#ffe08a}
-#intro .hp{position:relative;margin:12px 0 10px;height:74px;border-radius:8px;background:#f4f1ea;padding:10px 12px;overflow:hidden}
-#intro .hp i{display:block;height:4px;border-radius:2px;background:#9aa6bb;margin-bottom:9px}
-#intro .hp i:nth-child(2){width:82%}#intro .hp i:nth-child(3){width:90%}#intro .hp i:nth-child(4){width:64%}#intro .hp i:nth-child(5){width:75%}
-#intro .hp .beam{position:absolute;left:0;right:0;top:-10%;height:18px;background:linear-gradient(transparent,rgba(255,122,26,.55));border-bottom:2px solid #ff7a1a;box-shadow:0 4px 14px rgba(255,122,26,.7);animation:beam2 1.4s 2.4s ease-in-out infinite alternate}
-@keyframes beam2{to{top:85%}}
-#intro .hg{display:flex;justify-content:space-between;font-size:12px;opacity:.85}#intro .hg b{font-size:14px;color:#ff9a3c}
-#intro .hbar{height:7px;border-radius:9px;background:rgba(255,255,255,.12);margin-top:5px;overflow:hidden}
-#intro .hbar i{display:block;height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,#ff7a1a,#ff9a3c);animation:fillW 1.4s 2.4s cubic-bezier(.2,.8,.2,1) forwards}
-@keyframes fillW{to{width:87.5%}}
-@media (max-width:1179px){#intro .hud{display:none}#intro .ichips{display:flex;opacity:0;animation:show .5s 2.5s forwards}}
-
-/* ===== v3: brand logo, eye-to-logo flight, short mode ===== */
-.nlogo{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;overflow:hidden;background:linear-gradient(140deg,#082a6b,#0d3b8e 60%,#1450b8);box-shadow:0 0 0 2px rgba(255,255,255,.85),0 8px 18px -8px rgba(0,0,0,.45);flex:none}
-.nlogo svg{width:40px;height:20px;overflow:visible}.nlogo img{width:100%;height:100%;border-radius:inherit;display:block}
-.nlogo.land{animation:land .7s cubic-bezier(.2,1.6,.4,1)}
-@keyframes land{0%{transform:scale(1.25);box-shadow:0 0 0 2px #fff,0 0 30px 10px rgba(95,216,255,.8)}100%{transform:none}}
-.brand b i{font-style:normal;color:#ff9a3c}
-#intro{background:none!important}
-#intro .ibg{position:absolute;inset:0;z-index:-2;background:radial-gradient(ellipse at 50% 45%,#0b2f7a 0,#05184a 50%,#020b26 100%);transition:opacity .85s ease}
-#intro.out .ibg,#intro.fly .ibg{opacity:0}
-#intro.fly{pointer-events:none}
-#intro.fly .ist{transition:transform .9s cubic-bezier(.65,0,.25,1)!important;animation:none!important;translate:none!important}
-#intro.fly .iaura,#intro.fly .iring,#intro.fly .iorb,#intro.fly .hud,#intro.fly .ibr,#intro.fly #ibolt,#intro.fly .iflash,#intro.fly .ihex,#intro.fly .iskip,#intro.fly .s1{opacity:0!important;transition:opacity .35s!important}
-#intro.fly svg#ieye{filter:none!important}
-#intro.short .s1,#intro.short .hud,#intro.short .ichips{display:none!important}
-
-@media(max-width:560px){.brand b{font-size:16px;white-space:nowrap}.nlogo{width:40px;height:40px}.nlogo svg{width:34px;height:17px}.nav-cta{white-space:nowrap;padding:9px 12px!important;font-size:13px!important}}
-
-/* ===== v4: space → energy → warp → clouds ===== */
-#intro #ifx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}
-#intro #ibolt{z-index:0}
-/* v5: เนบิวลา WebGL อยู่ชั้นล่างสุด ดวงตาเยื้องขึ้นด้านบน */
-#intro #ineb{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
-#intro .iflash,#intro .ihex{display:none!important}
-#intro .ist{z-index:2;top:-7vh}
-#intro .ibr{top:-4vh}
-#intro .ibr,#intro .hud{z-index:3}
-#intro .iaura{opacity:.0}
-#intro.go .iaura{animation:inAura 1.2s 1.3s cubic-bezier(.2,.8,.2,1) forwards!important}
-#intro .ist,#intro .ibr,#intro .hud,#intro .ichips{transition:transform 1.3s cubic-bezier(.6,0,.4,1),opacity .9s ease}
-#intro.zoom .ist{transform:translateY(18vh) scale(3.2);opacity:0}
-#intro.zoom .ibr,#intro.zoom .ichips{transform:translateY(30vh) scale(1.6)!important;opacity:0!important}
-#intro.zoom .hud.l{transform:translate(-60vw,-50%)!important;opacity:0!important}
-#intro.zoom .hud.r{transform:translate(60vw,-50%)!important;opacity:0!important}
-#intro.zoom .iskip{opacity:.5}
-#intro.out{transition:opacity .9s ease!important}
-
-/* ===== v5: eye = sun, planets orbit, longer hold ===== */
-#intro .hud{display:none!important}
-#intro .ichips{display:flex!important;opacity:0;animation:show .6s 2.4s forwards}
-#intro .ist{top:0}
-#intro.zoom .ist{transform:translate(38vw,-42vh) scale(1.6)!important;opacity:0}
-
-/* ===== v6: 3D motion, eye appears already open ===== */
-#intro .iball{animation:none!important;transform:none!important}
-#intro .iopen{animation:none!important;opacity:1!important;transform:none!important}
-#intro .iclose{display:none!important}
-#intro svg#ieye{opacity:0;will-change:transform}
-#intro .s1{perspective:1100px;perspective-origin:50% 40%}
-#intro .iwin{animation:winIn .6s cubic-bezier(.2,1.2,.4,1) both,winAlert .9s 1.3s ease-out,winClose .55s 2.25s cubic-bezier(.7,0,.3,1) forwards,win3d 1.25s cubic-bezier(.2,.8,.25,1) both,winFace .45s 1.25s cubic-bezier(.3,1.4,.5,1) forwards!important}
-@keyframes win3d{from{rotate:1 -1.1 0 46deg;translate:0 60px -520px}to{rotate:1 -1.1 0 14deg;translate:0 0 0}}
-@keyframes winFace{from{rotate:1 -1.1 0 14deg}to{rotate:1 -1.1 0 0deg;translate:0 0 15px}}
-#intro .ialert{animation:alertIn .5s 1.25s cubic-bezier(.2,1.4,.4,1) forwards,alertOut .3s 2.2s ease-in forwards,alert3d .6s 1.25s cubic-bezier(.2,1.3,.4,1) both!important}
-@keyframes alert3d{from{rotate:x -80deg;translate:0 0 180px}to{rotate:x 0deg;translate:0 0 40px}}
-</style>
-<style>/* ไม่ใช้ไอคอนประดับ เหลือแต่ตัวหนังสือ */ svg.ic,.ico,.sec-ico{display:none!important}</style>
-<style>
-/* ===== ส่วนบน: 2 คอลัมน์ ข้อความซ้าย · ภาพตัวอย่างระบบขวา ===== */
-.hero .wrap{max-width:1180px;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:56px}
-.hv{position:relative;padding:34px 30px 46px;min-height:470px}
-.hv-glow{position:absolute;inset:6% 4% 10% 8%;border-radius:40px;background:radial-gradient(circle at 70% 30%,rgba(255,154,60,.45),transparent 60%),radial-gradient(circle at 25% 80%,rgba(52,211,153,.32),transparent 55%);filter:blur(30px);pointer-events:none}
-.hv-card{position:relative;background:#fff;color:#0f172a;border-radius:24px;padding:22px 22px 14px;box-shadow:0 40px 80px -30px rgba(3,14,48,.65),0 0 0 1px rgba(255,255,255,.4);transform:rotate(-1.5deg);animation:hvFloat 7s ease-in-out infinite}
-.hv-top{display:flex;justify-content:space-between;align-items:center}
-.hv-live{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:#166534;background:#e7f8ee;padding:4px 11px;border-radius:99px}
-.hv-live i{width:8px;height:8px;border-radius:50%;background:#16a34a;box-shadow:0 0 0 4px rgba(22,163,74,.2);animation:hvPulse 1.6s infinite}
-.hv-time{font-size:12.5px;font-weight:700;color:#b4500c;background:#fff1e4;padding:4px 10px;border-radius:99px}
-.hv-title{font-size:19px;font-weight:700;margin-top:12px}
-.hv-sub{font-size:13px;color:#64748b;margin-top:2px}
-.hv-pin{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding:10px 14px;border-radius:14px;background:linear-gradient(120deg,#0b2a7a,#1546b8);color:#fff}
-.hv-pin small{font-size:12px;color:#c8d8ff}
-.hv-pin b{font-family:ui-monospace,Consolas,monospace;font-size:24px;letter-spacing:4px}
-.hv-bar{display:flex;height:9px;border-radius:99px;background:#eef2f7;overflow:hidden;margin:14px 0 8px}
-.hv-bar i{display:block;height:100%}.hv-bar i:first-child{background:#16a34a}.hv-bar i:last-child{background:#1d5fd6}
-.hv-leg{display:flex;gap:14px;font-size:12.5px;color:#64748b}.hv-leg b{color:#0f172a;font-size:15px}.hv-leg b.g{color:#16a34a}.hv-leg b.bl{color:#1d5fd6}
-.hv-list{list-style:none;margin:12px 0 0;padding:0}
-.hv-list li{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid #eef2f7}
-.hv-av{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;font-weight:700;font-size:14px;background:#e7f8ee;color:#16a34a;flex:none}
-.hv-av.o{background:#fff1e4;color:#ff7a1a}.hv-av.b{background:#e8f1ff;color:#1d5fd6}
-.hv-n{flex:1;min-width:0;font-size:13.5px;font-weight:600;line-height:1.35}.hv-n small{display:block;font-size:11.5px;font-weight:400;color:#64748b}
-.hv-s{font-size:12px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}
-.hv-s.ok{background:#e7f8ee;color:#15803d}.hv-s.warn{background:#fdecea;color:#b91c1c}.hv-s.doing{background:#e8f1ff;color:#1d4ed8}
-.hv-chip{position:absolute;display:flex;align-items:center;gap:10px;background:#fff;color:#0f172a;border-radius:16px;padding:10px 14px;box-shadow:0 22px 40px -18px rgba(3,14,48,.6);font-size:12.5px;line-height:1.35;animation:hvFloat 6s ease-in-out infinite}
-.hv-chip b{display:block;font-size:13.5px}
-.hv-chip-a{left:-14px;top:4px;animation-delay:-2s}
-.hv-chip-b{right:-10px;bottom:4px;animation-delay:-4s}
-.hv-chip-b b{font-size:22px;color:#16a34a;line-height:1}
-.hv-dot{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;font-weight:800}
-.hv-dot.o{background:#fff1e4;color:#ff7a1a}
-.hv-mini{display:flex;align-items:flex-end;gap:4px;height:34px}
-.hv-mini i{width:8px;border-radius:3px;background:#c9dbfa}.hv-mini i:nth-child(3){background:#1d5fd6}
-@keyframes hvFloat{0%,100%{translate:0 0}50%{translate:0 -8px}}
-@keyframes hvPulse{50%{box-shadow:0 0 0 7px rgba(22,163,74,.05)}}
-@media (prefers-reduced-motion: reduce){.hv-card,.hv-chip,.hv-live i{animation:none}}
-@media (max-width:960px){.hero .wrap{grid-template-columns:1fr;max-width:760px}.hv{display:none}}
-</style>
+    .back-exampro { display: inline-block; margin-bottom: 12px; font-size: 14px; font-weight: 700; color: inherit; opacity: .9; text-decoration: none; padding: 6px 12px; border-radius: 99px; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.25); }
+    .back-exampro:hover { opacity: 1; background: rgba(255,255,255,.22); }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+  <script type="module" src="js/app.js"></script>
 </head>
 <body>
-<div id="intro" aria-hidden="true">
-  <i class="ibg"></i>
-  <div class="s1">
-    <div class="iwin">
-      <div class="wbar"><i></i><i></i><i></i>
-        <span class="tb ta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>ข้อสอบ · ExamPro</span>
-        <span class="tb tbb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>ค้นหาคำตอบ</span></div>
-      <div class="wbody">
-        <div class="pA"><div class="qh"><b>ข้อ 7</b> / 20<span>24:13</span></div>
-          <p>ข้อใดคือหน้าที่หลักของคลอโรฟิลล์ในกระบวนการสังเคราะห์แสง?</p>
-          <div class="ch"><i></i>ดูดกลืนพลังงานแสง</div><div class="ch"><i></i>ลำเลียงน้ำจากราก</div><div class="ch"><i></i>เก็บสะสมแป้ง</div></div>
-        <div class="pB"><div class="lg">ค้นหา</div><div class="sb"><span>หน้าที่ของคลอโรฟิลล์คือ</span></div></div>
-        <svg class="cur" viewBox="0 0 24 24"><path d="M4 2l15 11-6.5 1.2 3.8 7-2.8 1.5-3.8-7L5 20z" fill="#fff" stroke="#111" stroke-width="1.4" stroke-linejoin="round"/></svg>
+  <header class="top">
+    <a class="back-exampro" href="../admin-questions.html">← กลับหน้าสร้างข้อสอบ</a>
+    <div class="brand">
+      <span class="hex" aria-hidden="true"></span>
+      <div>
+        <div class="eyebrow">EXAMPRO</div>
+        <h1>ตัวแปลงข้อสอบ AI</h1>
       </div>
     </div>
-    <div class="ialert"><span class="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg></span><span><b>ตรวจพบการสลับหน้าจอ</b><small>นักศึกษา 6501 ออกจากหน้าสอบ · ครั้งที่ 1 · 10:42:05</small><em>✓ บันทึกแล้ว และแจ้งอาจารย์ผู้คุมสอบ</em></span></div>
-  </div>
-  <div class="s2">
-    <canvas id="ineb"></canvas>
-    <canvas id="ibolt"></canvas>
-    <i class="iflash"></i>
-    <div class="ist">
-    <i class="iaura"></i><svg class="iorb" viewBox="0 0 200 200"><circle cx="100" cy="100" r="96" stroke-dasharray="2 9"/><circle class="o2" cx="100" cy="100" r="84" stroke-dasharray="60 30 8 30"/><circle class="o3" cx="100" cy="100" r="72" stroke-dasharray="1 5"/></svg><i class="iring"></i><i class="iring r2"></i><i class="iring r3"></i>
-    <svg viewBox="0 0 600 300" id="ieye">
-      <defs>
-        <clipPath id="iwc"><path d="M40,160 C130,60 470,50 560,140 C480,250 140,262 40,160Z"/></clipPath>
-        <radialGradient id="iir" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fff"/><stop offset=".14" stop-color="#d8f8ff"/><stop offset=".38" stop-color="#4cc9ff"/><stop offset=".72" stop-color="#1565d8"/><stop offset="1" stop-color="#051d55"/></radialGradient>
-        <linearGradient id="iws" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fb2d9"/><stop offset=".4" stop-color="#eef4ff"/><stop offset="1" stop-color="#cfdcf3"/></linearGradient>
-        <linearGradient id="ish" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#020a24" stop-opacity=".8"/><stop offset=".45" stop-color="#020a24" stop-opacity="0"/></linearGradient>
-        <radialGradient id="ipw"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset=".35" stop-color="#9eeaff" stop-opacity=".8"/><stop offset="1" stop-color="#4cc9ff" stop-opacity="0"/></radialGradient>
-        <filter id="iblur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="7"/></filter>
-      </defs>
-      <defs>
-        <radialGradient id="imf" cx="50%" cy="50%" r="50%"><stop offset=".6" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
-        <mask id="imk" maskUnits="userSpaceOnUse" x="0" y="-60" width="600" height="420"><ellipse cx="305" cy="155" rx="160" ry="134" fill="url(#imf)"/></mask>
-      </defs>
-      <g class="iball">
-        <g class="ilook"><circle class="ipower2" cx="305" cy="155" r="70" fill="url(#ipw)"/></g>
-      </g>
-      <g class="iopen" fill="none" stroke="#06102e" stroke-linecap="round">
-        <path d="M28,162 C125,52 475,40 572,138" stroke-width="16"/>
-        <path d="M562,136 C586,128 600,116 610,98" stroke-width="9"/>
-        <g stroke-width="5"><path d="M500,92 L528,70"/><path d="M528,108 L560,88"/><path d="M548,126 L584,112"/><path d="M80,124 L58,108"/></g>
-        <path d="M150,232 C260,262 420,240 520,180" stroke-width="4" opacity=".8"/>
-      </g>
-      <g class="iclose" fill="none" stroke="#9eeaff" stroke-linecap="round">
-        <path d="M36,160 C160,212 440,206 564,140" stroke-width="9"/>
-        <g stroke-width="4"><path d="M150,188 L144,210"/><path d="M220,200 L217,222"/><path d="M300,204 L300,226"/><path d="M380,198 L383,220"/><path d="M450,186 L456,208"/><path d="M510,166 L520,188"/></g>
-      </g>
-    </svg>
-  </div>
-    <div class="ibr"><b>Exam<span>Pro</span></b>
-      <div class="ichips"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg>จับการสลับหน้าจอ · ระหว่างสอบ</i></div></div>
-    <div class="hud l"><div class="hh"><span class="hi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg></span><span><b>สลับหน้าจอ</b><small>ระหว่างสอบออนไลน์</small></span><em class="live"><i></i>สด</em></div>
-      <div class="hs"><div><b>32</b><small>กำลังสอบ</small></div><div><b class="r">1</b><small>สลับหน้าจอ</small></div></div>
-      <div class="hb"><i style="--h:40%"></i><i style="--h:65%"></i><i style="--h:30%"></i><i style="--h:80%"></i><i style="--h:55%"></i><i class="r" style="--h:95%"></i><i style="--h:45%"></i></div>
-      <div class="hf">✓ แจ้งอาจารย์ผู้คุมสอบแล้ว</div></div>
-    <i class="ihex"></i>
-    <canvas id="ifx"></canvas>
-  </div>
-  <button class="iskip" type="button">ข้าม ›</button>
-</div>
-<script>
-(function(){
-  const el=document.getElementById('intro'),root=document.documentElement;
-  const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
-  const q=location.search+location.hash;
-  if(reduce||/nointro/.test(q)){el.remove();return}
-  /* เล่นเต็มทุกครั้งที่เปิดหน้าเว็บ (ฉากสลับหน้าจอโดนตรวจจับ → ดวงตา → ดาว) */
-  const SHORT=false;
-  if(SHORT)el.classList.add('short');
-  /* เวลาในฉากอวกาศ (วินาที) */
-  const TC=3.3,TS=4.1,TH=4.9,TW=5.2,TCL=6.1,TEND=7.8;
-  const RATE=SHORT?1.8:1,S1=SHORT?0:2900,S2=TEND*1000/RATE;
-  root.classList.add('intro-on');root.style.overflow='hidden';
-  const LOW=innerWidth<700||(navigator.hardwareConcurrency||8)<=4;
-  const bgc=document.getElementById('ibolt'),bx=bgc.getContext('2d'),fxc=document.getElementById('ifx'),fx=fxc.getContext('2d');
-  const eye=document.getElementById('ieye'),look=el.querySelector('.ilook');
-  let W,H,D=LOW?1:Math.min(devicePixelRatio||1,2),neb=null;
-  function size(){W=innerWidth;H=innerHeight;[bgc,fxc].forEach(c=>{c.width=W*D;c.height=H*D});bx.setTransform(D,0,0,D,0,0);fx.setTransform(D,0,0,D,0,0);
-    neb=document.createElement('canvas');neb.width=W;neb.height=H;const n=neb.getContext('2d');
-    [[.22,.25,.5,'rgba(88,60,200,.22)'],[.8,.2,.45,'rgba(30,110,220,.24)'],[.65,.8,.55,'rgba(20,70,170,.2)'],[.12,.82,.4,'rgba(140,60,190,.14)']].forEach(([x,y,r,c])=>{const g=n.createRadialGradient(W*x,H*y,0,W*x,H*y,Math.max(W,H)*r);g.addColorStop(0,c);g.addColorStop(1,'rgba(0,0,0,0)');n.fillStyle=g;n.fillRect(0,0,W,H)})}
-  size();addEventListener('resize',size);
-  /* ---------- v5: เนบิวลา 3 มิติ (WebGL) + ดาวสมจริง + เมาส์ขยับมุมมอง ---------- */
-  let MX=0,MY=0,mx=0,my=0;
-  addEventListener('pointermove',e=>{MX=e.clientX/innerWidth*2-1;MY=e.clientY/innerHeight*2-1},{passive:true});
-  /* สีดาวตามอุณหภูมิ: ขาวอมฟ้า (ส่วนใหญ่) ฟ้า เหลืองนวล ส้ม */
-  const starCol=()=>{const k=Math.random();return k<.6?[225,235,255]:k<.8?[175,200,255]:k<.93?[255,240,215]:[255,200,165]};
-  const GL=(()=>{const c=document.getElementById('ineb');if(!c)return null;
-    let g=null;try{g=c.getContext('webgl',{antialias:false,alpha:false,powerPreference:'high-performance'})}catch(e){}
-    if(!g)return null;
-    const OCT=LOW?4:6,RES=LOW?.5:.75;
-    const vs='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
-    /* เมฆเนบิวลา 2 ชั้นคนละระยะ (ชั้นใกล้ขยับมากกว่า = รู้สึกเป็น 3 มิติ) แถบแสงลาเวนเดอร์เฉียง + แกนส้มแดงด้านบน */
-    const fs=`precision mediump float;uniform vec2 r;uniform float t,w;uniform vec2 m;
-float h(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
-float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1.,0.)),f.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),f.x),f.y);}
-float fbm(vec2 p){float v=0.,a=.5;mat2 R=mat2(.8,.6,-.6,.8);for(int i=0;i<${OCT};i++){v+=a*n(p);p=R*p*2.03+3.1;a*=.5;}return v;}
-vec3 layer(vec2 uv,float d){vec2 p=uv*(1.5+d*.6)+vec2(t*.010,-t*.005)*(1.+d)+m*(.05+d*.07);
- vec2 q=vec2(fbm(p+t*.018),fbm(p+vec2(5.2,1.3)-t*.014));
- float c=fbm(p+2.2*q),c2=fbm(p*2.3+3.*q+vec2(1.7,9.2));
- float band=exp(-pow((uv.y-.02+uv.x*.3)*3.+(q.x-.5)*1.8,2.));
- vec3 col=vec3(.25,.22,.66)*smoothstep(.35,.85,c)*(.3+.9*band);
- col+=vec3(.75,.72,1.)*pow(smoothstep(.5,.95,c2),2.)*band*1.7;
- vec2 k=uv-vec2(-.05,.36);float core=exp(-dot(k,k)*2.3);
- col+=mix(vec3(.5,.08,.12),vec3(1.,.45,.22),smoothstep(.4,.9,c2))*smoothstep(.28,.8,c)*core*2.6;
- col*=.5+.5*smoothstep(.25,.62,fbm(p*3.1+q*2.));
- return col;}
-void main(){vec2 uv=(gl_FragCoord.xy-.5*r)/r.y;uv/=1.+w*2.4;
- vec3 col=vec3(.004,.008,.03)+layer(uv,0.)*1.15+layer(uv*1.35+vec2(3.1,-1.7),1.)*.55;
- vec2 e=uv-vec2(0.,.1);col+=vec3(.22,.32,.85)*exp(-dot(e,e)*7.)*.4;
- col*=1.-.38*dot(uv,uv);gl_FragColor=vec4(pow(col,vec3(.92)),1.);}`;
-    const sh=(ty,src)=>{const s=g.createShader(ty);g.shaderSource(s,src);g.compileShader(s);return g.getShaderParameter(s,g.COMPILE_STATUS)?s:null};
-    const v=sh(g.VERTEX_SHADER,vs),f=sh(g.FRAGMENT_SHADER,fs);if(!v||!f)return null;
-    const pr=g.createProgram();g.attachShader(pr,v);g.attachShader(pr,f);g.linkProgram(pr);if(!g.getProgramParameter(pr,g.LINK_STATUS))return null;
-    g.useProgram(pr);g.bindBuffer(g.ARRAY_BUFFER,g.createBuffer());g.bufferData(g.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),g.STATIC_DRAW);
-    const al=g.getAttribLocation(pr,'a');g.enableVertexAttribArray(al);g.vertexAttribPointer(al,2,g.FLOAT,false,0,0);
-    const U={r:g.getUniformLocation(pr,'r'),t:g.getUniformLocation(pr,'t'),w:g.getUniformLocation(pr,'w'),m:g.getUniformLocation(pr,'m')};
-    const fit=()=>{c.width=Math.round(innerWidth*RES);c.height=Math.round(innerHeight*RES);g.viewport(0,0,c.width,c.height)};fit();addEventListener('resize',fit);
-    return (t,w,a)=>{c.style.opacity=a;g.uniform2f(U.r,c.width,c.height);g.uniform1f(U.t,t+3);g.uniform1f(U.w,w);g.uniform2f(U.m,mx,-my);g.drawArrays(g.TRIANGLES,0,3)};
-  })();
-  /* ดาวไกลหลายพันดวง วาดครั้งเดียวเก็บไว้ ขยับช้า ๆ ตามเมาส์ */
-  let dust=null;
-  const mkDust=()=>{dust=document.createElement('canvas');const w=dust.width=Math.round(innerWidth*1.2),h=dust.height=Math.round(innerHeight*1.2),d=dust.getContext('2d');
-    for(let i=0;i<(LOW?900:2200);i++){const m=Math.pow(Math.random(),3),[r,gg,bb]=starCol(),s=.35+m*1.3;d.fillStyle=`rgba(${r},${gg},${bb},${(.12+m*.75).toFixed(2)})`;d.beginPath();d.arc(Math.random()*w,Math.random()*h,s*.6,0,6.283);d.fill()}};
-  mkDust();addEventListener('resize',mkDust);
-  /* ดาวใกล้: ขนาด/สีต่างกัน ดวงสว่างมีแสงฟุ้งและแฉกแสง */
-  const drawStar=(p,X,Y,b)=>{const [r,gg,bb]=p.c,s=(1-p.z)*1.6+.35+p.m*1.6;
-    if(p.m>.82&&p.z<.7){const R=s*3;glow(bx,X,Y,R*2,[[0,`rgba(${r},${gg},${bb},${b*.9})`],[.25,`rgba(${r},${gg},${bb},${b*.25})`],[1,`rgba(${r},${gg},${bb},0)`]]);
-      bx.strokeStyle=`rgba(${r},${gg},${bb},${b*.45})`;bx.lineWidth=.8;bx.beginPath();bx.moveTo(X-R*2.2,Y);bx.lineTo(X+R*2.2,Y);bx.moveTo(X,Y-R*2.2);bx.lineTo(X,Y+R*2.2);bx.stroke()}
-    bx.fillStyle=`rgba(${r},${gg},${bb},${b})`;bx.beginPath();bx.arc(X,Y,s*.6,0,6.283);bx.fill()};
-  const stars=Array.from({length:LOW?220:460},()=>({x:(Math.random()*2-1)*1.6,y:(Math.random()*2-1)*1.6,z:Math.random()*.95+.05,tw:Math.random()*6.28,px:null,py:null,c:starCol(),m:Math.pow(Math.random(),2.2)}));
-  const clouds=Array.from({length:LOW?18:30},()=>{const a=Math.random()*6.28,r=Math.random()*1.1;return{x:Math.cos(a)*r,y:Math.sin(a)*r*.7,z:1+Math.random()*.9,puffs:Array.from({length:5},()=>[(Math.random()-.5)*1.4,(Math.random()-.5)*.6,.45+Math.random()*.55]),c:Math.random()<.5?'235,244,255':'214,232,255'}});
-  /* ดวงตา = ดวงอาทิตย์ ดาวโคจรรอบ */
-  const sun=()=>{const r=eye.getBoundingClientRect();return [r.left+r.width*.508,r.top+r.height*.517,r.width/600]};
-  const orbitR=()=>{const p=H>W;return p?[W*.46,H*.36]:[Math.min(W*.42,640),Math.min(H*.33,320)]};
-  let TILT=-.16;const W0=.42,TH0=()=>H>W?2.25:2.62; /* ดาวเป้าหมายอยู่ล่างซ้ายตอนยิง */
-  const PL=[{f:1,R:.072,c:['#d6f5ff','#3d9be9','#0b2a6b'],atm:'110,200,255',band:1,ring:1,th:t=>TH0()-W0*(t-TS)},
-            {f:.62,R:.022,c:['#ffe7a3','#e3a21a','#5a3a05'],atm:'255,200,90',th:t=>1.1-.85*t},
-            {f:1.32,R:.03,c:['#e7d4ff','#8a5fe0','#2b1460'],atm:'190,150,255',th:t=>4.2-.32*t},
-            /* v6: ดาวโลก ดาวอังคาร และดาวแก๊สยักษ์ลายแถบ */
-            {f:.82,R:.036,c:['#a8e0ff','#2a7fd6','#06204f'],atm:'120,190,255',earth:1,th:t=>3.6-.55*t},
-            {f:1.12,R:.02,c:['#ffc2a0','#d0582e','#4a1406'],atm:'255,140,100',shade:1,th:t=>5.6-.4*t},
-            {f:1.48,R:.056,c:['#fbe8c8','#d3a06a','#5a3416'],atm:'255,210,160',band:1,
-             bands:[[-.6,.12,'255,240,220,.35'],[-.3,.14,'150,80,40,.38'],[0,.1,'255,235,210,.3'],[.28,.16,'140,70,35,.34'],[.58,.1,'240,210,180,.3']],th:t=>4.4-.12*t}];
-  /* ดาวโลก: ทวีป น้ำแข็งขั้วโลก และเมฆ หมุนรอบตัวเองช้า ๆ */
-  const EARTH_LAND=[[.02,.35,.3,'64,140,72'],[.08,.05,.22,'86,150,70'],[.12,-.3,.26,'70,128,60'],[.33,.25,.34,'160,135,80'],[.38,-.15,.24,'88,150,72'],[.55,.4,.28,'72,140,70'],[.6,0,.2,'165,140,90'],[.72,-.35,.3,'80,145,68'],[.85,.15,.25,'70,135,65'],[0,-.8,.5,'240,248,255'],[.5,-.8,.5,'240,248,255'],[0,.8,.45,'240,248,255'],[.5,.8,.45,'240,248,255']];
-  const EARTH_CLOUD=[[.05,.15,.22],[.2,-.2,.18],[.4,.45,.2],[.62,-.05,.24],[.8,.3,.2],[.92,-.4,.18]];
-  function earth(c,x,y,r){const T=performance.now()/1000;c.save();c.beginPath();c.arc(x,y,r,0,7);c.clip();
-    const blob=(lon,lat,s,fill,spin)=>{const th=(lon+T*spin)*6.2832,v=Math.cos(th);if(v<=.02)return;const ph=lat*1.2;
-      c.fillStyle=fill;c.beginPath();c.ellipse(x+r*Math.sin(th)*Math.cos(ph),y-r*Math.sin(ph),s*r*v,s*r*.75*Math.cos(ph),0,0,7);c.fill()};
-    EARTH_LAND.forEach(([a,b,s,col],i)=>{const f=`rgba(${col},.92)`;if(Math.abs(b)>.7)return blob(a,b,s*.9,f,.035);
-      blob(a,b,s*1.45,f,.035);blob(a+.04,b-.12*(i%2?1:-1),s,f,.035);blob(a-.035,b+.1,s*.75,f,.035)});
-    EARTH_CLOUD.forEach(([a,b,s])=>blob(a,b,s,'rgba(255,255,255,.38)',.05));
-    c.restore()}
-  /* กล้อง 3 มิติ: หมุน (yaw) และก้ม (pitch) เข้าหาตำแหน่งยิง แล้วฉายภาพแบบ perspective */
-  const P0S=.5,cam=t=>{const e=ease(cl(Math.min(t,TS)/TS));return{yaw:-.55*(1-e),sp:Math.sin(.74+(.5236-.74)*e)}};
-  const proj=(a,f,t,cx,cy)=>{const [rx,ry]=orbitR(),{yaw,sp}=cam(t),cp=Math.sqrt(1-sp*sp);
-    const X=Math.cos(a)*rx*f,Z=Math.sin(a)*ry/P0S*f,x1=X*Math.cos(yaw)-Z*Math.sin(yaw),z1=X*Math.sin(yaw)+Z*Math.cos(yaw);
-    const Fp=Math.max(W,H)*2.6,sc=Fp/(Fp-z1*cp);return [cx+x1*sc,cy+z1*sp*sc,z1,sc]};
-  const pos=(p,t,cx,cy)=>proj(p.th(t),p.f,t,cx,cy);
-  function planet(c,x,y,r,p,cx,cy,al){if(al<=0)return;c.save();c.globalAlpha=al;
-    const g0=c.createRadialGradient(x,y,r*.8,x,y,r*2.4);g0.addColorStop(0,`rgba(${p.atm},.35)`);g0.addColorStop(1,`rgba(${p.atm},0)`);c.fillStyle=g0;c.beginPath();c.arc(x,y,r*2.4,0,7);c.fill();
-    const lx=Math.cos(Math.atan2(cy-y,cx-x)),ly=Math.sin(Math.atan2(cy-y,cx-x));
-    const g=c.createRadialGradient(x+lx*r*.45,y+ly*r*.45,r*.1,x,y,r);g.addColorStop(0,p.c[0]);g.addColorStop(.55,p.c[1]);g.addColorStop(1,p.c[2]);
-    const ring=(a0,a1)=>{if(!p.ring)return;c.save();c.translate(x,y);c.rotate(-.35);c.strokeStyle=`rgba(${p.atm},.75)`;c.lineWidth=Math.max(1.5,r*.13);c.beginPath();c.ellipse(0,0,r*1.75,r*.42,0,a0,a1);c.stroke();c.strokeStyle='rgba(230,248,255,.45)';c.lineWidth=Math.max(1,r*.05);c.beginPath();c.ellipse(0,0,r*1.98,r*.5,0,a0,a1);c.stroke();c.restore()};
-    ring(Math.PI,Math.PI*2);c.fillStyle=g;c.beginPath();c.arc(x,y,r,0,7);c.fill();
-    if(p.band){c.save();c.beginPath();c.arc(x,y,r,0,7);c.clip();c.translate(x,y);c.rotate(-.35);(p.bands||[[-.45,.16,'210,240,255,.28'],[-.05,.1,'10,40,110,.35'],[.3,.2,'170,225,255,.22'],[.62,.08,'10,40,110,.3']]).forEach(([o,h,col])=>{c.fillStyle=`rgba(${col})`;c.beginPath();c.ellipse(0,o*r,r*1.2,h*r,0,0,7);c.fill()});c.restore()}
-    if(p.earth)earth(c,x,y,r);
-    if(p.band||p.earth||p.shade){
-      const sh=c.createRadialGradient(x+lx*r*.5,y+ly*r*.5,r*.2,x,y,r*1.05);sh.addColorStop(0,'rgba(0,0,0,0)');sh.addColorStop(.7,'rgba(0,0,0,0)');sh.addColorStop(1,'rgba(2,6,20,.55)');c.fillStyle=sh;c.beginPath();c.arc(x,y,r,0,7);c.fill()}
-    ring(0,Math.PI);c.restore()}
-  let T0=0,raf=0,last=0,lx=0,ly=0,trail=[],sparks=[],charge=[],vp=null,tgt=null;
-  const ease=x=>x<0?0:x>1?1:x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2,cl=x=>x<0?0:x>1?1:x;
-  function glow(c,x,y,r,stops){const g=c.createRadialGradient(x,y,0,x,y,r);stops.forEach(([o,col])=>g.addColorStop(o,col));c.fillStyle=g;c.beginPath();c.arc(x,y,r,0,7);c.fill()}
-  function frame(now){
-    const t=(now-T0)*RATE/1000,dt=Math.min(.05,(now-(last||now))*RATE/1000);last=now;
-    const R=Math.max(W,H),m=Math.min(W,H),[cx,cy,k]=sun();
-    const fadeIn=cl(t/.6),warp=ease((t-TW)/1.5);
-    /* ---------- ฉากหลังอวกาศ ---------- */
-    mx+=(MX-mx)*.05;my+=(MY-my)*.05;
-    if(GL){bx.clearRect(0,0,W,H);GL(t,warp,fadeIn)}else{bx.fillStyle='#02040e';bx.fillRect(0,0,W,H)}
-    const P0=PL[0],tf=Math.min(t,TH);let [tx0,ty0,dep0,sc0]=pos(P0,tf,cx,cy);
-    if(t>=TH&&!vp)vp=[tx0,ty0];
-    const vx=vp?vp[0]:W/2,vy=vp?vp[1]:H/2;
-    if(!GL){bx.save();bx.globalAlpha=fadeIn;const zs=1+warp*2.2;bx.translate(vx,vy);bx.scale(zs,zs);bx.drawImage(neb,-vx,-vy);bx.restore()}
-    if(dust){bx.save();bx.globalAlpha=fadeIn*(1-warp);const zd=1+warp*1.5;bx.translate(W/2,H/2);bx.scale(zd,zd);bx.drawImage(dust,-dust.width/2-mx*14,-dust.height/2-my*10);bx.restore()}
-    const {yaw:cyw,sp:csp}=cam(t),speed=.015+warp*3.2,F=R*.2;
-    /* ดวงตาลอยเข้ามาแบบ 3 มิติ (ลืมตาอยู่แล้ว) แล้วเอียงตามกล้อง */
-    {const e=1-Math.pow(1-cl(t/1.05),3);eye.style.opacity=cl(t/.3);eye.style.transform=`perspective(1100px) translateZ(${(-1600*(1-e)).toFixed(0)}px) rotateY(${(-75*(1-e)+cyw*26+mx*9).toFixed(2)}deg) rotateX(${(32*(1-e)+(csp-.5)*55-my*7).toFixed(2)}deg)`}
+    <p class="lead">อัปโหลดข้อสอบ PDF หรือ Word แล้ว Gemini จะแปลงเป็นไฟล์ Excel พร้อมนำเข้าหน้า “สร้างข้อสอบ” ของ ExamPro</p>
+  </header>
 
-    for(const p of stars){p.z-=speed*dt;if(p.z<=.02){p.z=1;p.x=(Math.random()*2-1)*1.6;p.y=(Math.random()*2-1)*1.6;p.px=null}
-      const X=vx+(p.x+cyw*.25)/p.z*F-mx*40*(1-p.z),Y=vy+(p.y-(csp-.5)*.3)/p.z*F-my*28*(1-p.z);
-      if(X<-50||X>W+50||Y<-50||Y>H+50){p.z=1;p.px=null;continue}
-      const b=cl((1-p.z)*1.3)*fadeIn*(.55+.45*Math.sin(t*3+p.tw));
-      if(warp>.05&&p.px!==null){bx.strokeStyle=`rgba(200,230,255,${b})`;bx.lineWidth=1+(1-p.z)*2;bx.beginPath();bx.moveTo(p.px,p.py);bx.lineTo(X,Y);bx.stroke()}
-      else drawStar(p,X,Y,b);
-      p.px=X;p.py=Y}
-    /* วงโคจร */
-    const oa=fadeIn*cl((t-.3)/1)*(1-cl(warp*3));
-    if(oa>0){bx.save();bx.setLineDash([3,7]);bx.lineWidth=1;
-      PL.forEach((p,i)=>{bx.strokeStyle=i?`rgba(150,190,255,${.22*oa})`:`rgba(140,210,255,${.45*oa})`;bx.beginPath();for(let k=0;k<=96;k++){const [x,y]=proj(k/96*6.2832,p.f,t,cx,cy);k?bx.lineTo(x,y):bx.moveTo(x,y)}bx.stroke()});bx.restore();bx.setLineDash([])}
-    /* แสงดวงอาทิตย์รอบดวงตา */
-    glow(bx,cx,cy,170*k*2*(1-warp*.5),[[0,`rgba(140,210,255,${.35*fadeIn})`],[1,'rgba(20,80,200,0)']]);
-    fx.clearRect(0,0,W,H);
-    /* ดาวเคราะห์: ครึ่งหลังวาดหลังดวงตา ครึ่งหน้าวาดทับ */
-    const pa=fadeIn*cl((t-.5)/1);
-    PL.forEach((p,i)=>{if(i===0)return;const [x,y,d,sc]=pos(p,t,cx,cy);planet(d<0?bx:fx,x,y,m*p.R*sc,p,cx,cy,pa*(1-cl(warp*2.5)))});
-    let px0=tx0,py0=ty0,pr=m*P0.R*sc0;
-    if(warp>0){const g=Math.pow(warp,2.4);px0=tx0+(W/2-tx0)*g;py0=ty0+(H/2-ty0)*g;pr*=1+Math.pow(warp,3)*45}
-    tgt=[px0,py0];
-    planet(warp>0||dep0>=0?fx:bx,px0,py0,pr,P0,warp>0?W/2:cx,warp>0?-H:cy,pa);
-    if(t>TC-.5&&t<TH&&warp<=0){const la=cl((t-TC+.5)/.4),sp=t*1.6;fx.save();fx.translate(px0,py0);fx.strokeStyle=`rgba(150,225,255,${.85*la})`;fx.lineWidth=1.6;
-      const rr=pr*2.4*(1.5-.5*la);fx.rotate(sp);fx.setLineDash([pr*.5,pr*.35]);fx.beginPath();fx.arc(0,0,rr,0,7);fx.stroke();fx.setLineDash([]);fx.rotate(-sp);
-      for(let i=0;i<4;i++){const a=i*Math.PI/2;fx.beginPath();fx.moveTo(Math.cos(a)*(rr+4),Math.sin(a)*(rr+4));fx.lineTo(Math.cos(a)*(rr+pr*.6),Math.sin(a)*(rr+pr*.6));fx.stroke()}fx.restore()}
-    if(t>TH){const h=cl((t-TH)/.6);glow(fx,px0,py0,pr*(2+h*3),[[0,`rgba(220,245,255,${.7*(1-h)})`],[1,'rgba(120,200,255,0)']])}
-    /* ---------- ดวงตามองดาว ชาร์จ ยิง ---------- */
-    const ir=(()=>{const r=eye.getBoundingClientRect(),kk=r.width/600;return [r.left+(305+lx)*kk,r.top+(155+ly)*kk,kk]})();
-    const [ix,iy,kk]=ir;
-    if(t>1.35&&warp<=0){const ax=Math.max(-55,Math.min(55,(px0-ix)/W*200)),ay=Math.max(-26,Math.min(26,(py0-iy)/H*120));lx+=(ax-lx)*.07;ly+=(ay-ly)*.07;look.setAttribute('transform',`translate(${lx.toFixed(1)} ${ly.toFixed(1)})`)}
-    fx.globalCompositeOperation='lighter';
-    if(t>TC&&t<TS+.05){const cp=(t-TC)/(TS-TC);for(let i=0;i<(LOW?2:5);i++){const a=Math.random()*6.28,r=(140+Math.random()*90)*kk*2;charge.push({a,r,l:1})}
-      glow(fx,ix,iy,(30+cp*70)*kk*2,[[0,`rgba(255,255,255,${.5+cp*.5})`],[.3,`rgba(120,220,255,${.4+cp*.45})`],[1,'rgba(40,120,255,0)']])}
-    charge=charge.filter(c=>(c.r*=.86)>4*kk&&(c.l-=.04)>0);for(const c of charge){c.a+=.12;glow(fx,ix+Math.cos(c.a)*c.r,iy+Math.sin(c.a)*c.r*.8,3.5,[[0,'rgba(200,245,255,.95)'],[1,'rgba(80,200,255,0)']])}
-    if(t>=TS&&t<TH){const p=ease((t-TS)/(TH-TS)),qx=(ix+px0)/2+(py0-iy)*.35,qy=(iy+py0)/2-(px0-ix)*.1;
-      const ox=(1-p)*(1-p)*ix+2*(1-p)*p*qx+p*p*px0,oy=(1-p)*(1-p)*iy+2*(1-p)*p*qy+p*p*py0,orr=(34-14*p)*Math.max(.7,kk*2);
-      trail.push([ox,oy,orr]);if(trail.length>28)trail.shift();
-      trail.forEach(([x,y,r],i)=>glow(fx,x,y,r*(.3+i/trail.length*.8),[[0,`rgba(160,230,255,${i/trail.length*.5})`],[1,'rgba(40,120,255,0)']]));
-      glow(fx,ox,oy,orr*2.4,[[0,'rgba(255,255,255,1)'],[.18,'rgba(200,245,255,.95)'],[.45,'rgba(80,190,255,.5)'],[1,'rgba(30,90,255,0)']]);
-      for(let i=0;i<(LOW?2:4);i++)sparks.push({x:ox,y:oy,vx:(Math.random()-.5)*5,vy:(Math.random()-.5)*5,l:1})}
-    else trail=[];
-    if(t>=TH&&t<TH+.8){const h=(t-TH)/.8;fx.strokeStyle=`rgba(190,240,255,${1-h})`;fx.lineWidth=3*(1-h)+.5;fx.beginPath();fx.arc(px0,py0,pr+h*R*.3,0,7);fx.stroke()}
-    sparks=sparks.filter(p=>(p.l-=.035)>0);for(const p of sparks){p.x+=p.vx;p.y+=p.vy;fx.fillStyle=`rgba(200,240,255,${p.l})`;fx.fillRect(p.x,p.y,2,2)}
-    fx.globalCompositeOperation='source-over';
-    /* ---------- ทะลุชั้นเมฆของดาว ---------- */
-    if(t>TCL){const ct=t-TCL;
-      for(const c of clouds.sort((a,b)=>b.z-a.z)){c.z-=dt*1.2;if(c.z<.06)continue;
-        const sc=1/c.z,A=cl((1.9-c.z)*1.4)*cl((c.z-.06)*4)*.9;if(A<=0)continue;
-        const X=W/2+c.x*W*.45*sc,Y=H/2+c.y*H*.45*sc;
-        for(const [dx,dy,r] of c.puffs){const rr=r*R*.16*sc;glow(fx,X+dx*rr,Y+dy*rr,rr,[[0,`rgba(${c.c},${A})`],[.6,`rgba(${c.c},${A*.55})`],[1,`rgba(${c.c},0)`]])}}
-      const fog=cl((ct-.75)/.55)*.92;if(fog>0){fx.fillStyle=`rgba(236,244,255,${fog})`;fx.fillRect(0,0,W,H)}}
-    if(t>TW)el.classList.add('zoom');
-    raf=requestAnimationFrame(frame)}
-  const timers=[];
-  /* ฉากดวงตา/อวกาศ (ฉาก 2): ปิดไว้ — intro เหลือแค่ฉากสลับหน้าจอแล้วถูกเตือน
-     เปิดกลับ: เปลี่ยนเป็น true */
-  const SHOW_EYE_SCENE=false;
-  if(SHOW_EYE_SCENE)timers.push(setTimeout(()=>{el.classList.add('go');
-    if(RATE!==1)el.querySelectorAll('.s2,.s2 *').forEach(n=>n.getAnimations().forEach(a=>a.playbackRate=RATE));
-    T0=performance.now();raf=requestAnimationFrame(frame)},S1));
-  let fin=false;
-  const finish=()=>{if(fin)return;fin=true;timers.forEach(clearTimeout);
-    root.style.overflow='';root.classList.remove('intro-on');root.classList.add('intro-done');el.classList.add('out');
-    const lg=document.querySelector('.nlogo');if(lg)setTimeout(()=>lg.classList.add('land'),500);
-    setTimeout(()=>{cancelAnimationFrame(raf);el.remove()},1000)};
-  /* จบ intro: ถ้าไม่มีฉากดวงตา ให้จางหายพร้อมฉากเตือน (ฉาก 1 เริ่มจางที่ 2.6 วินาที) */
-  timers.push(setTimeout(finish,SHOW_EYE_SCENE?S1+S2:2600));el.addEventListener('click',finish);addEventListener('keydown',finish,{once:true});
-})();
-</script>
-
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.6-3 8.1-7 10-4-1.9-7-5.4-7-10V6z"/><path d="M9 12l2.2 2.2L15.5 10"/></symbol>
-  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3H7a1.5 1.5 0 0 0-1.5 1.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.5z"/><path d="M14 3v4.5h4.5M9 12.5h6M9 16h3.5"/></symbol>
-  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3.5 20.5h17M6.5 20.5v-6M11 20.5V9M15.5 20.5v-8.5M20 20.5V5"/></symbol>
-  <symbol id="i-list" viewBox="0 0 24 24"><path d="M10 6.5h10M10 12h10M10 17.5h10"/><path d="M3.5 6.5l1.3 1.3L7 5.5M3.5 12l1.3 1.3L7 11M3.5 17.5l1.3 1.3L7 16.5"/></symbol>
-  <symbol id="i-steps" viewBox="0 0 24 24"><path d="M4 19h5v-5h5V9h5V4"/><circle cx="19" cy="4" r="0.6"/></symbol>
-  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 0 1 4.8.9c0 1.8-2.4 2.2-2.4 3.9M12 17.2v.1"/></symbol>
-  <symbol id="i-cap" viewBox="0 0 24 24"><path d="M2.5 9.5L12 5l9.5 4.5L12 14z"/><path d="M6.5 11.6v4.2c3.2 2.3 7.8 2.3 11 0v-4.2M21.5 9.5v5"/></symbol>
-  <symbol id="i-board" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8.5 20h7M7 8.5h6M7 11.5h4"/></symbol>
-  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></symbol>
-  <symbol id="i-gauge" viewBox="0 0 24 24"><path d="M4.2 17.5a9 9 0 1 1 15.6 0"/><path d="M12 13.5l3.5-3.5"/><circle cx="12" cy="13.5" r="1.2"/></symbol>
-</defs></svg>
-
-<nav>
-  <div class="wrap">
-    <a class="brand" href="index.html"><span><b>Exam<i>Pro</i></b><small>ระบบสอบออนไลน์</small></span></a>
-    <div class="menu"><a href="#features">ความสามารถ</a><a href="#how">วิธีใช้งาน</a><a href="#faq">คำถามที่พบบ่อย</a></div>
-    <a class="btn btn-ol nav-cta" href="login.html">เข้าสู่ระบบ</a>
-  </div>
-</nav>
-
-<header class="hero">
-  <div class="wrap">
-    <div>
-      <div class="tag"><i></i>ระบบสอบออนไลน์</div>
-      <h1>สอบออนไลน์อย่างมั่นใจ<br><em>ป้องกันทุจริต</em> <span style="white-space:nowrap">ได้แบบเรียลไทม์</span></h1>
-      <p class="lead">จัดสอบปรนัย ติดตามพฤติกรรมผู้เข้าสอบแบบเรียลไทม์ ตรวจคะแนนอัตโนมัติ และส่งออกผลเป็น Excel</p>
-      <div class="cta">
-        <a class="btn btn-or" href="login.html"><svg class="ic "><use href="#i-cap"/></svg> เข้าสู่ระบบ</a>
-        <button class="btn btn-ol" type="button" onclick="openSignup()">สมัครสมาชิก</button>
-      </div>
-      <form class="pin" onsubmit="event.preventDefault();const v=this.pin.value.replace(/\s/g,'');if(v)location.href='Student-login.html?pin='+encodeURIComponent(v);">
-        <span>มีรหัส PIN ห้องสอบ?</span>
-        <input name="pin" inputmode="numeric" maxlength="7" placeholder="000 000" aria-label="รหัส PIN ห้องสอบ">
-        <button class="btn btn-or" type="submit">เข้าห้องสอบ</button>
-      </form>
+  <main class="wrap">
+    <div class="alert info" id="draft-banner" hidden>
+      <span id="draft-text"></span>
+      <span class="banner-actions">
+        <button class="primary small" type="button" id="draft-restore">เปิดต่อ</button>
+        <button class="ghost small" type="button" id="draft-discard">ทิ้ง</button>
+      </span>
     </div>
 
-    <!-- ภาพตัวอย่างหน้าจอระบบ (ตกแต่ง ไม่ใช่ข้อมูลจริง) -->
-    <div class="hv" aria-hidden="true">
-      <div class="hv-glow"></div>
-      <div class="hv-card">
-        <div class="hv-top">
-          <span class="hv-live"><i></i>กำลังสอบ</span>
-          <span class="hv-time">เหลือ 32 นาที</span>
+    <!-- 1. API key -->
+    <section class="card" id="key-card">
+      <div class="step-head">
+        <span class="step">1</span>
+        <h2 id="key-title">Gemini API Key</h2>
+        <span class="pill" id="key-status" hidden></span>
+      </div>
+      <p class="hint" id="server-hint" hidden>ใช้ AI ของระบบ ExamPro ได้เลย ไม่ต้องกรอก API Key</p>
+      <div class="row">
+        <div class="field grow direct-only">
+          <label for="api-key">API Key</label>
+          <div class="input-wrap">
+            <input id="api-key" type="password" autocomplete="off" spellcheck="false" placeholder="AIza..." />
+            <button class="ghost icon" type="button" id="toggle-key" aria-label="แสดง/ซ่อน API Key">แสดง</button>
+          </div>
         </div>
-        <div class="hv-title">แบบทดสอบท้ายบทที่ 1</div>
-        <div class="hv-sub">SW-101 · กลุ่ม TEC3R · 20 ข้อ</div>
-        <div class="hv-pin"><small>รหัสเข้าสอบ</small><b>704 103</b></div>
-        <div class="hv-bar"><i style="width:60%"></i><i style="width:27%"></i></div>
-        <div class="hv-leg"><span><b class="g">18</b> ส่งแล้ว</span><span><b class="bl">8</b> กำลังทำ</span><span><b>4</b> ยังไม่เข้า</span></div>
-        <ul class="hv-list">
-          <li><span class="hv-av">ส</span><span class="hv-n">สมชาย ใจดี<small>ส่งแล้ว · 2 นาทีที่แล้ว</small></span><span class="hv-s ok">17/20</span></li>
-          <li><span class="hv-av o">ม</span><span class="hv-n">มานี รักเรียน<small>สลับหน้าจอ 2 ครั้ง</small></span><span class="hv-s warn">ตรวจสอบ</span></li>
-          <li><span class="hv-av b">ว</span><span class="hv-n">วิชัย มั่นคง<small>กำลังทำข้อ 14</small></span><span class="hv-s doing">กำลังทำ</span></li>
-        </ul>
+        <div class="field">
+          <label for="model">โมเดล</label>
+          <select id="model"></select>
+        </div>
       </div>
-      <div class="hv-chip hv-chip-a"><span class="hv-dot o">!</span><span><b>ตรวจพบสลับหน้าจอ</b>แจ้งอาจารย์ทันที</span></div>
-      <div class="hv-chip hv-chip-b">
-        <span><b>72%</b>คะแนนเฉลี่ย</span>
-        <span class="hv-mini"><i style="height:30%"></i><i style="height:55%"></i><i style="height:100%"></i><i style="height:70%"></i></span>
+      <div class="row between direct-only">
+        <label class="check"><input type="checkbox" id="remember-key" /> จำ API Key ไว้ในเบราว์เซอร์นี้</label>
+        <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" class="link">ขอ API Key ฟรีที่ Google AI Studio →</a>
       </div>
-    </div>
-  </div>
-</header>
+      <p class="hint direct-only">Key จะถูกส่งตรงไปที่ Google เท่านั้น ไม่ผ่านเซิร์ฟเวอร์อื่น ถ้าใช้เครื่องสาธารณะอย่าติ๊ก “จำ API Key”</p>
+    </section>
 
-<div class="wrap" id="features">
-  <div class="cards">
-    <div class="card reveal"><div class="ico hex i-or"><svg class="ic "><use href="#i-shield"/></svg></div><h3>ป้องกันการทุจริต</h3><p>ตรวจจับการสลับแท็บ ย่อหน้าต่าง ล็อกคีย์ลัดคัดลอก และส่งคำเตือนถึงนักศึกษารายคนได้ทันที</p><a href="login.html">ดูหน้าคุมสอบ →</a></div>
-    <div class="card reveal"><div class="ico hex i-cy"><svg class="ic "><use href="#i-chart"/></svg></div><h3>ผลสอบและวิเคราะห์</h3><p>คะแนนรายข้อ สถิติห้องเรียน คะแนนรวมรายวิชา และส่งออก Excel ได้ในคลิกเดียว</p><a href="login.html">เข้าสู่ระบบ →</a></div>
-  </div>
-</div>
+    <!-- 2. Upload -->
+    <section class="card">
+      <div class="step-head">
+        <span class="step">2</span>
+        <h2>อัปโหลดข้อสอบ</h2>
+      </div>
+      <label class="drop" id="drop">
+        <input type="file" id="file-input" multiple hidden />
+        <span class="drop-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+        </span>
+        <span class="drop-title">ลากไฟล์มาวาง หรือคลิกเพื่อเลือก</span>
+        <span class="drop-sub">PDF, Word (.docx), รูปถ่าย (JPG/PNG) · เลือกได้หลายไฟล์ ข้อสอบจะต่อกันตามลำดับ</span>
+      </label>
+      <details class="paste">
+        <summary>หรือวางข้อความข้อสอบโดยตรง</summary>
+        <textarea id="paste-text" rows="6" placeholder="วางข้อสอบที่คัดลอกมาจากเว็บ อีเมล หรือเอกสาร เช่น&#10;1. ข้อใดคือ... ก. ... ข. ... ค. ... ง. ...&#10;เฉลย 1. ข"></textarea>
+        <button class="ghost" type="button" id="paste-add">เพิ่มเป็นไฟล์ในรายการ</button>
+      </details>
+      <ul class="files" id="file-list"></ul>
+      <label class="check"><input type="checkbox" id="solve-missing" checked /> ถ้าไฟล์ไม่มีเฉลย ให้ AI หาคำตอบให้ (ข้อเหล่านี้จะมีป้าย “AI ตอบ” ให้ตรวจทาน)</label>
+      <div class="actions">
+        <button class="primary" id="convert-btn" disabled>แปลงข้อสอบ</button>
+        <button class="ghost" id="cancel-btn" hidden>ยกเลิก</button>
+      </div>
+      <div class="progress" id="progress" hidden>
+        <div class="bar"><span id="bar-fill"></span></div>
+        <div class="progress-text" id="progress-text"></div>
+      </div>
+      <div class="alert error" id="error" hidden></div>
+    </section>
 
-<section id="how">
-  <div class="wrap split" style="grid-template-columns:1fr;max-width:820px">
-    <div class="reveal">
-      <div class="sec-ico hex i-cy"><svg class="ic sm"><use href="#i-list"/></svg></div>
-      <h2>ครบในระบบเดียว<br>ตั้งแต่สร้างข้อสอบถึงส่งเกรด</h2>
-      <ul class="checks">
-        <li>สร้างรายวิชา นำเข้ารายชื่อนักศึกษา และสร้างข้อสอบเอง หรือนำเข้าจาก Excel</li>
-        <li>เปิดห้องสอบด้วยรหัส PIN หรือ QR นักศึกษาเข้าสอบได้จากทุกอุปกรณ์</li>
-        <li>ติดตามผู้เข้าสอบและพฤติกรรมน่าสงสัยแบบเรียลไทม์</li>
-      </ul>
-      <a class="btn btn-navy" href="login.html">เริ่มใช้งานสำหรับอาจารย์</a>
-    </div>
-  </div>
-</section>
+    <!-- 3. Result -->
+    <section class="card" id="result-card" hidden>
+      <div class="step-head">
+        <span class="step">3</span>
+        <h2>ตรวจทานและดาวน์โหลด</h2>
+      </div>
+      <div class="stats" id="stats"></div>
+      <div class="alert warn" id="warnings" hidden></div>
+      <p class="hint">คลิกที่ช่องในตารางเพื่อแก้ไข · เฉลยพิมพ์ a, b, c, d (หรือ ก ข ค ง) · กด × เพื่อลบข้อ · งานจะถูกบันทึกในเบราว์เซอร์อัตโนมัติ</p>
+      <div class="table-wrap">
+        <table id="preview"></table>
+      </div>
+      <div><button class="ghost small" type="button" id="add-row">+ เพิ่มข้อ</button></div>
+      <div class="actions">
+        <div class="field">
+          <label for="filename">ชื่อไฟล์</label>
+          <input id="filename" type="text" value="ข้อสอบ" />
+        </div>
+        <button class="primary" id="download-btn">ดาวน์โหลด Excel (.xlsx)</button>
+        <button class="ghost" id="json-btn" title="สำหรับเชื่อมต่อกับระบบอื่น">ดาวน์โหลด JSON</button>
+      </div>
+      <a class="next" href="https://exampro-onlinex.onrender.com/admin-questions.html" target="_blank" rel="noopener">
+        นำไฟล์ไปใช้: ExamPro → สร้างข้อสอบ → นำเข้า Excel →
+      </a>
+    </section>
+  </main>
 
-<section style="padding-top:20px">
-  <div class="wrap center">
-    <div class="sec-ico hex i-nv"><svg class="ic sm"><use href="#i-steps"/></svg></div>
-    <h2>เริ่มใช้งานใน 4 ขั้นตอน</h2>
-    <p class="sub">สำหรับอาจารย์ผู้สอน</p>
-    <div class="steps" style="text-align:left">
-      <div class="step reveal"><b class="hex i-or">1</b><h4>สร้างรายวิชา</h4><p>เพิ่มรายวิชาและรายชื่อนักศึกษา</p></div>
-      <div class="step reveal"><b class="hex i-nv">2</b><h4>สร้างข้อสอบ</h4><p>ข้อสอบปรนัยพร้อมเฉลย ระบบตรวจให้อัตโนมัติ</p></div>
-      <div class="step reveal"><b class="hex i-cy">3</b><h4>เปิดห้องสอบ</h4><p>แจก PIN ให้นักศึกษา แล้วคุมสอบแบบเรียลไทม์</p></div>
-      <div class="step reveal"><b class="hex i-or">4</b><h4>ตรวจและส่งออก</h4><p>ดูคะแนนและพฤติกรรม แล้วส่งออก Excel</p></div>
-    </div>
-  </div>
-</section>
-
-<section id="faq" style="padding-top:20px">
-  <div class="wrap center">
-    <div class="sec-ico hex i-or"><svg class="ic sm"><use href="#i-help"/></svg></div>
-    <h2>คำถามที่พบบ่อย</h2>
-    <div class="faq" style="text-align:left">
-      <details class="reveal"><summary>นักศึกษาเข้าสอบอย่างไร?</summary><p>กด "นักศึกษาเข้าสอบ" หรือใส่รหัส PIN ที่อาจารย์แจก แล้วล็อกอินด้วยรหัสนักศึกษา ครั้งแรกระบบจะให้ตั้งรหัสผ่านใหม่ก่อนเข้าสอบ</p></details>
-      <details class="reveal"><summary>ลืมรหัสผ่านต้องทำอย่างไร?</summary><p>ติดต่ออาจารย์ผู้สอนหรือผู้ดูแลระบบของคณะ เพื่อขอตั้งรหัสผ่านใหม่</p></details>
-      <details class="reveal"><summary>ข้อมูลนักศึกษาปลอดภัยไหม?</summary><p>รหัสผ่านถูกเข้ารหัส อาจารย์แต่ละคนเห็นเฉพาะข้อมูลในรายวิชาของตนเอง</p></details>
-    </div>
-  </div>
-</section>
-
-<footer class="foot">
-  <div class="wrap">
-    <div class="ico hex i-or" style="margin:0 auto 14px"><svg class="ic "><use href="#i-cap"/></svg></div>
-    <h2>พร้อมเข้าสอบแล้วหรือยัง?</h2>
-    <p class="sub">เตรียมรหัสนักศึกษาและรหัส PIN จากอาจารย์ให้พร้อม</p>
-    <div class="cta"><a class="btn btn-or" href="login.html">เข้าสู่ระบบ</a><button class="btn btn-navy" type="button" onclick="openSignup()">สมัครสมาชิก</button></div>
-    <div class="bottom">
-      <span>© 2026 ExamPro · ทีม TEC Hope</span>
-      
-    </div>
-  </div>
-</footer>
-
-<script>
-  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .15 });
-  document.querySelectorAll('.reveal').forEach((el, i) => { el.style.transitionDelay = (i % 4) * 80 + 'ms'; io.observe(el); });
-</script>
-
-<!-- เลือกประเภทการสมัครสมาชิก -->
-<div id="signup-modal" class="su-ov" hidden onclick="if(event.target===this)closeSignup()">
-  <div class="su-box" role="dialog" aria-modal="true" aria-labelledby="su-title">
-    <button class="su-x" type="button" onclick="closeSignup()" aria-label="ปิด">✕</button>
-    <h3 id="su-title">สมัครสมาชิกในฐานะ</h3>
-    <p class="su-sub">เลือกประเภทบัญชีของคุณ</p>
-    <a class="su-opt" href="Student-login.html?register=1">
-      <b>นักศึกษา</b>
-      <span>ใช้รหัสนักศึกษาสมัคร แล้วเข้าสอบได้ทันที</span>
-    </a>
-    <a class="su-opt su-t" href="register-teacher.html">
-      <b>อาจารย์</b>
-      <span>สมัครแล้วรอผู้ดูแลระบบอนุมัติก่อนใช้งาน</span>
-    </a>
-    <p class="su-note">มีบัญชีแล้ว? <a href="login.html">เข้าสู่ระบบ</a></p>
-  </div>
-</div>
-<style>
-.su-ov{position:fixed;inset:0;z-index:1000;background:rgba(2,11,38,.6);display:flex;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(3px);animation:suFade .18s ease-out}
-.su-ov[hidden]{display:none}
-.su-box{position:relative;width:100%;max-width:420px;background:#fff;border-radius:22px;padding:26px 22px 20px;box-shadow:0 30px 70px -20px rgba(0,0,0,.5);animation:suPop .22s cubic-bezier(.2,.9,.3,1.2)}
-.su-box h3{margin:0;font-size:21px;color:#0b2a7a;text-align:center}
-.su-sub{margin:4px 0 18px;text-align:center;color:#64748b;font-size:14px}
-.su-opt{display:block;padding:16px 18px;margin-bottom:10px;border:1.5px solid #e2e8f0;border-radius:16px;text-decoration:none;transition:border-color .15s,background .15s,transform .15s}
-.su-opt:hover,.su-opt:focus-visible{border-color:#ff7a1a;background:#fff7ef;transform:translateY(-1px);outline:none}
-.su-opt b{display:block;font-size:17px;color:#0f172a}
-.su-opt span{display:block;margin-top:2px;font-size:13.5px;color:#64748b}
-.su-opt.su-t:hover,.su-opt.su-t:focus-visible{border-color:#1557e0;background:#eff5ff}
-.su-x{position:absolute;top:10px;right:12px;border:0;background:none;font-size:18px;color:#94a3b8;cursor:pointer;padding:6px 8px;border-radius:10px}
-.su-x:hover{background:#f1f5f9;color:#334155}
-.su-note{margin:8px 0 0;text-align:center;font-size:13.5px;color:#64748b}
-.su-note a{color:#1557e0;font-weight:600}
-@keyframes suFade{from{opacity:0}to{opacity:1}}
-@keyframes suPop{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.su-ov,.su-box{animation:none}}
-</style>
-<script>
-function openSignup(){const m=document.getElementById('signup-modal');m.hidden=false;setTimeout(()=>m.querySelector('.su-opt').focus(),30);}
-function closeSignup(){document.getElementById('signup-modal').hidden=true;}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSignup();});
-</script>
+  <footer class="foot">ExamPro · ตัวแปลงข้อสอบใช้ Google Gemini API · ทำงานในเบราว์เซอร์ทั้งหมด</footer>
 </body>
 </html>
