@@ -430,7 +430,7 @@
                 <!-- 3. แปลงข้อสอบด้วย AI (Gem ExamPro บน Gemini) -->
                 <div class="qx-tool">
                     <div class="qx-tool-h">                        <div><b>แปลงข้อสอบด้วย AI</b><small>อัปโหลด PDF, Word หรือรูปข้อสอบ ได้ไฟล์ Excel มานำเข้า</small></div></div>
-                    <button onclick="window.open('exam-converter.html', '_blank')" class="qx-tbtn">เปิดตัวแปลงข้อสอบ</button>
+                    <button type="button" onclick="openExamAI()" class="qx-tbtn">แปลงข้อสอบด้วย AI</button>
                 </div>
 
                 <!-- 4. คลังข้อสอบ -->
@@ -1955,6 +1955,23 @@
         if (innerWidth < 1024) { const sb = document.getElementById('settings-sidebar'); if (sb) sb.classList.add('hidden'); }
     </script>
 
+<!-- เพิ่มข้อสอบด้วย AI: เลือก/ลากไฟล์ PDF, Word, รูป หรือ .txt → ข้อสอบต่อท้ายรายการ (ยังไม่บันทึกจนกว่าจะกด "บันทึกข้อสอบ") -->
+<script>
+    // เปิดหน้าต่างแปลงข้อสอบ (ถ้าโมดูลยังโหลดไม่เสร็จ รอแป๊บหนึ่ง)
+    function openExamAI() {
+        if (window.__examAI) return window.__examAI.open();
+        window.__examAIWant = true;
+    }
+</script>
+<script type="module">
+    import { mountExamDropzone } from "./cv-exam-dropzone.mjs";
+    window.__examAI = mountExamDropzone({ mode: "server", fab: false });
+    // มาจากปุ่มลัดในแดชบอร์ด (?ai=1) หรือกดก่อนโมดูลพร้อม → เปิดให้เลย
+    if (window.__examAIWant || new URLSearchParams(location.search).get('ai') === '1') {
+        window.__examAIWant = false;
+        setTimeout(() => window.__examAI.open(), 400);
+    }
+</script>
 </body>
 </html>
 

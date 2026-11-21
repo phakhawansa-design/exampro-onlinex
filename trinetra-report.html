@@ -58,12 +58,12 @@ tr.det td{background:#fbfcff;padding:4px 14px 14px}
 @media (max-width:640px){input,select,textarea{font-size:16px!important}}
 /* ===== เมนูด้านซ้าย (เหมือนหน้าอื่นของอาจารย์) ===== */
 body{display:flex;min-height:100vh}
-#sidebar{width:260px;flex:none;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(175deg,#0b2a7a 0%,#0f3a9c 55%,#1d5fd6 130%);color:#fff;box-shadow:6px 0 30px -12px rgba(11,42,122,.45);z-index:50}
+#sidebar{width:280px;flex:none;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(175deg,#0b2a7a 0%,#0f3a9c 55%,#1d5fd6 130%);color:#fff;box-shadow:6px 0 30px -12px rgba(11,42,122,.45);z-index:50}
 .sb-in{padding:18px 16px}
 .sb-logo{font-weight:800;font-size:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.12)}
 .sb-logo span{color:#ff9a3c}.sb-logo small{display:block;font-size:11px;font-weight:700;color:#fdba74;letter-spacing:.04em}
 .sb-sec{font-size:11px;font-weight:700;color:#fdba74;letter-spacing:.08em;margin:20px 10px 6px}
-.sb-link{display:block;padding:10px 14px;margin:2px 0;border-radius:14px;color:rgba(255,255,255,.9);text-decoration:none;font-weight:600;font-size:15px;transition:background .15s,transform .15s}
+.sb-link{display:block;padding:10px 14px;margin:2px 0;border-radius:14px;color:rgba(255,255,255,.82);text-decoration:none;font-weight:500;font-size:15px;transition:background .15s,transform .15s}
 .sb-link:hover{background:rgba(255,154,60,.14);color:#fff;transform:translateX(3px)}
 .sb-link.active{background:#fff;color:#0b2a7a;box-shadow:inset 4px 0 0 #ff7a1a,0 10px 22px -8px rgba(0,0,0,.35)}
 .sb-foot{padding:14px 16px;border-top:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06)}
@@ -80,7 +80,7 @@ main{max-width:none;margin:-44px 24px 40px;padding:0}
 td:first-child{white-space:nowrap}
 .nm b{white-space:nowrap}.nm small{white-space:nowrap}
 @media (max-width:900px){
-  #sidebar{position:fixed;left:-280px;top:0;bottom:0;height:auto;width:260px;transition:left .3s cubic-bezier(.4,0,.2,1)}
+  #sidebar{position:fixed;left:-280px;top:0;bottom:0;height:auto;width:280px;transition:left .3s cubic-bezier(.4,0,.2,1)}
   #sidebar.mobile-open{left:0}
   .sb-menu{display:inline-block}
   main{margin:-44px 12px 32px}
@@ -95,7 +95,7 @@ td:first-child{white-space:nowrap}
     <nav>
       <div class="sb-sec">หมวดข้อมูลพื้นฐาน</div>
       <a href="dashboard.html" class="sb-link">แดชบอร์ดหลัก</a>
-      <a href="admin-courses.html" class="sb-link">จัดการรายวิชา</a>
+      <a href="admin-courses.html" class="sb-link">จัดการรายวิชาและข้อสอบ</a>
       <a href="admin-students.html" class="sb-link">ประวัตินักศึกษา</a>
       <div class="sb-sec">หมวดการจัดการสอบ</div>
       <a href="admin-rooms.html" class="sb-link">ห้องสอบ</a>

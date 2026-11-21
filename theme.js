@@ -229,7 +229,7 @@
     EMO.lastIndex = 0; if (EMO.test(document.title)) document.title = clean(document.title);
     // 2) ไอคอนเส้น (SVG ขนาดไอคอน) — เก็บไว้เฉพาะปุ่มที่มีแต่ไอคอน (เช่น ปุ่มปิด ปุ่มดูรหัสผ่าน)
     root.querySelectorAll('svg').forEach(svg => {
-      if (svg.closest('#intro,canvas,[data-keep-icon]') || !isIcon(svg)) return;
+      if (svg.closest('#intro,canvas,[data-keep-icon],[class*="xdz-"]') || !isIcon(svg)) return; // xdz- = หน้าต่างเพิ่มข้อสอบด้วย AI
       const host = svg.closest(HOST);
       if (host && !host.textContent.trim()) return;
       const p = svg.parentElement; svg.remove(); if (p) hideEmpty(p);

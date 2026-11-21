@@ -214,12 +214,13 @@
         /* ===== แถบเลือกมุมมอง ===== */
         .rs-viewbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
         .rs-viewbar .rs-room { flex: 1 1 320px; background: #fff; }
-        .rs-view-btn { flex: none; border: 0; border-radius: 14px; padding: 12px 22px; background: linear-gradient(120deg, #0b2a7a, #1d5fd6); color: #fff; font-family: inherit; font-size: 15px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 22px -12px rgba(11,42,122,.8); white-space: nowrap; transition: filter .15s, transform .1s; }
-        .rs-view-btn:hover { filter: brightness(1.08); } .rs-view-btn:active { transform: scale(.98); }
-        .rs-view-btn.back { background: #fff; color: #0b2a7a; border: 1.5px solid #c7d2fe; box-shadow: none; }
-        @media (max-width: 560px) { .rs-view-btn { width: 100%; } }
-        .rs-view { display: flex; flex-direction: column; gap: 24px; }
-        .rs-view[hidden] { display: none; }
+        .rs-tabs { display: inline-flex; flex: none; padding: 5px; gap: 4px; background: #e8eef8; border-radius: 16px; }
+        .rs-tabs button { border: 0; background: none; font-family: inherit; font-size: 15px; font-weight: 800; color: #475569; padding: 10px 20px; border-radius: 12px; cursor: pointer; white-space: nowrap; transition: background .15s, color .15s, box-shadow .15s; }
+        .rs-tabs button:hover { color: #0b2a7a; }
+        .rs-tabs button.on { background: #fff; color: #0b2a7a; box-shadow: 0 4px 14px -6px rgba(15,23,42,.35); }
+        @media (max-width: 560px) { .rs-tabs { width: 100%; } .rs-tabs button { flex: 1; padding: 10px 8px; font-size: 14px; } }
+        .rs-pane { display: flex; flex-direction: column; gap: 24px; }
+        .rs-pane[hidden] { display: none; }
         .ia-empty { display: none; padding: 40px 20px; text-align: center; color: #64748b; font-weight: 600; background: #fff; border: 1px dashed #cbd5e1; border-radius: 20px; }
         .ia.hidden + .ia-empty { display: block; }
     </style>
@@ -251,7 +252,7 @@
                         </a>
                         <a href="admin-courses.html" class="nav-link">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
-                            <span>จัดการรายวิชา</span>
+                            <span>จัดการรายวิชาและข้อสอบ</span>
                         </a>
                         <a href="admin-students.html" class="nav-link">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.62 48.62 0 0112 20.904a48.62 48.62 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0112 13.489a50.702 50.702 0 017.74-3.342M12 2.25V4.5m0 10.5v1.5c0 .9-.6 1.6-1.5 1.6a1.5 1.5 0 010-3c.9 0 1.5.7 1.5 1.4z" /></svg>
@@ -340,7 +341,7 @@
         </header>
 
         <!-- Main Workspace -->
-        <main class="p-6 md:p-8 flex-grow space-y-6 max-w-[1400px] w-full mx-auto overflow-y-auto">
+        <main class="p-6 md:p-8 flex-grow space-y-6 max-w-[1400px] w-full mx-auto overflow-y-auto" style="max-width:1720px;padding:16px clamp(10px, 1vw, 14px) 28px">
             
             <!-- Card แสดงเมื่อยังไม่ได้เลือกรายวิชา -->
             <div id="no-course-card" class="glass-card p-10 sm:p-14 text-center space-y-4 max-w-xl mx-auto shadow-2xl my-8 border-2 border-indigo-200/60 bg-gradient-to-b from-white via-indigo-50/30 to-white">
@@ -395,12 +396,15 @@
 
             <!-- ③ เลือกมุมมอง: ผลการสอบรายคน / ตารางวิเคราะห์ข้อสอบ -->
             <div class="rs-viewbar">
-                <button type="button" id="rs-view-btn" class="rs-view-btn" onclick="setResultsView(document.getElementById('view-analysis').hidden ? 'analysis' : 'results')">เปิดดูตารางวิเคราะห์ข้อสอบ</button>
+                <div class="rs-tabs" role="tablist" aria-label="เลือกมุมมอง">
+                    <button type="button" role="tab" id="tab-results" class="on" aria-selected="true" onclick="setResultsView('results')">ผลการสอบ</button>
+                    <button type="button" role="tab" id="tab-analysis" aria-selected="false" onclick="setResultsView('analysis')">ตารางวิเคราะห์ข้อสอบ</button>
+                </div>
                 <label class="rs-field rs-room"><span>ชุดข้อสอบ</span>
                     <select id="rs-room" onchange="onRoomChange()"><option value="ALL">กำลังโหลด...</option></select></label>
             </div>
 
-            <div id="view-results" class="rs-view">
+            <div id="view-results" class="rs-pane" role="tabpanel" aria-labelledby="tab-results">
                 <section class="rs-card">
                     <div class="rs-card-h">
                         <h3>คะแนนรายคน <span id="rs-shown" class="rs-count"></span></h3>
@@ -452,7 +456,7 @@
                 </div>
             </div>
 
-            <div id="view-analysis" class="rs-view" hidden>
+            <div id="view-analysis" class="rs-pane" role="tabpanel" aria-labelledby="tab-analysis" hidden>
                 <section id="item-analysis-box" class="ia hidden" aria-labelledby="ia-title">
                     <div class="ia-head">
                         <div>
@@ -573,10 +577,8 @@
             const a = v === 'analysis';
             document.getElementById('view-results').hidden = a;
             document.getElementById('view-analysis').hidden = !a;
-            const btn = document.getElementById('rs-view-btn');
-            btn.textContent = a ? '← กลับไปดูผลการสอบรายคน' : 'เปิดดูตารางวิเคราะห์ข้อสอบ';
-            btn.classList.toggle('back', a);
-            if (a) document.getElementById('view-analysis').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            ['results', 'analysis'].forEach(k => { const t = document.getElementById('tab-' + k); t.classList.toggle('on', (k === 'analysis') === a); t.setAttribute('aria-selected', String((k === 'analysis') === a)); });
+
         }
 
         // เมื่อผู้ใช้อยู่ในสถานะเลือกรายวิชา
