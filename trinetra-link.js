@@ -13,15 +13,9 @@ module.exports = function trinetraLink(app, db) {
     };
     const parse = (s, d) => { try { return s ? JSON.parse(s) : d; } catch (e) { return d; } };
     const norm = id => String(id || '').replace(/[^0-9a-zA-Z]/g, '').toLowerCase();
-    const kindOf = a => {
-        a = String(a || '');
-        // แยกประเภทจากข้อความ (ประวัติเก่าที่มีอีโมจินำหน้าก็ยังแยกได้)
-        if (/หายจากหน้าสอบ|หยุดทำงาน/.test(a)) return 'gap';
-        if (/เต็มจอ/.test(a)) return 'fs';
-        if (/อีกเครื่อง|หลายเครื่อง|หลายแท็บ|แท็บใหม่/.test(a)) return 'multi';
-        if (/สลับ|ออกหน้าจอ/.test(a)) return 'switch';
-        return 'other';
-    };
+    // ใช้กติกาเดียวกับทุกหน้า (watch-kind.js): สลับหน้าจอ = switch + fs + gap · เปิดในแอปแชต/ไม่มีรายชื่อ รวมไว้ใน other
+    const WatchKind = require('./watch-kind.js');
+    const kindOf = a => { const k = WatchKind.kindOf(a); return k === 'app' || k === 'roster' ? 'other' : k; };
 
     app.get('/api/trinetra/course-report', async (req, res) => {
         try {
@@ -60,7 +54,7 @@ module.exports = function trinetraLink(app, db) {
             const people = new Map();
             const person = (id, name, cls) => {
                 const k = norm(id); if (!k) return null;
-                if (!people.has(k)) people.set(k, { studentId: String(id).trim(), name: name || '', class: cls || '', inRoster: false, scores: {}, watch: { total: 0, switch: 0, fs: 0, gap: 0, multi: 0, other: 0, answer: 0, rooms: {}, events: [] } });
+                if (!people.has(k)) people.set(k, { studentId: String(id).trim(), name: name || '', class: cls || '', inRoster: false, scores: {}, watch: { total: 0, leaves: 0, switch: 0, fs: 0, gap: 0, multi: 0, other: 0, answer: 0, rooms: {}, events: [] } });
                 const p = people.get(k);
                 if (!p.name && name) p.name = name;
                 if (!p.class && cls) p.class = cls;
@@ -77,6 +71,7 @@ module.exports = function trinetraLink(app, db) {
                 const p = person(l.studentId, l.name, l.class); if (!p) continue;
                 const k = kindOf(l.action);
                 p.watch.total++; p.watch[k]++;
+                if (WatchKind.LEAVE_KINDS.includes(k)) p.watch.leaves++;
                 p.watch.rooms[l.roomId] = (p.watch.rooms[l.roomId] || 0) + 1;
                 p.watch.events.push({ roomId: l.roomId, room: roomLabel[l.roomId] || l.roomId, kind: k, action: l.action, time: l.time });
             }
@@ -100,8 +95,9 @@ module.exports = function trinetraLink(app, db) {
                 columns, totalMax, students,
                 summary: {
                     students: students.length,
-                    watched: students.filter(s => s.watch.total > 0).length,
-                    events: logs.length
+                    watched: students.filter(s => s.watch.leaves > 0).length,
+                    events: students.reduce((t, s) => t + s.watch.leaves, 0),
+                    otherEvents: students.reduce((t, s) => t + s.watch.multi + s.watch.other, 0)
                 }
             });
         } catch (e) { res.status(500).json({ success: false, message: e.message }); }

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <script src="auth-client.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ตัวแปลงข้อสอบ AI · ExamPro</title>
+  <meta name="description" content="แปลงข้อสอบจาก PDF / Word เป็นไฟล์ Excel สำหรับนำเข้า ExamPro ด้วย Gemini AI" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon points='50,4 92,27 92,73 50,96 8,73 8,27' fill='%231557e0'/><text x='50' y='66' font-size='46' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='700'>A</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="converter.css" />
+  <style>
+    .back-exampro { display: inline-block; margin-bottom: 12px; font-size: 14px; font-weight: 700; color: inherit; opacity: .9; text-decoration: none; padding: 6px 12px; border-radius: 99px; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.25); }
+    .back-exampro:hover { opacity: 1; background: rgba(255,255,255,.22); }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+  <script type="module" src="cv-app.mjs"></script>
+</head>
+<body>
+  <header class="top">
+    <a class="back-exampro" href="admin-questions.html">← กลับหน้าสร้างข้อสอบ</a>
+    <div class="brand">
+      <span class="hex" aria-hidden="true"></span>
+      <div>
+        <div class="eyebrow">EXAMPRO</div>
+        <h1>ตัวแปลงข้อสอบ AI</h1>
+      </div>
+    </div>
+    <p class="lead">อัปโหลดข้อสอบ PDF หรือ Word แล้ว Gemini จะแปลงเป็นไฟล์ Excel พร้อมนำเข้าหน้า “สร้างข้อสอบ” ของ ExamPro</p>
+  </header>
+
+  <main class="wrap">
+    <div class="alert info" id="draft-banner" hidden>
+      <span id="draft-text"></span>
+      <span class="banner-actions">
+        <button class="primary small" type="button" id="draft-restore">เปิดต่อ</button>
+        <button class="ghost small" type="button" id="draft-discard">ทิ้ง</button>
+      </span>
+    </div>
+
+    <!-- 1. API key -->
+    <section class="card" id="key-card">
+      <div class="step-head">
+        <span class="step">1</span>
+        <h2 id="key-title">Gemini API Key</h2>
+        <span class="pill" id="key-status" hidden></span>
+      </div>
+      <p class="hint" id="server-hint" hidden>ใช้ AI ของระบบ ExamPro ได้เลย ไม่ต้องกรอก API Key</p>
+      <div class="row">
+        <div class="field grow direct-only">
+          <label for="api-key">API Key</label>
+          <div class="input-wrap">
+            <input id="api-key" type="password" autocomplete="off" spellcheck="false" placeholder="AIza..." />
+            <button class="ghost icon" type="button" id="toggle-key" aria-label="แสดง/ซ่อน API Key">แสดง</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="model">โมเดล</label>
+          <select id="model"></select>
+        </div>
+      </div>
+      <div class="row between direct-only">
+        <label class="check"><input type="checkbox" id="remember-key" /> จำ API Key ไว้ในเบราว์เซอร์นี้</label>
+        <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" class="link">ขอ API Key ฟรีที่ Google AI Studio →</a>
+      </div>
+      <p class="hint direct-only">Key จะถูกส่งตรงไปที่ Google เท่านั้น ไม่ผ่านเซิร์ฟเวอร์อื่น ถ้าใช้เครื่องสาธารณะอย่าติ๊ก “จำ API Key”</p>
+    </section>
+
+    <!-- 2. Upload -->
+    <section class="card">
+      <div class="step-head">
+        <span class="step">2</span>
+        <h2>อัปโหลดข้อสอบ</h2>
+      </div>
+      <label class="drop" id="drop">
+        <input type="file" id="file-input" multiple hidden />
+        <span class="drop-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+        </span>
+        <span class="drop-title">ลากไฟล์มาวาง หรือคลิกเพื่อเลือก</span>
+        <span class="drop-sub">PDF, Word (.docx), รูปถ่าย (JPG/PNG) · เลือกได้หลายไฟล์ ข้อสอบจะต่อกันตามลำดับ</span>
+      </label>
+      <details class="paste">
+        <summary>หรือวางข้อความข้อสอบโดยตรง</summary>
+        <textarea id="paste-text" rows="6" placeholder="วางข้อสอบที่คัดลอกมาจากเว็บ อีเมล หรือเอกสาร เช่น&#10;1. ข้อใดคือ... ก. ... ข. ... ค. ... ง. ...&#10;เฉลย 1. ข"></textarea>
+        <button class="ghost" type="button" id="paste-add">เพิ่มเป็นไฟล์ในรายการ</button>
+      </details>
+      <ul class="files" id="file-list"></ul>
+      <label class="check"><input type="checkbox" id="solve-missing" checked /> ถ้าไฟล์ไม่มีเฉลย ให้ AI หาคำตอบให้ (ข้อเหล่านี้จะมีป้าย “AI ตอบ” ให้ตรวจทาน)</label>
+      <div class="actions">
+        <button class="primary" id="convert-btn" disabled>แปลงข้อสอบ</button>
+        <button class="ghost" id="cancel-btn" hidden>ยกเลิก</button>
+      </div>
+      <div class="progress" id="progress" hidden>
+        <div class="bar"><span id="bar-fill"></span></div>
+        <div class="progress-text" id="progress-text"></div>
+      </div>
+      <div class="alert error" id="error" hidden></div>
+    </section>
+
+    <!-- 3. Result -->
+    <section class="card" id="result-card" hidden>
+      <div class="step-head">
+        <span class="step">3</span>
+        <h2>ตรวจทานและดาวน์โหลด</h2>
+      </div>
+      <div class="stats" id="stats"></div>
+      <div class="alert warn" id="warnings" hidden></div>
+      <p class="hint">คลิกที่ช่องในตารางเพื่อแก้ไข · เฉลยพิมพ์ a, b, c, d (หรือ ก ข ค ง) · กด × เพื่อลบข้อ · งานจะถูกบันทึกในเบราว์เซอร์อัตโนมัติ</p>
+      <div class="table-wrap">
+        <table id="preview"></table>
+      </div>
+      <div><button class="ghost small" type="button" id="add-row">+ เพิ่มข้อ</button></div>
+      <div class="actions">
+        <div class="field">
+          <label for="filename">ชื่อไฟล์</label>
+          <input id="filename" type="text" value="ข้อสอบ" />
+        </div>
+        <button class="primary" id="download-btn">ดาวน์โหลด Excel (.xlsx)</button>
+        <button class="ghost" id="json-btn" title="สำหรับเชื่อมต่อกับระบบอื่น">ดาวน์โหลด JSON</button>
+      </div>
+      <a class="next" href="https://exampro-onlinex.onrender.com/admin-questions.html" target="_blank" rel="noopener">
+        นำไฟล์ไปใช้: ExamPro → สร้างข้อสอบ → นำเข้า Excel →
+      </a>
+    </section>
+  </main>
+
+  <footer class="foot">ExamPro · ตัวแปลงข้อสอบใช้ Google Gemini API · ทำงานในเบราว์เซอร์ทั้งหมด</footer>
+</body>
+</html>

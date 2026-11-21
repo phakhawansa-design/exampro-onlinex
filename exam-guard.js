@@ -74,6 +74,7 @@ module.exports = function examGuard(app, db) {
 
     // ---------- ตัวสังเกตการณ์ (ไม่เปลี่ยนการทำงานของเส้นทางเดิม) ----------
     const GAP_MS = Math.max(8, parseFloat(process.env.WATCH_GAP_SECONDS || '15')) * 1000;
+    const GAP_CONFIRM_MS = 6000; // รอรายงานจากหน้าสอบก่อนบันทึก "หายจากหน้าสอบ" (กันนับซ้ำ)
     const allowInApp = String(process.env.ALLOW_INAPP_BROWSER || '').toLowerCase() === 'on';
     const beats = new Map();      // key -> { t, state, vis }
     const lastCheat = new Map();  // key -> เวลาที่มีรายงานสลับหน้าจอล่าสุด
@@ -198,9 +199,15 @@ module.exports = function examGuard(app, db) {
                 && now - prev.t > GAP_MS && (lastCheat.get(k) || 0) < prev.t) {
                 const sec = Math.round((now - prev.t) / 1000);
                 const action = `หายจากหน้าสอบประมาณ ${sec} วินาที (พับแอป/ล็อกจอ/สลับแอป หรือเน็ตหลุด)`;
-                db.run('INSERT INTO cheat_logs (roomId, studentId, name, class, action, time, courseId) VALUES (?, ?, ?, ?, ?, ?, (SELECT courseId FROM teacher_rooms WHERE roomId = ?))',
-                    [String(b.roomId), String(b.studentId).trim(), b.name || '', b.class || '', action, thaiTime(), String(b.roomId)], () => {});
-                lastCheat.set(k, now);
+                const gapFrom = prev.t, time = thaiTime(), info = [String(b.roomId), String(b.studentId).trim(), b.name || '', b.class || ''];
+                // รอสักครู่ก่อนบันทึก: ตอนกลับเข้าหน้าสอบ หน้าสอบจะส่ง "ออกจากหน้าข้อสอบ …" มาเอง (แม่นกว่า)
+                // ถ้าสัญญาณชีพมาถึงก่อนรายงานนั้น เดิมจะได้ 2 แถวจากการออกครั้งเดียว (นับซ้ำ)
+                setTimeout(() => {
+                    if ((lastCheat.get(k) || 0) >= gapFrom) return; // หน้าสอบรายงานการออกช่วงนี้แล้ว
+                    db.run('INSERT INTO cheat_logs (roomId, studentId, name, class, action, time, courseId) VALUES (?, ?, ?, ?, ?, ?, (SELECT courseId FROM teacher_rooms WHERE roomId = ?))',
+                        [...info, action, time, info[0]], () => {});
+                    lastCheat.set(k, Date.now());
+                }, GAP_CONFIRM_MS);
             }
             beats.set(k, { t: now, state, vis });
         } else if ((p === '/api/submit-exam' || p === '/api/student/leave-room') && b.roomId && b.studentId) {

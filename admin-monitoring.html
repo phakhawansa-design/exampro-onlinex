@@ -3,6 +3,7 @@
 <head>
     <script src="auth-client.js"></script>
     <script src="term-scope.js"></script>
+    <script src="watch-kind.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ตรวจสอบพฤติกรรมน่าสงสัย - ExamPro</title>
@@ -252,10 +253,10 @@
                     <div><small>นักศึกษาที่ถูกบันทึก</small><b id="mn-k-students">0</b><em>คน</em></div>
                 </div>
                 <div class="mn-kpi">
-                    <div><small>พฤติกรรมทั้งหมด</small><b id="mn-k-events">0</b><em>ครั้ง</em></div>
+                    <div><small>สลับหน้าจอรวม</small><b id="mn-k-events">0</b><em>ครั้ง</em></div>
                 </div>
                 <div class="mn-kpi mn-kpi-risk">
-                    <div><small>เสี่ยงสูง (≥ 3 ครั้ง)</small><b id="mn-k-high" style="color:#be123c">0</b><em>คน</em></div>
+                    <div><small>เสี่ยงสูง (สลับ ≥ 3 ครั้ง)</small><b id="mn-k-high" style="color:#be123c">0</b><em>คน</em></div>
                 </div>
             </div>
 
@@ -524,12 +525,12 @@
             const perRoom = {};
             logs.forEach(log => {
                 if (!perRoom[log.roomId]) perRoom[log.roomId] = { count: 0, room: log.roomId, highRisk: 0, students: {} };
-                perRoom[log.roomId].count++;
-                if (!perRoom[log.roomId].students[log.studentId]) perRoom[log.roomId].students[log.studentId] = 0;
-                perRoom[log.roomId].students[log.studentId]++;
+                const sk = sidKey(log.studentId) || log.name;
+                if (!perRoom[log.roomId].students[sk]) perRoom[log.roomId].students[sk] = 0;
+                if (isLeaveLog(log)) { perRoom[log.roomId].count++; perRoom[log.roomId].students[sk]++; }
             });
             Object.values(perRoom).forEach(r => {
-                r.highRisk = Object.values(r.students).filter(c => c >= 3).length;
+                r.highRisk = Object.values(r.students).filter(c => c >= HIGH).length;
             });
 
             const summaryEl = document.getElementById('room-summary-row');
@@ -543,13 +544,13 @@
                 const nStu = Object.keys(r.students).length;
                 return `<button type="button" class="mn-room" onclick="selectRoom('${r.room}')" title="ดูเฉพาะห้องนี้">
                     <div class="mn-room-t">${escapeHtml(roomName)}</div>
-                    <div class="mn-room-b"><b>${nStu}</b><span>คน · ${r.count} ครั้ง</span>
+                    <div class="mn-room-b"><b>${nStu}</b><span>คน · สลับ ${r.count} ครั้ง</span>
                         ${r.highRisk > 0 ? `<em class="bad">เสี่ยง ${r.highRisk} คน</em>` : `<em class="good">ปกติ</em>`}</div>
                 </button>`;
             }).join('');
 
             const total = roomList.reduce((s, r) => s + r.count, 0);
-            document.getElementById('global-log-count').textContent = `รวม ${total} รายการ`;
+            document.getElementById('global-log-count').textContent = `สลับหน้าจอรวม ${total} ครั้ง`;
         }
 
         // ======================================================
@@ -561,21 +562,19 @@
         const HIGH = 3;
 
         // จัดกลุ่มพฤติกรรมตามข้อความ → ไอคอน/สี
+        // ประเภทเหตุการณ์: ใช้กติกาเดียวกับทุกหน้า (watch-kind.js)
+        const KIND_UI = { switch: 'sw', fs: 'fs', gap: 'away', multi: 'dev', app: 'app', roster: 'ros', other: 'etc' };
         function classifyAction(a) {
-            a = String(a || '');
-            if (/อีกเครื่อง|หลายเครื่อง|หลายแท็บ|แท็บใหม่/.test(a)) return { k: 'dev', ic: '', t: 'เปิดหลายเครื่อง/แท็บ' };
-            if (/เต็มจอ/.test(a)) return { k: 'fs', ic: '', t: 'ออกจากเต็มจอ' };
-            if (/หาย|หยุดทำงาน|ขาด/.test(a)) return { k: 'away', ic: '', t: 'หายจากหน้าสอบ' };
-            if (/สลับ|ออกหน้าจอ/.test(a)) return { k: 'sw', ic: '', t: 'สลับหน้าจอ' };
-            if (/เบราว์เซอร์ของ|LINE|Facebook/i.test(a)) return { k: 'app', ic: '', t: 'เปิดในแอปแชต' };
-            if (/รายชื่อ/.test(a)) return { k: 'ros', ic: '', t: 'ไม่มีรายชื่อ' };
-            return { k: 'etc', ic: '', t: 'อื่น ๆ' };
+            const k = WatchKind.kindOf(a);
+            return { k: KIND_UI[k], ic: '', t: WatchKind.LABEL[k], leave: WatchKind.LEAVE_KINDS.includes(k) };
         }
+        const isLeaveLog = l => WatchKind.isLeave(l.action);
         const cleanAction = a => String(a || '').replace(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\s]+/u, '');
         const lvOf = n => n >= HIGH ? 3 : n >= 2 ? 2 : 1;
         const lvText = n => n >= HIGH ? 'เสี่ยงสูง' : n >= 2 ? 'เฝ้าระวัง' : 'ปกติ';
         const roomNameOf = id => { const r = rooms.find(x => x.roomId === id) || {}; return r.exam_title || r.roomName || id; };
-        const keyOf = l => `${l.roomId}|${l.studentId || l.name}`;
+        const sidKey = s => String(s || '').replace(/[^0-9a-zA-Z]/g, '').toLowerCase();
+        const keyOf = l => `${l.roomId}|${sidKey(l.studentId) || l.name}`;
 
         function groupStudents(logs) {
             const m = {};
@@ -586,16 +585,16 @@
             });
             return Object.values(m).map(s => {
                 s.events.sort((x, y) => String(y.time).localeCompare(String(x.time)));
-                s.count = s.events.length; s.last = s.events[0];
+                s.count = s.events.filter(isLeaveLog).length; s.other = s.events.length - s.count; s.last = s.events[0];
                 return s;
-            }).sort((x, y) => y.count - x.count || String(y.last.time).localeCompare(String(x.last.time)));
+            }).sort((x, y) => y.count - x.count || y.other - x.other || String(y.last.time).localeCompare(String(x.last.time)));
         }
 
         function renderHighRisk(logs) {
             const studs = groupStudents(logs);
             const high = studs.filter(s => s.count >= HIGH);
             const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
-            set('mn-k-students', studs.length); set('mn-k-events', logs.length); set('mn-k-high', high.length);
+            set('mn-k-students', studs.length); set('mn-k-events', logs.filter(isLeaveLog).length); set('mn-k-high', high.length);
             const hrPanel = document.getElementById('high-risk-panel');
             const hrList = document.getElementById('high-risk-list');
             document.getElementById('high-risk-count').textContent = `${high.length} คน`;
@@ -606,7 +605,7 @@
                     <div class="mn-hr-t">
                         <b>${escapeHtml(s.name)}</b>
                         <span>${escapeHtml(s.studentId)}${currentRoomId === 'ALL' ? ' · ' + escapeHtml(roomNameOf(s.roomId)) : ''}</span>
-                        <em>${s.count} ครั้ง · ล่าสุด ${escapeHtml(s.last.time || '')}</em>
+                        <em>สลับหน้าจอ ${s.count} ครั้ง · ล่าสุด ${escapeHtml(s.last.time || '')}</em>
                     </div>
                     <div class="mn-hr-a">
                         <button onclick="focusStudent('${escapeHtml(s.key)}')" class="mn-btn">ดูประวัติ</button>
@@ -674,7 +673,7 @@
                             <div class="mn-st-meta"><span class="mn-id">${escapeHtml(s.studentId)}</span>${s.class ? `<span class="mn-cls">${escapeHtml(s.class)}</span>` : ''}${currentRoomId === 'ALL' ? `<span class="mn-room-tag">${escapeHtml(roomNameOf(s.roomId))}</span>` : ''}</div>
                             <div class="mn-kinds">${Object.values(kinds).map(k => `<span class="mn-kind mn-ev-${k.k}">${k.ic} ${k.t} ${k.n}</span>`).join('')}</div>
                         </div>
-                        <div class="mn-st-count"><b>${s.count}</b><span>ครั้ง</span></div>
+                        <div class="mn-st-count" title="จำนวนครั้งที่สลับหน้าจอ (ไม่นับเหตุการณ์อื่น)"><b>${s.count}</b><span>ครั้ง</span></div>
                         <div class="mn-st-last"><span>ล่าสุด ${escapeHtml(s.last.time || '')}</span><em>${c.ic} ${escapeHtml(c.t)}</em></div>
                         <div class="mn-st-act" onclick="event.stopPropagation()">
                             <button onclick="sendDirectWarning('${escapeHtml(s.studentId)}', '${escapeHtml(s.name)}', '${escapeHtml(s.roomId)}')" class="mn-btn mn-btn-warn">ส่งเตือน</button>
@@ -752,7 +751,7 @@
                 // นับจำนวนครั้งสลับหน้าจอต่อนักศึกษา
                 const studentSummary = {};
                 allLogs.forEach(log => {
-                    const key = log.studentId;
+                    const key = log.roomId + '|' + sidKey(log.studentId);
                     if (!studentSummary[key]) {
                         studentSummary[key] = {
                             ชื่อ: log.name || '',
@@ -760,15 +759,16 @@
                             ชั้นเรียน: log.class || '',
                             ห้องสอบ: log.roomId || '',
                             จำนวนครั้งสลับหน้าจอ: 0,
+                            เหตุการณ์อื่น: 0,
                             ล่าสุด: ''
                         };
                     }
-                    studentSummary[key].จำนวนครั้งสลับหน้าจอ++;
+                    if (WatchKind.isLeave(log.action)) studentSummary[key].จำนวนครั้งสลับหน้าจอ++; else studentSummary[key].เหตุการณ์อื่น++;
                     studentSummary[key].ล่าสุด = `${log.date || ''} ${log.time || ''}`;
                 });
 
                 // สร้าง CSV
-                const headers = ['ชื่อ', 'รหัสนักศึกษา', 'ชั้นเรียน', 'ห้องสอบ', 'จำนวนครั้งสลับหน้าจอ', 'ล่าสุด'];
+                const headers = ['ชื่อ', 'รหัสนักศึกษา', 'ชั้นเรียน', 'ห้องสอบ', 'จำนวนครั้งสลับหน้าจอ', 'เหตุการณ์อื่น', 'ล่าสุด'];
                 const rows = Object.values(studentSummary).sort((a, b) => b.จำนวนครั้งสลับหน้าจอ - a.จำนวนครั้งสลับหน้าจอ);
 
                 // Detail sheet - log ทุกรายการ

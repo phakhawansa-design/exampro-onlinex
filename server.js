@@ -58,11 +58,13 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 // กันไม่ให้ดาวน์โหลดไฟล์ฝั่งเซิร์ฟเวอร์ (ฐานข้อมูล, โค้ด, สคริปต์) ผ่านเว็บ
 app.use((req, res, next) => {
     const p = decodeURIComponent(req.path).toLowerCase();
-    if (/\.(db|db-journal|sqlite|bat|env|log|md)$/.test(p) || /^\/(server|auth|backup|check_storage|make_pdf|exam-guard|trinetra-link|backup-export)\.js$/.test(p) || /^\/(package(-lock)?\.json|\.npmrc|\.gitignore)$/.test(p) || p.startsWith('/_backup') || p.startsWith('/exam-converter/server/') || p.startsWith('/routes/') || p.startsWith('/node_modules') || p.startsWith('/.')) {
+    if (/\.(db|db-journal|sqlite|bat|env|log|md)$/.test(p) || /^\/(server|auth|backup|check_storage|make_pdf|exam-guard|trinetra-link|backup-export)\.js$/.test(p) || /^\/(package(-lock)?\.json|\.npmrc|\.gitignore)$/.test(p) || p.startsWith('/_backup') || p === '/converter-router.mjs' || p.startsWith('/exam-converter/server/') || p.startsWith('/routes/') || p.startsWith('/node_modules') || p.startsWith('/.')) {
         return res.status(404).end();
     }
     next();
 });
+// ลิงก์เก่าของตัวแปลงข้อสอบ (เคยอยู่ในโฟลเดอร์ exam-converter) → หน้าใหม่
+app.get(['/exam-converter', '/exam-converter/', '/exam-converter/index.html'], (req, res) => res.redirect(301, '/exam-converter.html'));
 app.use(express.static(__dirname));
 
 const { Pool } = require('pg');
@@ -247,6 +249,20 @@ app.use((req, res, next) => {
 
 // ระบบยืนยันตัวตนด้วย token (auth.js) — ต้องลงทะเบียนก่อน API ทั้งหมด
 const { hashTeacherPassword, verifyTeacherPassword } = require('./auth');
+const WatchKind = require('./watch-kind.js');
+
+// นับ "สลับหน้าจอ" ด้วยกติกาเดียวกับทุกหน้า (watch-kind.js) — ไม่นับเหตุการณ์อื่น เช่น เปิดหลายเครื่อง/ไม่มีรายชื่อ
+// where/params: เงื่อนไขของ cheat_logs (alias cl) · keyOf(row) → คีย์ที่ใช้รวมยอด · row มี studentId, roomId, cid, action
+const normSidKey = s => String(s || '').replace(/[^0-9a-zA-Z]/g, '').toLowerCase();
+function countLeaves(where, params, keyOf, cb) {
+    db.all(`SELECT cl.studentId, cl.roomId, cl.action,
+                   COALESCE(NULLIF(cl.courseId, 0), (SELECT NULLIF(t8.courseId, 0) FROM teacher_rooms t8 WHERE t8.roomId = cl.roomId)) AS cid
+            FROM cheat_logs cl WHERE ${where}`, params, (err, rows) => {
+        const m = new Map();
+        (rows || []).forEach(r => { if (!WatchKind.isLeave(r.action)) return; const k = keyOf(r); m.set(k, (m.get(k) || 0) + 1); });
+        cb(err, m);
+    });
+}
 require('./auth').register(app, db, process.env.DATA_DIR || path.join(__dirname, '.data'));
 // บันทึกคำตอบระหว่างสอบ + บล็อกเบราว์เซอร์ในแอป + จับสัญญาณขาดหาย (ต้องอยู่ก่อนเส้นทาง API ของการสอบ)
 try { require('./exam-guard')(app, db); } catch (e) { console.error('โหลด Exam Guard ไม่สำเร็จ:', e.message); }
@@ -1213,7 +1229,14 @@ app.get('/api/students', (req, res) => {
     const params = (one ? [courseId, String(courseId)] : [v.adm, v.user]).concat([v.adm, v.user]);
     db.all(sql, params, (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
-        res.json(rows || []);
+        rows = rows || [];
+        const cids = [...new Set(rows.map(r => String(r.courseId)).filter(x => x && x !== 'null'))];
+        if (!cids.length) return res.json(rows);
+        countLeaves(`CAST(COALESCE(NULLIF(cl.courseId, 0), (SELECT NULLIF(t8.courseId, 0) FROM teacher_rooms t8 WHERE t8.roomId = cl.roomId)) AS TEXT) IN (${cids.map(() => '?').join(',')})`, cids,
+            r => normSidKey(r.studentId) + '|' + String(r.cid), (cErr, m) => {
+                if (!cErr) rows.forEach(r => { r.cheatCount = m.get(normSidKey(r.studentId) + '|' + String(r.courseId)) || 0; });
+                res.json(rows);
+            });
     });
 });
 
@@ -1335,7 +1358,14 @@ app.get('/api/students/exam-history', (req, res) => {
         ORDER BY er.id DESC
     `, [studentId, studentId, viewer(req).adm, viewer(req).user, cId, cId], (err, rows) => {
         if (err) return res.status(500).json({ message: err.message });
-        res.json(rows || []);
+        rows = rows || [];
+        const rids = [...new Set(rows.map(r => String(r.roomId)))];
+        if (!rids.length) return res.json(rows);
+        countLeaves(`cl.roomId IN (${rids.map(() => '?').join(',')}) AND (cl.studentId = ? OR REPLACE(cl.studentId, '-', '') = REPLACE(?, '-', ''))`, [...rids, studentId, studentId],
+            r => String(r.roomId), (cErr, m) => {
+                if (!cErr) rows.forEach(r => { r.tabSwitches = m.get(String(r.roomId)) || 0; });
+                res.json(rows);
+            });
     });
 });
 
@@ -3159,21 +3189,24 @@ app.post('/api/submit-exam', (req, res) => {
     if (!roomId || !studentId || !name || !answers) return res.status(400).json({ message: "ข้อมูลไม่ครบถ้วน" });
     removeStudentActive(roomId, studentId);
 
-    // ตรวจสอบและบันทึกประวัติการสลับหน้าจอสำรอง หากมีส่งเข้ามาและยังไม่ถูกบันทึก
+    // สำรอง: ถ้ารายงาน "ออกจากหน้าข้อสอบ" บางครั้งส่งไม่ถึง (เน็ตหลุดตอนนั้น) เติมให้ครบตามจำนวนที่หน้าสอบนับได้
+    // นับเทียบเฉพาะแถว "ออกจากหน้าข้อสอบ …" (หน้าสอบนับแค่ประเภทนี้) · เดิมนับทุกประเภทรวมกัน ทำให้เติมขาด/เกิน
+    // รอ 4 วินาทีก่อนเทียบ เพราะรายงานครั้งล่าสุดอาจยังส่งมาไม่ถึง (ส่งพร้อมกับตอนกดส่งคำตอบ)
     if (tabSwitches && parseInt(tabSwitches, 10) > 0) {
-        const swCount = parseInt(tabSwitches, 10);
-        db.get('SELECT COUNT(*) as cnt FROM cheat_logs WHERE roomId = ? AND (studentId = ? OR REPLACE(studentId, \'-\', \'\') = REPLACE(?, \'-\', \'\'))',
-            [roomId, studentId, studentId], (cntErr, cntRow) => {
-                const existingCount = cntRow ? (cntRow.cnt || 0) : 0;
+        const swCount = Math.min(parseInt(tabSwitches, 10), 500);
+        setTimeout(() => db.get(`SELECT COUNT(*) as cnt FROM cheat_logs WHERE roomId = ? AND (studentId = ? OR REPLACE(studentId, '-', '') = REPLACE(?, '-', '')) AND action LIKE ?`,
+            [roomId, studentId, studentId, WatchKind.LEAVE_PREFIX + '%'], (cntErr, cntRow) => {
+                if (cntErr) return;
+                const existingCount = cntRow ? (Number(cntRow.cnt) || 0) : 0;
                 if (existingCount < swCount) {
                     const time = new Date().toLocaleTimeString('th-TH', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit', second: '2-digit' });
                     for (let i = existingCount + 1; i <= swCount; i++) {
                         db.run('INSERT INTO cheat_logs (roomId, studentId, name, class, action, time, courseId) VALUES (?, ?, ?, ?, ?, ?, (SELECT courseId FROM teacher_rooms WHERE roomId = ?))',
-                            [roomId, studentId, name, studentClass || '', `สลับแท็บเบราว์เซอร์ / ออกหน้าจออื่น (ครั้งที่ ${i})`, time, roomId]);
+                            [roomId, studentId, name, studentClass || '', `${WatchKind.LEAVE_PREFIX} (บันทึกตอนส่งคำตอบ เพราะรายงานเดิมส่งไม่ถึง · สลับหน้าจอครั้งที่ ${i})`, time, roomId]);
                     }
                 }
             }
-        );
+        ), 4000);
     }
 
     // 1. ค้นหา courseId จากห้องสอบ หรือจากประวัติการลงทะเบียนของนักศึกษา
@@ -4305,10 +4338,10 @@ app.get('/api/admin/storage-stats', (req, res) => {
 })(app, routeCtx);
 
 // รายงานรวมรายคนของรายวิชา
-// ===== ตัวแปลงข้อสอบด้วย AI (โฟลเดอร์ exam-converter) =====
+// ===== ตัวแปลงข้อสอบด้วย AI (หน้า exam-converter.html · โค้ดฝั่งเซิร์ฟเวอร์ converter-router.mjs) =====
 // API Key อยู่ใน environment ของเซิร์ฟเวอร์ (GEMINI_API_KEY) เท่านั้น · ใช้ได้เฉพาะอาจารย์/แอดมินที่ล็อกอิน
 // โควตาต่อคนต่อวัน: EXAM_AI_DAILY_LIMIT (ค่าเริ่มต้น 30 ไฟล์)
-import('./exam-converter/server/exam-converter-router.js').then(({ createExamConverterRouter }) => {
+import('./converter-router.mjs').then(({ createExamConverterRouter }) => {
     const requireTeacher = (req, res, next) => {
         const u = req.authUser;
         if (!u) return res.status(401).json({ error: 'กรุณาเข้าสู่ระบบ ExamPro ก่อนใช้งาน' });

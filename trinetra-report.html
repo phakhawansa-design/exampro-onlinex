@@ -46,7 +46,7 @@ tr.flag td:first-child{box-shadow:inset 4px 0 0 var(--red)}
 .nm b{font-weight:500}.nm small{display:block;color:var(--mut);font-size:12px}
 .chips{display:flex;gap:4px;flex-wrap:wrap}
 .chip{font-size:12px;padding:2px 8px;border-radius:99px;white-space:nowrap}
-.c-multi{background:#ffedd5;color:#9a3412}.c-ans{background:#e6f4ff;color:#0b5cad}.c-switch{background:#fde8e8;color:#b42318}.c-fs{background:#e0f2fe;color:#075985}.c-gap{background:#fff1dc;color:#92400e}.c-other{background:#eef1f5;color:var(--mut)}.c-ok{background:#e2f6ee;color:var(--green)}
+.c-multi{background:#ffedd5;color:#9a3412}.c-ans{background:#e6f4ff;color:#0b5cad}.c-switch{background:#fde8e8;color:#b42318}.c-fs{background:#e0f2fe;color:#075985}.c-gap{background:#fff1dc;color:#92400e}.c-other{background:#eef1f5;color:var(--mut)}.c-ok{background:#e2f6ee;color:var(--green)}.c-sum{background:#b42318;color:#fff;font-weight:800}
 .xb{font:inherit;font-size:12.5px;border:0;background:none;color:var(--navy);cursor:pointer;padding:2px 4px;white-space:nowrap}
 tr.det td{background:#fbfcff;padding:4px 14px 14px}
 .ev{display:grid;grid-template-columns:72px 1fr;gap:4px 12px;font-size:13.5px;margin-top:8px;position:sticky;left:14px;max-width:min(1100px,calc(100vw - 80px))}
@@ -136,7 +136,7 @@ td:first-child{white-space:nowrap}
       </select>
       <label><input type="checkbox" id="only"> เฉพาะคนที่มีประวัติสลับหน้าจอ</label>
     </div>
-    <p class="note">ประวัติสลับหน้าจอ: <span class="chip c-switch">สลับหน้าจอ</span> <span class="chip c-fs">ออกเต็มจอ</span> <span class="chip c-gap">หายจากหน้าสอบ</span> <span class="chip c-multi">หลายเครื่อง</span> <span class="chip c-ans">ตอบ/แก้หลังกลับมา</span> · ใช้ประกอบการพิจารณาเท่านั้น การสลับหน้าจอไม่ได้แปลว่าทุจริตเสมอ (เช่น เน็ตหลุด มีสายเรียกเข้า)</p>
+    <p class="note"><span class="chip c-sum">สลับหน้าจอรวม</span> = <span class="chip c-switch">สลับแอป/แท็บ</span> + <span class="chip c-fs">ออกเต็มจอ</span> + <span class="chip c-gap">หายจากหน้าสอบ</span> · เหตุการณ์อื่น (ไม่นับรวม): <span class="chip c-multi">หลายเครื่อง</span> <span class="chip c-ans">ตอบ/แก้หลังกลับมา</span> · ใช้ประกอบการพิจารณาเท่านั้น การสลับหน้าจอไม่ได้แปลว่าทุจริตเสมอ (เช่น เน็ตหลุด มีสายเรียกเข้า)</p>
     <div class="tw" id="tw"><div class="empty">เลือกรายวิชาเพื่อดูรายงาน</div></div>
   </div>
 </main>
@@ -146,7 +146,7 @@ td:first-child{white-space:nowrap}
   if (!U) { location.href = 'login.html'; return; }
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const KIND = { switch: ['สลับหน้าจอ', 'c-switch'], fs: ['ออกเต็มจอ', 'c-fs'], gap: ['หายจากหน้าสอบ', 'c-gap'], multi: ['หลายเครื่อง', 'c-multi'], other: ['อื่น ๆ', 'c-other'], answer: ['ตอบ/แก้หลังกลับมา', 'c-ans'] };
+  const KIND = { switch: ['สลับแอป/แท็บ', 'c-switch'], fs: ['ออกเต็มจอ', 'c-fs'], gap: ['หายจากหน้าสอบ', 'c-gap'], multi: ['หลายเครื่อง', 'c-multi'], other: ['อื่น ๆ', 'c-other'], answer: ['ตอบ/แก้หลังกลับมา', 'c-ans'] };
   let data = null, open = new Set();
 
   async function api(url) {
@@ -172,12 +172,12 @@ td:first-child{white-space:nowrap}
     catch (e) { data = null; $('cards').innerHTML = ''; $('tw').innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
   }
   const chips = w => (w.total || w.answer)
-    ? ['switch', 'fs', 'gap', 'multi', 'other', 'answer'].filter(k => w[k]).map(k => `<span class="chip ${KIND[k][1]}">${KIND[k][0]} ${w[k]}</span>`).join('')
+    ? (w.leaves ? `<span class="chip c-sum">สลับหน้าจอรวม ${w.leaves} ครั้ง</span>` : '') + ['switch', 'fs', 'gap', 'multi', 'other', 'answer'].filter(k => w[k]).map(k => `<span class="chip ${KIND[k][1]}">${KIND[k][0]} ${w[k]}</span>`).join('')
     : '<span class="chip c-ok">ไม่มีประวัติ</span>';
   function rows() {
     const qv = $('q').value.trim().toLowerCase(), only = $('only').checked, so = $('sort').value;
-    let list = data.students.filter(s => (!only || s.watch.total) && (!qv || (s.studentId + ' ' + s.name).toLowerCase().includes(qv)));
-    const by = { id: (a, b) => a.studentId.localeCompare(b.studentId), watch: (a, b) => b.watch.total - a.watch.total || a.studentId.localeCompare(b.studentId),
+    let list = data.students.filter(s => (!only || s.watch.leaves) && (!qv || (s.studentId + ' ' + s.name).toLowerCase().includes(qv)));
+    const by = { id: (a, b) => a.studentId.localeCompare(b.studentId), watch: (a, b) => b.watch.leaves - a.watch.leaves || b.watch.total - a.watch.total || a.studentId.localeCompare(b.studentId),
       low: (a, b) => a.total - b.total, high: (a, b) => b.total - a.total };
     return list.sort(by[so] || by.id);
   }
@@ -186,7 +186,7 @@ td:first-child{white-space:nowrap}
     $('cards').innerHTML = `
       <div class="card"><b>${d.summary.students}</b><span>นักศึกษาในรายงาน</span></div>
       <div class="card w"><b>${d.summary.watched}</b><span>คนที่มีประวัติสลับหน้าจอ</span></div>
-      <div class="card"><b>${d.summary.events}</b><span>เหตุการณ์สลับหน้าจอทั้งหมด</span></div>
+      <div class="card"><b>${d.summary.events}</b><span>ครั้งที่สลับหน้าจอรวมทั้งวิชา${d.summary.otherEvents ? ' · เหตุการณ์อื่น ' + d.summary.otherEvents : ''}</span></div>
       <div class="card"><b>${avg}${avg === '–' ? '' : '%'}</b><span>คะแนนรวมเฉลี่ย (${d.columns.length} รายการ)</span></div>`;
     const list = rows();
     if (!d.students.length) { $('tw').innerHTML = '<div class="empty">ยังไม่มีข้อมูลนักศึกษาในรายวิชานี้</div>'; return; }
@@ -196,7 +196,7 @@ td:first-child{white-space:nowrap}
       <th class="n">รวม<br>/${d.totalMax}</th><th class="n">%</th><th>สลับหน้าจอ</th><th class="noprint"></th></tr></thead><tbody>
       ${list.map(s => {
         const k = s.studentId, isOpen = open.has(k);
-        return `<tr class="st ${s.watch.total ? 'flag' : ''}"><td>${esc(k)}</td><td class="nm"><b>${esc(s.name || '–')}</b>${s.class ? `<small>${esc(s.class)}</small>` : ''}</td>
+        return `<tr class="st ${s.watch.leaves ? 'flag' : ''}"><td>${esc(k)}</td><td class="nm"><b>${esc(s.name || '–')}</b>${s.class ? `<small>${esc(s.class)}</small>` : ''}</td>
           ${cols.map(c => `<td class="n">${s.scores[c.key] ?? '–'}</td>`).join('')}
           <td class="n"><b>${s.total}</b></td><td class="n">${s.percent ?? '–'}</td>
           <td><div class="chips">${chips(s.watch)}</div></td>
@@ -215,8 +215,8 @@ td:first-child{white-space:nowrap}
   function csv() {
     if (!data) return;
     const cols = data.columns, q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
-    const head = ['รหัส', 'ชื่อ-สกุล', 'ชั้นเรียน', ...cols.map(c => `ปรนัย: ${c.label} (/${c.max})`), `รวม (/${data.totalMax})`, 'ร้อยละ', 'สลับหน้าจอ', 'ออกเต็มจอ', 'หายจากหน้าสอบ', 'หลายเครื่อง', 'ตอบ/แก้หลังกลับมา', 'รายละเอียดการสลับหน้าจอ'];
-    const lines = [head, ...rows().map(s => [s.studentId, s.name, s.class, ...cols.map(c => s.scores[c.key] ?? ''), s.total, s.percent ?? '', s.watch.switch, s.watch.fs, s.watch.gap, s.watch.multi, s.watch.answer,
+    const head = ['รหัส', 'ชื่อ-สกุล', 'ชั้นเรียน', ...cols.map(c => `ปรนัย: ${c.label} (/${c.max})`), `รวม (/${data.totalMax})`, 'ร้อยละ', 'สลับหน้าจอรวม (ครั้ง)', '- สลับแอป/แท็บ', '- ออกเต็มจอ', '- หายจากหน้าสอบ', 'เปิดหลายเครื่อง', 'ตอบ/แก้หลังกลับมา', 'รายละเอียดการสลับหน้าจอ'];
+    const lines = [head, ...rows().map(s => [s.studentId, s.name, s.class, ...cols.map(c => s.scores[c.key] ?? ''), s.total, s.percent ?? '', s.watch.leaves, s.watch.switch, s.watch.fs, s.watch.gap, s.watch.multi, s.watch.answer,
       s.watch.events.map(e => `[${e.room} ${e.time}] ${e.action}`).join(' | ')])];
     const blob = new Blob(['﻿' + lines.map(r => r.map(q).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob);

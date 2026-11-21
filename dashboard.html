@@ -3,6 +3,7 @@
 <head>
     <script src="auth-client.js"></script>
     <script src="term-scope.js"></script>
+    <script src="watch-kind.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>แผงควบคุมหลัก · ExamPro</title>
@@ -434,7 +435,7 @@
                 <section class="db-card">
                     <div class="db-h"><h3>ทางลัด</h3></div>
                     <div class="db-quick">
-                        <a href="exam-converter/index.html" class="db-q db-q-or"><span class="db-q-ic"><svg viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9Z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8Z"/></svg></span><b>แปลงข้อสอบด้วย AI</b><small>จาก Word, PDF หรือรูป</small></a>
+                        <a href="exam-converter.html" class="db-q db-q-or"><span class="db-q-ic"><svg viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9Z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8Z"/></svg></span><b>แปลงข้อสอบด้วย AI</b><small>จาก Word, PDF หรือรูป</small></a>
                         <a href="admin-courses.html" class="db-q db-q-gr"><span class="db-q-ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M19 8v6M16 11h6"/></svg></span><b>เพิ่มรายชื่อนักศึกษา</b><small>นำเข้าจาก Excel</small></a>
                         <a href="admin-results.html" class="db-q db-q-bl"><span class="db-q-ic"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><b>ดูผลและสถิติ</b><small>ส่งออก Excel ได้</small></a>
                         <a href="trinetra-report.html" class="db-q db-q-nv"><span class="db-q-ic"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg></span><b>แฟ้มประวัติรวม</b><small>ประวัติสลับหน้าจอ</small></a>
@@ -513,6 +514,7 @@
     };
     const ic = (name, tone) => `<span class="db-ic db-ic-${tone}"><svg viewBox="0 0 24 24">${IC[name]}</svg></span>`;
     const J = u => fetch(u).then(r => r.ok ? r.json() : null).catch(() => null);
+    const sidKey = s => String(s || '').replace(/[^0-9a-zA-Z]/g, '').toLowerCase();
     const arr = x => Array.isArray(x) ? x : [];
 
     // ห้องที่อาจารย์ตั้งค่าไว้จริง (ไม่นับห้องว่างที่ระบบสร้างอัตโนมัติ)
@@ -541,10 +543,15 @@
         // ตัวเลขสรุป
         document.getElementById('stat-total-courses').textContent = coursesR ? courses.length : '-';
         document.getElementById('stat-total-templates').textContent = coursesR ? templates : '-';
-        document.getElementById('stat-total-students').textContent = studentsR ? arr(studentsR).length : '-';
+        document.getElementById('stat-total-students').textContent = studentsR ? new Set(arr(studentsR).map(s => sidKey(s.studentId))).size : '-';
         document.getElementById('stat-rooms').textContent = roomsR ? setUp.length : '-';
 
         // ===== ห้องที่กำลังสอบ =====
+        const liveSum = Object.fromEntries(await Promise.all(live.map(async r => {
+            const d = await J('/api/teacher/room-realtime-dashboard?roomId=' + encodeURIComponent(r.roomId));
+            return [r.roomId, d && d.summary ? d.summary : null];
+        })));
+        const leaveLogs = cheats.filter(x => WatchKind.isLeave(x.action));
         let sumSub = 0, sumAll = 0;
         const liveBox = document.getElementById('db-live');
         if (!live.length) {
@@ -556,13 +563,19 @@
         } else {
             liveBox.innerHTML = live.map(r => {
                 const c = courseOf(r.courseId);
-                const st = liveMap[r.roomId] || {};
-                const sub = Number(st.submitted) || 0, act = Number(st.active) || 0;
-                const enrolled = c ? Number(c.studentCount) || 0 : 0;
-                const total = Math.max(enrolled, sub + act);
-                const notIn = Math.max(0, total - sub - act);
+                const st = liveMap[r.roomId] || {}, ls = liveSum[r.roomId];
+                let sub, act, away, notIn, total, enrolled;
+                if (ls) {
+                    sub = Number(ls.totalSubmitted) || 0; act = Number(ls.totalActive) || 0; away = Number(ls.totalAway) || 0;
+                    notIn = Number(ls.totalNotJoined) || 0; enrolled = Number(ls.totalEnrolled) || 0;
+                    total = sub + act + away + notIn;
+                } else {
+                    sub = Number(st.submitted) || 0; act = Number(st.active) || 0; away = 0;
+                    enrolled = c ? Number(c.studentCount) || 0 : 0;
+                    total = Math.max(enrolled, sub + act); notIn = Math.max(0, total - sub - act);
+                }
                 sumSub += sub; sumAll += total;
-                const sw = new Set(cheats.filter(x => x.roomId === r.roomId).map(x => x.studentId)).size;
+                const sw = new Set(leaveLogs.filter(x => x.roomId === r.roomId).map(x => sidKey(x.studentId))).size;
                 const pct = n => total ? (n / total * 100) : 0;
                 const sub2 = [r.courseCode, r.studentClasses ? 'กลุ่ม ' + r.studentClasses : '', Number(r.questionCount) + ' ข้อ', r.duration ? 'เวลาสอบ ' + r.duration + ' นาที' : ''].filter(Boolean).join(' · ');
                 const pin = r.exam_code || '------';
@@ -579,12 +592,13 @@
                             <button type="button" class="db-btn db-sm" onclick="copyPin('${esc(pin)}')"><svg viewBox="0 0 24 24" class="db-i" style="width:15px;height:15px">${IC.copy}</svg>คัดลอก</button>
                         </div>
                     </div>
-                    <div class="db-bar" role="img" aria-label="ส่งแล้ว ${sub} กำลังทำ ${act} ยังไม่เข้า ${notIn} จาก ${total} คน">
-                        <i style="width:${pct(sub)}%;background:var(--gr)"></i><i style="width:${pct(act)}%;background:var(--bl)"></i>
+                    <div class="db-bar" role="img" aria-label="ส่งแล้ว ${sub} กำลังทำ ${act} หลุด ${away} ยังไม่เข้า ${notIn} จาก ${total} คน">
+                        <i style="width:${pct(sub)}%;background:var(--gr)"></i><i style="width:${pct(act)}%;background:var(--bl)"></i><i style="width:${pct(away)}%;background:#f59e0b"></i>
                     </div>
                     <div class="db-legend">
                         <span><b style="color:var(--gr)">${sub}</b>ส่งแล้ว</span>
                         <span><b style="color:var(--bl)">${act}</b>กำลังทำ</span>
+                        ${away ? `<span><b style="color:#b45309">${away}</b>หลุด/ออกไปชั่วคราว</span>` : ''}
                         ${enrolled ? `<span><b>${notIn}</b>ยังไม่เข้า</span>` : ''}
                         ${sw ? `<span style="color:#c2410c"><b style="color:#c2410c">${sw}</b>คนสลับหน้าจอ</span>` : '<span>ยังไม่มีใครสลับหน้าจอ</span>'}
                     </div>
@@ -612,7 +626,7 @@
         else if (coursesR && !courses.length) todo.push({ i: 'book', t: 'bl', h: 'สร้างรายวิชาแรก', s: 'เริ่มจากรายวิชา แล้วค่อยเพิ่มรายชื่อและข้อสอบ', go: 'สร้างรายวิชา', href: 'admin-courses.html' });
         live.forEach(r => {
             const per = {};
-            cheats.filter(x => x.roomId === r.roomId).forEach(x => { per[x.studentId] = (per[x.studentId] || 0) + 1; });
+            leaveLogs.filter(x => x.roomId === r.roomId).forEach(x => { const k = sidKey(x.studentId); per[k] = (per[k] || 0) + 1; });
             const n = Object.values(per).filter(v => v >= 2).length;
             if (n) todo.push({ i: 'eye', t: 'rd', h: `${n} คนสลับหน้าจอ 2 ครั้งขึ้นไป`, s: roomTitle(r), go: 'ตรวจสอบ', href: 'admin-monitoring.html?room=' + encodeURIComponent(r.roomId) });
         });
@@ -637,7 +651,7 @@
         const nameOfRoom = id => { const r = rooms.find(x => x.roomId === id); return r ? roomTitle(r) : ''; };
         const latestDate = results[0] ? results[0].date : null;
         const evRes = results.slice(0, 8).map(x => ({ k: (x.date === latestDate ? '1' : '0') + (x.time || ''), html: `${ic('check', 'gr')}<span class="db-row-t">${esc(x.name)} ส่งข้อสอบ · ได้ ${x.score}/${x.maxScore}<small>${esc(nameOfRoom(x.roomId))}</small></span><span class="db-t">${esc(x.date === latestDate ? x.time : x.date)}</span>` }));
-        const evCh = cheats.slice(0, 5).map(x => ({ k: '1' + (x.time || ''), html: `${ic('swap', 'or')}<span class="db-row-t">${esc(x.name)} สลับหน้าจอ<small>${esc(nameOfRoom(x.roomId))}</small></span><span class="db-t">${esc(x.time)}</span>` }));
+        const evCh = cheats.slice(0, 5).map(x => ({ k: '1' + (x.time || ''), html: `${ic('swap', 'or')}<span class="db-row-t">${esc(x.name)} ${esc(WatchKind.LABEL[WatchKind.kindOf(x.action)])}<small>${esc(nameOfRoom(x.roomId))}</small></span><span class="db-t">${esc(x.time)}</span>` }));
         const feed = evRes.concat(evCh).sort((a, b) => b.k.localeCompare(a.k)).slice(0, 6);
         document.getElementById('db-feed').innerHTML = feed.length
             ? feed.map(x => `<div class="db-row">${x.html}</div>`).join('')

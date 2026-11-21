@@ -184,9 +184,6 @@
         .rc-meta span b { color: #0f172a; }
         .rc-meta span.g { background: #eef4ff; color: #0b2a7a; font-weight: 700; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
         .rc-link { border: 0; background: none; font: inherit; font-size: 13px; font-weight: 700; color: #1d5fd6; text-decoration: underline; cursor: pointer; padding: 0 2px; }
-        .rc-set { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 12px; border-radius: 12px; background: #fafbfe; border: 1px dashed #d6deea; font-size: 13px; color: #334155; cursor: pointer; }
-        .rc-set span { line-height: 1.45; }
-        .rc-set select { flex: none; border: 1.5px solid #ffc89c; background: #fff7ef; color: #9a3412; font: inherit; font-size: 13px; font-weight: 800; padding: 5px 8px; border-radius: 10px; cursor: pointer; }
         .rc-ann { font-size: 13px; color: #9a3412; background: #fff7ef; border-radius: 10px; padding: 7px 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .rc-act { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-top: auto; padding-top: 4px; }
         .rc-btn { display: flex; align-items: center; justify-content: center; padding: 11px 10px; border-radius: 12px; font: inherit; font-size: 14px; font-weight: 800; border: 1.5px solid transparent; cursor: pointer; text-decoration: none; white-space: nowrap; transition: filter .15s, background .15s; }
@@ -213,7 +210,10 @@
         .lv-tools input:focus { border-color: #1d5fd6; }
         .lv-tools span { flex: 1 1 260px; font-size: 12.5px; color: #64748b; }
         .lv-board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding: 14px 18px 18px; overflow-y: auto; max-height: 52vh; align-items: start; background: #f8fafc; }
-        #dtab-view-roster { overflow-y: auto !important; min-height: 0; }
+        #live-students-card { max-width: min(1500px, 97vw) !important; height: 95vh; max-height: 95vh !important; }
+        #live-students-modal { padding: 12px !important; }
+        #dtab-view-roster { overflow-y: auto !important; min-height: 0; flex: 1 1 auto; }
+        #dtab-view-roster .lv-board { max-height: none; min-height: 100%; }
         #dtab-view-roster > * { flex: none; }
         .lv-col { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; }
         .lv-col h4 { margin: 0; display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; font-size: 14.5px; font-weight: 800; border-bottom: 1px solid #eef2f7; }
@@ -514,7 +514,7 @@
     </div>
 
     <div id="create-room-modal" class="fixed inset-0 bg-slate-950/75 backdrop-blur-md z-50 flex items-center justify-center hidden p-4 sm:p-6 md:p-8">
-        <div class="bg-white rounded-3xl w-full max-w-4xl lg:max-w-6xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[94vh]">
+        <div class="bg-white rounded-3xl w-full max-w-4xl lg:max-w-5xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[94vh]">
             
             <!-- Modal Header (Spacious & Clean) -->
             <div class="px-6 sm:px-8 py-5 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border-b border-slate-200 flex items-center justify-between shrink-0">
@@ -703,7 +703,7 @@
     <!-- 3. LIVE STUDENTS LIST MODAL                              -->
     <!-- ======================================================== -->
     <div id="live-students-modal" class="fixed inset-0 bg-slate-950/75 backdrop-blur-md z-50 flex items-center justify-center hidden p-4 sm:p-6 md:p-8">
-        <div class="bg-white rounded-3xl w-full max-w-4xl lg:max-w-5xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[92vh]">
+        <div id="live-students-card" class="bg-white rounded-3xl w-full max-w-4xl lg:max-w-5xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[92vh]">
             <!-- Header -->
             <div class="px-7 py-5 bg-gradient-to-r from-slate-50 via-indigo-50/40 to-purple-50/30 border-b border-slate-200 flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -755,7 +755,7 @@
             </div>
 
             <!-- Content Area 2: Histogram Score Distribution -->
-            <div id="dtab-view-histogram" class="p-6 overflow-y-auto space-y-4 max-h-[55vh] hidden">
+            <div id="dtab-view-histogram" class="p-6 overflow-y-auto space-y-4 flex-1 min-h-0 hidden">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
                         <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
@@ -789,7 +789,7 @@
             </div>
 
             <!-- Content Area 3: Top Wrong Questions Analysis -->
-            <div id="dtab-view-wrong-questions" class="p-6 overflow-y-auto space-y-3 max-h-[55vh] hidden">
+            <div id="dtab-view-wrong-questions" class="p-6 overflow-y-auto space-y-3 flex-1 min-h-0 hidden">
                 <div class="text-xs text-slate-500 font-medium pb-2 border-b border-slate-200">
                     เรียงลำดับข้อสอบที่มีอัตราการตอบผิดมากที่สุด เพื่อให้อาจารย์สามารถทบทวนหรืออธิบายเพิ่มเติมแก่นักศึกษาได้
                 </div>
@@ -1035,7 +1035,6 @@
                     : 'กลุ่ม ' + classNameStr;
                 const pinShow = /^\d{6}$/.test(examPin) ? examPin.slice(0, 3) + ' ' + examPin.slice(3) : examPin;
                 const rid = escapeHtml(room.roomId);
-                const leaveSel = `<select onchange="setLeaveLimit('${rid}', this)" aria-label="ส่งคำตอบอัตโนมัติเมื่อออกจากหน้าข้อสอบครบ">${[0, 1, 2, 3, 5, 10].map(n => `<option value="${n}" ${Number(room.max_leaves ?? 3) === n ? 'selected' : ''}>${n ? 'ครบ ' + n + ' ครั้ง' : 'ไม่ส่งอัตโนมัติ'}</option>`).join('')}</select>`;
                 html += `
                     <article class="rc ${isPub ? 'live' : 'wait'}">
                         <div class="rc-top">
@@ -1062,11 +1061,6 @@
                             <span class="g" title="${escapeHtml(groupText)}">${escapeHtml(groupText)}</span>
                             ${room.courseId && groupsAll.length > 1 ? `<button type="button" class="rc-link" onclick="openRoomGroups('${rid}')">เปลี่ยนกลุ่ม</button>` : ''}
                         </div>
-
-                        <label class="rc-set" title="นักศึกษาออกจากหน้าข้อสอบ (สลับแอป/แท็บ ล็อกจอ นานเกิน 3 วินาที) ครบจำนวนนี้ ระบบส่งคำตอบให้อัตโนมัติ">
-                            <span>ส่งคำตอบอัตโนมัติ เมื่อนักศึกษาออกจากหน้าข้อสอบ</span>
-                            ${leaveSel}
-                        </label>
 
                         ${announcement ? `<div class="rc-ann"><b>ประกาศ</b> ${escapeHtml(announcement)}</div>` : ''}
 
@@ -1178,17 +1172,6 @@
             document.getElementById('rgm-sub').textContent = (room.exam_title || room.roomName || '') + (room.exam_code ? ' · PIN ' + room.exam_code : '');
             document.getElementById('rgm-list').innerHTML = list.length ? groupPickHtml(list, splitG(room.allowed_classes)) : '<p class="text-sm text-slate-500">รายวิชานี้ยังไม่มีกลุ่มเรียน (ตั้งได้ที่หน้าจัดการรายวิชา)</p>';
             document.getElementById('room-groups-modal').classList.remove('hidden');
-        }
-        async function setLeaveLimit(roomId, sel) {
-            sel.disabled = true;
-            try {
-                const r = await fetch('/api/teacher/room-leave-limit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ roomId, maxLeaves: Number(sel.value) }) });
-                const d = await r.json().catch(() => ({}));
-                if (!r.ok || !d.success) throw new Error(d.message || 'HTTP ' + r.status);
-                const room = (allRooms || []).find(x => x.roomId === roomId); if (room) room.max_leaves = d.maxLeaves;
-                if (window.uiToast) uiToast(d.maxLeaves ? `นักศึกษาออกจากหน้าข้อสอบครบ ${d.maxLeaves} ครั้ง ระบบจะส่งคำตอบให้อัตโนมัติ` : 'ปิดการส่งอัตโนมัติแล้ว (ยังบันทึกและเตือนนักศึกษาทุกครั้ง)', 'ok');
-            } catch (e) { alert('บันทึกไม่สำเร็จ: ' + e.message); }
-            finally { sel.disabled = false; }
         }
         function closeRoomGroups() { document.getElementById('room-groups-modal').classList.add('hidden'); rgmRoomId = null; }
         async function saveRoomGroups() {

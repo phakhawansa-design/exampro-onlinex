@@ -782,15 +782,12 @@
                 const resume = !!readLocalProgress();
                 const mins = Number(settings && settings.duration) || 0;
                 const n = Number(settings && settings.questionCount) || 0;
-                const ml = settings && settings.maxLeaves !== undefined ? Number(settings.maxLeaves) : 3;
                 const ov = document.createElement('div');
                 ov.id = 'ready-screen';
                 ov.style.cssText = 'position:fixed;inset:0;z-index:9996;display:flex;align-items:center;justify-content:center;padding:16px;background:linear-gradient(135deg,#0b2a7a,#1d5fd6);overflow-y:auto';
                 const course = [settings.courseCode, settings.courseName].filter(Boolean).join(' ');
                 const rules = [
                     mins ? `มีเวลาทำ <b>${mins} นาที</b> เริ่มนับเมื่อกดปุ่มด้านล่าง${resume ? ' (ถ้าเคยเริ่มไว้แล้ว เวลาจะนับต่อจากเดิม)' : ''}` : 'ข้อสอบนี้ไม่จำกัดเวลา',
-                    'ห้ามออกจากหน้าข้อสอบ สลับแอป หรือเปิดแท็บอื่น ระบบจะบันทึกและแจ้งอาจารย์',
-                    ml > 0 ? `ออกจากหน้าข้อสอบครบ <b>${ml} ครั้ง</b> ระบบจะส่งคำตอบให้อัตโนมัติ` : 'การออกจากหน้าข้อสอบทุกครั้งจะถูกบันทึก',
                     'ระบบจะเปิดหน้าจอค้างไว้ระหว่างสอบ ปิดเสียงแจ้งเตือนและเปิดโหมดห้ามรบกวนก่อนเริ่ม',
                     'คำตอบบันทึกอัตโนมัติ ถ้าเน็ตหลุดหรือรีเฟรช เข้ามาทำต่อได้'
                 ];
@@ -801,7 +798,6 @@
                     '<div style="display:flex;gap:10px;margin:16px 0">' +
                     `<div style="flex:1;padding:12px;border-radius:14px;background:#f1f5ff;text-align:center"><b style="display:block;font-size:24px;color:#0b2a7a">${n || '-'}</b><span style="font-size:12.5px;color:#475569">ข้อ</span></div>` +
                     `<div style="flex:1;padding:12px;border-radius:14px;background:#f1f5ff;text-align:center"><b style="display:block;font-size:24px;color:#0b2a7a">${mins || '∞'}</b><span style="font-size:12.5px;color:#475569">นาที</span></div>` +
-                    `<div style="flex:1;padding:12px;border-radius:14px;background:#fff1e4;text-align:center"><b style="display:block;font-size:24px;color:#b4500c">${ml > 0 ? ml : '-'}</b><span style="font-size:12.5px;color:#9a3412">ออกได้ (ครั้ง)</span></div>` +
                     '</div>' +
                     '<ul style="margin:0 0 18px;padding-left:20px;color:#334155;font-size:14px;line-height:1.75;list-style:disc">' + rules.map(r => '<li>' + r + '</li>').join('') + '</ul>' +
                     `<button type="button" id="rs-go" style="width:100%;padding:15px;border:0;border-radius:16px;background:#ff7a1a;color:#fff;font-size:17px;font-weight:800;cursor:pointer;box-shadow:0 12px 24px -12px rgba(255,122,26,.9)">${resume ? 'ทำข้อสอบต่อ' : 'เริ่มทำข้อสอบ'}</button>` +
@@ -897,7 +893,7 @@
             d.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(2,11,38,.88)';
             d.innerHTML = '<div style="max-width:440px;width:100%;background:#fff;border-radius:22px;padding:26px 24px;text-align:center;font-family:Noto Sans Thai Looped, Tahoma, sans-serif">' +
                 '<h3 style="margin:0 0 8px;font-size:20px;color:#b42318">ข้อสอบถูกเปิดบนเครื่องหรือแท็บอื่นแล้ว</h3>' +
-                '<p style="margin:0;font-size:14px;line-height:1.7;color:#475569">หน้านี้หยุดทำงานแล้ว ระบบบันทึกเหตุการณ์และแจ้งอาจารย์ผู้คุมสอบ<br>คำตอบที่ทำไว้ยังอยู่ กรุณาทำข้อสอบต่อบนเครื่องที่เปิดล่าสุดเพียงเครื่องเดียว</p></div>';
+                '<p style="margin:0;font-size:14px;line-height:1.7;color:#475569">หน้านี้หยุดทำงานแล้ว<br>คำตอบที่ทำไว้ยังอยู่ กรุณาทำข้อสอบต่อบนเครื่องที่เปิดล่าสุดเพียงเครื่องเดียว</p></div>';
             document.body.appendChild(d);
         }
 
@@ -964,14 +960,14 @@
             gate.innerHTML = '<div style="max-width:440px;width:100%;background:#fff;border-radius:22px;padding:26px 24px;text-align:center;box-shadow:0 30px 70px -20px rgba(0,0,0,.6)">' +
                 '' +
                 '<h3 id="fs-title" style="margin:0 0 8px;font-size:20px;font-weight:700;color:#0d3b8e">เข้าสู่โหมดเต็มจอเพื่อทำข้อสอบ</h3>' +
-                '<p id="fs-desc" style="margin:0 0 16px;font-size:14px;line-height:1.65;color:#475569">การสอบบนคอมพิวเตอร์ต้องทำในโหมดเต็มจอ ห้ามแบ่งหน้าจอหรือเปิดหน้าต่างอื่นซ้อน<br>การออกจากโหมดเต็มจอจะถูกบันทึกและแจ้งอาจารย์</p>' +
+                '<p id="fs-desc" style="margin:0 0 16px;font-size:14px;line-height:1.65;color:#475569">ข้อสอบนี้ทำในโหมดเต็มจอ เพื่อให้อ่านโจทย์ได้สะดวกและไม่มีสิ่งรบกวน</p>' +
                 '<button id="fs-btn" type="button" style="width:100%;padding:13px;border:0;border-radius:14px;background:#c2410c;color:#fff;font-size:15.5px;font-weight:700;cursor:pointer">เข้าสู่โหมดเต็มจอ</button></div>';
             document.body.appendChild(gate);
             const show = (again) => {
                 if (isExamFinished) return;
                 if (again) {
-                    document.getElementById('fs-title').textContent = 'คุณออกจากโหมดเต็มจอ';
-                    document.getElementById('fs-desc').innerHTML = `ระบบบันทึกแล้วและแจ้งอาจารย์ผู้คุมสอบ (ครั้งที่ ${fsExitCount})<br>กดปุ่มด้านล่างเพื่อกลับไปทำข้อสอบต่อ`;
+                    document.getElementById('fs-title').textContent = 'กลับเข้าโหมดเต็มจอ';
+                    document.getElementById('fs-desc').textContent = 'กดปุ่มด้านล่างเพื่อทำข้อสอบต่อ';
                 }
                 gate.style.display = 'flex';
             };
@@ -1062,8 +1058,6 @@
                 if (e.ctrlKey||e.metaKey) {
                     if (['c','v','x','a','p'].includes(e.key.toLowerCase())) {
                         e.preventDefault();
-                        alert("ระบบความปลอดภัยล็อกคีย์ลัดในการสอบครับ!");
-                        window.__fsQuietUntil = Date.now() + 1500;
                     }
                 }
             });
@@ -1080,7 +1074,6 @@
         const LEAVE_PREFIX = 'ออกจากหน้าข้อสอบ';
         const LEAVE_GRACE_MS = 3000;
         let tabSwitchCount = 0;      // จำนวนครั้งที่ออกจริง (นับต่อจากเซิร์ฟเวอร์ รีเฟรชแล้วไม่เริ่มใหม่)
-        let maxLeaves = 3;
         let lastReportedTime = 0;
         let awaySince = 0, awayKind = '';
         const isTouchDevice = matchMedia('(pointer: coarse)').matches || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -1096,46 +1089,10 @@
         }
 
         async function initLeaveLimit(settings) {
-            maxLeaves = Number(settings && settings.maxLeaves);
-            if (isNaN(maxLeaves) || maxLeaves < 0) maxLeaves = 3;
             try {
                 const r = await fetch('/api/student/leave-count?roomId=' + encodeURIComponent(currentRoomId));
                 if (r.ok) { const d = await r.json(); tabSwitchCount = Number(d.count) || 0; }
             } catch (e) {}
-            if (maxLeaves > 0 && tabSwitchCount >= maxLeaves) autoSubmitForLeaves();
-        }
-
-        function showLeaveWarning(sec) {
-            let ov = document.getElementById('leave-warn');
-            if (!ov) {
-                ov = document.createElement('div');
-                ov.id = 'leave-warn';
-                ov.setAttribute('role', 'alertdialog'); ov.setAttribute('aria-modal', 'true');
-                ov.style.cssText = 'position:fixed;inset:0;z-index:9997;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(127,29,29,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)';
-                ov.innerHTML = '<div style="max-width:430px;width:100%;background:#fff;border-radius:22px;padding:24px 22px;text-align:center;box-shadow:0 30px 70px -20px rgba(0,0,0,.6);border-top:6px solid #dc2626">' +
-                    '<div id="lw-count" style="display:inline-block;padding:4px 12px;border-radius:99px;background:#fdecea;color:#b91c1c;font-weight:800;font-size:13px;margin-bottom:10px"></div>' +
-                    '<h3 style="margin:0 0 8px;font-size:20px;font-weight:800;color:#991b1b">คุณมีพฤติกรรมเข้าข่ายออกจากหน้าข้อสอบ</h3>' +
-                    '<p id="lw-desc" style="margin:0 0 16px;font-size:14.5px;line-height:1.7;color:#334155"></p>' +
-                    '<button type="button" id="lw-ok" style="width:100%;padding:13px;border:0;border-radius:14px;background:#0b2a7a;color:#fff;font-size:15.5px;font-weight:700;cursor:pointer">กลับไปทำข้อสอบ</button></div>';
-                document.body.appendChild(ov);
-                ov.querySelector('#lw-ok').addEventListener('click', () => { ov.style.display = 'none'; keepScreenOn(); });
-            }
-            const left = maxLeaves > 0 ? maxLeaves - tabSwitchCount : 0;
-            ov.querySelector('#lw-count').textContent = maxLeaves > 0 ? `ครั้งที่ ${tabSwitchCount} จาก ${maxLeaves}` : `ครั้งที่ ${tabSwitchCount}`;
-            ov.querySelector('#lw-desc').innerHTML =
-                `ระบบตรวจพบว่าคุณออกจากหน้าข้อสอบประมาณ <b>${sec} วินาที</b> และแจ้งอาจารย์ผู้คุมสอบแล้ว<br>` +
-                (maxLeaves > 0
-                    ? (left === 1 ? '<b style="color:#b91c1c">ถ้าออกอีก 1 ครั้ง ระบบจะส่งคำตอบให้อัตโนมัติทันที</b>' : `ออกได้อีก <b>${left} ครั้ง</b> ก่อนระบบส่งคำตอบให้อัตโนมัติ`)
-                    : 'กรุณาอยู่ในหน้าข้อสอบจนกว่าจะส่งคำตอบ');
-            ov.style.display = 'flex';
-            setTimeout(() => { const b = ov.querySelector('#lw-ok'); if (b) b.focus(); }, 30);
-        }
-
-        function autoSubmitForLeaves() {
-            if (isExamFinished) return;
-            reportCheat(`ส่งคำตอบอัตโนมัติ: ออกจากหน้าข้อสอบครบ ${maxLeaves} ครั้ง`);
-            const w = document.getElementById('leave-warn'); if (w) w.style.display = 'none';
-            handleExamEnd('ระบบส่งคำตอบให้อัตโนมัติ', `คุณออกจากหน้าข้อสอบครบ ${maxLeaves} ครั้ง ระบบจึงส่งคำตอบที่ทำไว้ให้อัตโนมัติ และแจ้งอาจารย์ผู้คุมสอบแล้ว`);
         }
 
         function countLeave(sec, kind) {
@@ -1143,9 +1100,7 @@
             tabSwitchCount++;
             lastReportedTime = Date.now();
             reportCheat(`${LEAVE_PREFIX} ${sec} วินาที · ${kind} (สลับหน้าจอครั้งที่ ${tabSwitchCount})`);
-            if (maxLeaves > 0 && tabSwitchCount >= maxLeaves) { autoSubmitForLeaves(); return; }
-            // ไม่แสดงหน้าต่างเตือนนักศึกษาแต่ละครั้ง (บันทึกให้อาจารย์อย่างเดียว) · กติกาแจ้งไว้ที่หน้าเตรียมตัวก่อนเริ่มสอบแล้ว
-            // ถ้าต้องการเปิดเตือนกลับมา: เรียก showLeaveWarning(sec) ตรงนี้
+            // ตรวจจับแบบเงียบ: ไม่เตือน ไม่ส่งคำตอบอัตโนมัติ นักศึกษาไม่รู้ว่าถูกบันทึก (อาจารย์ดูได้ที่หน้าเฝ้าระวังสด / แฟ้มประวัติรวม)
         }
 
         function initTabSwitchMonitoring() {

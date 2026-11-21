@@ -3,6 +3,7 @@
 <head>
     <script src="auth-client.js"></script>
     <script src="term-scope.js"></script>
+    <script src="watch-kind.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ประวัตินักศึกษา - ExamPro</title>
@@ -413,7 +414,7 @@
             </div>
             <div class="text-center">
                 <div class="text-2xl font-bold text-rose-500" id="hist-cheat-count">0</div>
-                <div class="text-xs text-slate-500 font-semibold">ตรวจพบสลับแท็บ</div>
+                <div class="text-xs text-slate-500 font-semibold">สลับหน้าจอ</div>
             </div>
         </div>
 
@@ -993,7 +994,8 @@
             console.warn("API cheat-history offline, โหลดไม่สำเร็จ:", e);
         }
 
-        document.getElementById('hist-cheat-count').textContent = records.length + ' ครั้ง';
+        // นับเฉพาะการสลับหน้าจอ (กติกาเดียวกับทุกหน้า) · รายการด้านล่างยังแสดงทุกเหตุการณ์
+        document.getElementById('hist-cheat-count').textContent = records.filter(r => WatchKind.isLeave(r.action)).length + ' ครั้ง';
 
         if (currentHistTab !== 'cheat') return;
 

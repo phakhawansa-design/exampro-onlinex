@@ -1,3 +1,35 @@
+# Dependency directories
 node_modules/
-.env
+
+# Local databases (SQLite)
+*.db
+*.db-journal
+
+# Logs
+logs
 *.log
+npm-debug.log*
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Environments / Secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ไฟล์กระดาษคำตอบที่อัปโหลด (ข้อมูลนักเรียน)
+.data/essay_uploads/
+
+# ข้อมูลระบบทั้งหมด (ฐานข้อมูล ไฟล์อัปโหลด ไฟล์สำรอง)
+.data/
+
+# ไฟล์สำรองเวอร์ชันเก่า
+_backup*/
+
+# ไฟล์ที่ไม่ได้ใช้แล้ว (ย้ายออกมาเก็บไว้ก่อนลบ)
+.unused*/
+_ไม่ได้ใช้แล้ว/
