@@ -196,6 +196,50 @@
         .cs-label { font-size: 14px !important; font-weight: 800 !important; color: #0b2a7a !important; }
         @media (max-width: 760px) { #course-selector { min-width: 0 !important; width: 100% !important; } }
     </style>
+    <style>
+        /* ===== ภาพรวมด้านบน: วงกลม + สถิติ ===== */
+        .rs-top2 { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; align-items: stretch; }
+        .rs-top2 .sd-card { padding: 18px 20px; }
+        .rs-top2 .sd-body { grid-template-columns: 190px minmax(0, 1fr); gap: 20px; margin-top: 10px; }
+        .rs-top2 .sd-ring { width: 190px; height: 190px; }
+        .rs-top2 .sd-center b { font-size: 32px; }
+        .rs-top2 .sd-legend { gap: 7px; }
+        .rs-top2 .sd-legend li { padding: 8px 12px; }
+        .rs-top2 .sd-n { font-size: 17px; }
+        .rs-top2 .rs-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; }
+        .rs-top2 .rs-kpi { padding: 18px 20px; }
+        .rs-top2 .rs-kpi b { font-size: 26px; }
+        @media (max-width: 1100px) { .rs-top2 { grid-template-columns: 1fr; } }
+        @media (max-width: 560px) { .rs-top2 .sd-body { grid-template-columns: 1fr; justify-items: center; } .rs-top2 .sd-legend { width: 100%; } }
+        /* ===== แถบเลือกมุมมอง ===== */
+        .rs-viewbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+        .rs-tabs { display: inline-flex; padding: 5px; gap: 4px; background: #e8eef8; border-radius: 16px; }
+        .rs-tabs button { border: 0; background: none; font-family: inherit; font-size: 15px; font-weight: 800; color: #475569; padding: 10px 20px; border-radius: 12px; cursor: pointer; white-space: nowrap; transition: background .15s, color .15s, box-shadow .15s; }
+        .rs-tabs button:hover { color: #0b2a7a; }
+        .rs-tabs button.on { background: #fff; color: #0b2a7a; box-shadow: 0 4px 14px -6px rgba(15,23,42,.35); }
+        .rs-viewbar .rs-room { flex: 1 1 320px; background: #fff; }
+        .rs-view { display: flex; flex-direction: column; gap: 24px; }
+        .rs-view[hidden] { display: none; }
+        .ia-empty { display: none; padding: 40px 20px; text-align: center; color: #64748b; font-weight: 600; background: #fff; border: 1px dashed #cbd5e1; border-radius: 20px; }
+        .ia.hidden + .ia-empty { display: block; }
+        @media (max-width: 560px) { .rs-tabs { width: 100%; } .rs-tabs button { flex: 1; padding: 10px 8px; font-size: 14px; } }
+        /* ===== ป็อปอัพเลือกมุมมอง ===== */
+        .vc-back { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(15,23,42,.55); backdrop-filter: blur(4px); }
+        .vc-back[hidden] { display: none; }
+        .vc-box { width: 100%; max-width: 680px; background: #fff; border-radius: 24px; padding: 28px; box-shadow: 0 30px 60px -20px rgba(15,23,42,.5); text-align: center; animation: vcIn .2s ease-out; }
+        @keyframes vcIn { from { transform: translateY(10px) scale(.98); opacity: 0; } }
+        .vc-box h3 { margin: 0; font-size: 22px; font-weight: 800; color: #0f172a; }
+        .vc-box > p { margin: 4px 0 20px; font-size: 14px; color: #64748b; }
+        .vc-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .vc-opt { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 24px 18px; border: 2px solid #e5eaf2; border-radius: 20px; background: #fff; font-family: inherit; cursor: pointer; transition: border-color .15s, transform .15s, box-shadow .15s; }
+        .vc-opt:hover, .vc-opt:focus-visible { border-color: #1d5fd6; transform: translateY(-2px); box-shadow: 0 16px 30px -18px rgba(29,95,214,.6); outline: none; }
+        .vc-opt b { font-size: 17px; font-weight: 800; color: #0f172a; }
+        .vc-opt small { font-size: 13px; line-height: 1.5; color: #64748b; }
+        .vc-ic { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
+        .vc-ic.r { background: #fff1e4; color: #ea580c; }
+        .vc-ic.a { background: #e8efff; color: #1d4ed8; }
+        @media (max-width: 560px) { .vc-opts { grid-template-columns: 1fr; } .vc-box { padding: 22px 18px; } }
+    </style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
@@ -343,113 +387,141 @@
                 <div class="rs-bar" title="สัดส่วนผู้ผ่านเกณฑ์"><i id="rs-pass-bar" style="width:0%"></i></div>
             </section>
 
-            <!-- ② การ์ดสถิติ -->
-            <div class="rs-kpis">
-                <div class="rs-kpi"><div><small>คะแนนสูงสุด</small><b id="stat-max" style="color:#047857">-</b></div></div>
-                <div class="rs-kpi"><div><small>คะแนนต่ำสุด</small><b id="stat-min" style="color:#be123c">-</b></div></div>
-                <div class="rs-kpi"><div><small>คะแนนเฉลี่ย</small><b id="stat-avg" style="color:#b45309">-</b></div></div>
-                <div class="rs-kpi"><div><small>ส่วนเบี่ยงเบนมาตรฐาน (SD)</small><b id="stat-sd" style="color:#4338ca">-</b><em>ยิ่งน้อย คะแนนยิ่งใกล้กัน</em></div></div>
+            <!-- ② ภาพรวมคะแนน: วงกลมการกระจายคะแนน + การ์ดสถิติ -->
+            <div class="rs-top2">
+                <section class="rs-card sd-card" aria-labelledby="sd-title">
+                    <div class="sd-h">
+                        <h3 id="sd-title">การกระจายช่วงคะแนน</h3>
+                        <p>นักศึกษาแต่ละช่วงคะแนนมีกี่คน</p>
+                    </div>
+                    <div class="sd-body">
+                        <div class="sd-ring">
+                            <canvas id="scoreDistChart" aria-label="แผนภูมิวงกลมการกระจายช่วงคะแนน" role="img"></canvas>
+                            <div class="sd-center"><b id="sd-total">0</b><span>คนที่ส่ง</span></div>
+                        </div>
+                        <ul class="sd-legend" id="sd-legend"></ul>
+                    </div>
+                </section>
+                <div class="rs-kpis">
+                    <div class="rs-kpi"><div><small>คะแนนสูงสุด</small><b id="stat-max" style="color:#047857">-</b></div></div>
+                    <div class="rs-kpi"><div><small>คะแนนต่ำสุด</small><b id="stat-min" style="color:#be123c">-</b></div></div>
+                    <div class="rs-kpi"><div><small>คะแนนเฉลี่ย</small><b id="stat-avg" style="color:#b45309">-</b></div></div>
+                    <div class="rs-kpi"><div><small>ส่วนเบี่ยงเบนมาตรฐาน (SD)</small><b id="stat-sd" style="color:#4338ca">-</b><em>ยิ่งน้อย คะแนนยิ่งใกล้กัน</em></div></div>
+                </div>
             </div>
 
-            <!-- ③ คุณภาพข้อสอบรายข้อ (Item Analysis) -->
-            <section id="item-analysis-box" class="ia hidden" aria-labelledby="ia-title">
-                <div class="ia-head">
-                    <div>
-                        <div class="ia-chip">คำนวณอัตโนมัติจากคำตอบของนักศึกษา</div>
-                        <h3 id="ia-title">ตารางวิเคราะห์คุณภาพข้อสอบรายข้อ</h3>
-                        <p id="ia-sub">ชุดข้อสอบ · วิเคราะห์จากนักศึกษา - คน</p>
-                    </div>
-                    <div class="ia-sum" id="ia-sum"></div>
+            <!-- ③ เลือกมุมมอง: ผลการสอบรายคน / ตารางวิเคราะห์ข้อสอบ -->
+            <div class="rs-viewbar">
+                <div class="rs-tabs" role="tablist" aria-label="เลือกมุมมอง">
+                    <button type="button" role="tab" id="tab-results" class="on" aria-selected="true" onclick="setResultsView('results')">ผลการสอบรายคน</button>
+                    <button type="button" role="tab" id="tab-analysis" aria-selected="false" onclick="setResultsView('analysis')">ตารางวิเคราะห์ข้อสอบ</button>
                 </div>
-                <div class="ia-legend">
-                    <span><b>ค่าความยากง่าย (p)</b> สัดส่วนคนที่ตอบถูก · 0.30–0.80 กำลังดี</span>
-                    <span><b>ค่าอำนาจจำแนก (r)</b> แยกคนเก่งกับคนอ่อนได้แค่ไหน · 0.20 ขึ้นไปใช้ได้ · ติดลบ = ควรตรวจเฉลย</span>
-                </div>
-                <div class="ia-wrap">
-                    <table class="ia-table">
-                        <thead>
-                            <tr>
-                                <th class="c">ข้อ</th>
-                                <th>โจทย์คำถาม</th>
-                                <th>ค่าความยากง่าย (p)</th>
-                                <th class="c">ค่าอำนาจจำแนก (r)</th>
-                                <th>ผลวิเคราะห์สรุป</th>
-                            </tr>
-                        </thead>
-                        <tbody id="item-analysis-body"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- ④ ตารางคะแนนรายคน -->
-            <section class="rs-card">
-                <div class="rs-card-h">
-                    <h3>คะแนนรายคน <span id="rs-shown" class="rs-count"></span></h3>
-                    <div class="rs-actions">
-                        <button onclick="fetchResults()" class="rs-btn">รีเฟรช</button>
-                        <button onclick="exportToExcel()" class="rs-btn rs-btn-p">ดาวน์โหลด Excel</button>
-                    </div>
-                </div>
-                <div class="rs-tools">
-                    <label class="rs-field rs-room"><span>ชุดข้อสอบ</span>
-                        <select id="rs-room" onchange="onRoomChange()"><option value="ALL">กำลังโหลด...</option></select></label>
-                    <label class="rs-search"><input id="rs-search" type="search" placeholder="ค้นหาชื่อ หรือรหัสนักศึกษา" oninput="filterAndRenderResults()"></label>
-                    <label class="rs-field"><span>ชั้นเรียน</span>
-                        <select id="class-filter" onchange="filterAndRenderResults()"><option value="ALL">ทุกชั้นเรียน</option></select></label>
-                    <label class="rs-field"><span>เรียงตาม</span>
-                        <select id="sort-selector" onchange="filterAndRenderResults()">
-                            <option value="id_asc">รหัสนักศึกษา (น้อย → มาก)</option>
-                            <option value="id_desc">รหัสนักศึกษา (มาก → น้อย)</option>
-                            <option value="score_desc">คะแนน (มาก → น้อย)</option>
-                            <option value="score_asc">คะแนน (น้อย → มาก)</option>
-                            <option value="time_desc">ส่งล่าสุดก่อน</option>
-                        </select></label>
-                    <label class="rs-field"><span>เกณฑ์ผ่าน</span>
-                        <select id="rs-pass-cut" onchange="savePassCut();calculateStats(rawResultsData);filterAndRenderResults()">
-                            <option value="50">50%</option><option value="60">60%</option><option value="70">70%</option><option value="80">80%</option>
-                        </select></label>
-                </div>
-                <div class="rs-table-wrap">
-                    <table class="rs-table">
-                        <thead>
-                            <tr>
-                                <th class="c">#</th>
-                                <th>นักศึกษา</th>
-                                <th class="c">ชั้นเรียน</th>
-                                <th>คะแนน</th>
-                                <th class="c">ผล</th>
-                                <th class="c" title="Z-Score / T-Score เทียบกับกลุ่มที่แสดงอยู่">Z / T</th>
-                                <th class="c">เวลาส่ง</th>
-                                <th class="c">จัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="results-table-body">
-                            <tr><td colspan="8" class="rs-empty">กำลังโหลดข้อมูลคะแนนสอบของนักศึกษา...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- ⑤ กราฟภาพรวม -->
-            <section class="rs-card sd-card" aria-labelledby="sd-title">
-                <div class="sd-h">
-                    <h3 id="sd-title">การกระจายช่วงคะแนน</h3>
-                    <p>นักศึกษาแต่ละช่วงคะแนนมีกี่คน</p>
-                </div>
-                <div class="sd-body">
-                    <div class="sd-ring">
-                        <canvas id="scoreDistChart" aria-label="แผนภูมิวงกลมการกระจายช่วงคะแนน" role="img"></canvas>
-                        <div class="sd-center"><b id="sd-total">0</b><span>คนที่ส่ง</span></div>
-                    </div>
-                    <ul class="sd-legend" id="sd-legend"></ul>
-                </div>
-            </section>
-
-            <!-- โซนอันตราย: ลบประวัติ (แยกออกมา ไม่ปนกับปุ่มใช้งานประจำ) -->
-            <div class="rs-danger">
-                <span>ต้องการเริ่มเก็บคะแนนใหม่ทั้งห้อง?</span>
-                <button onclick="clearResults()" title="ลบประวัติการส่งคำตอบและคะแนนทั้งหมดของห้องนี้">ลบประวัติการสอบทั้งหมด</button>
+                <label class="rs-field rs-room"><span>ชุดข้อสอบ</span>
+                    <select id="rs-room" onchange="onRoomChange()"><option value="ALL">กำลังโหลด...</option></select></label>
             </div>
+
+            <div id="view-results" class="rs-view">
+                <section class="rs-card">
+                    <div class="rs-card-h">
+                        <h3>คะแนนรายคน <span id="rs-shown" class="rs-count"></span></h3>
+                        <div class="rs-actions">
+                            <button onclick="fetchResults()" class="rs-btn">รีเฟรช</button>
+                            <button onclick="exportToExcel()" class="rs-btn rs-btn-p">ดาวน์โหลด Excel</button>
+                        </div>
+                    </div>
+                    <div class="rs-tools">
+                        <label class="rs-search"><input id="rs-search" type="search" placeholder="ค้นหาชื่อ หรือรหัสนักศึกษา" oninput="filterAndRenderResults()"></label>
+                        <label class="rs-field"><span>ชั้นเรียน</span>
+                            <select id="class-filter" onchange="filterAndRenderResults()"><option value="ALL">ทุกชั้นเรียน</option></select></label>
+                        <label class="rs-field"><span>เรียงตาม</span>
+                            <select id="sort-selector" onchange="filterAndRenderResults()">
+                                <option value="id_asc">รหัสนักศึกษา (น้อย → มาก)</option>
+                                <option value="id_desc">รหัสนักศึกษา (มาก → น้อย)</option>
+                                <option value="score_desc">คะแนน (มาก → น้อย)</option>
+                                <option value="score_asc">คะแนน (น้อย → มาก)</option>
+                                <option value="time_desc">ส่งล่าสุดก่อน</option>
+                            </select></label>
+                        <label class="rs-field"><span>เกณฑ์ผ่าน</span>
+                            <select id="rs-pass-cut" onchange="savePassCut();calculateStats(rawResultsData);filterAndRenderResults()">
+                                <option value="50">50%</option><option value="60">60%</option><option value="70">70%</option><option value="80">80%</option>
+                            </select></label>
+                    </div>
+                    <div class="rs-table-wrap">
+                        <table class="rs-table">
+                            <thead>
+                                <tr>
+                                    <th class="c">#</th>
+                                    <th>นักศึกษา</th>
+                                    <th class="c">ชั้นเรียน</th>
+                                    <th>คะแนน</th>
+                                    <th class="c">ผล</th>
+                                    <th class="c" title="Z-Score / T-Score เทียบกับกลุ่มที่แสดงอยู่">Z / T</th>
+                                    <th class="c">เวลาส่ง</th>
+                                    <th class="c">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="results-table-body">
+                                <tr><td colspan="8" class="rs-empty">กำลังโหลดข้อมูลคะแนนสอบของนักศึกษา...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <div class="rs-danger">
+                    <span>ต้องการเริ่มเก็บคะแนนใหม่ทั้งห้อง?</span>
+                    <button onclick="clearResults()" title="ลบประวัติการส่งคำตอบและคะแนนทั้งหมดของห้องนี้">ลบประวัติการสอบทั้งหมด</button>
+                </div>
+            </div>
+
+            <div id="view-analysis" class="rs-view" hidden>
+                <section id="item-analysis-box" class="ia hidden" aria-labelledby="ia-title">
+                    <div class="ia-head">
+                        <div>
+                            <div class="ia-chip">คำนวณอัตโนมัติจากคำตอบของนักศึกษา</div>
+                            <h3 id="ia-title">ตารางวิเคราะห์คุณภาพข้อสอบรายข้อ</h3>
+                            <p id="ia-sub">ชุดข้อสอบ · วิเคราะห์จากนักศึกษา - คน</p>
+                        </div>
+                        <div class="ia-sum" id="ia-sum"></div>
+                    </div>
+                    <div class="ia-legend">
+                        <span><b>ค่าความยากง่าย (p)</b> สัดส่วนคนที่ตอบถูก · 0.30–0.80 กำลังดี</span>
+                        <span><b>ค่าอำนาจจำแนก (r)</b> แยกคนเก่งกับคนอ่อนได้แค่ไหน · 0.20 ขึ้นไปใช้ได้ · ติดลบ = ควรตรวจเฉลย</span>
+                    </div>
+                    <div class="ia-wrap">
+                        <table class="ia-table">
+                            <thead>
+                                <tr>
+                                    <th class="c">ข้อ</th>
+                                    <th>โจทย์คำถาม</th>
+                                    <th>ค่าความยากง่าย (p)</th>
+                                    <th class="c">ค่าอำนาจจำแนก (r)</th>
+                                    <th>ผลวิเคราะห์สรุป</th>
+                                </tr>
+                            </thead>
+                            <tbody id="item-analysis-body"></tbody>
+                        </table>
+                    </div>
+                </section>
+                <div class="ia-empty">ยังวิเคราะห์ไม่ได้ เพราะชุดข้อสอบนี้ยังไม่มีนักศึกษาส่งคำตอบ</div>
+            </div>
+
+            <!-- ป็อปอัพเลือกมุมมองเมื่อเปิดหน้า -->
+            <div id="view-chooser" class="vc-back" hidden onclick="if(event.target===this)setResultsView('results',true)">
+                <div class="vc-box" role="dialog" aria-modal="true" aria-labelledby="vc-title">
+                    <h3 id="vc-title">ต้องการดูอะไร</h3>
+                    <p>เลือกได้ภายหลังจากแถบด้านบนของตาราง</p>
+                    <div class="vc-opts">
+                        <button type="button" class="vc-opt" onclick="setResultsView('results',true)">
+                            <b>ผลการสอบรายคน</b>
+                            <small>คะแนนของนักศึกษาแต่ละคน ผ่าน/ไม่ผ่าน ดูกระดาษคำตอบ ดาวน์โหลด Excel</small>
+                        </button>
+                        <button type="button" class="vc-opt" onclick="setResultsView('analysis',true)">
+                            <b>ตารางวิเคราะห์ข้อสอบ</b>
+                            <small>ค่าความยากง่าย ค่าอำนาจจำแนก และข้อที่ควรปรับปรุง รายข้อ</small>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Answer Sheet Review Modal -->
             <div id="answer-sheet-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300 p-4">
                 <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-4xl max-h-[85vh] flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 text-slate-800">
@@ -533,6 +605,24 @@
             }
         }
 
+        // ===== มุมมองหน้าผลสอบ: ผลการสอบรายคน / ตารางวิเคราะห์ข้อสอบ =====
+        function setResultsView(v, fromChooser) {
+            const a = v === 'analysis';
+            document.getElementById('view-results').hidden = a;
+            document.getElementById('view-analysis').hidden = !a;
+            const tr = document.getElementById('tab-results'), ta = document.getElementById('tab-analysis');
+            tr.classList.toggle('on', !a); ta.classList.toggle('on', a);
+            tr.setAttribute('aria-selected', String(!a)); ta.setAttribute('aria-selected', String(a));
+            if (fromChooser) closeViewChooser();
+        }
+        function openViewChooser() {
+            const m = document.getElementById('view-chooser'); if (!m) return;
+            m.hidden = false; document.addEventListener('keydown', vcEsc);
+            setTimeout(() => m.querySelector('.vc-opt')?.focus(), 30);
+        }
+        function closeViewChooser() { const m = document.getElementById('view-chooser'); if (m) m.hidden = true; document.removeEventListener('keydown', vcEsc); }
+        function vcEsc(e) { if (e.key === 'Escape') setResultsView('results', true); }
+
         // เมื่อผู้ใช้อยู่ในสถานะเลือกรายวิชา
         async function onCourseChange() {
             const courseId = document.getElementById('course-selector').value;
@@ -550,6 +640,7 @@
             currentCourseId = courseId;
             if (noCourseCard) noCourseCard.classList.add('hidden');
             if (contentArea) contentArea.classList.remove('hidden');
+            if (!window.__viewAsked) { window.__viewAsked = true; openViewChooser(); }
 
             await fetchResults(courseId);
         }

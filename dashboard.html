@@ -210,10 +210,6 @@
         /* ผลสอบ */
         .db-avg{display:flex;align-items:baseline;gap:10px;margin:6px 0 2px;flex-wrap:wrap}
         .db-avg b{font-size:34px;font-weight:800;color:var(--ink);line-height:1.1}
-        .db-hist{display:flex;align-items:flex-end;gap:6px;height:84px;margin-top:14px}
-        .db-hist i{flex:1;border-radius:6px 6px 3px 3px;background:#c9dbfa;min-height:4px;transition:height .6s cubic-bezier(.2,.8,.2,1)}
-        .db-hist i.top{background:var(--bl)}
-        .db-hist-l{display:flex;justify-content:space-between;gap:6px;font-size:11.5px;color:var(--mut);margin-top:6px}.db-hist-l span{flex:1;text-align:center}
         /* คอลัมน์ขวา: เติมสี */
         .db-todo{background:linear-gradient(160deg,#fff4ea 0%,#fff 70%);border-color:#ffd2ad;position:relative;overflow:hidden}
         .db-todo::before{content:'';position:absolute;inset:0 0 auto 0;height:4px;background:linear-gradient(90deg,#ff7a1a,#ffb347)}
@@ -224,10 +220,22 @@
         .db-scorecard::after{content:'';position:absolute;right:-60px;top:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(255,154,60,.35),transparent 70%);pointer-events:none}
         .db-scorecard .db-h h3,.db-scorecard .db-avg b{color:#fff}
         .db-scorecard .db-h a{color:#ffd0a6}
-        .db-scorecard .db-sub,.db-scorecard .db-empty,.db-scorecard .db-hist-l{color:#c8d8ff}
-        .db-scorecard .db-hist i{background:rgba(255,255,255,.28)}
-        .db-scorecard .db-hist i.top{background:#ff9a3c}
+        .db-scorecard .db-sub,.db-scorecard .db-empty{color:#c8d8ff}
         .db-scorecard > *{position:relative;z-index:1}
+        .db-ring-wrap{display:flex;align-items:center;gap:20px;margin-top:12px}
+        .db-ring{width:124px;height:124px;flex:none}
+        .db-ring-arc{transition:stroke-dasharray .8s cubic-bezier(.2,.8,.2,1)}
+        .db-ring-n{fill:#fff;font-size:26px;font-weight:800;font-family:inherit}
+        .db-ring-s{fill:#c8d8ff;font-size:12px;font-weight:600;font-family:inherit}
+        .db-ring-info{flex:1;min-width:0;display:grid;gap:6px}
+        .db-ring-big{font-size:15px;color:#fff;margin-bottom:2px}.db-ring-big b{font-size:22px;font-weight:800}
+        .db-ring-row{display:flex;justify-content:space-between;gap:8px;font-size:13.5px;color:#c8d8ff;padding-top:6px;border-top:1px solid rgba(255,255,255,.14)}
+        .db-ring-row b{color:#fff;font-weight:800}
+        .db-ring-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px;font-size:13px;color:#c8d8ff}
+        .db-ring-foot span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .db-ring-foot em{flex:none;font-style:normal;font-weight:800;color:#fff;background:rgba(255,122,26,.9);padding:3px 10px;border-radius:99px;font-size:12.5px}
+        .db-ring-foot em.ok{background:rgba(74,222,128,.25);color:#bbf7d0}
+        @media (max-width:420px){.db-ring-wrap{gap:14px}.db-ring{width:104px;height:104px}}
         .db-quick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
         .db-q{display:flex;flex-direction:column;gap:2px;padding:14px;border-radius:14px;text-decoration:none;transition:transform .15s,box-shadow .15s}
         .db-q:hover{transform:translateY(-2px);box-shadow:0 10px 20px -14px rgba(15,23,42,.45)}
@@ -644,12 +652,27 @@
             const rs = results.filter(x => x.roomId === rid && Number(x.maxScore) > 0);
             const pcts = rs.map(x => Number(x.score) / Number(x.maxScore) * 100);
             const avg = pcts.length ? Math.round(pcts.reduce((a, b) => a + b, 0) / pcts.length) : 0;
-            const b = [0, 0, 0, 0, 0]; pcts.forEach(p => b[Math.min(4, Math.floor(p / 20))]++);
-            const mx = Math.max(1, ...b);
-            scoreBox.innerHTML = `<div class="db-avg"><b>${avg}%</b><span class="db-sub" style="margin:0">คะแนนเฉลี่ย · ส่งแล้ว ${rs.length} คน</span></div>
-                <div class="db-sub">${esc(nameOfRoom(rid) || 'ห้องสอบล่าสุด')}</div>
-                <div class="db-hist" role="img" aria-label="จำนวนนักศึกษาตามช่วงคะแนน ${b.join(', ')}">${b.map(n => `<i class="${n === mx && n ? 'top' : ''}" style="height:${n / mx * 100}%" title="${n} คน"></i>`).join('')}</div>
-                <div class="db-hist-l"><span>0–19%</span><span>20–39%</span><span>40–59%</span><span>60–79%</span><span>80–100%</span></div>`;
+            let cut = 50; try { cut = Number(localStorage.getItem('results_pass_cut')) || 50; } catch (e) {}
+            const pass = pcts.filter(p => p >= cut).length;
+            const passPct = rs.length ? Math.round(pass / rs.length * 100) : 0;
+            const fail = rs.length - pass;
+            const sc = rs.map(x => Number(x.score) || 0), mxS = Number(rs[0] && rs[0].maxScore) || 0;
+            const C = 2 * Math.PI * 52, dash = (passPct / 100) * C;
+            scoreBox.innerHTML = `<div class="db-ring-wrap">
+                    <svg class="db-ring" viewBox="0 0 124 124" role="img" aria-label="ผ่านเกณฑ์ ${pass} จาก ${rs.length} คน (${passPct}%)">
+                        <circle cx="62" cy="62" r="52" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="13"/>
+                        <circle class="db-ring-arc" cx="62" cy="62" r="52" fill="none" stroke="#4ade80" stroke-width="13" stroke-linecap="round" stroke-dasharray="${dash.toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 62 62)"/>
+                        <text x="62" y="62" text-anchor="middle" class="db-ring-n">${passPct}%</text>
+                        <text x="62" y="82" text-anchor="middle" class="db-ring-s">ผ่านเกณฑ์</text>
+                    </svg>
+                    <div class="db-ring-info">
+                        <div class="db-ring-big">ผ่าน <b>${pass}</b> / ${rs.length} คน</div>
+                        <div class="db-ring-row"><span>คะแนนเฉลี่ย</span><b>${avg}%</b></div>
+                        <div class="db-ring-row"><span>สูงสุด</span><b>${Math.max(...sc)}${mxS ? '/' + mxS : ''}</b></div>
+                        <div class="db-ring-row"><span>ต่ำสุด</span><b>${Math.min(...sc)}${mxS ? '/' + mxS : ''}</b></div>
+                    </div>
+                </div>
+                <div class="db-ring-foot"><span>${esc(nameOfRoom(rid) || 'ห้องสอบล่าสุด')}</span>${fail ? `<em>ไม่ผ่าน ${fail} คน</em>` : '<em class="ok">ผ่านทุกคน</em>'}</div>`;
         }
 
         // ===== สรุปบรรทัดบน =====

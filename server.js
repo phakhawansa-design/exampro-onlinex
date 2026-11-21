@@ -646,11 +646,22 @@ function getActiveRoomStudents(roomId) {
     for (const [sId, data] of Array.from(roomMap.entries())) {
         if (now - data.lastSeen < TIMEOUT_MS) {
             active.push(data);
-        } else {
+        } else if (now - data.lastSeen > SEEN_KEEP_MS) {
             roomMap.delete(sId);
         }
     }
     return active;
+}
+
+// นักศึกษาที่เคยเข้าห้องนี้แล้ว แต่ขาดการติดต่อ (ปิดจอ/สลับแอป/เน็ตหลุด) → แสดงเป็น "หลุด/ออกไปชั่วคราว" ไม่ใช่ "ยังไม่เข้าสอบ"
+const SEEN_KEEP_MS = 6 * 60 * 60 * 1000;
+function getAwayRoomStudentMap(roomId) {
+    const map = new Map();
+    const roomMap = activeRoomTracker.get(String(roomId || '').trim());
+    if (!roomMap) return map;
+    const now = Date.now();
+    roomMap.forEach((d, sId) => { const age = now - d.lastSeen; if (age >= 8000 && age <= SEEN_KEEP_MS) map.set(sId, { ...d, awaySec: Math.round(age / 1000) }); });
+    return map;
 }
 
 function getActiveRoomStudentMap(roomId) {
@@ -2039,8 +2050,10 @@ app.get('/api/teacher/room-realtime-dashboard', (req, res) => {
                 // 4. ดึงรายชื่อนักศึกษาจาก course_students
                 const sqlEnrolled = 'SELECT * FROM course_students WHERE courseId = ? OR CAST(courseId AS TEXT) = ? ORDER BY studentId ASC';
                 db.all(sqlEnrolled, [courseId, String(courseId)], (csErr, enrolledRows) => {
-                    const enrolledList = enrolledRows || [];
+                    // ห้องที่เปิดเฉพาะบางกลุ่ม → นับเฉพาะนักศึกษากลุ่มนั้น
+                    const enrolledList = (enrolledRows || []).filter(e => !outsideAllowedGroups(room.allowed_classes, e.class));
                     const activeMap = getActiveRoomStudentMap(roomId);
+                    const awayMap = getAwayRoomStudentMap(roomId);
 
                     // คำนวณสถานะนักศึกษา
                     const studentStatusList = [];
@@ -2065,6 +2078,8 @@ app.get('/api/teacher/room-realtime-dashboard', (req, res) => {
                             submitTime = isSubmitted.time;
                         } else if (isActive) {
                             status = 'active';
+                        } else if (awayMap.get(sIdStr)) {
+                            status = 'away';
                         }
 
                         const fullName = `${e.prefix || ''}${e.firstName || ''} ${e.lastName || ''}`.trim() || 'นักศึกษา';
@@ -2073,6 +2088,7 @@ app.get('/api/teacher/room-realtime-dashboard', (req, res) => {
                             name: fullName,
                             class: e.class || '-',
                             status,
+                            awaySec: status === 'away' ? awayMap.get(sIdStr).awaySec : null,
                             score,
                             maxScore,
                             time: submitTime
@@ -2080,7 +2096,7 @@ app.get('/api/teacher/room-realtime-dashboard', (req, res) => {
                     });
 
                     // เพิ่มนักศึกษาที่ส่งหรือกำลังสอบ แต่นอกรายชื่อ
-                    const extra = new Map([...submittedMap, ...activeMap]);
+                    const extra = new Map([...awayMap, ...submittedMap, ...activeMap]);
                     extra.forEach((val, sIdStr) => {
                         if (!enrolledSet.has(sIdStr)) {
                             const isSubmitted = submittedMap.get(sIdStr);
@@ -2089,7 +2105,8 @@ app.get('/api/teacher/room-realtime-dashboard', (req, res) => {
                                 studentId: sIdStr,
                                 name: isSubmitted ? isSubmitted.name : (val.name || val.studentName || 'นักศึกษา'),
                                 class: isSubmitted ? (isSubmitted.class || '-') : (val.class || '-'),
-                                status: isSubmitted ? 'submitted' : (isActive ? 'active' : 'not_joined'),
+                                status: isSubmitted ? 'submitted' : (isActive ? 'active' : (awayMap.get(sIdStr) ? 'away' : 'not_joined')),
+                                awaySec: !isSubmitted && !isActive && awayMap.get(sIdStr) ? awayMap.get(sIdStr).awaySec : null,
                                 score: isSubmitted ? isSubmitted.score : null,
                                 maxScore: isSubmitted ? isSubmitted.maxScore : null,
                                 time: isSubmitted ? isSubmitted.time : null
@@ -2100,7 +2117,8 @@ app.get('/api/teacher/room-realtime-dashboard', (req, res) => {
                     const totalEnrolled = enrolledList.length;
                     const totalSubmitted = studentStatusList.filter(s => s.status === 'submitted').length;
                     const totalActive = studentStatusList.filter(s => s.status === 'active').length;
-                    const totalNotJoined = Math.max(0, totalEnrolled - (totalSubmitted + totalActive));
+                    const totalAway = studentStatusList.filter(s => s.status === 'away').length;
+                    const totalNotJoined = studentStatusList.filter(s => s.status === 'not_joined').length;
 
                     // คำนวณสถิติการกระจายคะแนน (Score Histogram)
                     let scoreBuckets = { '0-25%': 0, '26-50%': 0, '51-75%': 0, '76-100%': 0 };
@@ -2187,6 +2205,7 @@ app.get('/api/teacher/room-realtime-dashboard', (req, res) => {
                             totalActive,
                             totalSubmitted,
                             totalNotJoined,
+                            totalAway,
                             avgScore,
                             maxScore: maxScoreVal,
                             minScore: totalSubmitted > 0 ? minScoreVal : 0,

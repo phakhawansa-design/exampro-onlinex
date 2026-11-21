@@ -168,7 +168,8 @@
         .rc-del { border: 0; background: none; color: #94a3b8; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; padding: 4px 6px; border-radius: 8px; }
         .rc-del:hover { color: #dc2626; background: #fef2f2; }
         .rc-course { font-size: 13.5px; font-weight: 700; color: #1d5fd6; line-height: 1.4; }
-        .rc-title { margin: -6px 0 0; font-size: 20px; font-weight: 800; color: #0f172a; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .rc-course + .rc-title { margin-top: -6px; }
+        .rc-title { margin: 0; font-size: 20px; font-weight: 800; color: #0f172a; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .rc-pin { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-radius: 16px; background: linear-gradient(120deg, #0b2a7a, #1546b8); color: #fff; }
         .rc-pin-l { cursor: pointer; min-width: 0; }
         .rc-pin-l small { display: block; font-size: 12px; color: #c8d8ff; font-weight: 600; }
@@ -196,6 +197,116 @@
         .rc-btn.stop:hover { background: #fef2f2; }
         .rc-btn:hover { filter: brightness(1.04); }
         @media (max-width: 420px) { .rc-pin { flex-direction: column; align-items: stretch; } .rc-pin-r { justify-content: stretch; } .rc-pin-r button { flex: 1; } }
+    </style>
+    <style>
+        /* ===== รายชื่อผู้เข้าสอบ (สด) ===== */
+        .lv-sum { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; padding: 14px 18px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+        .lv-k { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 10px 14px; border-top: 4px solid #94a3b8; }
+        .lv-k small { display: block; font-size: 12.5px; font-weight: 700; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .lv-k b { display: block; font-size: 28px; font-weight: 800; color: #0f172a; line-height: 1.15; }
+        .lv-k.act { border-top-color: #16a34a; } .lv-k.act b { color: #15803d; }
+        .lv-k.away { border-top-color: #f59e0b; } .lv-k.away b { color: #b45309; }
+        .lv-k.no { border-top-color: #e11d48; } .lv-k.no b { color: #be123c; }
+        .lv-k.done { border-top-color: #1d5fd6; } .lv-k.done b { color: #1d4ed8; }
+        .lv-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 10px 18px; border-bottom: 1px solid #e2e8f0; background: #fff; }
+        .lv-tools input { flex: 0 1 300px; min-width: 0; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 8px 12px; font-family: inherit; font-size: 14px; outline: none; }
+        .lv-tools input:focus { border-color: #1d5fd6; }
+        .lv-tools span { flex: 1 1 260px; font-size: 12.5px; color: #64748b; }
+        .lv-board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding: 14px 18px 18px; overflow-y: auto; max-height: 52vh; align-items: start; background: #f8fafc; }
+        #dtab-view-roster { overflow-y: auto !important; min-height: 0; }
+        #dtab-view-roster > * { flex: none; }
+        .lv-col { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; }
+        .lv-col h4 { margin: 0; display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; font-size: 14.5px; font-weight: 800; border-bottom: 1px solid #eef2f7; }
+        .lv-col h4 span { font-size: 13px; font-weight: 800; padding: 1px 10px; border-radius: 99px; background: #f1f5f9; }
+        .lv-col.act h4 { color: #15803d; background: #f0fdf4; } .lv-col.act h4 span { background: #dcfce7; }
+        .lv-col.away h4 { color: #b45309; background: #fffbeb; } .lv-col.away h4 span { background: #fef3c7; }
+        .lv-col.no h4 { color: #be123c; background: #fff1f2; } .lv-col.no h4 span { background: #ffe4e6; }
+        .lv-col.done h4 { color: #1d4ed8; background: #eff6ff; } .lv-col.done h4 span { background: #dbeafe; }
+        .lv-items { display: flex; flex-direction: column; }
+        .lv-it { padding: 9px 14px; border-bottom: 1px solid #f1f5f9; min-width: 0; }
+        .lv-it:last-child { border-bottom: 0; }
+        .lv-it b { display: block; font-size: 14px; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .lv-it small { display: block; font-size: 12px; color: #64748b; font-family: ui-monospace, Consolas, monospace; }
+        .lv-it em { display: inline-block; margin-top: 3px; font-style: normal; font-size: 12px; font-weight: 700; color: #b45309; }
+        .lv-col.done .lv-it em { color: #1d4ed8; }
+        .lv-it em.lv-live { color: #15803d; }
+        .lv-none { padding: 16px 14px; font-size: 13px; color: #94a3b8; text-align: center; }
+        @media (max-width: 1000px) { .lv-board { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        @media (max-width: 640px) { .lv-sum { grid-template-columns: repeat(2, minmax(0, 1fr)); } .lv-sum .lv-k:first-child { grid-column: 1 / -1; } .lv-board { grid-template-columns: 1fr; max-height: none; } }
+    </style>
+    <style>
+        /* ===== ห้องรอสอบ (PIN + QR) ===== */
+        .wl-card { width: 100%; max-width: 920px; max-height: 92vh; overflow-y: auto; background: #fff; border-radius: 26px; box-shadow: 0 30px 70px -20px rgba(2,6,23,.6); display: flex; flex-direction: column; }
+        .wl-h { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 18px 22px 14px; border-bottom: 1px solid #eef2f7; }
+        .wl-h-l { min-width: 0; }
+        .wl-h-t { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .wl-h-t h3 { margin: 0; font-size: 20px; font-weight: 800; color: #0f172a; }
+        .wl-h-l p { margin: 3px 0 0; font-size: 14px; font-weight: 600; color: #1d5fd6; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .wl-badge { font-size: 12.5px; font-weight: 800; padding: 3px 11px; border-radius: 99px; }
+        .wl-badge.wait { background: #fff1e4; color: #b4500c; }
+        .wl-badge.live { background: #dcfce7; color: #15803d; }
+        .wl-h-r { display: flex; gap: 8px; flex: none; }
+        .wl-ghost { border: 1.5px solid #dbe3ef; background: #fff; color: #0b2a7a; font-family: inherit; font-size: 13.5px; font-weight: 800; padding: 8px 14px; border-radius: 12px; cursor: pointer; }
+        .wl-ghost:hover { background: #f1f5fb; }
+        .wl-x { width: 38px; height: 38px; border: 0; border-radius: 50%; background: #f1f5f9; color: #475569; font-size: 15px; font-weight: 800; cursor: pointer; }
+        .wl-x:hover { background: #e2e8f0; }
+        .wl-body { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 18px; padding: 18px 22px 22px; }
+        .wl-join { background: linear-gradient(150deg, #0b2a7a, #1546b8 70%, #1d5fd6); color: #fff; border-radius: 22px; padding: 22px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .wl-step { margin: 0 0 6px; align-self: stretch; display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600; color: #dbe6ff; text-align: left; }
+        .wl-step b { flex: none; width: 24px; height: 24px; border-radius: 50%; background: #ff7a1a; color: #fff; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+        .wl-step span { color: #fff; font-weight: 800; word-break: break-all; }
+        .wl-pin { margin: 10px 0 4px; font-family: ui-monospace, Consolas, monospace; font-size: 56px; font-weight: 800; letter-spacing: 6px; line-height: 1.1; cursor: pointer; white-space: nowrap; }
+        .wl-pin:hover { color: #ffd0a6; }
+        .wl-or { width: 100%; display: flex; align-items: center; gap: 10px; margin: 12px 0; font-size: 13px; color: #c8d8ff; }
+        .wl-or::before, .wl-or::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,.2); }
+        .wl-qr { width: 200px; height: 200px; background: #fff; border-radius: 18px; padding: 10px; }
+        .wl-qr img { width: 100%; height: 100%; object-fit: contain; display: block; }
+        .wl-side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+        .wl-count { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 18px; background: #f0fdf4; border: 1px solid #bbf7d0; }
+        .wl-count b { font-size: 34px; font-weight: 800; color: #15803d; line-height: 1; }
+        .wl-count span { font-size: 15px; font-weight: 700; color: #15803d; }
+        .wl-count small { display: block; font-size: 13px; color: #166534; margin-top: 2px; }
+        .wl-dot { flex: none; width: 12px; height: 12px; border-radius: 50%; background: #16a34a; box-shadow: 0 0 0 5px rgba(22,163,74,.18); animation: rcPulse 1.6s infinite; }
+        .wl-list { flex: 1; min-height: 120px; max-height: 230px; overflow-y: auto; border: 1px solid #e5eaf2; border-radius: 16px; background: #fafbfe; }
+        .wl-list.hidden { display: block !important; }
+        .wl-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 14px; border-bottom: 1px solid #eef2f7; }
+        .wl-row:last-child { border-bottom: 0; }
+        .wl-row b { font-size: 14px; font-weight: 700; color: #0f172a; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .wl-row small { flex: none; font-size: 12px; color: #64748b; font-family: ui-monospace, Consolas, monospace; }
+        .wl-empty { margin: 0; padding: 36px 14px; text-align: center; font-size: 14px; color: #94a3b8; }
+        .wl-main { display: flex; flex-direction: column; gap: 6px; }
+        .wl-go, .wl-stop { width: 100%; border: 0; border-radius: 16px; padding: 15px; font-family: inherit; font-size: 17px; font-weight: 800; cursor: pointer; transition: filter .15s, transform .1s; }
+        .wl-go { background: #16a34a; color: #fff; box-shadow: 0 12px 24px -14px rgba(22,163,74,.9); }
+        .wl-stop { background: #fff; color: #dc2626; border: 1.5px solid #fecaca; }
+        .wl-stop:hover { background: #fef2f2; }
+        .wl-go:hover { filter: brightness(1.05); } .wl-go:active, .wl-stop:active { transform: scale(.98); }
+        .wl-go.hidden, .wl-stop.hidden { display: none; }
+        .wl-hint { margin: 0; font-size: 12.5px; color: #64748b; text-align: center; }
+        .wl-tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+        .wl-tools button { border: 1px solid #dbe3ef; background: #f6f8fc; color: #0b2a7a; font-family: inherit; font-size: 13px; font-weight: 700; padding: 9px 6px; border-radius: 12px; cursor: pointer; white-space: nowrap; }
+        .wl-tools button:hover { background: #eaf0fb; }
+        /* ฉายเต็มจอ: เหลือแค่วิธีเข้าห้อง + จำนวนคน ตัวใหญ่ */
+        #publish-modal:fullscreen { background: #fff; }
+        .wl-card.wl-proj { max-width: none; width: 100vw; height: 100vh; max-height: none; border-radius: 0; box-shadow: none; }
+        .wl-proj .wl-body { flex: 1; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: stretch; }
+        .wl-proj .wl-join { justify-content: center; }
+        .wl-proj .wl-step { font-size: 24px; justify-content: center; }
+        .wl-proj .wl-step b { width: 36px; height: 36px; font-size: 18px; }
+        .wl-proj .wl-pin { font-size: min(14vw, 150px); letter-spacing: 12px; }
+        .wl-proj .wl-qr { width: min(34vh, 340px); height: min(34vh, 340px); }
+        .wl-proj .wl-or { font-size: 18px; }
+        .wl-proj .wl-count b { font-size: 64px; }
+        .wl-proj .wl-count span { font-size: 22px; } .wl-proj .wl-count small { font-size: 17px; }
+        .wl-proj .wl-list { max-height: none; }
+        .wl-proj .wl-tools, .wl-proj .wl-hint { display: none; }
+        @media (max-width: 760px) {
+            .wl-body { grid-template-columns: 1fr; padding: 14px; }
+            .wl-h { padding: 14px; }
+            .wl-pin { font-size: 44px; letter-spacing: 4px; }
+            .wl-qr { width: 170px; height: 170px; }
+            .wl-list { max-height: 180px; min-height: 90px; }
+            #wl-proj-btn { display: none; }
+        }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
@@ -403,7 +514,7 @@
     </div>
 
     <div id="create-room-modal" class="fixed inset-0 bg-slate-950/75 backdrop-blur-md z-50 flex items-center justify-center hidden p-4 sm:p-6 md:p-8">
-        <div class="bg-white rounded-3xl w-full max-w-4xl lg:max-w-5xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[94vh]">
+        <div class="bg-white rounded-3xl w-full max-w-4xl lg:max-w-6xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[94vh]">
             
             <!-- Modal Header (Spacious & Clean) -->
             <div class="px-6 sm:px-8 py-5 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border-b border-slate-200 flex items-center justify-between shrink-0">
@@ -535,80 +646,52 @@
     <!-- 2. POPUP: WAITING LOUNGE & PROJECTOR (คิวอาร์โค้ด & รหัส PIN) -->
     <!-- ======================================================== -->
     <div id="publish-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
-        <div id="publish-modal-card" class="bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden border border-slate-100 flex flex-col p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-            
-            <!-- Header -->
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <div class="flex items-center gap-2.5">
-                    <span id="pub-modal-icon" class="text-2xl"></span>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <h3 id="pub-modal-title" class="font-bold text-slate-800 text-base">ห้องรอสอบ</h3>
-                            <span id="pub-modal-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">รอกดเริ่มสอบ</span>
-                        </div>
-                        <p id="pub-modal-room-info" class="text-[11px] text-slate-500 font-bold">ห้องสอบ...</p>
+        <div id="publish-modal-card" class="wl-card" role="dialog" aria-modal="true" aria-labelledby="pub-modal-title">
+            <header class="wl-h">
+                <div class="wl-h-l">
+                    <div class="wl-h-t">
+                        <h3 id="pub-modal-title">ห้องรอสอบ</h3>
+                        <span id="pub-modal-badge" class="wl-badge wait">รอเริ่มสอบ</span>
+                        <span id="pub-modal-icon" hidden></span>
                     </div>
+                    <p id="pub-modal-room-info">ห้องสอบ...</p>
                 </div>
-                <button onclick="closePublishModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-sm transition">
-                    ✕
-                </button>
-            </div>
-
-            <!-- PIN Code Box -->
-            <div class="bg-gradient-to-br from-slate-900 to-indigo-950 p-4 rounded-2xl text-center text-white space-y-1">
-                <div class="text-[10px] uppercase font-bold text-cyan-400 tracking-widest">รหัสเข้าห้องสอบ (PIN 6 หลัก)</div>
-                <div id="pub-modal-pin" onclick="copyPinOnly()" class="text-4xl font-bold font-mono tracking-widest text-white py-1 cursor-pointer hover:text-cyan-300 transition" title="คลิกเพื่อคัดลอก PIN">
-                    ------
+                <div class="wl-h-r">
+                    <button type="button" class="wl-ghost" onclick="toggleProjectorMode()" id="wl-proj-btn">ฉายเต็มจอ</button>
+                    <button type="button" class="wl-x" onclick="closePublishModal()" aria-label="ปิด">✕</button>
                 </div>
-                <p class="text-[10px] text-slate-300">ให้นักศึกษาเข้าหน้าเว็บ แล้วกรอกรหัส PIN นี้เพื่อเข้ามารอในห้องสอบ</p>
-            </div>
+            </header>
 
-            <!-- QR Code -->
-            <div class="flex flex-col items-center justify-center p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
-                <div class="w-40 h-40 bg-white p-2 rounded-xl border border-slate-200 shadow-xs flex items-center justify-center">
-                    <img id="pub-modal-qrcode" src="" alt="QR Code" class="w-full h-full object-contain">
-                </div>
-                <p class="text-[11px] font-bold text-slate-600">สแกนด้วยกล้องมือถือ/แท็บเล็ตเพื่อเข้าห้องรอสอบทันที</p>
-            </div>
+            <div class="wl-body">
+                <!-- ฝั่งซ้าย: วิธีเข้าห้อง (ฉายให้นักศึกษาดู) -->
+                <section class="wl-join">
+                    <p class="wl-step"><b>1</b> เข้าเว็บ <span id="wl-host">ExamPro</span></p>
+                    <p class="wl-step"><b>2</b> กรอกรหัสเข้าสอบ</p>
+                    <div id="pub-modal-pin" class="wl-pin" onclick="copyPinOnly()" title="คลิกเพื่อคัดลอกรหัส">------</div>
+                    <div class="wl-or"><span>หรือสแกน QR ด้วยกล้องมือถือ</span></div>
+                    <div class="wl-qr"><img id="pub-modal-qrcode" src="" alt="QR Code สำหรับเข้าห้องสอบ"></div>
+                </section>
 
-            <!-- Real-time Waiting Students Count -->
-            <div class="p-3 bg-indigo-50/80 border border-indigo-200 rounded-2xl flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span class="text-xs font-bold text-slate-700">นักศึกษาที่เข้าห้องรอสอบแล้ว:</span>
-                    <span id="pub-waiting-count" class="text-lg font-bold text-indigo-700">0</span>
-                    <span class="text-xs font-bold text-slate-500">คน</span>
-                </div>
-                <button onclick="toggleWaitingStudentsList()" class="text-xs text-indigo-600 hover:underline font-semibold cursor-pointer">
-                    ดูรายชื่อ
-                </button>
-            </div>
-
-            <div id="pub-waiting-list-container" class="hidden max-h-28 overflow-y-auto p-2 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1">
-                <div id="pub-waiting-students-list">ยังไม่มีนักศึกษา...</div>
-            </div>
-
-            <!-- Start / Stop Exam Buttons -->
-            <div class="space-y-2 pt-1">
-                <button id="btn-lounge-start-exam" onclick="startExamFromLounge()" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-600/30 transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-                    <span>เริ่มการสอบทันที (เผยแพร่ให้นักศึกษาทำพร้อมกัน)</span>
-                </button>
-                <button id="btn-lounge-stop-exam" onclick="stopExamFromLounge()" class="hidden w-full py-3 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
-                    <span>หยุดเผยแพร่ / ปิดการสอบห้องนี้</span>
-                </button>
-            </div>
-
-            <!-- Utility Buttons -->
-            <div class="flex items-center gap-2 pt-1 flex-wrap sm:flex-nowrap">
-                <button onclick="toggleProjectorMode()" class="flex-1 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
-                    ฉายจอโปรเจกเตอร์
-                </button>
-                <button onclick="openMonitoringFromModal()" class="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl transition active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer">
-                    ตรวจจับพฤติกรรมสด
-                </button>
-                <button onclick="copyPublishLink()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition active:scale-95 cursor-pointer">
-                    คัดลอกลิงก์
-                </button>
+                <!-- ฝั่งขวา: สถานะ + ปุ่มควบคุม -->
+                <section class="wl-side">
+                    <div class="wl-count">
+                        <span class="wl-dot"></span>
+                        <div><b id="pub-waiting-count">0</b> <span>คน</span><small id="wl-count-label">เข้ามารอในห้องแล้ว</small></div>
+                    </div>
+                    <div id="pub-waiting-list-container" class="wl-list">
+                        <div id="pub-waiting-students-list"><p class="wl-empty">ยังไม่มีนักศึกษาเข้ามารอ</p></div>
+                    </div>
+                    <div class="wl-main">
+                        <button type="button" id="btn-lounge-start-exam" class="wl-go" onclick="startExamFromLounge()">เริ่มสอบ</button>
+                        <button type="button" id="btn-lounge-stop-exam" class="wl-stop hidden" onclick="stopExamFromLounge()">หยุดสอบและปิดห้อง</button>
+                        <p id="wl-hint" class="wl-hint">นักศึกษาที่เข้ามารอจะเริ่มทำข้อสอบได้พร้อมกันเมื่อกดเริ่มสอบ</p>
+                    </div>
+                    <div class="wl-tools">
+                        <button type="button" onclick="copyPinOnly()">คัดลอกรหัส</button>
+                        <button type="button" onclick="copyPublishLink()">คัดลอกลิงก์</button>
+                        <button type="button" onclick="openMonitoringFromModal()">เฝ้าระวังสด</button>
+                    </div>
+                </section>
             </div>
             <input type="hidden" id="pub-modal-link">
         </div>
@@ -626,7 +709,7 @@
                 <div class="flex items-center gap-3">
                     <div>
                         <div class="flex items-center gap-2">
-                            <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">แดชบอร์ดสรุปผลสอบสด</h3>
+                            <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight">รายชื่อผู้เข้าสอบ (สด)</h3>
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shadow-xs">
                                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                                 <span>อัปเดตสดทุก 2.5 วินาที</span>
@@ -640,34 +723,19 @@
                 </button>
             </div>
 
-            <!-- Top Summary stats bar (5 cards) -->
-            <div class="p-4 border-b border-slate-200 bg-slate-50/60 grid grid-cols-2 sm:grid-cols-5 gap-3 text-center font-bold">
-                <div class="p-3 bg-white rounded-2xl border border-indigo-200/80 shadow-xs">
-                    <div class="text-[11px] sm:text-xs text-slate-500 font-bold">ทั้งหมดในวิชา</div>
-                    <div id="students-modal-enrolled" class="text-lg sm:text-2xl font-black text-indigo-700 mt-0.5">0</div>
-                </div>
-                <div class="p-3 bg-white rounded-2xl border border-cyan-200/80 shadow-xs">
-                    <div class="text-[11px] sm:text-xs text-cyan-600 font-bold">กำลังทำข้อสอบ</div>
-                    <div id="students-modal-active" class="text-lg sm:text-2xl font-black text-cyan-600 mt-0.5">0</div>
-                </div>
-                <div class="p-3 bg-white rounded-2xl border border-emerald-200/80 shadow-xs">
-                    <div class="text-[11px] sm:text-xs text-emerald-600 font-bold">ส่งข้อสอบแล้ว</div>
-                    <div id="students-modal-submitted" class="text-lg sm:text-2xl font-black text-emerald-700 mt-0.5">0</div>
-                </div>
-                <div class="p-3 bg-white rounded-2xl border border-rose-200/80 shadow-xs">
-                    <div class="text-[11px] sm:text-xs text-rose-600 font-bold">ยังไม่เข้าสอบ</div>
-                    <div id="students-modal-not-joined" class="text-lg sm:text-2xl font-black text-rose-700 mt-0.5">0</div>
-                </div>
-                <div class="p-3 bg-white rounded-2xl border border-amber-200/80 shadow-xs col-span-2 sm:col-span-1">
-                    <div class="text-[11px] sm:text-xs text-amber-600 font-bold">คะแนนเฉลี่ย</div>
-                    <div id="students-modal-avg-score" class="text-lg sm:text-2xl font-black text-amber-600 mt-0.5">-</div>
-                </div>
+            <!-- สรุปจำนวน -->
+            <div class="lv-sum">
+                <div class="lv-k"><small>ต้องสอบ</small><b id="students-modal-enrolled">0</b></div>
+                <div class="lv-k act"><small>กำลังสอบ</small><b id="students-modal-active">0</b></div>
+                <div class="lv-k away"><small>หลุด / ออกไปชั่วคราว</small><b id="students-modal-away">0</b></div>
+                <div class="lv-k no"><small>ยังไม่เข้าสอบ</small><b id="students-modal-not-joined">0</b></div>
+                <div class="lv-k done"><small>ส่งแล้ว</small><b id="students-modal-submitted">0</b></div>
             </div>
 
             <!-- Dashboard Sub Tabs -->
             <div class="px-6 py-2.5 bg-slate-100/80 border-b border-slate-200 flex items-center gap-2 text-xs sm:text-sm font-bold flex-wrap">
                 <button type="button" onclick="switchDashboardTab('roster')" id="dtab-btn-roster" class="px-4 py-2 bg-indigo-600 text-white rounded-xl shadow-xs cursor-pointer font-bold transition flex items-center gap-1.5">
-                    <span>รายชื่อและสถานะสด</span>
+                    <span>รายชื่อผู้เข้าสอบ</span>
                 </button>
                 <button type="button" onclick="switchDashboardTab('histogram')" id="dtab-btn-histogram" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl cursor-pointer font-bold transition flex items-center gap-1.5">
                     <span>การกระจายคะแนน</span>
@@ -679,14 +747,11 @@
 
             <!-- Content Area 1: Roster List -->
             <div id="dtab-view-roster" class="flex flex-col flex-1 overflow-hidden">
-                <div class="px-7 py-2.5 bg-white border-b border-slate-200 flex items-center gap-2 text-xs font-bold">
-                    <span class="text-slate-400">กรองสถานะ:</span>
-                    <button onclick="filterLiveModalStudents('all')" id="tab-live-all" class="px-3 py-1.5 bg-indigo-600 text-white rounded-lg transition shadow-xs cursor-pointer font-bold">ทั้งหมด</button>
-                    <button onclick="filterLiveModalStudents('active')" id="tab-live-active" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition cursor-pointer font-bold">กำลังทำ</button>
-                    <button onclick="filterLiveModalStudents('submitted')" id="tab-live-submitted" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition cursor-pointer font-bold">ส่งแล้ว</button>
-                    <button onclick="filterLiveModalStudents('not_joined')" id="tab-live-not-joined" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition cursor-pointer font-bold">ยังไม่เข้า</button>
+                <div class="lv-tools">
+                    <input id="lv-search" type="search" placeholder="ค้นหาชื่อ หรือรหัสนักศึกษา" oninput="renderLiveModalStudentsList()">
+                    <span>หลุด/ออกไปชั่วคราว = เคยเข้าห้องสอบแล้ว แต่ขาดการติดต่อเกิน 8 วินาที (ปิดจอ สลับแอป หรือเน็ตหลุด)</span>
                 </div>
-                <div id="students-modal-list" class="p-6 overflow-y-auto space-y-3 text-sm max-h-[50vh]"></div>
+                <div id="students-modal-list" class="lv-board"></div>
             </div>
 
             <!-- Content Area 2: Histogram Score Distribution -->
@@ -977,7 +1042,7 @@
                             <span class="rc-status">${isPub ? '<i></i>กำลังสอบ' : 'รอเริ่มสอบ'}</span>
                             <button type="button" class="rc-del" onclick="deleteRoom('${rid}')" title="ลบห้องสอบนี้ (ผลสอบยังเก็บไว้)">ลบห้อง</button>
                         </div>
-                        <div class="rc-course">${escapeHtml(courseNameStr)}</div>
+                        ${(() => { const pc = String(room.courseName || courseObj?.courseName || '').trim(); return pc && examTitleStr.includes(pc) ? '' : `<div class="rc-course">${escapeHtml(courseNameStr)}</div>`; })()}
                         <h3 class="rc-title">${escapeHtml(examTitleStr)}</h3>
 
                         <div class="rc-pin">
@@ -1008,11 +1073,11 @@
                         <div class="rc-act">
                             ${isPub ? `
                                 <a class="rc-btn or" href="admin-monitoring.html?room=${encodeURIComponent(room.roomId)}">เฝ้าระวังสด</a>
-                                <button type="button" class="rc-btn soft" onclick="openLiveStudentsModal('${rid}')">แดชบอร์ดสด</button>
+                                <button type="button" class="rc-btn soft" onclick="openLiveStudentsModal('${rid}')">รายชื่อผู้เข้าสอบ</button>
                                 <button type="button" class="rc-btn stop" onclick="togglePublishExam('${rid}', false)">หยุดสอบ</button>
                             ` : `
                                 <button type="button" class="rc-btn go" onclick="togglePublishExam('${rid}', true)">เริ่มสอบ</button>
-                                <button type="button" class="rc-btn soft" onclick="openLiveStudentsModal('${rid}')">แดชบอร์ดสด</button>
+                                <button type="button" class="rc-btn soft" onclick="openLiveStudentsModal('${rid}')">รายชื่อผู้เข้าสอบ</button>
                             `}
                         </div>
                     </article>
@@ -1347,8 +1412,10 @@
                 const examCode = roomData.examCode || '------';
                 currentPublishedPin = examCode;
 
-                document.getElementById('pub-modal-pin').textContent = examCode;
-                document.getElementById('pub-modal-room-info').textContent = `${roomData.examTitle || roomData.roomName} | รหัสห้อง: ${roomId}`;
+                document.getElementById('pub-modal-pin').textContent = /^\d{6}$/.test(examCode) ? examCode.slice(0, 3) + ' ' + examCode.slice(3) : examCode;
+                const lr0 = (allRooms || []).find(r => r.roomId === roomId) || {}; const lc = (typeof courses !== 'undefined' && Array.isArray(courses) ? courses : []).find(c => String(c.id) === String(lr0.courseId)) || {}; const lr = { courseCode: lr0.courseCode || lc.courseCode, courseName: lr0.courseName || lc.courseName };
+                document.getElementById('pub-modal-room-info').textContent = [lr.courseCode ? '[' + lr.courseCode + '] ' + (lr.courseName || '') : '', roomData.examTitle || roomData.roomName || ''].filter(Boolean).join(' · ');
+                const hostEl = document.getElementById('wl-host'); if (hostEl) hostEl.textContent = window.location.host;
 
                 const joinUrl = `${window.location.origin}/Student-login.html?pin=${encodeURIComponent(examCode)}&roomId=${encodeURIComponent(roomId)}&openExternalBrowser=1`;
                 document.getElementById('pub-modal-link').value = joinUrl;
@@ -1362,20 +1429,18 @@
 
                 if (roomData.is_published === 1) {
                     if (icon) icon.textContent = '';
-                    if (title) title.textContent = 'การสอบกำลังดำเนินการอยู่';
-                    if (badge) {
-                        badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700';
-                        badge.textContent = 'กำลังเปิดสอบ';
-                    }
+                    if (title) title.textContent = 'ห้องสอบ';
+                    if (badge) { badge.className = 'wl-badge live'; badge.textContent = 'กำลังสอบ'; }
+                    document.getElementById('wl-count-label').textContent = 'อยู่ในห้องสอบตอนนี้';
+                    document.getElementById('wl-hint').textContent = 'นักศึกษาที่มาช้ายังใช้รหัสนี้เข้าสอบได้ จนกว่าจะกดหยุดสอบ';
                     if (startBtn) startBtn.classList.add('hidden');
                     if (stopBtn) stopBtn.classList.remove('hidden');
                 } else {
                     if (icon) icon.textContent = '';
                     if (title) title.textContent = 'ห้องรอสอบ';
-                    if (badge) {
-                        badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700';
-                        badge.textContent = 'รอกดเริ่มสอบ';
-                    }
+                    if (badge) { badge.className = 'wl-badge wait'; badge.textContent = 'รอเริ่มสอบ'; }
+                    document.getElementById('wl-count-label').textContent = 'เข้ามารอในห้องแล้ว';
+                    document.getElementById('wl-hint').textContent = 'นักศึกษาที่เข้ามารอจะเริ่มทำข้อสอบได้พร้อมกันเมื่อกดเริ่มสอบ';
                     if (startBtn) startBtn.classList.remove('hidden');
                     if (stopBtn) stopBtn.classList.add('hidden');
                 }
@@ -1396,6 +1461,8 @@
                 waitingStudentsInterval = null;
             }
             document.getElementById('publish-modal').classList.add('hidden');
+            const card = document.getElementById('publish-modal-card');
+            if (card && card.classList.contains('wl-proj')) toggleProjectorMode();
         }
 
         function openMonitoringFromModal() {
@@ -1411,14 +1478,9 @@
                 document.getElementById('pub-waiting-count').textContent = data.count || 0;
                 const list = document.getElementById('pub-waiting-students-list');
                 if (data.students && data.students.length > 0) {
-                    list.innerHTML = data.students.map(s => `
-                        <div class="flex items-center justify-between py-1 border-b border-slate-100 last:border-b-0">
-                            <span class="font-bold text-slate-800">${escapeHtml(s.name)}</span>
-                            <span class="font-mono text-slate-400 text-[11px]">${escapeHtml(s.studentId)}</span>
-                        </div>
-                    `).join('');
+                    list.innerHTML = data.students.map(s => `<div class="wl-row"><b>${escapeHtml(s.name)}</b><small>${escapeHtml(s.studentId)}</small></div>`).join('');
                 } else {
-                    list.innerHTML = '<p class="text-slate-400 text-center py-1">ยังไม่มีนักศึกษาเข้ามารอ...</p>';
+                    list.innerHTML = '<p class="wl-empty">ยังไม่มีนักศึกษาเข้ามา</p>';
                 }
             } catch(e) {}
         }
@@ -1530,7 +1592,7 @@
             const modal = document.getElementById('live-students-modal');
             const list = document.getElementById('students-modal-list');
             list.innerHTML = '<div class="text-center py-6 text-slate-400 font-bold">กำลังเชื่อมต่อแดชบอร์ดผลสอบสด...</div>';
-            document.getElementById('live-students-room-name').textContent = `ห้องสอบ: ${roomId}`;
+            document.getElementById('live-students-room-name').textContent = 'กำลังโหลด…';
             modal.classList.remove('hidden');
 
             switchDashboardTab('roster');
@@ -1565,6 +1627,7 @@
                 document.getElementById('students-modal-active').textContent = summary.totalActive || 0;
                 document.getElementById('students-modal-submitted').textContent = summary.totalSubmitted || 0;
                 document.getElementById('students-modal-not-joined').textContent = summary.totalNotJoined || 0;
+                document.getElementById('students-modal-away').textContent = summary.totalAway || 0;
 
                 const avgEl = document.getElementById('students-modal-avg-score');
                 if (avgEl) {
@@ -1574,7 +1637,7 @@
                 }
 
                 if (data.room && (data.room.courseCode || data.room.courseName)) {
-                    document.getElementById('live-students-room-name').textContent = `วิชา: [${data.room.courseCode}] ${data.room.courseName} | ${data.room.examTitle || ''} (ห้อง: ${roomId})`;
+                    document.getElementById('live-students-room-name').textContent = `วิชา: [${data.room.courseCode}] ${data.room.courseName} · ${data.room.examTitle || ''}`;
                 }
 
                 currentLiveStudentsData = data.students || [];
@@ -1606,55 +1669,25 @@
 
         function renderLiveModalStudentsList() {
             const list = document.getElementById('students-modal-list');
-            let filtered = currentLiveStudentsData;
-            if (currentLiveFilterTab === 'active') {
-                filtered = currentLiveStudentsData.filter(s => s.status === 'active' || s.status === 'joined');
-            } else if (currentLiveFilterTab === 'submitted') {
-                filtered = currentLiveStudentsData.filter(s => s.status === 'submitted');
-            } else if (currentLiveFilterTab === 'not_joined') {
-                filtered = currentLiveStudentsData.filter(s => s.status === 'not_joined');
-            }
-
-            if (!filtered || filtered.length === 0) {
-                list.innerHTML = '<div class="text-center py-8 text-slate-400 font-bold">ไม่พบนักศึกษาในหมวดหมู่นี้</div>';
-                return;
-            }
-
-            list.innerHTML = filtered.map(s => {
-                const isSub = s.status === 'submitted';
-                const isActive = s.status === 'active' || s.status === 'joined';
-
-                let badgeHtml = '';
-                let borderClass = 'border-slate-200 bg-white';
-                if (isSub) {
-                    badgeHtml = `<span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-emerald-600 text-white shadow-xs">ส่งข้อสอบแล้ว</span>`;
-                    borderClass = 'border-emerald-200 bg-emerald-50/20';
-                } else if (isActive) {
-                    badgeHtml = `<span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-gradient-to-r from-cyan-600 to-indigo-600 text-white shadow-xs flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> กำลังสอบ</span>`;
-                    borderClass = 'border-cyan-200 bg-cyan-50/20';
-                } else {
-                    badgeHtml = `<span class="px-2.5 py-1 rounded-xl text-[10px] font-black bg-rose-100 text-rose-700 border border-rose-300">ยังไม่เข้าสอบ</span>`;
-                    borderClass = 'border-slate-200 bg-slate-50/50';
-                }
-
-                return `
-                    <div class="p-3.5 rounded-2xl border flex items-center justify-between ${borderClass} transition-all duration-200 shadow-xs hover:shadow-sm">
-                        <div>
-                            <div class="font-extrabold text-slate-900 text-xs sm:text-sm flex items-center gap-2">
-                                <span>${escapeHtml(s.name)}</span>
-                            </div>
-                            <div class="text-[11px] text-slate-500 font-mono mt-0.5">
-                                รหัสนักศึกษา: <b>${escapeHtml(s.studentId)}</b> | กลุ่ม/ห้อง: ${escapeHtml(s.class || '-')}
-                            </div>
-                        </div>
-                        <div class="text-right shrink-0">
-                            ${badgeHtml}
-                            ${s.score !== null && s.score !== undefined ? `
-                                <div class="text-xs font-black text-emerald-700 mt-1">${s.score} / ${s.maxScore} คะแนน</div>
-                            ` : ''}
-                        </div>
-                    </div>
-                `;
+            const q = (document.getElementById('lv-search')?.value || '').trim().toLowerCase();
+            const all = (currentLiveStudentsData || []).filter(s => !q || (String(s.studentId) + ' ' + (s.name || '')).toLowerCase().includes(q));
+            const ago = sec => sec >= 3600 ? Math.floor(sec / 3600) + ' ชม.' : sec >= 60 ? Math.floor(sec / 60) + ' นาที' : sec + ' วินาที';
+            const cols = [
+                { k: 'act', t: 'กำลังสอบ', f: s => s.status === 'active' || s.status === 'joined', note: () => '<em class="lv-live">ออนไลน์</em>' },
+                { k: 'away', t: 'หลุด / ออกไปชั่วคราว', f: s => s.status === 'away', note: s => `<em>ขาดการติดต่อ ${ago(Number(s.awaySec) || 0)}</em>` },
+                { k: 'no', t: 'ยังไม่เข้าสอบ', f: s => s.status === 'not_joined', note: () => '' },
+                { k: 'done', t: 'ส่งแล้ว', f: s => s.status === 'submitted', note: s => (s.score !== null && s.score !== undefined) ? `<em>${s.score}/${s.maxScore}${s.time ? ' · ' + escapeHtml(s.time) : ''}</em>` : '' }
+            ];
+            list.innerHTML = cols.map(c => {
+                const xs = all.filter(c.f).sort((a, b) => String(a.studentId).localeCompare(String(b.studentId)));
+                return `<section class="lv-col ${c.k}">
+                    <h4>${c.t}<span>${xs.length}</span></h4>
+                    <div class="lv-items">${xs.length ? xs.map(s => `<div class="lv-it">
+                        <b>${escapeHtml(s.name || 'นักศึกษา')}</b>
+                        <small>${escapeHtml(s.studentId)}${s.class && s.class !== '-' ? ' · ' + escapeHtml(s.class) : ''}</small>
+                        ${c.note(s)}
+                    </div>`).join('') : `<div class="lv-none">${q ? 'ไม่พบ' : 'ไม่มี'}</div>`}</div>
+                </section>`;
             }).join('');
         }
 
@@ -1786,16 +1819,21 @@
         function toggleProjectorMode() {
             const card = document.getElementById('publish-modal-card');
             const modal = document.getElementById('publish-modal');
-            if (!document.fullscreenElement) {
-                modal.requestFullscreen().catch(() => {});
-                card.classList.remove('max-w-lg');
-                card.classList.add('max-w-3xl', 'p-10');
-            } else {
-                document.exitFullscreen().catch(() => {});
-                card.classList.remove('max-w-3xl', 'p-10');
-                card.classList.add('max-w-lg');
-            }
+            const on = !card.classList.contains('wl-proj');
+            card.classList.toggle('wl-proj', on);
+            document.getElementById('wl-proj-btn').textContent = on ? 'ออกจากเต็มจอ' : 'ฉายเต็มจอ';
+            try {
+                if (on && !document.fullscreenElement) modal.requestFullscreen().catch(() => {});
+                if (!on && document.fullscreenElement) document.exitFullscreen().catch(() => {});
+            } catch (e) {}
         }
+        document.addEventListener('fullscreenchange', () => {
+            const card = document.getElementById('publish-modal-card');
+            if (!document.fullscreenElement && card && card.classList.contains('wl-proj')) {
+                card.classList.remove('wl-proj');
+                document.getElementById('wl-proj-btn').textContent = 'ฉายเต็มจอ';
+            }
+        });
 
         // Polling ข้อมูลอัตโนมัติ
         function startGlobalPolling() {
