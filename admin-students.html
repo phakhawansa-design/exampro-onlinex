@@ -333,7 +333,7 @@
     <!-- Footer -->
     <footer class="border-t border-slate-200 bg-white py-3.5 px-8 text-center">
         <p class="text-xs text-slate-500 font-medium">
-            &copy; 2026 ExamPro &middot; ทีม TEC Hope
+            &copy; 2026 ExamPro &middot; ทีม MiniVC
         </p>
     </footer>
 </div>
@@ -641,7 +641,7 @@
 
     async function approveSingleStudent(studentId, action) {
         const actionText = action === 'approve' ? 'อนุมัติ' : 'ปฏิเสธ';
-        if (!confirm(`ยืนยันการ "${actionText}" บัญชีนักศึกษารหัส ${studentId} หรือไม่?`)) return;
+        if (!await uiConfirm(`ยืนยันการ "${actionText}" บัญชีนักศึกษารหัส ${studentId} หรือไม่?`)) return;
 
         try {
             const res = await fetch('/api/admin/approve-student', {
@@ -665,7 +665,7 @@
 
     async function approveAllStudents() {
         if (!pendingStudents.length) return;
-        if (!confirm(`ยืนยันการอนุมัตินักศึกษาทั้งหมด ${pendingStudents.length} คนในครั้งเดียวหรือไม่?`)) return;
+        if (!await uiConfirm(`ยืนยันการอนุมัตินักศึกษาทั้งหมด ${pendingStudents.length} คนในครั้งเดียวหรือไม่?`)) return;
 
         try {
             const res = await fetch('/api/admin/approve-all-students', {
@@ -853,7 +853,7 @@
     }
 
     async function resetStudentPw(studentId, name) {
-        if (!confirm(`รีเซ็ตรหัสผ่านของ "${name}" (รหัส: ${studentId}) ใช่หรือไม่?\n\nระบบจะสร้างรหัสชั่วคราวให้ นักศึกษาต้องตั้งรหัสใหม่ทันทีที่เข้าสู่ระบบ`)) return;
+        if (!await uiConfirm(`รีเซ็ตรหัสผ่านของ "${name}" (รหัส: ${studentId}) ใช่หรือไม่?\n\nระบบจะสร้างรหัสชั่วคราวให้ นักศึกษาต้องตั้งรหัสใหม่ทันทีที่เข้าสู่ระบบ`)) return;
         try {
             const res = await fetch('/api/teacher/reset-student-password', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ studentId })
@@ -865,7 +865,7 @@
     }
 
     async function deleteStudent(studentId, name) {
-        if (!confirm(`ลบข้อมูลของ "${name}" (รหัส: ${studentId}) ใช่หรือไม่?`)) return;
+        if (!await uiConfirm(`ลบข้อมูลของ "${name}" (รหัส: ${studentId}) ใช่หรือไม่?`)) return;
         try {
             const res = await fetch('/api/students/delete', {
                 method: 'DELETE', headers: { 'Content-Type': 'application/json' },

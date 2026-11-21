@@ -460,7 +460,9 @@
   const el=document.getElementById('intro'),root=document.documentElement;
   const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
   const q=location.search+location.hash;
-  if(reduce||/nointro/.test(q)){el.remove();return}
+  /* เล่นครั้งแรกของการเปิดเว็บเท่านั้น · กลับมาหน้าแรกอีกในรอบเดียวกันข้ามเลย (เดิมรอ 2.6 วินาทีทุกครั้ง) */
+  let seen=false;try{seen=sessionStorage.getItem('exampro_intro_seen')==='1';sessionStorage.setItem('exampro_intro_seen','1')}catch(e){}
+  if(reduce||seen||/nointro/.test(q)){el.remove();if(seen&&!reduce)root.classList.add('intro-done');return}
   /* เล่นเต็มทุกครั้งที่เปิดหน้าเว็บ (ฉากสลับหน้าจอโดนตรวจจับ → ดวงตา → ดาว) */
   const SHORT=false;
   if(SHORT)el.classList.add('short');
@@ -774,7 +776,7 @@ void main(){vec2 uv=(gl_FragCoord.xy-.5*r)/r.y;uv/=1.+w*2.4;
     <p class="sub">เตรียมรหัสนักศึกษาและรหัส PIN จากอาจารย์ให้พร้อม</p>
     <div class="cta"><a class="btn btn-or" href="login.html">เข้าสู่ระบบ</a><button class="btn btn-navy" type="button" onclick="openSignup()">สมัครสมาชิก</button></div>
     <div class="bottom">
-      <span>© 2026 ExamPro · ทีม TEC Hope</span>
+      <span>© 2026 ExamPro · ทีม MiniVC</span>
       
     </div>
   </div>

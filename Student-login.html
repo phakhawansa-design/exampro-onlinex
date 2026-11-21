@@ -37,6 +37,7 @@
     <link rel="stylesheet" href="theme.css">
     <script src="theme.js" defer></script>
     <link rel="stylesheet" href="tailwind.css">
+    <style>html, body { overscroll-behavior-y: none; } /* กันดึงลงเพื่อรีเฟรชหน้าระหว่างสอบ */</style>
 </head>
 <body class="min-h-screen flex flex-col relative overflow-x-hidden">
 
@@ -63,7 +64,7 @@
             <!-- QR Code Scan Detection Banner -->
             <div id="qr-detected-banner" class="hidden p-3.5 bg-emerald-50 border border-emerald-300 rounded-2xl text-xs font-bold text-emerald-800 flex items-start gap-3 shadow-sm">
                 <div class="leading-tight space-y-1">
-                    <div class="text-sm font-bold text-emerald-900">ตรวจพบรหัสจาก QR Code สำเร็จ!</div>
+                    <div class="text-sm font-bold text-emerald-900">ได้รับรหัสห้องสอบแล้ว</div>
                     <div class="text-xs text-emerald-700 font-normal">รหัส PIN: <strong id="qr-detected-pin" class="font-mono font-bold text-emerald-900 text-sm"></strong></div>
                     <div id="qr-detected-info" class="text-xs text-emerald-600 font-medium"></div>
                 </div>
@@ -85,11 +86,11 @@
             <div id="auth-login-view" class="space-y-3.5 sm:space-y-4">
                 <div class="space-y-1.5">
                     <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">รหัสนักศึกษา *</label>
-                    <input type="text" id="student-id" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm font-mono transition-all" placeholder="เช่น 67311226543-5" autofocus>
+                    <input type="text" id="student-id" autocomplete="username" inputmode="text" autocapitalize="off" spellcheck="false" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm font-mono transition-all" placeholder="เช่น 67311226543-5" autofocus>
                 </div>
                 <div class="space-y-1.5">
                     <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">รหัสผ่าน (เริ่มต้น 1234) *</label>
-                    <input type="password" id="student-password" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="กรอกรหัสผ่าน">
+                    <input type="password" id="student-password" autocomplete="current-password" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="กรอกรหัสผ่าน">
                     <p class="text-[11px] text-slate-500 font-medium flex items-center gap-1.5 pt-0.5">
                         <span>เข้าสอบครั้งแรกใช้ <strong class="text-indigo-600 font-mono font-bold">1234</strong> หรือ 4 หลักท้ายของรหัสนักศึกษา<span id="pw-last4-hint"></span> แล้วระบบจะให้ตั้งรหัสใหม่</span>
                     </p>
@@ -115,30 +116,30 @@
             <div id="auth-register-view" class="space-y-3 sm:space-y-3.5 hidden">
                 <div class="space-y-1">
                     <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">รหัสนักศึกษา *</label>
-                    <input type="text" id="reg-student-id" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm font-mono transition-all" placeholder="เช่น 67311226543-5">
+                    <input type="text" id="reg-student-id" autocomplete="username" autocapitalize="off" spellcheck="false" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm font-mono transition-all" placeholder="เช่น 67311226543-5">
                 </div>
                 <div class="grid grid-cols-2 gap-2.5">
                     <div class="space-y-1">
                         <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">ชื่อจริง (ภาษาไทย) *</label>
-                        <input type="text" id="reg-firstname" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="เช่น สุดหล่อ">
+                        <input type="text" id="reg-firstname" autocomplete="given-name" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="เช่น สุดหล่อ">
                     </div>
                     <div class="space-y-1">
                         <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">นามสกุล (ภาษาไทย) *</label>
-                        <input type="text" id="reg-lastname" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="เช่น ห้องN">
+                        <input type="text" id="reg-lastname" autocomplete="family-name" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="เช่น ห้องN">
                     </div>
                 </div>
                 <div class="space-y-1">
                     <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">ชั้นเรียน / กลุ่มเรียน *</label>
-                    <input type="text" id="reg-class" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="เช่น TEC3N">
+                    <input type="text" id="reg-class" autocomplete="off" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="เช่น TEC3N">
                 </div>
                 <div class="grid grid-cols-2 gap-2.5">
                     <div class="space-y-1">
                         <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">กำหนดรหัสผ่าน *</label>
-                        <input type="password" id="reg-password" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="อย่างน้อย 4 ตัว">
+                        <input type="password" id="reg-password" autocomplete="new-password" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="อย่างน้อย 6 ตัว">
                     </div>
                     <div class="space-y-1">
                         <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">ยืนยันรหัสผ่าน *</label>
-                        <input type="password" id="reg-confirm-password" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="พิมพ์ซ้ำอีกครั้ง">
+                        <input type="password" id="reg-confirm-password" autocomplete="new-password" class="input-dark w-full px-3.5 py-2.5 rounded-xl text-sm transition-all" placeholder="พิมพ์ซ้ำอีกครั้ง">
                     </div>
                 </div>
 
@@ -258,7 +259,7 @@
 
     <!-- Footer -->
     <footer class="text-center py-4 sm:py-5 px-3 text-[10px] text-slate-500 font-bold uppercase tracking-widest z-10 relative">
-        ExamPro &bull; &copy; 2026 ทีม TEC Hope
+        ExamPro &bull; &copy; 2026 ทีม MiniVC
     </footer>
 
     <!-- Warning Modal -->
@@ -292,11 +293,11 @@
             <div class="space-y-3 text-left">
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">รหัสผ่านใหม่</label>
-                    <input type="password" id="modal-new-password" placeholder="อย่างน้อย 6 ตัวอักษร (ห้ามใช้ 1234)..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-medium outline-none focus:border-indigo-500 transition">
+                    <input type="password" id="modal-new-password" autocomplete="new-password" placeholder="อย่างน้อย 6 ตัวอักษร (ห้ามใช้ 1234)..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-medium outline-none focus:border-indigo-500 transition">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">ยืนยันรหัสผ่านใหม่</label>
-                    <input type="password" id="modal-confirm-password" placeholder="พิมพ์รหัสผ่านใหม่อีกครั้ง..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-medium outline-none focus:border-indigo-500 transition">
+                    <input type="password" id="modal-confirm-password" autocomplete="new-password" placeholder="พิมพ์รหัสผ่านใหม่อีกครั้ง..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-medium outline-none focus:border-indigo-500 transition">
                 </div>
             </div>
 
@@ -841,6 +842,9 @@
             examQuestions.forEach(q => { const c = document.querySelector(`input[name="q_${q.id}"]:checked`); if (c) a[q.id] = c.value; });
             return a;
         }
+        function setSaveState(text, s) {
+            ['save-state', 'qnav-save'].forEach(id => { const el = document.getElementById(id); if (!el) return; el.textContent = text; el.dataset.s = s; el.hidden = false; });
+        }
         function saveProgress() {
             if (isExamFinished) return;
             const answers = collectAnswers();
@@ -851,19 +855,26 @@
                 }));
             } catch (e) {}
             clearTimeout(progressTimer);
-            const st = Object.keys(answers || {}).length ? document.getElementById('save-state') : null; // ยังไม่ได้ตอบ → คงข้อความเดิม
-            if (st) { st.textContent = 'กำลังบันทึก...'; st.dataset.s = 'busy'; }
+            const st = Object.keys(answers || {}).length; // ยังไม่ได้ตอบ → คงข้อความเดิม
+            if (st) setSaveState(navigator.onLine === false ? 'เน็ตหลุด · เก็บคำตอบไว้ในเครื่องแล้ว' : 'กำลังบันทึก…', navigator.onLine === false ? 'local' : 'busy');
             progressTimer = setTimeout(() => {
                 fetch('/api/student/progress', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ roomId: currentRoomId, studentId: currentStudentId, answers })
                 }).then(r => {
                     if (!st) return;
-                    if (r.ok) { st.textContent = '✓ บันทึกคำตอบแล้ว'; st.dataset.s = 'ok'; }
-                    else { st.textContent = 'เก็บคำตอบไว้ในเครื่องแล้ว'; st.dataset.s = 'local'; }
-                }).catch(() => { if (st) { st.textContent = 'เน็ตหลุด · เก็บคำตอบไว้ในเครื่องแล้ว'; st.dataset.s = 'local'; } });
+                    if (r.ok) setSaveState('✓ บันทึกคำตอบแล้ว', 'ok');
+                    else setSaveState('เก็บคำตอบไว้ในเครื่องแล้ว', 'local');
+                }).catch(() => { if (st) setSaveState('เน็ตหลุด · เก็บคำตอบไว้ในเครื่องแล้ว', 'local'); });
             }, 700);
         }
+        window.addEventListener('offline', () => { if (!isExamFinished && currentRoomId && examQuestions.length) setSaveState('เน็ตหลุด · เก็บคำตอบไว้ในเครื่องแล้ว', 'local'); });
+        window.addEventListener('online', () => {
+            if (window.__pendingEnd) { const p = window.__pendingEnd; window.__pendingEnd = null; sendEndSubmission(p); return; }
+            if (isExamFinished || !currentRoomId || !examQuestions.length) return;
+            if (window.__pendingSubmit) { if (window.uiToast) uiToast('เน็ตกลับมาแล้ว กำลังส่งคำตอบ…', 'info'); submitExam(true); }
+            else saveProgress();
+        });
         // ตอบ/แก้คำตอบภายใน 90 วินาทีหลังกลับจากการสลับหน้าจอ → บันทึกให้อาจารย์เห็น (สูงสุด 5 ข้อต่อการกลับมา 1 ครั้ง)
         function trackAnswerAfterReturn(e) {
             const el = e.target; if (!el || el.type !== 'radio' || isExamFinished) return;
@@ -1122,8 +1133,8 @@
             };
 
             document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'hidden') startAway('ออกจากหน้าจอ/สลับแอปหรือแท็บ');
-                else endAway();
+                if (document.visibilityState === 'hidden') { startAway('ออกจากหน้าจอ/สลับแอปหรือแท็บ'); if (window.__beatNow) window.__beatNow(); }
+                else { endAway(); if (window.__beatNow) window.__beatNow(); }
             });
             // คลิกไปหน้าต่างอื่น นับเฉพาะคอมพิวเตอร์ · บนมือถือ blur เกิดจากแจ้งเตือน/สายเข้า/ศูนย์ควบคุมที่เด้งทับ จึงไม่นับ
             if (!isTouchDevice) {
@@ -1172,14 +1183,11 @@
                 // หน้าตรวจทานก่อนส่ง: บอกข้อที่ยังไม่ได้ตอบ แตะเพื่อไปที่ข้อนั้นได้ (ไม่ใช้กล่องยืนยันของเบราว์เซอร์ ซึ่งบางแอปปิดเองได้)
                 const blocks = [...document.querySelectorAll('#questions-container [data-qid]')];
                 const missing = blocks.map((b, i) => ({ b, no: i + 1 })).filter(x => !x.b.querySelector('input[type=radio]:checked'));
+                if (navigator.onLine === false && window.uiToast) uiToast('ตอนนี้เน็ตหลุดอยู่ · กดส่งได้เลย ระบบจะส่งให้เองเมื่อเน็ตกลับมา', 'err', 6000);
                 const ok = await reviewBeforeSubmit(missing, blocks.length);
                 if (!ok) return;
             }
-            stopStudentHeartbeat();
-            if (examTimerInterval) clearInterval(examTimerInterval);
-            if (announcementInterval) clearInterval(announcementInterval);
-            if (warningInterval) clearInterval(warningInterval);
-            if (publishCheckInterval) clearInterval(publishCheckInterval);
+            if (navigator.onLine === false) { queueSubmit(); return; }
             try {
                 const response = await fetch('/api/submit-exam', {
                     method: 'POST',
@@ -1188,18 +1196,26 @@
                 });
                 const result = await response.json();
                 if (response.ok) {
-                    isExamFinished = true;
+                    isExamFinished = true; window.__pendingSubmit = false;
+                    stopStudentHeartbeat();
+                    [examTimerInterval, announcementInterval, warningInterval, publishCheckInterval].forEach(i => i && clearInterval(i));
                     clearProgress(); exitFullscreenQuietly();
-                    window.location.href = `finish.html?score=${result.score}&maxScore=${result.maxScore}&showScore=${result.scoreHidden ? 0 : showScoreSetting}&roomId=${currentRoomId}&studentName=${encodeURIComponent(currentStudentName)}&studentId=${currentStudentId}&class=${encodeURIComponent(currentStudentClass)}`;
+                    window.location.href = `finish.html?roomId=${encodeURIComponent(currentRoomId)}`;
                 } else {
                     alert(`ล้มเหลวในการส่งข้อสอบ: ${result.message}`);
-                    startStudentHeartbeat(); // ส่งไม่สำเร็จ ยังอยู่ในห้องสอบ
                 }
             } catch(err) {
                 console.error(err);
-                startStudentHeartbeat();
-                alert("เกิดปัญหาในการส่งข้อสอบ (คำตอบยังบันทึกไว้ในเครื่อง) กรุณาลองกดส่งอีกครั้ง หรือติดต่อครูผู้คุมสอบ");
+                queueSubmit(); // เน็ตหลุดตอนส่ง → ส่งเองเมื่อเน็ตกลับ
             }
+        }
+        // คำตอบอยู่ในเครื่องแล้ว · รอเน็ตกลับแล้วส่งให้เอง (ไม่ต้องกดซ้ำ ไม่ต้องปิดหน้า)
+        function queueSubmit() {
+            window.__pendingSubmit = true;
+            setSaveState('เน็ตหลุด · จะส่งคำตอบให้เมื่อเน็ตกลับ', 'local');
+            alert('ตอนนี้เน็ตหลุด คำตอบเก็บไว้ในเครื่องแล้ว\nระบบจะส่งคำตอบให้เองทันทีที่เน็ตกลับมา ไม่ต้องปิดหน้านี้');
+            clearTimeout(window.__submitRetry);
+            window.__submitRetry = setTimeout(() => { if (window.__pendingSubmit && !isExamFinished) submitExam(true); }, 15000); // เผื่อเหตุการณ์ online ไม่มา
         }
 
         function startExamTimer(durationMinutes) {
@@ -1246,24 +1262,8 @@
         }
 
         // ตรวจสอบสถานะเผยแพร่ข้อสอบแบบ Real-Time (ทุก 5 วินาที)
-        function startPublishStatusCheck() {
-            if (!currentRoomId) return;
-            publishCheckInterval = setInterval(async () => {
-                if (isExamFinished) { clearInterval(publishCheckInterval); return; }
-                try {
-                    const sIdParam = encodeURIComponent(currentStudentId || '');
-                    const sNameParam = encodeURIComponent(currentStudentName || '');
-                    const sClsParam = encodeURIComponent(currentStudentClass || '');
-                    const res = await fetch(`/api/teacher/get-publish-status?roomId=${encodeURIComponent(currentRoomId)}&studentId=${sIdParam}&studentName=${sNameParam}&studentClass=${sClsParam}`);
-                    if (!res.ok) return;
-                    const data = await res.json();
-                    if (data.is_published !== 1) {
-                        clearInterval(publishCheckInterval);
-                        handleExamEnd("อาจารย์ได้ปิดการสอบแล้ว (หมดเวลาสอบ)", "อาจารย์ผู้คุมสอบได้ปิดการสอบเรียบร้อยแล้ว ระบบทำการบันทึกและส่งคำตอบของคุณเข้าระบบทันที");
-                    }
-                } catch(e) { /* network error, skip this check */ }
-            }, 5000);
-        }
+        // ห้องถูกปิด: ตรวจจากผลของสัญญาณชีพ (applyPoll) แล้ว ไม่ต้องถามแยก
+        function startPublishStatusCheck() { }
 
         // จัดการจบการสอบเมื่อหมดเวลาหรืออาจารย์กดปิด
         async function handleExamEnd(title, desc) {
@@ -1282,28 +1282,32 @@
                 if (checked) answersPayload[q.id] = checked.value;
             });
 
+            await sendEndSubmission({ roomId: currentRoomId, studentId: currentStudentId, name: currentStudentName, class: currentStudentClass, answers: answersPayload, tabSwitches: tabSwitchCount });
+            exitFullscreenQuietly();
+
+            document.getElementById('times-up-title').textContent = title;
+            document.getElementById('times-up-desc').textContent = desc + (window.__pendingEnd ? ' · ตอนนี้เน็ตหลุด ระบบจะส่งคำตอบให้เองเมื่อเน็ตกลับมา กรุณาเปิดหน้านี้ไว้' : '');
+            document.getElementById('times-up-modal').classList.remove('hidden');
+        }
+        async function sendEndSubmission(payload) {
             try {
                 const r = await fetch('/api/submit-exam', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ roomId: currentRoomId, studentId: currentStudentId, name: currentStudentName, class: currentStudentClass, answers: answersPayload, tabSwitches: tabSwitchCount })
+                    body: JSON.stringify(payload)
                 });
                 const result = await r.json().catch(() => ({}));
                 clearProgress();
                 // ปุ่มในกล่องแจ้ง → หน้าผลสอบ (ดูคะแนน/รายข้อได้ตามที่อาจารย์ตั้ง)
                 if (r.ok) {
-                    const go = `finish.html?score=${result.score}&maxScore=${result.maxScore}&showScore=${result.scoreHidden ? 0 : showScoreSetting}&roomId=${encodeURIComponent(currentRoomId)}&studentName=${encodeURIComponent(currentStudentName)}&studentId=${encodeURIComponent(currentStudentId)}`;
+                    const go = `finish.html?roomId=${encodeURIComponent(currentRoomId)}`;
                     const btn = document.querySelector('#times-up-modal button');
                     if (btn) { btn.textContent = 'ดูผลสอบ'; btn.onclick = () => { location.href = go; }; }
                 }
-            } catch(e) { console.error('Auto-submit on exam end failed:', e); }
-            exitFullscreenQuietly();
-
-            document.getElementById('times-up-title').textContent = title;
-            document.getElementById('times-up-desc').textContent = desc;
-            document.getElementById('times-up-modal').classList.remove('hidden');
-
-            alert(`${title}\n${desc}`);
+            } catch(e) {
+                // เน็ตหลุดตอนหมดเวลา: เก็บไว้ ส่งให้เมื่อเน็ตกลับ (คำตอบยังอยู่ในเครื่อง)
+                window.__pendingEnd = payload;
+            }
         }
 
         function startAnnouncementStream(initialAnnouncement) {
@@ -1311,26 +1315,18 @@
             const txt = document.getElementById('announcement-text');
             if (initialAnnouncement && initialAnnouncement.trim() !== '') { txt.textContent = initialAnnouncement; banner.classList.remove('hidden'); }
             else { banner.classList.add('hidden'); }
-            let currentAnn = initialAnnouncement || '';
-            announcementInterval = setInterval(async () => {
-                try {
-                    const res = await fetch(`/api/room-settings?roomId=${currentRoomId}`);
-                    const data = await res.json();
-                    if (data.announcement !== currentAnn) {
-                        currentAnn = data.announcement || '';
-                        if (currentAnn.trim() === '') { banner.classList.add('hidden'); }
-                        else { txt.textContent = currentAnn; banner.classList.remove('hidden'); }
-                    }
-                } catch(e) { console.error(e); }
-            }, 5000);
+            window.__currentAnn = initialAnnouncement || '';
+        }
+        function applyAnnouncement(a) {
+            if (a === null || a === undefined || a === window.__currentAnn) return;
+            window.__currentAnn = a;
+            const banner = document.getElementById('announcement-banner'), txt = document.getElementById('announcement-text');
+            if (!a.trim()) banner.classList.add('hidden'); else { txt.textContent = a; banner.classList.remove('hidden'); }
         }
 
-        function startWarningStream() {
-            if (!currentRoomId || !currentStudentId) return;
-            warningInterval = setInterval(async () => {
+        function startWarningStream() { }
+        function applyWarnings(data) {
                 try {
-                    const res = await fetch(`/api/get-warnings?roomId=${currentRoomId}&studentId=${currentStudentId}`);
-                    const data = await res.json();
                     if (Array.isArray(data) && data.length > 0) {
                         activeWarningIds = data.map(w => w.id);
                         const latestMsg = data[data.length-1].message;
@@ -1350,7 +1346,16 @@
                         }
                     }
                 } catch(e) { console.error(e); }
-            }, 4000);
+        }
+        // ผลจากสัญญาณชีพ: สถานะห้อง + ประกาศ + ข้อความเตือน
+        function applyPoll(d) {
+            if (!d || isExamFinished) return;
+            if (d.is_published === 0) {
+                handleExamEnd("อาจารย์ได้ปิดการสอบแล้ว (หมดเวลาสอบ)", "อาจารย์ผู้คุมสอบได้ปิดการสอบเรียบร้อยแล้ว ระบบทำการบันทึกและส่งคำตอบของคุณเข้าระบบทันที");
+                return;
+            }
+            applyAnnouncement(d.announcement);
+            applyWarnings(d.warnings);
         }
 
         async function acknowledgeWarning() {
@@ -1389,12 +1394,18 @@
                         class: currentStudentClass,
                         state: 'in_exam',
                         vis: document.visibilityState,
-                        sid: EXAM_SID
-                    })
-                }).then(r => { if (r.headers.get('X-Trinetra-Session') === 'superseded') stopSuperseded(); }).catch(() => {});
+                        sid: EXAM_SID,
+                        poll: true
+                    }),
+                    keepalive: true
+                }).then(r => {
+                    if (r.headers.get('X-Trinetra-Session') === 'superseded') { stopSuperseded(); return; }
+                    return r.ok ? r.json().then(applyPoll) : null;
+                }).catch(() => {});
             };
             sendHeartbeat();
-            studentHeartbeatInterval = setInterval(sendHeartbeat, 3000);
+            window.__beatNow = sendHeartbeat;
+            studentHeartbeatInterval = setInterval(sendHeartbeat, 5000);
         }
 
         function stopStudentHeartbeat() {
@@ -1434,6 +1445,15 @@
         .qnav-h span:last-child{font-weight:600;color:#64748b}
         .qnav-t{margin-left:auto;font:800 15px ui-monospace,Consolas,monospace;color:#1d5fd6;background:#e8f1ff;border:1.5px solid #c9dbfa;padding:4px 10px;border-radius:10px;white-space:nowrap}
         .qnav-t[hidden]{display:none}
+        .qnav-save{font-style:normal;font-size:12px;font-weight:700;padding:3px 8px;border-radius:99px;background:#f1f5f9;color:#475569;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+        .qnav-save[hidden]{display:none}
+        .qnav-save[data-s="ok"]{background:#dcfce7;color:#15803d}
+        .qnav-save[data-s="local"]{background:#fef3c7;color:#92400e}
+        #save-state[data-s="local"]{color:#b45309}
+        /* มือถือ: เวลาอยู่ในแถบ "เลือกข้อ" ที่ติดด้านบนแล้ว ซ่อนกล่องเวลาใหญ่ เห็นข้อ 1 ได้เร็วขึ้น */
+        @media (max-width:640px){#timer-banner{display:none!important}.qnav-h span:last-child{display:none}}
+        /* แถบเลือกข้อติดด้านบน ไม่บังหัวข้อคำถามตอนเลื่อนไป */
+        #questions-container [data-qid]{scroll-margin-top:120px}
         .qnav-t.t-or{color:#b4500c;background:#fff1e4;border-color:#ffc89c}
         .qnav-t.t-red{color:#fff;background:#dc2626;border-color:#dc2626;animation:qtBlink 1s infinite}
         @keyframes qtBlink{50%{opacity:.75}}
@@ -1500,7 +1520,7 @@
             if (!bs.length) { if (nav) nav.remove(); nav = null; return; }
             if (!nav) {
                 nav = document.createElement('div'); nav.className = 'qnav';
-                nav.innerHTML = '<div class="qnav-h"><span>เลือกข้อ</span><b class="qnav-t" id="qnav-timer" hidden></b><span>บนคอม กด 1–4 เพื่อเลือกคำตอบ</span></div><div class="qnav-row"></div>';
+                nav.innerHTML = '<div class="qnav-h"><span>เลือกข้อ</span><em class="qnav-save" id="qnav-save" aria-live="polite" hidden></em><b class="qnav-t" id="qnav-timer" hidden></b><span>บนคอม กด 1–4 เพื่อเลือกคำตอบ</span></div><div class="qnav-row"></div>';
                 const card = qc.closest('.glass') || qc; card.parentNode.insertBefore(nav, card);
             }
             const row = nav.querySelector('.qnav-row');

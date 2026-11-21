@@ -273,7 +273,7 @@
         <!-- Footer -->
         <footer class="border-t border-slate-200 bg-white py-3.5 px-8 text-center">
             <p class="text-xs text-slate-500 font-medium">
-                &copy; 2026 ExamPro &middot; ทีม TEC Hope
+                &copy; 2026 ExamPro &middot; ทีม MiniVC
             </p>
         </footer>
     </div>
@@ -608,7 +608,7 @@
 
         // ลบเทมเพลตออกจากคลัง
         async function deleteLibraryTemplate(templateId) {
-            const confirmDel = confirm("คุณยืนยันที่จะลบชุดข้อสอบนี้ออกจากคลังข้อสอบส่วนตัวของคุณอย่างถาวรใช่หรือไม่?");
+            const confirmDel = await uiConfirm("คุณยืนยันที่จะลบชุดข้อสอบนี้ออกจากคลังข้อสอบส่วนตัวของคุณอย่างถาวรใช่หรือไม่?");
             if (!confirmDel) return;
 
             try {

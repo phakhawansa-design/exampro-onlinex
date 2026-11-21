@@ -607,7 +607,7 @@
 
         // Actions
         async function approveTeacher(username) {
-            if (!confirm(`ต้องการอนุมัติบัญชี "${username}" ใช่หรือไม่?`)) return;
+            if (!await uiConfirm(`ต้องการอนุมัติบัญชี "${username}" ใช่หรือไม่?`)) return;
             try {
                 const res = await fetch('/api/superadmin/approve-teacher', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -621,7 +621,7 @@
         }
 
         async function rejectTeacher(username) {
-            if (!confirm(`ต้องการปฏิเสธ/ระงับบัญชี "${username}" ใช่หรือไม่?`)) return;
+            if (!await uiConfirm(`ต้องการปฏิเสธ/ระงับบัญชี "${username}" ใช่หรือไม่?`)) return;
             try {
                 const res = await fetch('/api/superadmin/reject-teacher', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -635,7 +635,7 @@
         }
 
         async function deleteTeacher(username) {
-            if (!confirm(`ลบบัญชี "${username}" ถาวร? (ห้องสอบทั้งหมดจะถูกลบด้วย)`)) return;
+            if (!await uiConfirm(`ลบบัญชี "${username}" ถาวร? (ห้องสอบทั้งหมดจะถูกลบด้วย)`)) return;
             try {
                 const res = await fetch('/api/superadmin/delete-teacher', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -791,7 +791,7 @@
 
         async function approveSingleStudent(studentId, action) {
             const actionText = action === 'approve' ? 'อนุมัติ' : 'ปฏิเสธ/ระงับ';
-            if (!confirm(`ต้องการ "${actionText}" บัญชีนักศึกษารหัส "${studentId}" ใช่หรือไม่?`)) return;
+            if (!await uiConfirm(`ต้องการ "${actionText}" บัญชีนักศึกษารหัส "${studentId}" ใช่หรือไม่?`)) return;
             try {
                 const res = await fetch('/api/admin/approve-student', {
                     method: 'POST',
@@ -817,7 +817,7 @@
                 alert('ไม่มีคำขอนักศึกษาที่รออนุมัติในขณะนี้ครับ');
                 return;
             }
-            if (!confirm(`ต้องการอนุมัติบัญชีนักศึกษาที่รออยู่ทั้งหมด ${pendingCount} คนพร้อมกันใช่หรือไม่?`)) return;
+            if (!await uiConfirm(`ต้องการอนุมัติบัญชีนักศึกษาที่รออยู่ทั้งหมด ${pendingCount} คนพร้อมกันใช่หรือไม่?`)) return;
 
             try {
                 const res = await fetch('/api/admin/approve-all-students', {
@@ -839,7 +839,7 @@
         }
 
         async function deleteSingleStudent(studentId) {
-            if (!confirm(`ยืนยันการลบบัญชีนักศึกษารหัส "${studentId}" หรือไม่? (ข้อมูลจะไม่สามารถกู้คืนได้)`)) return;
+            if (!await uiConfirm(`ยืนยันการลบบัญชีนักศึกษารหัส "${studentId}" หรือไม่? (ข้อมูลจะไม่สามารถกู้คืนได้)`)) return;
             try {
                 const res = await fetch('/api/admin/delete-student', {
                     method: 'POST',

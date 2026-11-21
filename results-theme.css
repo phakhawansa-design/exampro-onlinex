@@ -120,3 +120,9 @@
 /* กราฟผลสอบ: ไม่ให้กล่องกราฟกว้างเกินจอมือถือ (ก่อนกราฟวาดเสร็จ canvas กว้างตั้งต้น 300px) */
 .h-60.relative { min-width: 0; max-width: 100%; }
 .h-60.relative canvas { max-width: 100% !important; }
+
+/* มือถือ: คอลัมน์ "จัดการ" (ดูคำตอบ / ลบ) ติดขอบขวา ไม่ต้องเลื่อนตารางไปหา */
+@media (max-width: 760px) {
+  .rs-table th:last-child, .rs-table td:last-child { position: sticky; right: 0; z-index: 2; background: #fff; box-shadow: -8px 0 10px -8px rgba(15, 23, 42, .25); }
+  .rs-table thead th:last-child { background: #f8fafc; z-index: 3; }
+}

@@ -353,3 +353,18 @@ select.dark-select:focus, input.dark-input:focus, textarea.dark-input:focus,
 ::-webkit-scrollbar-thumb { background: #a9b8d0 !important; border-radius: 99px !important; border: 3px solid transparent !important; background-clip: padding-box !important; }
 ::-webkit-scrollbar-thumb:hover { background: #7f93b5 !important; border: 3px solid transparent !important; background-clip: padding-box !important; }
 * { scrollbar-color: #a9b8d0 transparent; }
+
+/* ===== การเข้าถึง: เห็นวงโฟกัสเมื่อใช้คีย์บอร์ด (หลายหน้าเคยปิดด้วย outline:none) ===== */
+a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible,
+[role="button"]:focus-visible, [tabindex]:focus-visible {
+    outline: 3px solid #ff9a3c !important;
+    outline-offset: 2px !important;
+}
+/* ลดการเคลื่อนไหวตามการตั้งค่าเครื่อง */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+}
+/* iPhone/Safari: ช่องกรอกที่ตัวอักษรเล็กกว่า 16px ทำให้หน้าซูมเข้าเองทุกครั้งที่แตะ (หน้าเข้าสู่ระบบกระโดด) */
+@media (pointer: coarse) {
+    input:not([type="radio"]):not([type="checkbox"]):not([type="range"]):not([type="file"]), select, textarea { font-size: 16px !important; }
+}

@@ -63,6 +63,39 @@ app.use((req, res, next) => {
     }
     next();
 });
+// ===== ปิดห้องสอบอัตโนมัติ (เดิมหมดเวลาแล้วห้องค้างสถานะ "กำลังสอบ") =====
+// ปิดเมื่อ (1) นักศึกษาทุกคนที่มีสิทธิ์สอบห้องนี้ส่งแล้ว หรือ
+//         (2) เลยเวลาสอบ + 5 นาทีนับจากกดเริ่มสอบ และไม่มีใครยังอยู่ในเวลาของตัวเอง (คนมาสายได้เวลาเต็ม จึงรอคนสุดท้าย)
+// ปิด = เหมือนกดปิดห้องในแดชบอร์ด (ผลสอบและประวัติยังอยู่ครบ)
+const AUTO_CLOSE_GRACE_MS = 5 * 60 * 1000;
+function autoCloseRooms() {
+    db.all("SELECT roomId, duration, courseId, allowed_classes, published_at FROM teacher_rooms WHERE is_published = 1 AND COALESCE(archived, 0) = 0", [], (err, rooms) => {
+        if (err || !rooms) return;
+        const now = Date.now();
+        rooms.forEach(r => {
+            const durMs = (Number(r.duration) || 0) * 60000;
+            db.all('SELECT studentId FROM exam_results WHERE roomId = ?', [r.roomId], (e1, subs) => {
+                const done = new Set((subs || []).map(s => String(s.studentId || '').replace(/[^0-9a-zA-Z]/g, '').toLowerCase()));
+                db.all('SELECT studentId, class FROM course_students WHERE courseId = ?', [r.courseId || -1], (e2, roster) => {
+                    const eligible = (roster || []).filter(s => !outsideAllowedGroups(r.allowed_classes, s.class));
+                    const allDone = eligible.length > 0 && eligible.every(s => done.has(String(s.studentId || '').replace(/[^0-9a-zA-Z]/g, '').toLowerCase()));
+                    db.all('SELECT started_at FROM exam_progress WHERE room_id = ?', [r.roomId], (e3, prog) => {
+                        const someoneWorking = (prog || []).some(p => !durMs || (Number(p.started_at) || 0) + durMs + 60000 > now);
+                        const pub = Number(r.published_at) || 0;
+                        const timeOver = durMs > 0 && pub > 0 && now > pub + durMs + AUTO_CLOSE_GRACE_MS && !someoneWorking;
+                        if (!allDone && !timeOver) return;
+                        db.run('UPDATE cheat_logs SET monitor_hidden = 1 WHERE roomId = ?', [r.roomId]);
+                        db.run('UPDATE teacher_rooms SET is_published = 0 WHERE roomId = ? AND is_published = 1', [r.roomId], () => {
+                            console.log(`[ปิดห้องอัตโนมัติ] ${r.roomId} · ${allDone ? 'นักศึกษาส่งครบทุกคน' : 'หมดเวลาสอบแล้ว'}`);
+                        });
+                    });
+                });
+            });
+        });
+    });
+}
+setTimeout(() => { autoCloseRooms(); setInterval(autoCloseRooms, 60000); }, 20000);
+
 // ลิงก์เก่าของตัวแปลงข้อสอบ (เคยอยู่ในโฟลเดอร์ exam-converter) → หน้าใหม่
 app.get(['/exam-converter', '/exam-converter/', '/exam-converter/index.html'], (req, res) => res.redirect(301, '/exam-converter.html'));
 app.use(express.static(__dirname));
@@ -465,6 +498,9 @@ db.serialize(() => {
     // ค่าตั้งของระบบ (แอดมินตั้ง) เช่น ปีการศึกษา/ภาคเรียนเริ่มต้นของทุกบัญชี
     // มีคอลัมน์ id เพราะตัวแปลงคำสั่งของ PostgreSQL เติม RETURNING id ให้ทุก INSERT
     db.run("CREATE TABLE IF NOT EXISTS app_settings (id INTEGER PRIMARY KEY AUTOINCREMENT, skey VARCHAR(100) UNIQUE, svalue TEXT, updated_at TEXT)");
+    db.run("ALTER TABLE teacher_rooms ADD COLUMN published_at TEXT", (err) => {
+        if (!err) console.log("✔ Added column 'published_at' to teacher_rooms table");
+    });
     db.run("ALTER TABLE teacher_rooms ADD COLUMN max_leaves INTEGER DEFAULT 3", (err) => {
         if (!err) console.log("✔ Added column 'max_leaves' to teacher_rooms table");
     });
@@ -658,7 +694,7 @@ function getActiveRoomStudents(roomId) {
     const roomMap = activeRoomTracker.get(rId);
     const now = Date.now();
     const active = [];
-    const TIMEOUT_MS = 8000; // หากขาดการติดต่อเกิน 8 วินาทีถือว่าออกจากห้องสอบ
+    const TIMEOUT_MS = 14000; // หน้าสอบส่งสัญญาณทุก 5 วินาที · ขาดเกิน 14 วินาที (พลาด 2 ครั้ง) ถือว่าหลุด
     for (const [sId, data] of Array.from(roomMap.entries())) {
         if (now - data.lastSeen < TIMEOUT_MS) {
             active.push(data);
@@ -676,7 +712,7 @@ function getAwayRoomStudentMap(roomId) {
     const roomMap = activeRoomTracker.get(String(roomId || '').trim());
     if (!roomMap) return map;
     const now = Date.now();
-    roomMap.forEach((d, sId) => { const age = now - d.lastSeen; if (age >= 8000 && age <= SEEN_KEEP_MS) map.set(sId, { ...d, awaySec: Math.round(age / 1000) }); });
+    roomMap.forEach((d, sId) => { const age = now - d.lastSeen; if (age >= 14000 && age <= SEEN_KEEP_MS) map.set(sId, { ...d, awaySec: Math.round(age / 1000) }); });
     return map;
 }
 
@@ -1033,13 +1069,13 @@ app.get('/api/student/result-detail', (req, res) => {
     if (!u || u.typ !== 'student') return res.status(401).json({ message: 'กรุณาเข้าสู่ระบบ' });
     const roomId = String(req.query.roomId || '');
     if (!roomId) return res.status(400).json({ message: 'กรุณาระบุห้องสอบ' });
-    db.get(`SELECT er.score, er.maxScore, er.answers_json, er.date, er.time, tr.show_score, tr.is_published, tr.exam_title, tr.roomName, c.courseCode, c.courseName
+    db.get(`SELECT er.score, er.maxScore, er.answers_json, er.date, er.time, er.name, er.studentId, tr.show_score, tr.is_published, tr.exam_title, tr.roomName, c.courseCode, c.courseName
             FROM exam_results er LEFT JOIN teacher_rooms tr ON tr.roomId = er.roomId LEFT JOIN courses c ON c.id = tr.courseId
             WHERE er.roomId = ? AND (er.studentId = ? OR REPLACE(er.studentId, '-', '') = REPLACE(?, '-', '')) ORDER BY er.id DESC LIMIT 1`,
         [roomId, u.u, u.u], (err, r) => {
             if (err) return res.status(500).json({ message: err.message });
             if (!r) return res.status(404).json({ message: 'ไม่พบผลสอบของคุณในห้องนี้' });
-            const head = { examTitle: r.exam_title || r.roomName || '', courseCode: r.courseCode || '', courseName: r.courseName || '', date: r.date, time: r.time };
+            const head = { examTitle: r.exam_title || r.roomName || '', courseCode: r.courseCode || '', courseName: r.courseName || '', date: r.date, time: r.time, studentId: r.studentId || u.u, name: r.name || '' };
             if (Number(r.show_score) === 0) return res.json({ ...head, hidden: true, message: 'อาจารย์ตั้งค่าไม่แสดงคะแนนของห้องสอบนี้' });
             const closed = Number(r.is_published) !== 1;
             let mine = {}; try { mine = JSON.parse(r.answers_json || '{}') || {}; } catch (e) {}
@@ -1892,7 +1928,22 @@ app.post('/api/student/heartbeat', (req, res) => {
     if (!roomId || !studentId) return res.status(400).json({ success: false, message: "ข้อมูลไม่ครบถ้วน" });
 
     recordStudentActive(roomId, studentId, name, studentClass, state || 'in_exam');
-    res.json({ success: true, active: true });
+    // poll: ส่งสถานะห้อง ประกาศ และข้อความเตือนจากผู้คุมสอบกลับไปในคำขอเดียว
+    // (เดิมหน้าสอบยิง 4 เส้นทางแยกกัน ราว 1 ครั้ง/วินาที/คน → ห้อง 50 คน ≈ 50 ครั้ง/วินาที)
+    const poll = (req.body && req.body.poll) || (typeof req.body === 'string' && /"poll"\s*:\s*true/.test(req.body));
+    if (!poll) return res.json({ success: true, active: true });
+    const sid = req.authUser && req.authUser.typ === 'student' ? req.authUser.u : String(studentId);
+    db.get('SELECT is_published, announcement FROM teacher_rooms WHERE roomId = ?', [roomId], (e1, room) => {
+        db.all("SELECT id, message FROM student_warnings WHERE roomId = ? AND (studentId = ? OR REPLACE(studentId, '-', '') = REPLACE(?, '-', '')) AND status = 'unread' ORDER BY id",
+            [roomId, sid, sid], (e2, warns) => {
+                res.json({
+                    success: true, active: true,
+                    is_published: room ? Number(room.is_published) : null,
+                    announcement: room ? (room.announcement || '') : null,
+                    warnings: e2 ? [] : (warns || [])
+                });
+            });
+    });
 });
 
 // แจ้งเตือนเมื่อนักศึกษาออกจากห้องสอบ (ปิดแท็บ / กดย้อนกลับ / ออกจากระบบ)
@@ -4014,7 +4065,7 @@ app.post('/api/teacher/publish-exam', (req, res) => {
                 const dynamicPin = (cRoom && cRoom.exam_code && cRoom.exam_code.trim()) ? cRoom.exam_code.trim() : Math.floor(100000 + Math.random() * 900000).toString();
 
                 const doPublish = () => {
-                    db.run('UPDATE teacher_rooms SET is_published = 1, exam_code = ? WHERE roomId = ?', [dynamicPin, roomId], (err) => {
+                    db.run('UPDATE teacher_rooms SET is_published = 1, exam_code = ?, published_at = ? WHERE roomId = ?', [dynamicPin, String(Date.now()), roomId], (err) => {
                     if (err) return res.status(500).json({ message: err.message });
                     db.get('SELECT roomId, roomName, exam_title, exam_code FROM teacher_rooms WHERE roomId = ?', [roomId], (gErr, rData) => {
                         res.json({ 

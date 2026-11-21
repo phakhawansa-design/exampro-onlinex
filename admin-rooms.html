@@ -299,6 +299,26 @@
         .wl-proj .wl-count span { font-size: 22px; } .wl-proj .wl-count small { font-size: 17px; }
         .wl-proj .wl-list { max-height: none; }
         .wl-proj .wl-tools, .wl-proj .wl-hint { display: none; }
+        /* หน้าต่างใหญ่ขึ้น (จอคอม) */
+        @media (min-width: 761px) {
+            #publish-modal { padding: 12px !important; }
+            .wl-card:not(.wl-proj) { max-width: min(1280px, 96vw); min-height: min(760px, 90vh); max-height: 94vh; }
+            .wl-card:not(.wl-proj) .wl-body { flex: 1; gap: 22px; padding: 22px 26px 26px; }
+            .wl-card:not(.wl-proj) .wl-h-t h3 { font-size: 24px; }
+            .wl-card:not(.wl-proj) .wl-h-l p { font-size: 15.5px; }
+            .wl-card:not(.wl-proj) .wl-join { justify-content: center; padding: 30px; }
+            .wl-card:not(.wl-proj) .wl-step { font-size: 18px; justify-content: center; }
+            .wl-card:not(.wl-proj) .wl-step b { width: 30px; height: 30px; font-size: 15px; }
+            .wl-card:not(.wl-proj) .wl-pin { font-size: 84px; letter-spacing: 10px; margin: 14px 0 6px; }
+            .wl-card:not(.wl-proj) .wl-or { font-size: 15px; }
+            .wl-card:not(.wl-proj) .wl-qr { width: 270px; height: 270px; }
+            .wl-card:not(.wl-proj) .wl-count b { font-size: 46px; }
+            .wl-card:not(.wl-proj) .wl-count span { font-size: 17px; } .wl-card:not(.wl-proj) .wl-count small { font-size: 14.5px; }
+            .wl-card:not(.wl-proj) .wl-list { max-height: none; min-height: 200px; }
+            .wl-card:not(.wl-proj) .wl-row b { font-size: 15px; }
+            .wl-card:not(.wl-proj) .wl-go, .wl-card:not(.wl-proj) .wl-stop { font-size: 19px; padding: 18px; }
+            .wl-card:not(.wl-proj) .wl-tools button { font-size: 14px; padding: 11px 8px; }
+        }
         @media (max-width: 760px) {
             .wl-body { grid-template-columns: 1fr; padding: 14px; }
             .wl-h { padding: 14px; }
@@ -490,7 +510,7 @@
         <!-- Footer -->
         <footer class="border-t border-slate-200 bg-white py-3.5 px-8 text-center shrink-0">
             <p class="text-xs text-slate-500 font-medium">
-                &copy; 2026 ExamPro &middot; ทีม TEC Hope
+                &copy; 2026 ExamPro &middot; ทีม MiniVC
             </p>
         </footer>
     </div>
@@ -749,7 +769,7 @@
             <div id="dtab-view-roster" class="flex flex-col flex-1 overflow-hidden">
                 <div class="lv-tools">
                     <input id="lv-search" type="search" placeholder="ค้นหาชื่อ หรือรหัสนักศึกษา" oninput="renderLiveModalStudentsList()">
-                    <span>หลุด/ออกไปชั่วคราว = เคยเข้าห้องสอบแล้ว แต่ขาดการติดต่อเกิน 8 วินาที (ปิดจอ สลับแอป หรือเน็ตหลุด)</span>
+                    <span>หลุด/ออกไปชั่วคราว = เคยเข้าห้องสอบแล้ว แต่ขาดการติดต่อเกิน 14 วินาที (ปิดจอ สลับแอป หรือเน็ตหลุด)</span>
                 </div>
                 <div id="students-modal-list" class="lv-board"></div>
             </div>
@@ -946,7 +966,8 @@
         }
 
         // 2. ดึงข้อมูลห้องสอบทั้งหมดของอาจารย์
-        async function refreshAllRoomsData() {
+        async function refreshAllRoomsData(opt) {
+            const auto = !!(opt && opt.auto);
             try {
                 await loadCourseGroupRows(true); // จำนวนคนต่อกลุ่ม ใช้บนการ์ดห้องสอบ
                 const res = await fetch(`/api/teacher/rooms?username=${encodeURIComponent(username)}`);
@@ -967,7 +988,7 @@
                 console.error("โหลดข้อมูลห้องสอบผิดพลาด:", e);
             } finally {
                 try {
-                    renderRoomsGrid();
+                    renderRoomsGrid(auto);
                 } catch(renderErr) {
                     console.error("renderRoomsGrid error:", renderErr);
                 }
@@ -975,7 +996,7 @@
         }
 
         // 3. แสดงผลการ์ดห้องสอบแบบหลายห้อง (รองรับครู 1 คนเปิด 2 ห้องพร้อมกันคนละวิชา)
-        function renderRoomsGrid() {
+        function renderRoomsGrid(auto) {
             const container = document.getElementById('rooms-grid-container');
             const emptyState = document.getElementById('rooms-empty-state');
             const badge = document.getElementById('active-rooms-badge');
@@ -1096,7 +1117,7 @@
                 </div>
             `;
 
-            container.innerHTML = html;
+            (window.uiSetHTML || ((e, x) => { e.innerHTML = x; }))(container, html, { auto });
         }
 
         // 4. เปิดโมดอล "+ สร้างห้องสอบ" (ขั้นตอนที่ 1, 2, 3)
@@ -1483,7 +1504,7 @@
             }
 
             const actionText = "ยืนยันเริ่มการสอบทันที? (นักศึกษาจะสามารถเริ่มทำข้อสอบได้พร้อมกัน)";
-            if (!confirm(actionText)) return;
+            if (!await uiConfirm(actionText)) return;
 
             try {
                 const res = await fetch('/api/teacher/publish-exam', {
@@ -1519,7 +1540,8 @@
 
         // 8. ลบห้องสอบ
         async function deleteRoom(roomId) {
-            if (!confirm(`ยืนยันลบ/ปิดห้องสอบ ${roomId} นี้?`)) return;
+            const dr = (allRooms || []).find(r => r.roomId === roomId) || {};
+            if (!await uiConfirm(`ปิดห้องสอบ "${dr.exam_title || dr.roomName || 'ห้องนี้'}"?\n\nผลสอบและประวัติทั้งหมดยังเก็บไว้ในหน้าตรวจสอบผลการสอบและแฟ้มประวัติรวม`, { ok: 'ปิดห้องสอบ' })) return;
 
             try {
                 const res = await fetch('/api/teacher/room', {
@@ -1822,8 +1844,8 @@
         function startGlobalPolling() {
             if (globalRefreshInterval) clearInterval(globalRefreshInterval);
             globalRefreshInterval = setInterval(() => {
-                // อัปเดตข้อมูลห้องทุก 5 วินาที
-                refreshAllRoomsData();
+                // อัปเดตข้อมูลห้องทุก 5 วินาที (ไม่วาดทับขณะเมาส์อยู่บนการ์ด)
+                refreshAllRoomsData({ auto: true });
             }, 5000);
         }
 

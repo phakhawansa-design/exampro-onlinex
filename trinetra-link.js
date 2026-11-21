@@ -97,7 +97,7 @@ module.exports = function trinetraLink(app, db) {
                     students: students.length,
                     watched: students.filter(s => s.watch.leaves > 0).length,
                     events: students.reduce((t, s) => t + s.watch.leaves, 0),
-                    otherEvents: students.reduce((t, s) => t + s.watch.multi + s.watch.other, 0)
+                    otherEvents: students.reduce((t, s) => t + s.watch.gap + s.watch.multi + s.watch.other, 0)
                 }
             });
         } catch (e) { res.status(500).json({ success: false, message: e.message }); }

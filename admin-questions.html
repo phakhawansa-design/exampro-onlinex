@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>สร้างและจัดการข้อสอบ - ExamPro</title>
-    <script src="vendor/xlsx.full.min.js"></script><script>window.XLSX || document.write('<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>')</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script><script>window.XLSX || document.head.appendChild(Object.assign(document.createElement('script'), { src: 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js' }))</script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; }
@@ -593,7 +593,7 @@
                 question_img: '',
                 choices: ['', '', '', ''],
                 choices_img: ['', '', '', ''],
-                answer: 'a',
+                answer: '', // ยังไม่เลือกเฉลย: ต้องเลือกเองก่อนบันทึก (เดิมตั้ง ก. ไว้ ถ้าลืมเลือกทุกข้อจะเฉลย ก.)
                 timeLimit: 20,
                 type: 'quiz'
             };
@@ -605,8 +605,7 @@
         window.addEventListener('DOMContentLoaded', async () => {
             await loadTeacherCourses();
             await loadExistingExamForCourse();
-            // เข้ามาครั้งแรก: ถามว่ามีรายวิชาหรือยัง แล้วให้เลือกรายวิชาในหน้าต่างเดียวกัน
-            if (!activeCourseId && !new URLSearchParams(location.search).get('templateId')) showCourseCheckModal();
+            // ไม่เปิดถาม "มีรายวิชาแล้วหรือยัง" อัตโนมัติแล้ว (ขึ้นทุกครั้งที่กลับจากตัวแปลงข้อสอบ) · เลือกจากช่อง "วิชา" ด้านบน ตอนบันทึกถ้ายังไม่เลือกระบบจะเตือน
         });
 
         function showCourseCheckModal() {
@@ -792,7 +791,7 @@
                                     question_img: q.question_img || '',
                                     choices,
                                     choices_img,
-                                    answer: (q.answer || 'a').toLowerCase(),
+                                    answer: (q.answer || '').toLowerCase(),
                                     timeLimit: 20,
                                     type: 'quiz'
                                 };
@@ -844,8 +843,8 @@
             container.innerHTML = questions.map((q, idx) => {
                 const isActive = idx === activeQuestionIndex;
                 const snippet = q.question.trim() || '(คำถามว่าง...)';
-                const ansKey = (q.answer || 'a').toLowerCase();
-                const thaiAns = thaiKeys[choiceKeys.indexOf(ansKey)] || 'ก';
+                const ansKey = (q.answer || '').toLowerCase();
+                const thaiAns = thaiKeys[choiceKeys.indexOf(ansKey)] || '';
                 const hasImg = !!q.question_img;
 
                 return `
@@ -865,9 +864,9 @@
                         </div>
 
                         <div class="flex items-center justify-between mt-2 pt-1 border-t border-slate-100">
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            ${thaiAns ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
                                 เฉลย: ${thaiAns}.
-                            </span>
+                            </span>` : '<span class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-300">ยังไม่มีเฉลย</span>'}
                             ${hasImg ? '<span class="text-[11px]" title="มีรูปภาพประกอบ"></span>' : ''}
                         </div>
                     </div>
@@ -929,7 +928,7 @@
                 if (textInput) textInput.value = cur.choices[i] || '';
 
                 const key = choiceKeys[i];
-                const isCorrect = (cur.answer || 'a').toLowerCase() === key;
+                const isCorrect = (cur.answer || '').toLowerCase() === key;
 
                 if (card) {
                     if (isCorrect) {
@@ -1062,9 +1061,9 @@
             deleteQuestion(activeQuestionIndex);
         }
 
-        function deleteQuestion(idx) {
+        async function deleteQuestion(idx) {
             if (questions.length <= 1) {
-                if (confirm("ต้องการล้างข้อสอบข้อนี้ให้เป็นกระดาษเปล่าใช่หรือไม่?")) {
+                if (await uiConfirm("ต้องการล้างข้อสอบข้อนี้ให้เป็นกระดาษเปล่าใช่หรือไม่?")) {
                     questions[0] = createEmptyQuestion();
                     hasUnsavedChanges = false;
                     renderAllQuestionsList();
@@ -1072,7 +1071,7 @@
                 }
                 return;
             }
-            if (!confirm(`ยืนยันลบข้อสอบข้อที่ ${idx + 1}?`)) return;
+            if (!await uiConfirm(`ยืนยันลบข้อสอบข้อที่ ${idx + 1}?`)) return;
 
             markAsDirty();
             questions.splice(idx, 1);
@@ -1090,7 +1089,7 @@
             }
 
             const count = questions.length;
-            if (!confirm(`ยืนยันการลบข้อสอบทั้งหมดจำนวน ${count} ข้อ?\n\nข้อสอบทั้งหมดในกระดานนี้จะถูกล้างออกและเริ่มต้นใหม่เป็นกระดาษเปล่า 1 ข้อ`)) {
+            if (!await uiConfirm(`ยืนยันการลบข้อสอบทั้งหมดจำนวน ${count} ข้อ?\n\nข้อสอบทั้งหมดในกระดานนี้จะถูกล้างออกและเริ่มต้นใหม่เป็นกระดาษเปล่า 1 ข้อ`)) {
                 return;
             }
 
@@ -1188,10 +1187,11 @@
                 const ch = q.choices || [], img = q.choices_img || [];
                 const has = k => !!((ch[k] || '').trim() || img[k]);
                 const filled = ch.filter((_, k) => has(k)).length;
-                const ai = choiceKeys.indexOf((q.answer || 'a').toLowerCase());
+                const ai = choiceKeys.indexOf((q.answer || '').toLowerCase());
                 if (!(q.question || '').trim() && !q.question_img) problems.push(`ข้อ ${i + 1}: ยังไม่ได้พิมพ์โจทย์`);
                 else if (filled < 2) problems.push(`ข้อ ${i + 1}: ต้องมีตัวเลือกอย่างน้อย 2 ตัว`);
-                else if (ai < 0 || !has(ai)) problems.push(`ข้อ ${i + 1}: เฉลยเลือกไว้ที่ตัวเลือกที่ว่าง`);
+                else if (ai < 0) problems.push(`ข้อ ${i + 1}: ยังไม่ได้เลือกเฉลย`);
+                else if (!has(ai)) problems.push(`ข้อ ${i + 1}: เฉลยเลือกไว้ที่ตัวเลือกที่ว่าง`);
             });
             if (!questions.length) problems.push('ยังไม่มีข้อสอบ');
             if (problems.length) {
@@ -1236,7 +1236,9 @@
 
                 if (res.ok && data.success) {
                     markAsClean();
-                    alert(`บันทึกชุดข้อสอบเข้าสู่วิชา "${courseName}" เรียบร้อยแล้ว!\n(รวมข้อสอบทั้งสิ้น ${formatted.length} ข้อ)\n\nเมื่อต้องการเริ่มสอบจริง ให้ไปที่เมนู "ห้องสอบ" แล้วกด "+ สร้างห้องสอบ"`);
+                    // บันทึกแล้ว → ให้กดไปเปิดห้องสอบได้เลย (เลือกวิชาและชุดข้อสอบนี้ไว้ให้)
+                    const goRoom = await uiConfirm(`บันทึกชุดข้อสอบเข้าสู่วิชา "${courseName}" แล้ว (${formatted.length} ข้อ)\n\nเปิดห้องสอบด้วยชุดข้อสอบนี้เลยไหม?`, { ok: 'เปิดห้องสอบเลย', cancel: 'อยู่หน้านี้ต่อ', danger: false });
+                    if (goRoom) location.href = `admin-rooms.html?courseId=${encodeURIComponent(activeCourseId)}` + (data.templateId ? `&templateId=${encodeURIComponent(data.templateId)}` : '');
                 } else {
                     alert(`บันทึกไม่สำเร็จ: ${data.message || 'เกิดข้อผิดพลาด'}`);
                 }
@@ -1558,7 +1560,7 @@
             for (let i = newQuestions.length - 1; i >= 0; i--) {
                 const q = newQuestions[i];
                 if (!q.question || filled(q) < 2) { newQuestions.splice(i, 1); continue; }
-                Object.assign(q, { _hasAnswer: !!q.answer, question_img: '', choices_img: ['', '', '', ''], answer: q.answer || 'a', timeLimit: 20, type: 'quiz' });
+                Object.assign(q, { _hasAnswer: !!q.answer, question_img: '', choices_img: ['', '', '', ''], answer: q.answer || '', timeLimit: 20, type: 'quiz' });
                 delete q.numericChoices;
             }
 
@@ -1571,7 +1573,9 @@
                 alert("กรุณาวางข้อความที่ได้จาก AI ก่อนครับ");
                 return;
             }
-            const newQuestions = parseExamText(rawText).map(q => { delete q._hasAnswer; return q; });
+            const parsed = parseExamText(rawText);
+            const missingAns = parsed.map((q, i) => q._hasAnswer ? 0 : questions.filter(x => (x.question || '').trim()).length + i + 1).filter(Boolean);
+            const newQuestions = parsed.map(q => { delete q._hasAnswer; return q; });
 
             if (newQuestions.length === 0) {
                 alert("ไม่สามารถแปลงข้อความได้ กรุณาตรวจสอบรูปแบบข้อความให้มี ก. ข. ค. ง. และ เฉลย:");
@@ -1590,7 +1594,8 @@
             markAsDirty();
             closeAiModal();
 
-            alert(`นำเข้าข้อสอบ ${newQuestions.length} ข้อแล้ว ตรวจทานแต่ละข้อ แล้วกด "บันทึกข้อสอบ"`);
+            if (missingAns.length) uiDialog(`นำเข้าข้อสอบ ${newQuestions.length} ข้อแล้ว\n\nข้อ ${missingAns.join(', ')} ยังไม่มีเฉลย (มีป้าย "ยังไม่มีเฉลย" สีส้ม)\nกรุณาเลือกเฉลยให้ครบก่อนกดบันทึก ระบบจะไม่ใส่ ก. ให้เอง`);
+            else             alert(`นำเข้าข้อสอบ ${newQuestions.length} ข้อแล้ว ตรวจทานแต่ละข้อ แล้วกด "บันทึกข้อสอบ"`);
         }
 
         // Question Bank Modal
@@ -1654,7 +1659,7 @@
                                 question_img: q.question_img || '',
                                 choices,
                                 choices_img,
-                                answer: (q.answer || 'a').toLowerCase(),
+                                answer: (q.answer || '').toLowerCase(),
                                 timeLimit: 20,
                                 type: 'quiz'
                             };

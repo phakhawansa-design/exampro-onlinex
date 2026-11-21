@@ -302,7 +302,7 @@
         <!-- Footer -->
         <footer class="border-t border-slate-200 bg-white py-3.5 px-8 text-center shrink-0">
             <p class="text-xs text-slate-500 font-medium">
-                &copy; 2026 ExamPro &middot; ทีม TEC Hope
+                &copy; 2026 ExamPro &middot; ทีม MiniVC
             </p>
         </footer>
     </div>
@@ -616,7 +616,7 @@
             return {};
         }
 
-        function renderTimeline(logs) { lastLogs = Array.isArray(logs) ? logs : []; renderLogs(); }
+        function renderTimeline(logs) { lastLogs = Array.isArray(logs) ? logs : []; renderLogs(true); }
 
         function setLogView(v) {
             logView = v;
@@ -631,7 +631,7 @@
             if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1400); }
         }
 
-        function renderLogs() {
+        function renderLogs(auto) {
             const container = document.getElementById('live-logs-container');
             const q = (document.getElementById('mn-search')?.value || '').trim().toLowerCase().replace(/-/g, '');
             const onlyHigh = document.getElementById('mn-only-high')?.checked;
@@ -645,7 +645,7 @@
                 if (onlyHigh) list = list.filter(l => counts[keyOf(l)] >= HIGH);
                 list = [...list].sort((x, y) => String(y.time).localeCompare(String(x.time)));
                 if (!list.length) { container.innerHTML = '<div class="mn-empty">ไม่พบรายการที่ตรงกับการค้นหา</div>'; return; }
-                container.innerHTML = '<div class="mn-tl">' + list.map(l => {
+                (window.uiSetHTML || ((e, x) => { e.innerHTML = x; }))(container, '<div class="mn-tl">' + list.map(l => {
                     const c = classifyAction(l.action), n = counts[keyOf(l)] || 1;
                     return `<div class="mn-tl-row">
                         <span class="mn-tl-time">${escapeHtml(l.time || '')}</span>
@@ -655,14 +655,14 @@
                             <div class="mn-tl-act">${escapeHtml(cleanAction(l.action))}</div>
                         </div>
                     </div>`;
-                }).join('') + '</div>';
+                }).join('') + '</div>', { auto });
                 return;
             }
 
             studs = studs.filter(s => s.events.some(match));
             if (onlyHigh) studs = studs.filter(s => s.count >= HIGH);
             if (!studs.length) { container.innerHTML = '<div class="mn-empty">ไม่พบนักศึกษาที่ตรงกับการค้นหา</div>'; return; }
-            container.innerHTML = studs.map(s => {
+            (window.uiSetHTML || ((e, x) => { e.innerHTML = x; }))(container, studs.map(s => {
                 const lv = lvOf(s.count), open = expandedStudents.has(s.key), c = classifyAction(s.last.action);
                 const kinds = {}; s.events.forEach(e => { const k = classifyAction(e.action); kinds[k.k] = kinds[k.k] || { ...k, n: 0 }; kinds[k.k].n++; });
                 return `<div class="mn-st lv-${lv} ${open ? 'open' : ''}" data-k="${escapeHtml(s.key)}">
@@ -682,7 +682,7 @@
                     </div>
                     ${open ? `<ol class="mn-hist">${s.events.map(e => { const k = classifyAction(e.action); return `<li><span class="mn-tl-time">${escapeHtml(e.time || '')}</span><span class="mn-ev mn-ev-${k.k}">${k.ic}</span><span>${escapeHtml(cleanAction(e.action))}</span></li>`; }).join('')}</ol>` : ''}
                 </div>`;
-            }).join('');
+            }).join(''), { auto });
         }
 
         async function sendDirectWarning(studentId, name, roomId) {
@@ -705,7 +705,7 @@
         }
         async function clearCheatLogs() {
             if (currentRoomId === 'ALL') { alert('กรุณาเลือกห้องสอบก่อนล้างบันทึกครับ'); return; }
-            if (!confirm(`ล้างบันทึกของห้องนี้ออกจากหน้าตรวจสอบพฤติกรรม?
+            if (!await uiConfirm(`ล้างบันทึกของห้องนี้ออกจากหน้าตรวจสอบพฤติกรรม?
 
 ประวัติการสลับหน้าจอยังเก็บไว้ครบใน "แฟ้มประวัติรวม" และประวัตินักศึกษา`)) return;
             try {

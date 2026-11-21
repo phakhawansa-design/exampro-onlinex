@@ -70,6 +70,17 @@
     <link rel="stylesheet" href="theme.css">
     <script src="theme.js" defer></script>
     <link rel="stylesheet" href="tailwind.css">
+    <style>
+        /* จอแคบ (≤360px): แท็บไม่ขึ้นหลายบรรทัด แบนเนอร์ไม่กินจอแรก */
+        @media (max-width: 360px) {
+            .tab-btn { font-size: 12.5px !important; padding-left: 4px !important; padding-right: 4px !important; white-space: nowrap; }
+            main > .glass-card:first-child { padding: 14px !important; }
+            #banner-student-name { font-size: 18px !important; }
+        }
+        .tab-btn { white-space: nowrap; }
+        button[onclick="logoutStudent()"] { white-space: nowrap; flex: none; }
+        @media (max-width: 360px) { button[onclick="logoutStudent()"] { padding: 8px 10px !important; } }
+    </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
@@ -96,7 +107,7 @@
             </div>
 
             <!-- Logout Button -->
-            <button onclick="logoutStudent()"
+            <button onclick="logoutStudent()" aria-label="ออกจากระบบ" title="ออกจากระบบ"
                 class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5 active:scale-95">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/></svg>
                 <span class="hidden sm:inline">ออกจากระบบ</span>
@@ -126,24 +137,19 @@
                     </div>
                 </div>
 
-                <div class="flex gap-2 w-full sm:w-auto">
-                    <button onclick="switchTab('exam')" class="flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r from-cyan-600 to-indigo-600 text-white rounded-xl text-xs font-bold shadow-md shadow-cyan-500/20 active:scale-95 transition">
-                        เข้าห้องสอบ
-                    </button>
-                </div>
             </div>
         </div>
 
         <!-- Tab Navigation Buttons -->
         <div class="flex p-1.5 bg-slate-100 border border-slate-200 rounded-2xl max-w-xl mx-auto select-none gap-1.5 shadow-inner">
             <button id="tab-btn-exam" onclick="switchTab('exam')" class="tab-btn active flex-1 py-2.5 text-xs sm:text-sm font-semibold rounded-xl transition flex items-center justify-center gap-1.5">
-                เข้าห้องสอบ / รอสอบ
+                เข้าสอบ
             </button>
             <button id="tab-btn-history" onclick="switchTab('history')" class="tab-btn flex-1 py-2.5 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-800 rounded-xl transition flex items-center justify-center gap-1.5">
-                ประวัติการสอบ
+                ประวัติสอบ
             </button>
             <button id="tab-btn-profile" onclick="switchTab('profile')" class="tab-btn flex-1 py-2.5 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-800 rounded-xl transition flex items-center justify-center gap-1.5">
-                แก้ไขข้อมูลส่วนตัว
+                ข้อมูลส่วนตัว
             </button>
         </div>
 
@@ -453,11 +459,13 @@
                 const data = await res.json();
 
                 if (!res.ok || !data.success) {
-                    alert(`ปฏิเสธการเข้าสอบ:\n\n${data.message || 'ไม่สามารถเข้าห้องสอบนี้ได้'}`);
+                    alert(`เข้าห้องสอบไม่ได้\n\n${data.message || 'ไม่สามารถเข้าห้องสอบนี้ได้'}`);
                     // อยู่ที่หน้าหลักนักศึกษาต่อ (ไม่ส่งกลับหน้าเข้าสู่ระบบ ซึ่งจะวนกลับมาเจอข้อความเดิมซ้ำ)
                     const params = new URLSearchParams(window.location.search);
                     if (params.get('code') || params.get('pin')) history.replaceState(null, '', 'student-portal.html');
-                    document.getElementById('join-exam-pin').value = '';
+                    // เก็บตัวเลขไว้ แล้วเลือกทั้งช่อง พิมพ์ทับได้เลย (เดิมล้างทิ้ง ต้องพิมพ์ใหม่ทั้ง 6 หลัก)
+                    const pinEl = document.getElementById('join-exam-pin');
+                    if (pinEl) { pinEl.focus(); pinEl.select(); }
                     return;
                 }
 
@@ -500,7 +508,7 @@
 
             document.getElementById('wait-student-identity').innerHTML = `<span>✔</span> <span>${escapeHtml(stName)} (${escapeHtml(stId)}) • ${escapeHtml(stCls)}</span>`;
 
-            // Start polling every 2 seconds to check if teacher published
+            // ถามทุก 4 วินาทีว่าอาจารย์เริ่มสอบหรือยัง
             if (waitingRoomInterval) clearInterval(waitingRoomInterval);
             waitingRoomInterval = setInterval(async () => {
                 try {
@@ -522,7 +530,7 @@
                 } catch(e) {
                     console.error('Polling publish status error:', e);
                 }
-            }, 2000);
+            }, 4000); // ทุก 4 วินาที (เดิม 2) ลดภาระเซิร์ฟเวอร์ตอนนักศึกษารอพร้อมกันทั้งห้อง
         }
 
         function cancelWaitingRoom() {
@@ -595,7 +603,7 @@
                             <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">
                                 ✔ ส่งเรียบร้อย
                             </span>
-                            ${hasScore ? `<a href="finish.html?roomId=${encodeURIComponent(item.roomId)}&score=${encodeURIComponent(item.score)}&maxScore=${encodeURIComponent(item.maxScore)}&showScore=1&studentName=${encodeURIComponent(currentStudent.name || ((currentStudent.firstName || '') + ' ' + (currentStudent.lastName || '')).trim())}&studentId=${encodeURIComponent(currentStudent.studentId)}#rv" style="display:block;margin-top:6px;font-size:12px;font-weight:700;color:#1d5fd6;text-decoration:underline">ดูผลรายข้อ</a>` : ''}
+                            ${hasScore ? `<a href="finish.html?roomId=${encodeURIComponent(item.roomId)}" style="display:block;margin-top:6px;font-size:12px;font-weight:700;color:#1d5fd6;text-decoration:underline">ดูผลรายข้อ</a>` : ''}
                         </td>
                     </tr>
                 `;

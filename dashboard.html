@@ -466,7 +466,7 @@
     <!-- Footer -->
     <footer class="border-t border-slate-200 bg-white py-3.5 px-8 text-center">
         <p class="text-xs text-slate-500 font-medium">
-            &copy; 2026 ExamPro &middot; ทีม TEC Hope
+            &copy; 2026 ExamPro &middot; ทีม MiniVC
         </p>
     </footer>
 </div>
@@ -524,7 +524,8 @@
     let DB = { courses: [], rooms: [] };
     let refreshTimer = null;
 
-    async function loadDashboardData() {
+    async function loadDashboardData(opt) {
+        const __autoRefresh = !!(opt && opt.auto);
         const u = encodeURIComponent(teacherUsername);
         const [coursesR, roomsR, studentsR, liveR, resultsR, cheatsR] = await Promise.all([
             J(`/api/teacher/courses?username=${u}`), J(`/api/teacher/rooms?username=${u}`), J('/api/students'),
@@ -561,7 +562,7 @@
                 <p>${hasRoomReady ? 'มีห้องสอบที่พร้อมแล้ว เปิดห้องเพื่อรับรหัสเข้าสอบ 6 หลัก แล้วให้นักศึกษากรอกเพื่อเข้าสอบ' : 'เปิดห้องสอบเพื่อรับรหัสเข้าสอบ 6 หลัก แล้วให้นักศึกษากรอกเพื่อเข้าสอบได้ทันที'}</p>
                 <a href="admin-rooms.html" class="db-btn db-pri">เปิดห้องสอบ</a></div>`;
         } else {
-            liveBox.innerHTML = live.map(r => {
+            (window.uiSetHTML || ((e, x) => { e.innerHTML = x; }))(liveBox, live.map(r => {
                 const c = courseOf(r.courseId);
                 const st = liveMap[r.roomId] || {}, ls = liveSum[r.roomId];
                 let sub, act, away, notIn, total, enrolled;
@@ -609,7 +610,7 @@
                         <button type="button" class="db-btn db-close" onclick="closeLiveRoom('${esc(r.roomId)}', this)">ปิดห้องสอบ</button>
                     </div>
                 </section>`;
-            }).join('');
+            }).join(''), { auto: __autoRefresh });
         }
 
         // ===== ห้องสอบอื่น (ยังไม่เปิด) =====
@@ -697,12 +698,12 @@
 
         // ห้องกำลังสอบ → อัปเดตทุก 20 วินาที
         clearTimeout(refreshTimer);
-        if (live.length) refreshTimer = setTimeout(() => { if (!document.hidden) loadDashboardData(); else refreshTimer = setTimeout(loadDashboardData, 20000); }, 20000);
+        if (live.length) refreshTimer = setTimeout(() => { if (!document.hidden) loadDashboardData({ auto: true }); else refreshTimer = setTimeout(() => loadDashboardData({ auto: true }), 20000); }, 20000);
     }
 
     // ปิดห้องสอบจากหน้าหลัก (ถามยืนยันก่อน) · ผลสอบและประวัติยังอยู่ครบ
     async function closeLiveRoom(roomId, btn) {
-        if (!confirm('ปิดห้องสอบนี้ใช่ไหม?\n\nนักศึกษาที่ยังไม่ส่งจะเข้าสอบต่อไม่ได้ ผลสอบที่ส่งแล้วและประวัติยังเก็บไว้ครบ')) return;
+        if (!await uiConfirm('ปิดห้องสอบนี้ใช่ไหม?\n\nนักศึกษาที่ยังไม่ส่งจะเข้าสอบต่อไม่ได้ ผลสอบที่ส่งแล้วและประวัติยังเก็บไว้ครบ')) return;
         if (btn) { btn.disabled = true; btn.textContent = 'กำลังปิด…'; }
         try {
             const r = await fetch('/api/teacher/publish-exam', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ roomId, publish: false }) });

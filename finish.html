@@ -173,11 +173,12 @@
     </style>
 
     <script>
+        window.__resultReady = d => { if (window.__applyResult) window.__applyResult(d); else window.__pendingResult = d; };
         // ===== ผลรายข้อ =====
         (function () {
             const p = new URLSearchParams(location.search);
             const roomId = p.get('roomId');
-            if (!roomId || p.get('showScore') === '0') return;
+            if (!roomId) return;
             const TH = { a: 'ก', b: 'ข', c: 'ค', d: 'ง', e: 'จ', f: 'ฉ', g: 'ช', h: 'ซ', i: 'ฌ', j: 'ญ' };
             const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
             let data = null, filter = 'all';
@@ -202,8 +203,9 @@
                 document.querySelectorAll('#rv-tabs button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
                 render();
             });
-            fetch('/api/student/result-detail?roomId=' + encodeURIComponent(roomId)).then(r => r.ok ? r.json() : null).then(d => {
-                if (!d) return;
+            fetch('/api/student/result-detail?roomId=' + encodeURIComponent(roomId)).then(r => r.ok ? r.json() : r.json().then(x => ({ __error: r.status, message: x && x.message })).catch(() => ({ __error: r.status }))).then(d => {
+                window.__resultReady(d);
+                if (!d || d.__error) return;
                 // ชื่อห้องสอบ: แสดงชื่อข้อสอบแทนรหัสห้อง
                 const room = document.getElementById('display-room');
                 if (room && (d.examTitle || d.courseName)) room.textContent = d.examTitle || d.courseName;
@@ -221,7 +223,7 @@
                 box.hidden = false;
                 render();
                 if (!d.closed) box.insertAdjacentHTML('beforeend', '<p class="rvx-note">เฉลยของแต่ละข้อจะแสดงหลังอาจารย์ปิดห้องสอบ (เพื่อไม่ให้เฉลยไปถึงเพื่อนที่ยังสอบอยู่) · กลับมาดูได้ที่หน้าหลักนักศึกษา › ประวัติการสอบ</p>');
-            }).catch(() => {});
+            }).catch(() => window.__resultReady(null));
         })();
 
         function getUrlParams() {
@@ -249,27 +251,42 @@
                 return;
             }
 
-            document.getElementById('display-name').textContent = params.studentName || 'ไม่ระบุชื่อ';
-            document.getElementById('display-id').textContent = params.studentId || '-';
-            document.getElementById('display-room').textContent = params.roomId || '-';
-
-            const score = parseInt(params.score) || 0;
-            const maxScore = parseInt(params.maxScore) || 1;
-            const showScore = parseInt(params.showScore) === 1;
-
             const teaseEl = document.getElementById('teasing-quote');
             const emojiEl = document.getElementById('mascot-emoji');
+            document.getElementById('display-name').textContent = 'กำลังโหลด…';
+            document.getElementById('display-id').textContent = '-';
+            document.getElementById('display-room').textContent = '-';
 
-            if (showScore) {
+            // ข้อมูลทั้งหมดมาจากเซิร์ฟเวอร์ตามบัญชีที่เข้าสู่ระบบ (แก้ตัวเลขใน URL ไม่มีผล)
+            window.__applyResult = function (d) {
+                if (!d || d.__error) {
+                    document.getElementById('display-name').textContent = '-';
+                    emojiEl.textContent = '';
+                    teaseEl.textContent = d && d.__error === 401
+                        ? 'กรุณาเข้าสู่ระบบก่อน แล้วดูผลสอบได้ที่หน้าหลักนักศึกษา › ประวัติการสอบ'
+                        : (d && d.message) || 'ยังโหลดผลสอบไม่ได้ ดูได้ที่หน้าหลักนักศึกษา › ประวัติการสอบ';
+                    return;
+                }
+                document.getElementById('display-name').textContent = d.name || 'ไม่ระบุชื่อ';
+                document.getElementById('display-id').textContent = d.studentId || '-';
+                document.getElementById('display-room').textContent = d.examTitle || d.courseName || '-';
+                emojiEl.textContent = '';
+                if (d.hidden || d.score === undefined || d.score === null) {
+                const hiddenQuotes = [
+                    "ส่งกระดาษคำตอบสำเร็จ! แต่คะแนนเป็นความลับระดับสุดยอด (Top Secret) รอลุ้นเกรดเอาเองนะ ถ้าอาจารย์ไม่อ่านการ์ตูนจนลืมตรวจ! ",
+                    "ทำข้อสอบเสร็จแล้วก็รีบปิดคอมพ์ไปวิ่งเล่นข้างนอกซะ! คะแนนของคุณปลอดภัยในระบบดี... (มั้งนะ )",
+                    "บันทึกผลสอบเข้าระบบเรียบร้อย! ส่วนคะแนนนั้น... ลอยอยู่ในหลุมดำ รออาจารย์ปล่อยคิวเฉลยรอบหน้าทีเดียวนะจ๊ะ "
+                ];
+                    teaseEl.textContent = hiddenQuotes[Math.floor(Math.random() * hiddenQuotes.length)];
+                    return;
+                }
+                const score = Number(d.score) || 0;
+                const maxScore = Number(d.maxScore) || 1;
                 document.getElementById('score-section').classList.remove('hidden');
                 document.getElementById('score-num').textContent = score;
                 document.getElementById('max-score-num').textContent = maxScore;
-                
                 const percent = Math.min(100, Math.max(0, (score / maxScore) * 100));
-                setTimeout(() => {
-                    document.getElementById('score-bar-fill').style.width = `${percent}%`;
-                }, 300);
-
+                setTimeout(() => { document.getElementById('score-bar-fill').style.width = `${percent}%`; }, 300);
                 if (percent === 100) {
                     emojiEl.textContent = "";
                     teaseEl.textContent = "กราบแทบตักคุณพี่ศิษย์เอก! หัวดีเกินมนุษย์ขนาดนี้ ลอกเพื่อนนั่งข้างๆ มาป่ะเนี่ย หรือจารย์เฉลยข้อสอบรั่ว? ";
@@ -283,17 +300,8 @@
                     emojiEl.textContent = "";
                     teaseEl.textContent = "สอบตกจ้า! นี่คะแนนสอบหรือคะแนนความน่าจะเป็นของอุณหภูมิห้องห้องปรับอากาศ? ต่ำเตี้ยเรี่ยราดปวดใจจี๊ดเลยเพื่อน! ";
                 }
-            } else {
-                emojiEl.textContent = "";
-                
-                const hiddenQuotes = [
-                    "ส่งกระดาษคำตอบสำเร็จ! แต่คะแนนเป็นความลับระดับสุดยอด (Top Secret) รอลุ้นเกรดเอาเองนะ ถ้าอาจารย์ไม่อ่านการ์ตูนจนลืมตรวจ! ",
-                    "ทำข้อสอบเสร็จแล้วก็รีบปิดคอมพ์ไปวิ่งเล่นข้างนอกซะ! คะแนนของคุณปลอดภัยในระบบดี... (มั้งนะ )",
-                    "บันทึกผลสอบเข้าระบบเรียบร้อย! ส่วนคะแนนนั้น... ลอยอยู่ในหลุมดำ รออาจารย์ปล่อยคิวเฉลยรอบหน้าทีเดียวนะจ๊ะ "
-                ];
-                const randomQuoteIndex = (score + maxScore) % hiddenQuotes.length;
-                teaseEl.textContent = hiddenQuotes[randomQuoteIndex];
-            }
+            };
+            if (window.__pendingResult !== undefined) window.__applyResult(window.__pendingResult);
         });
     </script>
 </body>

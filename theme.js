@@ -61,7 +61,66 @@
       document.body.appendChild(d); setTimeout(() => d.querySelector('button').focus(), 20);
     });
   }
-  window.uiToast = toast; window.uiDialog = dialog;
+  // ยืนยันการทำงานแบบกล่องในหน้าเว็บ (แทน confirm() ของเบราว์เซอร์)
+  // เดิม confirm() ถูกบางเบราว์เซอร์บล็อก → คืนค่า false ทันที ปุ่มอย่าง "เริ่มสอบ" กดแล้วไม่เกิดอะไร
+  // ใช้: if (!(await uiConfirm('ข้อความ'))) return;   · ตัวเลือก { ok: 'ลบ', cancel: 'ยกเลิก', danger: true }
+  function confirmBox(msg, opt) {
+    opt = opt || {};
+    const text = String(msg == null ? '' : msg);
+    const danger = opt.danger !== undefined ? opt.danger : /ลบ|ล้าง|ระงับ|ปฏิเสธ|ปิดห้อง|หยุด|ถาวร/.test(text);
+    return new Promise(resolve => ready(() => {
+      mount();
+      if (!document.getElementById('ui-cf-css')) {
+        const st = document.createElement('style'); st.id = 'ui-cf-css';
+        st.textContent = `.ui-cf .ui-cf-row{display:flex;gap:10px;margin-top:16px}.ui-cf .ui-cf-row button{margin:0;flex:1;min-height:44px}
+        .ui-cf .ui-cf-no{background:#eef2f8;color:#0f172a}.ui-cf .ui-cf-ok.danger{background:#dc2626}
+        .ui-cf button:focus-visible{outline:3px solid #ff9a3c;outline-offset:2px}
+        @media (max-width:560px){.ui-dlg.ui-cf{align-items:flex-end;padding:0}.ui-dlg.ui-cf>div{max-width:none;border-radius:20px 20px 0 0;padding-bottom:calc(16px + env(safe-area-inset-bottom))}}`;
+        document.head.appendChild(st);
+      }
+      const prevFocus = document.activeElement;
+      const d = document.createElement('div'); d.className = 'ui-dlg ui-cf'; d.setAttribute('role', 'alertdialog'); d.setAttribute('aria-modal', 'true');
+      d.innerHTML = '<div><span id="ui-cf-msg"></span><div class="ui-cf-row"><button type="button" class="ui-cf-no"></button><button type="button" class="ui-cf-ok"></button></div></div>';
+      d.setAttribute('aria-describedby', 'ui-cf-msg');
+      d.querySelector('span').textContent = text;
+      const ok = d.querySelector('.ui-cf-ok'), no = d.querySelector('.ui-cf-no');
+      ok.textContent = opt.ok || 'ยืนยัน'; no.textContent = opt.cancel || 'ยกเลิก';
+      if (danger) ok.classList.add('danger');
+      const done = v => { d.remove(); window.__inDialog = false; try { prevFocus && prevFocus.focus && prevFocus.focus(); } catch (e) {} resolve(v); };
+      ok.addEventListener('click', () => done(true)); no.addEventListener('click', () => done(false));
+      d.addEventListener('click', e => { if (e.target === d) done(false); });
+      d.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { e.preventDefault(); done(false); }
+        if (e.key === 'Tab') { e.preventDefault(); (document.activeElement === ok ? no : ok).focus(); }
+      });
+      window.__inDialog = true;
+      document.body.appendChild(d); setTimeout(() => (danger ? no : ok).focus(), 20);
+    }));
+  }
+  // วาดรายการใหม่อย่างนุ่มนวล: ข้อมูลไม่เปลี่ยน → ไม่วาด · รีเฟรชอัตโนมัติระหว่างที่เมาส์/โฟกัสอยู่ในรายการ → รอจนออกก่อน
+  // (เดิมวาดใหม่ทุก 3–5 วินาที ปุ่มที่กำลังจะกดถูกแทนที่ และแถวที่กางไว้หุบเอง)
+  // ใช้: uiSetHTML(el, html, { auto: true })  · auto = มาจากตัวจับเวลา · การกดของผู้ใช้ไม่ต้องใส่ (วาดทันที)
+  function setHTML(el, html, opt) {
+    if (!el) return false;
+    const auto = opt && opt.auto;
+    if (el.__uiHtml === html && el.innerHTML !== '') return false;
+    const busy = () => el.matches(':hover') || el.contains(document.activeElement) || !!document.querySelector('.ui-cf');
+    if (auto && el.__uiHtml !== undefined && busy()) {
+      el.__uiPending = html;
+      if (!el.__uiWait) {
+        el.__uiWait = setInterval(() => {
+          if (el.__uiPending === undefined) { clearInterval(el.__uiWait); el.__uiWait = null; return; }
+          if (busy()) return;
+          const p = el.__uiPending; el.__uiPending = undefined; clearInterval(el.__uiWait); el.__uiWait = null;
+          el.innerHTML = p; el.__uiHtml = p;
+        }, 700);
+      }
+      return false;
+    }
+    el.__uiPending = undefined;
+    el.innerHTML = html; el.__uiHtml = html; return true;
+  }
+  window.uiToast = toast; window.uiDialog = dialog; window.uiConfirm = confirmBox; window.uiSetHTML = setHTML;
   window.alert = function (m) {
     const s = String(m == null ? '' : m);
     if (s.length > 160 || /\n\s*\n/.test(s)) dialog(s); else toast(s);
@@ -162,7 +221,9 @@
     // 1) อีโมจิในข้อความ
     const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
     const list = []; let t;
-    while ((t = w.nextNode())) { EMO.lastIndex = 0; if (EMO.test(t.nodeValue) && t.parentElement && !SKIP.test(t.parentElement.tagName)) list.push(t); }
+    // เนื้อหาข้อสอบ (โจทย์/ตัวเลือก/คำตอบ) ที่อาจารย์พิมพ์เอง ต้องแสดงตามจริง รวมอีโมจิ — ลบเฉพาะอีโมจิประดับของหน้าเว็บ
+    const KEEP = '[data-keep-emoji],#questions-container,#questions-list-container,#rv-list,#modal-answer-sheet-content,#item-analysis-body,#answer-sheet-modal,#library-modal';
+    while ((t = w.nextNode())) { EMO.lastIndex = 0; if (EMO.test(t.nodeValue) && t.parentElement && !SKIP.test(t.parentElement.tagName) && !t.parentElement.closest(KEEP)) list.push(t); }
     list.forEach(n => { n.nodeValue = clean(n.nodeValue); if (!n.nodeValue.trim()) hideEmpty(n.parentElement); });
     document.querySelectorAll('input[placeholder],textarea[placeholder]').forEach(i => { const p = i.getAttribute('placeholder'); EMO.lastIndex = 0; if (EMO.test(p)) i.setAttribute('placeholder', clean(p)); });
     EMO.lastIndex = 0; if (EMO.test(document.title)) document.title = clean(document.title);

@@ -136,7 +136,7 @@ td:first-child{white-space:nowrap}
       </select>
       <label><input type="checkbox" id="only"> เฉพาะคนที่มีประวัติสลับหน้าจอ</label>
     </div>
-    <p class="note"><span class="chip c-sum">สลับหน้าจอรวม</span> = <span class="chip c-switch">สลับแอป/แท็บ</span> + <span class="chip c-fs">ออกเต็มจอ</span> + <span class="chip c-gap">หายจากหน้าสอบ</span> · เหตุการณ์อื่น (ไม่นับรวม): <span class="chip c-multi">หลายเครื่อง</span> <span class="chip c-ans">ตอบ/แก้หลังกลับมา</span> · ใช้ประกอบการพิจารณาเท่านั้น การสลับหน้าจอไม่ได้แปลว่าทุจริตเสมอ (เช่น เน็ตหลุด มีสายเรียกเข้า)</p>
+    <p class="note"><span class="chip c-sum">สลับหน้าจอรวม</span> = <span class="chip c-switch">สลับแอป/แท็บ</span> + <span class="chip c-fs">ออกเต็มจอ</span> · ไม่นับรวม: <span class="chip c-gap">สัญญาณขาด</span> (อาจเน็ตหลุด/รีเฟรช/จอดับ) <span class="chip c-multi">หลายเครื่อง</span> <span class="chip c-ans">ตอบ/แก้หลังกลับมา</span> · ใช้ประกอบการพิจารณาเท่านั้น การสลับหน้าจอไม่ได้แปลว่าทุจริตเสมอ (เช่น เน็ตหลุด มีสายเรียกเข้า)</p>
     <div class="tw" id="tw"><div class="empty">เลือกรายวิชาเพื่อดูรายงาน</div></div>
   </div>
 </main>
@@ -146,7 +146,7 @@ td:first-child{white-space:nowrap}
   if (!U) { location.href = 'login.html'; return; }
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const KIND = { switch: ['สลับแอป/แท็บ', 'c-switch'], fs: ['ออกเต็มจอ', 'c-fs'], gap: ['หายจากหน้าสอบ', 'c-gap'], multi: ['หลายเครื่อง', 'c-multi'], other: ['อื่น ๆ', 'c-other'], answer: ['ตอบ/แก้หลังกลับมา', 'c-ans'] };
+  const KIND = { switch: ['สลับแอป/แท็บ', 'c-switch'], fs: ['ออกเต็มจอ', 'c-fs'], gap: ['สัญญาณขาด', 'c-gap'], multi: ['หลายเครื่อง', 'c-multi'], other: ['อื่น ๆ', 'c-other'], answer: ['ตอบ/แก้หลังกลับมา', 'c-ans'] };
   let data = null, open = new Set();
 
   async function api(url) {
@@ -215,7 +215,7 @@ td:first-child{white-space:nowrap}
   function csv() {
     if (!data) return;
     const cols = data.columns, q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
-    const head = ['รหัส', 'ชื่อ-สกุล', 'ชั้นเรียน', ...cols.map(c => `ปรนัย: ${c.label} (/${c.max})`), `รวม (/${data.totalMax})`, 'ร้อยละ', 'สลับหน้าจอรวม (ครั้ง)', '- สลับแอป/แท็บ', '- ออกเต็มจอ', '- หายจากหน้าสอบ', 'เปิดหลายเครื่อง', 'ตอบ/แก้หลังกลับมา', 'รายละเอียดการสลับหน้าจอ'];
+    const head = ['รหัส', 'ชื่อ-สกุล', 'ชั้นเรียน', ...cols.map(c => `ปรนัย: ${c.label} (/${c.max})`), `รวม (/${data.totalMax})`, 'ร้อยละ', 'สลับหน้าจอรวม (ครั้ง)', '- สลับแอป/แท็บ', '- ออกเต็มจอ', 'สัญญาณขาด (ไม่นับรวม)', 'เปิดหลายเครื่อง', 'ตอบ/แก้หลังกลับมา', 'รายละเอียดการสลับหน้าจอ'];
     const lines = [head, ...rows().map(s => [s.studentId, s.name, s.class, ...cols.map(c => s.scores[c.key] ?? ''), s.total, s.percent ?? '', s.watch.leaves, s.watch.switch, s.watch.fs, s.watch.gap, s.watch.multi, s.watch.answer,
       s.watch.events.map(e => `[${e.room} ${e.time}] ${e.action}`).join(' | ')])];
     const blob = new Blob(['﻿' + lines.map(r => r.map(q).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' });

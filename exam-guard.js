@@ -198,7 +198,7 @@ module.exports = function examGuard(app, db) {
             if (state === 'in_exam' && prev && prev.state === 'in_exam' && prev.vis !== 'hidden'
                 && now - prev.t > GAP_MS && (lastCheat.get(k) || 0) < prev.t) {
                 const sec = Math.round((now - prev.t) / 1000);
-                const action = `หายจากหน้าสอบประมาณ ${sec} วินาที (พับแอป/ล็อกจอ/สลับแอป หรือเน็ตหลุด)`;
+                const action = `สัญญาณขาดประมาณ ${sec} วินาที (อาจเน็ตหลุด รีเฟรชหน้า จอดับ หรือพับแอป · ไม่นับเป็นการสลับหน้าจอ)`;
                 const gapFrom = prev.t, time = thaiTime(), info = [String(b.roomId), String(b.studentId).trim(), b.name || '', b.class || ''];
                 // รอสักครู่ก่อนบันทึก: ตอนกลับเข้าหน้าสอบ หน้าสอบจะส่ง "ออกจากหน้าข้อสอบ …" มาเอง (แม่นกว่า)
                 // ถ้าสัญญาณชีพมาถึงก่อนรายงานนั้น เดิมจะได้ 2 แถวจากการออกครั้งเดียว (นับซ้ำ)

@@ -114,18 +114,23 @@
             
             '.ts-def{border:0;background:#fff1e4;border-radius:8px;padding:3px 8px;font-family:inherit;font-size:12px;font-weight:700;color:#b4500c;cursor:pointer}.top .ts-def{background:rgba(255,255,255,.15);color:#ffd0a6}' +
             '.ts-clear{border:0;background:none;padding:2px 4px;font-family:inherit;font-size:12px;font-weight:700;color:#1d5fd6;text-decoration:underline;cursor:pointer}' +
-            '@media (max-width:640px){.ts-sel{font-size:16px;padding:6px 28px 6px 10px}}';
+            '.ts-chip{display:none;border:1.5px solid #cbd5e1;background:#fff;border-radius:99px;padding:4px 12px;font-family:inherit;font-size:13px;font-weight:800;color:#0b2a7a;cursor:pointer}' +
+            '@media (max-width:640px){.ts-sel{font-size:16px;padding:6px 28px 6px 10px}.ts-chip{display:inline-flex}.ts-bar:not(.open)>:not(.ts-chip){display:none!important}.ts-bar.open{display:flex;width:100%}}';
         document.head.appendChild(st);
     }
     function build() {
         const box = document.createElement('div');
         box.className = 'ts-bar' + (active() ? ' on' : '');
         box.setAttribute('role', 'group'); box.setAttribute('aria-label', 'เลือกปีการศึกษาและภาคเรียน');
+        const chipText = (scope.t === 'all' ? 'ทุกภาค' : (scope.t === '3' ? 'ฤดูร้อน' : scope.t === '4' ? 'พิเศษ' : scope.t)) + '/' + (scope.y === 'all' ? 'ทุกปี' : scope.y);
         box.innerHTML =
+            '<button type="button" class="ts-chip" aria-expanded="false" title="เปลี่ยนปีการศึกษา/ภาคเรียน">' + chipText + ' ▾</button>' +
             '<label for="ts-year">ปีการศึกษา</label><select id="ts-year" class="ts-sel"><option value="all">ทุกปี</option>' + YEARS.map(y => '<option value="' + y + '">' + y + '</option>').join('') + '</select>' +
             '<label for="ts-term">ภาค</label><select id="ts-term" class="ts-sel"><option value="all">ทุกภาค</option>' + Object.keys(TERMS).map(k => '<option value="' + k + '">' + TERMS[k] + '</option>').join('') + '</select>' +
             (!isDefault() && (def.y !== 'all' || def.t !== 'all') ? '<button type="button" class="ts-def" title="กลับไปใช้ปี/ภาคที่ผู้ดูแลระบบตั้งไว้">ค่าเริ่มต้น</button>' : '') +
             (active() ? '<button type="button" class="ts-clear">ดูทั้งหมด</button>' : '');
+        const chip = box.querySelector('.ts-chip');
+        chip.onclick = () => { const o = box.classList.toggle('open'); chip.setAttribute('aria-expanded', String(o)); chip.textContent = o ? 'ปิด ▴' : chipText + ' ▾'; };
         box.querySelector('#ts-year').value = scope.y;
         box.querySelector('#ts-term').value = scope.t;
         box.querySelector('#ts-year').onchange = e => set(e.target.value, scope.t);

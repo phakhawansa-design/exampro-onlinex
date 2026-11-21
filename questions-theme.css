@@ -208,3 +208,10 @@
 .choice-card.is-correct .choice-badge, .correct-toggle-btn.active { background-color: #047857 !important; border-color: #047857 !important; }
 /* ช่องพิมพ์ตัวเลือก: สูงพอให้นิ้วแตะง่าย */
 .choice-card input[type="text"] { min-height: 36px; }
+
+/* แถบรายการข้อ (คอม/แท็บเล็ต): ความกว้างคงที่ · คลาส w-68/w-76/w-80 ไม่มีใน tailwind.css ที่ build ไว้
+   โจทย์ยาวมากเคยดันแถบนี้กว้างหลายพันพิกเซล จนส่วนแก้ไขข้อสอบหายไป */
+@media (min-width: 768px) {
+  .qx-qlist { width: 300px !important; min-width: 300px; max-width: 300px; }
+}
+.qx-qlist .slide-item, .qx-qlist .slide-item * { min-width: 0; overflow-wrap: anywhere; word-break: break-word; }

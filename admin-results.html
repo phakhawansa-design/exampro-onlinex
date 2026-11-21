@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>จัดการผลสอบและคะแนนนักศึกษา - ExamPro</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script src="vendor/xlsx.full.min.js"></script><script>window.XLSX || document.write('<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>')</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script><script>window.XLSX || document.head.appendChild(Object.assign(document.createElement('script'), { src: 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js' }))</script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         html { font-size: 100%; -webkit-text-size-adjust: 100%; }
@@ -516,7 +516,7 @@
         <!-- Footer -->
         <footer class="border-t border-slate-200 bg-white py-3.5 px-8 text-center shrink-0">
             <p class="text-xs text-slate-500 font-medium">
-                &copy; 2026 ExamPro &middot; ทีม TEC Hope
+                &copy; 2026 ExamPro &middot; ทีม MiniVC
             </p>
         </footer>
     </div>
@@ -817,6 +817,7 @@
 
             if (filteredList.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="8" class="rs-empty">${q ? 'ไม่พบนักศึกษาที่ตรงกับคำค้นหา' : (rawResultsData.length ? 'ยังไม่มีผลคะแนนในชั้นเรียนที่เลือก' : 'ชุดข้อสอบนี้ยังไม่มีนักศึกษาส่งคำตอบ')}</td></tr>`;
+                iaGen++;
                 document.getElementById('item-analysis-box').classList.add('hidden');
                 return;
             }
@@ -955,7 +956,7 @@
             const roomIds = [...new Set((rawResultsData || []).map(r => r.roomId).filter(Boolean))];
             if (!roomIds.length) { alert('ยังไม่มีผลคะแนนให้ลบในรายวิชานี้'); return; }
             const label = roomIds.length === 1 ? `ห้องสอบ ${roomIds[0]}` : `${roomIds.length} ห้องสอบ (${roomIds.join(', ')})`;
-            if (!confirm(`ยืนยันการลบประวัติคำตอบและคะแนนทั้งหมดของ${label} ใช่หรือไม่?\n(ข้อมูลทั้งหมดจะถูกลบถาวร ไม่สามารถกู้คืนได้)`)) return;
+            if (!await uiConfirm(`ยืนยันการลบประวัติคำตอบและคะแนนทั้งหมดของ${label} ใช่หรือไม่?\n(ข้อมูลทั้งหมดจะถูกลบถาวร ไม่สามารถกู้คืนได้)`)) return;
 
             try {
                 let ok = 0;
@@ -976,7 +977,7 @@
 
         // ลบผลคะแนนของนักศึกษาเฉพาะคน
         async function deleteStudentResult(id, studentId) {
-            if (!confirm(`ยืนยันการลบผลคะแนนสอบของนักศึกษารหัส ${studentId} ใช่หรือไม่?\n(เมื่อลบแล้วนักศึกษาจะสามารถล็อกอินมาส่งข้อสอบได้ใหม่)`)) return;
+            if (!await uiConfirm(`ยืนยันการลบผลคะแนนสอบของนักศึกษารหัส ${studentId} ใช่หรือไม่?\n(เมื่อลบแล้วนักศึกษาจะสามารถล็อกอินมาส่งข้อสอบได้ใหม่)`)) return;
 
             try {
                 const response = await fetch('/api/delete-student-result', {
@@ -1262,7 +1263,9 @@
         }
 
         // ฟังก์ชันคำนวณและวาดตารางวิเคราะห์คุณภาพข้อสอบ (Item Analysis)
+        let iaGen = 0; // รอบการคำนวณล่าสุด: รอบที่เก่ากว่าห้ามวาดทับ
         async function runItemAnalysis(filteredList) {
+            const gen = ++iaGen;
             const analysisBox = document.getElementById('item-analysis-box');
             const analysisBody = document.getElementById('item-analysis-body');
 
@@ -1279,11 +1282,13 @@
                 // ดึงรายการข้อสอบทั้งหมดของห้องเพื่อรู้ตัวโจทย์และเฉลยที่ถูกต้อง
                 const res = await fetch(`/api/teacher/get-questions?roomId=${encodeURIComponent(itemRoom)}`);
                 let questions = res.ok ? await res.json() : [];
+                if (gen !== iaGen) return;
                 if (!Array.isArray(questions)) questions = [];
                 let iaNote = '';
                 if (questions.length === 0) {
                     // ห้องสอบถูกลบไปพร้อมข้อสอบ (ระบบเวอร์ชันก่อน) → หาชุดข้อสอบในคลังของวิชาที่จำนวนข้อเท่ากัน
                     const fb = await questionsFromBank(filteredList);
+                    if (gen !== iaGen) return;
                     if (fb) { questions = fb.questions; iaNote = ' · ห้องสอบถูกลบแล้ว ใช้โจทย์จากคลังข้อสอบ "' + fb.name + '"'; }
                 }
                 if (questions.length === 0) {
